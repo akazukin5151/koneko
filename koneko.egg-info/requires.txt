@@ -1,0 +1,8 @@
+funcy==1.14
+docopt==0.6.2
+pixcat==0.1.4
+tqdm==4.44.1
+cytoolz==0.10.1
+PixivPy==3.5.7
+blessed==1.17.4
+colorama==0.4.3

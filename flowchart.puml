@@ -1,0 +1,33 @@
+@startuml
+
+usecase Artist_gallery1
+usecase Image2
+usecase Following_artists3
+usecase Search_artists4
+usecase Illust_following5
+
+usecase start1 #DeepSkyBlue
+Artist_gallery1 <-[#DeepSkyBlue]right-> start1
+Artist_gallery1 <-[#DeepSkyBlue]-> Image2
+
+usecase start2 #LawnGreen
+Artist_gallery1 <-[#LawnGreen]-> Image2
+Image2 <-[#LawnGreen]- start2
+
+usecase start3 #green
+Following_artists3 <-[#green]-> Artist_gallery1
+Artist_gallery1 <-[#green]-> Image2
+Following_artists3 <-[#green]up- start3
+
+usecase start4 #red
+Search_artists4 <-[#red]-> Artist_gallery1
+Search_artists4 <-[#red]up- start4
+Artist_gallery1 <-[#red]-> Image2
+
+usecase start5 #BlueViolet
+Illust_following5 <-[#BlueViolet]-> Image2
+Illust_following5 <-[#BlueViolet]left-> start5
+Artist_gallery1 <-[#BlueViolet]-> Image2
+Illust_following5 <-[#BlueViolet]right-> Artist_gallery1
+
+@enduml

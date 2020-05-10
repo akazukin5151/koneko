@@ -1,0 +1,85 @@
+@startuml
+title Gallery modes (mode 1 and 5)
+
+actor User
+
+== Mode selection ==
+User -> ui ++: Mode 1 or 5
+ui --> User: Ask for user id (mode 1 only)
+User --> ui: Pixiv id
+ui -> api ++: JSON request
+return JSON response
+database gdata
+ui -> gdata: Stores response
+ui -> download: Download images
+activate download
+deactivate download
+ui --> User: Displays images, print info
+group prefetching
+    ui -> gdata ++: current_illusts()
+    return current_illusts()
+    ui -> gdata ++: cached_pages
+    return cached_pages
+    ui -> gdata ++: next_url
+    return next_url
+    ui -> api ++: parse_next()
+    return JSON response
+    ui -> gdata: Update all_pages_cache
+    ui -> download: Download page
+    activate download
+    deactivate download
+end
+return
+|||
+
+== Open image ==
+User -> ui ++: Open image
+ui -> gdata ++: image_id
+return image_id
+return Opened {link}!
+|||
+
+== Download image ==
+User -> ui ++: Download image
+ui -> gdata ++: post_json
+return post_json
+ui -> download: download_image_verified()
+activate download
+deactivate download
+return
+|||
+
+== Next page ==
+User -> ui ++: Next Page
+ui --> User: Displays images, prints info
+ui -> ui: prefetching
+return
+|||
+
+== Previous page ==
+User -> ui ++: previous_page()
+return Displays images, prints info
+|||
+
+== Reload ==
+User -> ui ++: reload()
+ui -> User: Are you sure?
+User -> ui: Confirmation
+ui -> gdata: Clear all_pages_cache
+return Restarts mode
+|||
+
+== View image (go to image mode) ==
+User -> ui ++: View image
+ui -> gdata ++: post_json
+return post_json
+database idata
+create idata
+ui -> idata: Stores response
+return display_image(), print info
+|||
+
+
+@enduml
+
+

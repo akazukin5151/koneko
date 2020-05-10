@@ -18,9 +18,7 @@ import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from tqdm import tqdm
-
-from koneko import KONEKODIR, ui, api, cli, data, pure, utils, prompt, download
+from koneko import ui, api, cli, data, pure, utils, prompt, download
 
 
 def main(start=True):
@@ -179,7 +177,8 @@ class ArtistModeLoop(Loop):
         self._url_or_id = utils.artist_user_id_prompt()
 
     def _go_to_mode(self):
-        self.mode = ArtistGalleryMode(self._user_input)
+        self.mode = ui.ArtistGallery(1, self._user_input)
+        prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
         main(start=False)
 
@@ -255,107 +254,12 @@ class IllustFollowModeLoop:
             self._go_to_mode()
 
     def _go_to_mode(self):
-        self.mode = IllustFollowMode()
-
-# - Mode classes
-class GalleryLikeMode(ABC):
-    def __init__(self, current_page_num=1, gdata=None):
-        self._current_page_num = current_page_num
-        self.data = gdata
-        self._show = True
-        # Defined in child classes
-        self._download_path: str
-        self.gallery: GalleryLikeMode
-
-        self.start()
-
-    def start(self):
-        """
-        If artist_user_id dir exists, show immediately (without checking
-        for contents!)
-        Else, fetch current_page json and proceed download -> show -> prompt
-        """
-        if Path(self._download_path).is_dir():
-            try:
-                utils.show_artist_illusts(self._download_path)
-            except IndexError: # Folder exists but no files
-                Path(self._download_path).rmdir()
-                self._show = True
-            else:
-                self._show = False
-        else:
-            self._show = True
-
-        if not self.data:
-            current_page = self._pixivrequest()
-            self.data = data.GalleryJson(current_page)
-        self._init_download()
-        if self._show:
-            utils.show_artist_illusts(self._download_path)
-        self._instantiate()
-
-    @abstractmethod
-    def _pixivrequest(self):
-        raise NotImplementedError
-
-    def _download_pbar(self):
-        pbar = tqdm(total=len(self.data.current_illusts()), smoothing=0)
-        download.download_page(self.data.current_illusts(), self._download_path,
-                               pbar=pbar)
-        pbar.close()
-
-    def _init_download(self):
-        if not Path(self._download_path).is_dir():
-            self._download_pbar()
-
-        elif (not self.data.titles[0] in sorted(os.listdir(self._download_path))[0]
-              and self._current_page_num == 1):
-            print('Cache is outdated, reloading...')
-            # Remove old images
-            os.system(f'rm -r {self._download_path}') # shutil.rmtree is better
-            self._download_pbar()
-            self._show = True
-
-
-    @abstractmethod
-    def _instantiate(self):
-        """Instantiate the correct Gallery class"""
-        raise NotImplementedError
-
-class ArtistGalleryMode(GalleryLikeMode):
-    def __init__(self, artist_user_id, current_page_num=1, gdata=None):
-        self._artist_user_id = artist_user_id
-        self._download_path = f'{KONEKODIR}/{artist_user_id}/{current_page_num}/'
-        super().__init__(current_page_num, gdata)
-
-    def _pixivrequest(self):
-        return api.myapi.artist_gallery_request(self._artist_user_id)
-
-    def _instantiate(self):
-        self.gallery = ui.ArtistGallery(
-            self.data,
-            self._current_page_num,
-            self._artist_user_id,
-        )
-        prompt.gallery_like_prompt(self.gallery)
-        # After backing, exit mode. The class that instantiated this mode
-        # should catch the back.
-
-
-class IllustFollowMode(GalleryLikeMode):
-    def __init__(self, current_page_num=1, gdata=None):
-        self._download_path = f'{KONEKODIR}/illustfollow/{current_page_num}/'
-        super().__init__(current_page_num, gdata)
-
-    def _pixivrequest(self):
-        return api.myapi.illust_follow_request(restrict='private') # Publicity
-
-    def _instantiate(self):
-        self.gallery = ui.IllustFollowGallery(self.data, self._current_page_num)
-        prompt.gallery_like_prompt(self.gallery)
+        mode = ui.IllustFollowGallery(1)
+        prompt.gallery_like_prompt(mode)
         # After backing
         main(start=False)
 
+# - Mode
 def view_post_mode(image_id):
     """
     Fetch all the illust info, download it in the correct directory, then display it.
@@ -377,7 +281,6 @@ def view_post_mode(image_id):
     # Download the next page for multi-image posts
     if idata.number_of_pages != 1:
         download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
-        downloaded_images = list(map(pure.split_backslash_last, idata.page_urls[:2]))
 
     image = ui.Image(image_id, idata, 1, True)
     prompt.image_prompt(image)

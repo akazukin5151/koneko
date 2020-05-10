@@ -4,6 +4,7 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 import cytoolz
+from tqdm import tqdm
 
 from koneko import api, pure, utils
 
@@ -68,6 +69,40 @@ def download_page(current_page_illusts, download_path, pbar=None):
         download_path, urls, rename_images=True, file_names=titles, pbar=pbar
     )
 
+# - Wrappers around above download functions, for downloading multi-images
+def download_page_pbar(current_illusts, download_path):
+    pbar = tqdm(total=len(current_illusts), smoothing=0)
+    download_page(current_illusts, download_path, pbar=pbar)
+    pbar.close()
+
+def user_download(data, preview_path, download_path, page_num):
+    pbar = tqdm(total=len(data.all_urls()), smoothing=0)
+    async_download_core(
+        preview_path,
+        data.all_urls(),
+        rename_images=True,
+        file_names=data.all_names(page_num),
+        pbar=pbar
+    )
+    pbar.close()
+
+    # Move artist profile pics to their correct dir
+    to_move = sorted(os.listdir(preview_path))[:data.splitpoint()]
+    with pure.cd(download_path):
+        [os.rename(f'{download_path}/previews/{pic}',
+                   f'{download_path}/{pic}')
+         for pic in to_move]
+
+def init_download(download_path, data, current_page_num, download_func, *args):
+    if not Path(download_path).is_dir():
+        download_func(*args)
+
+    elif (not data.first_img() in sorted(os.listdir(download_path))[0]
+          and current_page_num == 1):
+        print('Cache is outdated, reloading...')
+        # Remove old images
+        os.system(f'rm -r {download_path}') # shutil.rmtree is better
+        download_func(*args)
 
 # - Wrappers around the core functions for downloading one image
 @pure.spinner('')
@@ -125,3 +160,4 @@ def full_img_details(png=False, post_json=None, image_id=None):
     filename = pure.split_backslash_last(url)
     filepath = pure.generate_filepath(filename)
     return url, filename, filepath
+

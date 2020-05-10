@@ -11,15 +11,13 @@ def _letter(letter):
     """
     return ''.join([Fore.RED, '[', Fore.MAGENTA, letter, Fore.RED, ']', Fore.RESET])
 
-_blue_n = ''.join([Fore.RED, '[', Fore.BLUE, 'n', Fore.RED, ']'])
-
 def _letter_with_coords(letter):
     """ letter is magenta, n is blue, [] is red
     >>> _letter_with_coords("i")
     ... [i][n]
     """
     return ''.join([Fore.RED, '[', Fore.MAGENTA, letter, Fore.RED, ']',
-                    _blue_n, Fore.RESET])
+                    blue_n, Fore.RESET])
 
 def _two_letter_with_coords(letter):
     """ [] and {} is red, | is black, o and O is magenta, y and x is blue
@@ -27,13 +25,14 @@ def _two_letter_with_coords(letter):
     ... [o{y}{x}|O[n]]
     """
     return ''.join([Fore.RED, '[', Fore.MAGENTA, letter.lower(), Fore.RESET, coords, '|',
-                    Fore.MAGENTA, letter.upper(), _blue_n, Fore.RED, ']', Fore.RESET])
+                    Fore.MAGENTA, letter.upper(), blue_n, Fore.RED, ']', Fore.RESET])
 
 
 _letters = ['n', 'p', 'r', 'q', 'm', 'b', 'o', 'd']
 _tlc = ['a', 'o', 'd']
 
 # Public
+blue_n = ''.join([Fore.RED, '[', Fore.BLUE, 'n', Fore.RED, ']', Fore.RESET])
 # {y}{x}
 coords = ''.join([Fore.RED, '{', Fore.BLUE, 'x', Fore.RED, '}{', Fore.BLUE,
                   'y', Fore.RED, '}', Fore.RESET])

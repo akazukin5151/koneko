@@ -94,6 +94,7 @@ For more details refer to the [manual](#manual).
 
 ## Features
 
+* Show large version in image view - useful for 'landscape' pictures
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (but either it blocks the prompt or the prompt blocks)
 * Image and User views should use lscat.py to render so alternate renderers can be used
@@ -103,11 +104,6 @@ For more details refer to the [manual](#manual).
 ## Speed
 
 * Display each image as soon as they finish downloading (but due to lscat limitations, only one page at a time). Requires "integrating" (read: basically rewriting) lscat.py and threaded download functions
-
-## Structure and maintenence
-
-* Fix bug where posts with multiple images indicator is not shown after going to the next page
-* Re-write AbstractGallery in the style and form of Users (and merging GalleryLikeMode(s) into it). Might be even possible to pull out a more abstract core.
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!
@@ -152,11 +148,12 @@ You might have problems with image positioning with lscat.py. I wrote it to fit 
 
 # Contributing
 * Fork it
-* Edit the files on your fork
-* Submit a pull request
+* Make a new branch with `git checkout -b myfeature` (a git pre-commit hook might prevent your git client from commiting to master, but github might let you. It doesn't matter which branch you edit, the pre-commit hook is just for me)
+* Edit the files on your fork and branch
+* Submit a pull request to master
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
-* If you're encountering/fixing a bug and you're stuck, try clearing the cache.
-* When testing your edit, don't forget to uninstall the pip version and do `python setup.py develop`.
+* If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.
+* When testing your edit, don't forget to uninstall the pip version and do `python setup.py develop` (totally didn't happen to me).
 
 **NOTE:** running `koneko.py` with python or executing it will fail with an import error (circular import). Python imports are a mess, just use `python setup.py develop` when you want to test a change.
 
@@ -170,11 +167,32 @@ You might have problems with image positioning with lscat.py. I wrote it to fit 
 
 Flowchart of modes and their connections:
 
-![UML](http://plantuml.com:80/plantuml/png/dPDD2y8m38Rl_HM5dZtejfk8YYY2Dy6BY1IDTHWtwGVYltVMhfkrAdWgIzuyUPUcGwMvrEQCX1W5Eww0ZgJEbTuAZWZorlNn-PaBwFdFQObONlD2RBajK8bFBO7BtR6Efmq1qLJaGrsPDKsjZIvb4u3BydGRem4I6A7zphgTtyXS77Ldu6f_oYkb-uNNhZtA5lnQp2H04ONuR0lnFCAq0mOD4ig4XR-Fp094pGud7pCZ0YDVcURYB2M1fPGo2NiIN9IjhE8nBv-alaKQjUjeqS5db3qkPfMN29gyBOUjRmJjuV-I8XpyOcHHN_znwuqBXqE6KEohHtG7)
+![Flowchart UML](http://plantuml.com:80/plantuml/png/dPDD2y8m38Rl_HM5dZtejfk8YYY2Dy6BY1IDTHWtwGVYltVMhfkrAdWgIzuyUPUcGwMvrEQCX1W5Eww0ZgJEbTuAZWZorlNn-PaBwFdFQObONlD2RBajK8bFBO7BtR6Efmq1qLJaGrsPDKsjZIvb4u3BydGRem4I6A7zphgTtyXS77Ldu6f_oYkb-uNNhZtA5lnQp2H04ONuR0lnFCAq0mOD4ig4XR-Fp094pGud7pCZ0YDVcURYB2M1fPGo2NiIN9IjhE8nBv-alaKQjUjeqS5db3qkPfMN29gyBOUjRmJjuV-I8XpyOcHHN_znwuqBXqE6KEohHtG7)
 
 Simplified UML diagram of the classes:
 
-![UML](http://plantuml.com:80/plantuml/png/bLVRQjmm47tNL_WnsTR-W192Gg2ba4AXj2-b6CKMksgqbf7af27DlzUIB7j6bsJxbXsVCwCpcejofGrLPZeAGWmtWbL7oeTcV2A4tccZQ6UgJb2jgrifn-hYukpwVQLOVtvv-KogwjrpGBquFsVdv8KGJxXMXclpHVRCKIry9bJ7sU3_t1YUy5c8IPkFKWZvU1BD7-bltSl7eOxYVQZuS62A6urWFm-yxzdmgyv60wH4_oSg15DFj_oUMNYIYemWVwA5w4X1pTxRYj8pmEWu4s-k5yiI87UYWVqnxKZtR3wLCuoAFN3sY6noP4Ch-73VTbAgNgVsOJe6eqsYaBHl-N5s4J6YZu3cWZfhi2XcaU7NLaS7ElI2jQEInn7LarKC4shrtholkYSwR89Jzag6ENxDnLwsrCLfb-H78jFlG6SQFwaRLAwWE43nuLBUbHdT74Pgfdrx56F5vGL2vTfWLwH5yN95k73p2Nyby1Aqp5nZXvvu8pnALv9Sa4OOEIBbOw8gh1NV7ymwLouBvmzL_6DkXA_onBaextwpkUDznyware6sYhRzbAtX2dTYgCxAjJGskH61JMv8o4b7Pi7e0_CTYITlh0aaEv7RDB4S_DC2WZGIakOpoOVzTysK_e-LyerHrHrEPs5T-R25pLBdWi65ibuRTellRqC1Rn4atGGhAfx_swooQiDDvhU2lV2nEA2t76tnjbx3ae3g71We0yXyidVb67WMPPA_AuICXbYSJw4xQXfRkBcCRejAiQ5d2XIR9zvGrQyrLi24sP614HZUpvOQU0O9Gq2l57c7jHUkOTTOO8CShkcmZHYla5qpZR5RJ4Y7yDkStEIkwsa4KpGwHx8kqhcRp7KITL72Y7sc2nI_6Okp_GGQEjrs8UcXOk6WgbxFK168hWB1C2wz5496sjtR9UCVD4l1BcjfcWKiBnrdNZNP4Gw-GKvuCc5QN0jBbKPWwCS_CB4Nlmuzjq60kQskvXPp_-Ny0m00)
+![Classes UML](http://plantuml.com:80/plantuml/png/bLVRJjmm47ttL-GHjYGVW1028RLgrKgLglQbgYAJc8t1YItROOie_rvV4u_ZfVHjCpdZcJENu-oLqbZgUMG8QQePgKPCfqOy8OHlbPQuqrN7i5BLPyv5TN5nSdrMITAVNbu-ewfwznnHB-wSarFqWf1tk9QQAls5zyIvMhXng4PZy3zN3-_maR5PwVUSCNvuavjFwK_TyyDKP_7EApeDH5Aj0EpdGFkUJB_gOhJ4AQS_q-OwM3vWneXysXJ3v3QHtxeLU4zCViuW97cav01iN92fPNHwQ3lEPQ-szcaUez4cpJZkMpgQ8pAFx6NYve8wQxH8Of7nQUtRWAUUaLP8FWhGFylObJJXUtDMTKzuMWbllHVdjC2l7R7dBNPnshr7PIItxnEUs_Xm37PXE78ovrLdFBWYoayMAer3ubmWipcYD2B_E64TjzUTizoX6sXIBUb-qCkONnu97Plymyp9L_x6DUMtzyGiX1zeuzGwqDfmEsx55bTmK6FpAZVnqEGs29hS3l5PPMP6y2Fn0mk58EUKr6j3jsboEl3H0Y8r58lcAqcd_NT5fFeFXVj6iEo6jtj1NkMmHuIkBWLB9sTf6pmMzcz59QTbaArGBgXS7jTLjcnZ9ykYQHikZkhNMgCrtheka5B2kWHEc2N8Sh5tnsD0CIWKVtSaPAOYUJsPwh1kxE2MAhhgk2HJJsGoRDxn1ii-pjWHI9IEBGgbmRsorCcvIRa0qFC4XsUQvQZl6Wjim85BCUmQ5aHnrymYFndwe8HtFOj42O4RW47SDYf20dSFLjtyHHDA5VHmDcJ23UJCov1PxKZUfJxnAeDk-GqG2fI1qtFynGzFyJhiVHi0U5aahCSQnr9yKdnQP4ZYG_XbNhe5L6s7ko5eK-K-4fL_w6PfXWNkRhHHT-SibxWJr7iJA1fyNdHPQ1UZzm61CCoI9HFhydO4GTO657xTKKOcFCPqWzpuR4ouOARZtcky2DzDyVQPnrlJC7xd4uaNa0MP4F6POMaCFPNPxKR2_QPIYZ6XICe-2wm7GDBcuuc28XQusya2r6aF6sHZGSlQqbZGvMBbDfjMq2wbv_DU3Q66RfJNXhauyS7EYdL8dm502KQru7GAdvYR-TkP7QmBEv2ij_L1sG0iRivK12yLMx2vy3eikZAwP_y7_GK0)
+
+<details>
+  <summary>Actor-ish model of the ui.Gallery class</summary>
+  
+  ![Gallery UML](http://plantuml.com:80/plantuml/png/bLLBRzim3BxhLt2t15qFFVHY85sB5XWmO6tGehiQciMaN1N9qoDjiEw_Jv9bnw-zSebCVY8_af_fI-kuSNudcICd4JvoAT4SOAS5MbZ4FpW3hWISBndZbTC67YqQnbOh-1oz5YLMZhI2rOf55vnUW2SuEIaQm1c4E-Sic4w39o8AkBBFi0bc7_4akaHQoSCoHqbX2bZJA-q39WMu05uteJyztDs2mUyUhMC6dJUgjTbQAujCSCU_SekmZQTyFPqBU0XrXFewRECK-aL9pKK1D_a4jEDRjB5msdE77OG9dDe69TwGhIK_s1pYFTI6b0DI6yssHliw6723hdeYjMKGVZs6gSJA6uFAbIIbjyukbWcLQvrtJaBmwWb5MQSY-hV7zl55XQ-kz4RsBmrimsdKt5Wi8s38SZYHKQ827ciH6nWqrr0f4wyURcOY4PWGq_v7wznSK8ai4VRszfQaUrUZQYOp8zkZautxagmbjV4cp_4g2lWXIJt_VDUb6-ff9kKGC4bRQ-lARrQhDi_HC6vKUoeRQdiqj24KOIx_9k9Hesx3J5FFPqWdtxhb-nVbsqRw3TtuOlVbFqgwDhWdxUtl4jVPdrGJAijD-MFYDlOzfZvFWvha2D4QYdbH6OI3zc2zmG-z6mLSQxKXi-DnzGsNoxL4RYQYpXplCMrScpPiH-eBuKlMncAhmUdy447B6Qv7_Fz8fTk8b3PYPJ1EddhhaURNOuuaclusobei1oijLS8kmwiMFoQC_G80)
+  
+</details>
+
+<details>
+  <summary>Actor-ish model of the ui.Image class</summary>
+  
+  ![Image UML](http://plantuml.com:80/plantuml/png/bLHDJyCm3BtdLvWRQ73XMAbeIBk0n3PfshaAZJiYkYJ4ITd4-Eya_Tf71nezLCvxp-wp7NLCZbldroLpqfK8Jsk-GdZH0XbBqpe0mX9p9xM2D6KyTzh2aj2o-8Ax1_0IHgEaqTwpS0fOv19uf7SeWjn7fHG76GdCvKPM4MmIk6cgF2zcKx3uuP4Si-YyLHr6HYj29hZZhvmmv8QeJQ_Z11R17D9Usv12VwfISv70f8r0nZufTYChxh2NC853hBKnaMHAlgKc-HQCbSg5aoeqs-rszS1c1bN3ns6TJ6XFTYKZWWA-IgdUlw_wAiSsprGw5WpQxAAifhCAhImaYkkRVpNSsvdYnlrgHGKoCu4BrKzzSDggFElTa95AeRtOHYpNtwM_fh-osXkOMopGvM-rfNOo49w36x9tBDUhpDko5hJB6E0NjnF5G_iHFTVMYQS4baOS2h3T6p5KWrs49YkfFO4vlmxJyjrABhsxu_2j-1jWFm00)
+
+</details>
+
+<details>
+  <summary>Actor-ish model of the ui.User class</summary>
+  
+  ![User UML](http://plantuml.com:80/plantuml/png/TLFBJiCm4BpxA_P8XNg2KwH0Av2Ga2WL5UV8DDjWaSJ1Q_SXzUFnEawQ4CWXScPdzZ5PByXAOrrL2gjiYV1EQ0YkAfqZt80sS3iJ8atXXG724hTMwHhILCYjzM7c2tx1_0wSWklhfEMsOk6XkOym8u4bVS7EmuxvAe-w84nWhOvgpoXBxa0sRRBdpUiA37ux92iCMcVg3gD6ruGYbrP-I49mV8hoS4vWutj4kd3ROAuFTQbbdi1ZF86gP874GwczjDXJH8vJR50Yz5ZBocjZS-t7QEvSKLFAKrUaCDerq1ZSeTr-gheGu9z9KZpQp9ao1BlSGspiKoCDOSQ4gzbGClRgell3WyPt5nZJYHdzomciypYtE9_FOLDMleMGYfVarsQ4s9hBZFoXJtt8ME9RZpRuXUWC-brWRN2ljAF_YZGntcMCHWoBTAcUDFZjLsGXBFmqLw6pbf0nuT9U_vTYb3SwKvqN_w3BW3x9iaHpwdjums3-jBO9WRvcl486uQGTa3DuFr0ayA3hdJALvFlPpyoNkvjNBFpVufikn0y0)
+  
+</details>
 
 ## Conda environment
 
@@ -185,6 +203,8 @@ conda env list                  # make sure you're in the correct environment...
 conda install -n koneko pip     # and make sure pip is installed...
 which pip                       # and pip is in your conda directory
 
+# Or use manual installation instructions below
+# If you're using a separate conda env, you probably want to make some edits
 pip install koneko
 
 # Use anywhere:
@@ -195,6 +215,9 @@ conda remove --name koneko --all
 ```
 
 ## Manual installation
+
+Note: if you want to make some edits, you should install it in a conda environment. See above
+
 ```sh
 # Use the latest stable version (recommended)
 # Make sure the version number is the latest
@@ -204,9 +227,9 @@ git clone -b master https://github.com/twenty5151/koneko.git
 # Use the dev branch for latest features, fixes, and instability:
 git clone -b dev https://github.com/twenty5151/koneko.git
 
+cd koneko
 # Manually install without PyPI; for general usage
 # Both will correctly copy the required pictures
-cd koneko
 pip install .
 # or
 python setup.py install
@@ -231,7 +254,9 @@ curl -e 'https://www.pixiv.net' "https://i.pximg.net/img-original/img/2019/12/21
 ```
 
 ## Upload to PyPI
-```
+Bump version info in `__init__.py`, `setup.py`, and `README.md`
+
+```sh
 python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade
@@ -318,10 +343,13 @@ Image view commands (No need to press enter):
 
 ```
 User view commands (No need to press enter):
-    n -- view next page
-    p -- view previous page
-    h -- show this help
-    q -- quit (with confirmation)
+    {digit1}{digit2}   -- display artist illusts on column digit1 and row digit2
+    n                  -- view next page
+    p                  -- view previous page
+    r                  -- delete all cached images, re-download and reload view
+    h                  -- show keybindings
+    m                  -- show this manual
+    q                  -- quit (with confirmation)
 ```
 
 ```

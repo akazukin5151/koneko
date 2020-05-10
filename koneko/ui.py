@@ -15,15 +15,45 @@ class LastPageException(ValueError):
     pass
 
 class AbstractGallery(ABC):
-    def __init__(self, gdata, current_page_num):
+    def __init__(self, current_page_num):
         self._current_page_num = current_page_num
-        self.data = gdata
+        self.data: 'data.GalleryJson'
+        self._show = True
         # Defined in self.view_image
         self._selected_image_num: int
         # Defined in child classes
         self._main_path: str
+        self._download_path = self._main_path + str(self._current_page_num)
 
-        pure.print_multiple_imgs(self.data.current_page_illusts)
+        self.start()
+
+    def start(self):
+        """
+        If artist_user_id dir exists, show immediately (without checking
+        for contents!)
+        Else, fetch current_page json and proceed download -> show -> prefetch
+        """
+        if Path(self._download_path).is_dir():
+            try:
+                utils.show_artist_illusts(self._download_path)
+            except IndexError: # Folder exists but no files
+                Path(self._download_path).rmdir()
+                self._show = True
+            else:
+                self._show = False
+        else:
+            self._show = True
+
+        current_page = self._pixivrequest()
+        self.data = data.GalleryJson(current_page)
+        download.init_download(self._download_path, self.data,
+                               self._current_page_num, download.download_page_pbar,
+                               self.data.current_illusts(), self._download_path)
+
+        if self._show:
+            utils.show_artist_illusts(self._download_path)
+
+        pure.print_multiple_imgs(self.data.current_illusts())
         print(f'Page {self._current_page_num}')
         # Make sure the following work:
         # Gallery -> next page -> image prompt -> back -> prev page
@@ -31,6 +61,7 @@ class AbstractGallery(ABC):
             # Prefetch the next page on first gallery load
             with funcy.suppress(LastPageException):
                 self._prefetch_next_page()
+
 
     def open_link_coords(self, first_num, second_num):
         selected_image_num = pure.find_number_map(int(first_num), int(second_num))
@@ -90,6 +121,7 @@ class AbstractGallery(ABC):
             print('This is the last page!')
         else:
             self._current_page_num += 1
+            pure.print_multiple_imgs(self.data.current_illusts(self._current_page_num))
             print(f'Page {self._current_page_num}')
             print('Enter a gallery command:\n')
 
@@ -104,12 +136,12 @@ class AbstractGallery(ABC):
     def previous_page(self):
         if self._current_page_num > 1:
             self._current_page_num -= 1
-            self.data.update_current_illusts(self._current_page_num)
 
             download_path = (
                 f'{self._main_path}/{self._current_page_num}/'
             )
             utils.show_artist_illusts(download_path)
+            pure.print_multiple_imgs(self.data.current_illusts(self._current_page_num))
             print(f'Page {self._current_page_num}')
             print('Enter a gallery command:\n')
 
@@ -165,7 +197,7 @@ class ArtistGallery(AbstractGallery):
     """
     Artist Gallery commands: (No need to press enter)
         Using coordinates, where {digit1} is the row and {digit2} is the column
-        {digit1}{digit2}   -- display the image on row digit1 and column digit2
+        {digit1}{digit2}   -- display the image on column digit1 and row digit2
         o{digit1}{digit2}  -- open pixiv image/post in browser
         d{digit1}{digit2}  -- download image in large resolution
 
@@ -193,19 +225,22 @@ class ArtistGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
 
     """
-    def __init__(self, gdata, current_page_num, artist_user_id, **kwargs):
+    def __init__(self, current_page_num, artist_user_id, **kwargs):
         self._main_path = f'{KONEKODIR}/{artist_user_id}/'
         self._artist_user_id = artist_user_id
         self._kwargs = kwargs
-        super().__init__(gdata, current_page_num)
+        super().__init__(current_page_num)
 
     def _pixivrequest(self, **kwargs):
-        return api.myapi.artist_gallery_parse_next(**kwargs)
+        if kwargs:
+            return api.myapi.artist_gallery_parse_next(**kwargs) # Parse next
+        else:
+            return api.myapi.artist_gallery_request(self._artist_user_id)
 
     def _back(self):
         # After user 'back's from image prompt, start mode again
-        main.ArtistGalleryMode(self._artist_user_id, self._current_page_num,
-                               self.data)
+        self.__init__(self._current_page_num, self._artist_user_id)
+        prompt.gallery_like_prompt(self)
 
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
                       first_num, second_num):
@@ -239,7 +274,7 @@ class IllustFollowGallery(AbstractGallery):
     """
     Illust Follow Gallery commands: (No need to press enter)
         Using coordinates, where {digit1} is the row and {digit2} is the column
-        {digit1}{digit2}   -- display the image on row digit1 and column digit2
+        {digit1}{digit2}   -- display the image on column digit1 and row digit2
         o{digit1}{digit2}  -- open pixiv image/post in browser
         d{digit1}{digit2}  -- download image in large resolution
         a{digit1}{digit2}  -- view illusts by the artist of the selected image
@@ -269,12 +304,15 @@ class IllustFollowGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
 
     """
-    def __init__(self, gdata, current_page_num):
+    def __init__(self, current_page_num):
         self._main_path = f'{KONEKODIR}/illustfollow/'
-        super().__init__(gdata, current_page_num)
+        super().__init__(current_page_num)
 
     def _pixivrequest(self, **kwargs):
-        return api.myapi.illust_follow_request(**kwargs)
+        if kwargs:
+            return api.myapi.illust_follow_request(**kwargs) # Parse next
+        else:
+            return api.myapi.illust_follow_request(restrict='private') # Publicity
 
     def go_artist_gallery_coords(self, first_num, second_num):
         selected_image_num = pure.find_number_map(int(first_num), int(second_num))
@@ -289,7 +327,8 @@ class IllustFollowGallery(AbstractGallery):
         post_json = self.data.post_json(self._current_page_num, selected_image_num)
 
         artist_user_id = post_json['user']['id']
-        main.ArtistGalleryMode(artist_user_id)
+        mode = ArtistGallery(1, artist_user_id)
+        prompt.gallery_like_prompt(mode)
         # Gallery prompt ends, user presses back
         self._back()
 
@@ -333,6 +372,8 @@ def display_image(post_json, artist_user_id, number_prefix, current_page_num):
     """
     Opens image given by the number (medium-res), downloads large-res and
     then display that.
+    Alternative to main.view_post_mode(). It does its own stuff before calling
+    the Image class for the prompt.
 
     Parameters
     ----------
@@ -450,7 +491,8 @@ class Image:
         if self._firstmode or force:
             # Came from view post mode, don't know current page num
             # Defaults to page 1
-            main.ArtistGalleryMode(self.data.artist_user_id, self._current_page_num)
+            mode = ArtistGallery(self._current_page_num, self.data.artist_user_id)
+            prompt.gallery_like_prompt(mode)
             # After backing
             main.main(start=False)
         # Else: image prompt and class ends, goes back to previous mode
@@ -459,12 +501,13 @@ class Image:
 class Users(ABC):
     """
     User view commands (No need to press enter):
-        n -- view next page
-        p -- view previous page
-        r -- delete all cached images, re-download and reload view
-        h -- show keybindings
-        m -- show this manual
-        q -- quit (with confirmation)
+        {digit1}{digit2}   -- display artist illusts on column digit1 and row digit2
+        n                  -- view next page
+        p                  -- view previous page
+        r                  -- delete all cached images, re-download and reload view
+        h                  -- show keybindings
+        m                  -- show this manual
+        q                  -- quit (with confirmation)
 
     """
 
@@ -484,7 +527,7 @@ class Users(ABC):
         # because it needs to print the right message
         # Which means parsing is needed first
         self._parse_and_download()
-        if self._show:
+        if self._show: # Is always true for now
             self._show_page()
         self._prefetch_next_page()
 
@@ -496,37 +539,10 @@ class Users(ABC):
         self._parse_user_infos()
         preview_path = f'{self._main_path}/{self._input}/{self._page_num}/previews/'
 
-        # Similar to logic in GalleryLikeMode (_init_download())...
-        if not Path(self.download_path).is_dir():
-            self._download_pbar(preview_path)
-
-        elif not (self.data.all_names(self._page_num)[0]
-                  in sorted(os.listdir(self.download_path))[0]):
-
-            print('Cache is outdated, reloading...')
-            # Remove old images
-            os.system(f'rm -r {self.download_path}') # shutil.rmtree is better
-            self._download_pbar(preview_path)
-            self._show = True
-
-    def _download_pbar(self, preview_path):
-        pbar = tqdm(total=len(self.data.all_urls()), smoothing=0)
-        download.async_download_core(
-            preview_path,
-            self.data.all_urls(),
-            rename_images=True,
-            file_names=self.data.all_names(self._page_num),
-            pbar=pbar
-        )
-        pbar.close()
-
-        # Move artist profile pics to their correct dir
-        to_move = sorted(os.listdir(preview_path))[:self.data.splitpoint()]
-        with pure.cd(self.download_path):
-            [os.rename(f'{self.download_path}/previews/{pic}',
-                       f'{self.download_path}/{pic}')
-             for pic in to_move]
-
+        download.init_download(self.download_path, self.data,
+                               self._page_num, download.user_download,
+                               self.data, preview_path, self.download_path,
+                               self._page_num)
 
     @abstractmethod
     def _pixivrequest(self):
@@ -601,7 +617,8 @@ class Users(ABC):
         except IndexError:
             print('Invalid number!')
         else:
-            main.ArtistGalleryMode(artist_user_id)
+            mode = ArtistGallery(1, artist_user_id)
+            prompt.gallery_like_prompt(mode)
             # After backing from gallery
             self._show_page()
             prompt.user_prompt(self)

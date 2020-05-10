@@ -9,9 +9,6 @@ class GalleryJson:
     def __init__(self, raw):
         self.raw = raw
         self.all_pages_cache = {'1': self.raw}
-        self.current_page_illusts = self.raw['illusts']
-
-        self.titles = pure.post_titles_in_page(self.current_page_illusts)
 
     def current_page(self, current_page_num=1):
         return self.all_pages_cache[str(current_page_num)]
@@ -25,14 +22,14 @@ class GalleryJson:
     def image_id(self, current_page_num, number):
         return self.current_illusts(current_page_num)[number]['id']
 
-    def update_current_illusts(self, current_page_num):
-        self.current_page_illusts = self.current_illusts(current_page_num)
-
     def cached_pages(self):
         return self.all_pages_cache.keys()
 
     def next_url(self, current_page_num):
         return self.all_pages_cache[str(current_page_num)]['next_url']
+
+    def first_img(self):
+        return pure.post_titles_in_page(self.current_illusts())
 
 
 class ImageJson:
@@ -108,6 +105,9 @@ class UserJson:
 
     def splitpoint(self):
         return len(self.profile_pic_urls)
+
+    def first_img(self, page_num=1):
+        return self.all_names(page_num)[0]
 
     @staticmethod
     def _user_id(json):

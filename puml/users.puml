@@ -1,0 +1,60 @@
+@startuml
+title Users (mode 3 or 4)
+
+== Mode selection ==
+actor User
+User -> ui ++: Mode 3 or 4
+ui --> User: Ask for user id
+User --> ui: Pixiv id
+ui -> api ++: JSON request
+return JSON response
+database udata
+ui -> udata: Stores response
+ui -> download: Download images
+activate download
+deactivate download
+ui -> udata ++: names
+return names
+ui --> User: display images
+group prefetching
+    ui -> udata ++: next_url
+    return next_url
+    ui -> api ++: parse_next()
+    return JSON response
+    ui -> download: Download page
+    activate download
+    deactivate download
+end
+return
+|||
+
+== Next page ==
+User -> ui ++: Next Page
+ui --> User: show_page()
+ui -> ui: prefetch
+return
+|||
+
+== Previous page ==
+User -> ui ++: previous_page()
+return show_page()
+|||
+
+== Go artist mode ==
+User -> ui ++: go_artist_mode()
+ui -> udata ++: artist_user_id
+return artist_user_id
+return ArtistGallery
+|||
+
+== Reload ==
+User -> ui ++: reload()
+ui -> User: Are you sure?
+User -> ui: Confirmation
+return start()
+|||
+
+
+@enduml
+
+

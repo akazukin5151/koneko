@@ -86,7 +86,7 @@ def main_loop(prompted, main_command, user_input, your_id=None, start=True):
             SearchUsersModeLoop(prompted, user_input).start(start)
 
         elif main_command == '5':
-            IllustFollowModeLoop().start(start)
+            IllustFollowModeLoop()
 
         elif main_command == '?':
             utils.info_screen_loop()
@@ -203,7 +203,7 @@ class ViewPostModeLoop(Loop):
             self._user_input = self._url_or_id
 
     def _go_to_mode(self):
-        self.mode = view_post_mode(self._user_input)
+        view_post_mode(self._user_input)
 
 
 class SearchUsersModeLoop(Loop):
@@ -245,15 +245,11 @@ class FollowingUserModeLoop(Loop):
         self.mode.start()
         prompt.user_prompt(self.mode)
 
-class IllustFollowModeLoop:
+def IllustFollowModeLoop(start):
     """Immediately goes to IllustFollow()"""
-    def start(self, start):
-        while True:
-            if start:
-                api.myapi.await_login()
-            self._go_to_mode()
-
-    def _go_to_mode(self):
+    while True:
+        if start:
+            api.myapi.await_login()
         mode = ui.IllustFollowGallery(1)
         prompt.gallery_like_prompt(mode)
         # After backing

@@ -438,6 +438,12 @@ class Image:
         download.download_image_verified(url=large_url, filename=filename,
                                          filepath=filepath)
 
+    def show_large_res(self):
+        large_url = pure.change_url_to_full(url=self.data.current_url())
+        filename = pure.split_backslash_last(large_url)
+        download.download_core(self.data.large_dir, large_url, filename)
+        utils.display_image_vp(self.data.large_dir + filename)
+
     def next_image(self):
         if not self.data.page_urls:
             print('This is the only page in the post!')
@@ -478,6 +484,7 @@ class Image:
         print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
 
     def previous_image(self):
+        # FIXME
         if not self.data.page_urls:
             print('This is the only page in the post!')
         elif self.data.img_post_page_num == 0:

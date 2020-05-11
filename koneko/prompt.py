@@ -147,6 +147,7 @@ def image_prompt(image):
         'd': image.download_image,
         'n': image.next_image,
         'p': image.previous_image,
+        'l': image.show_large_res,
     }
 
     with TERM.cbreak():

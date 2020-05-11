@@ -7,6 +7,7 @@ import os
 import re
 import itertools
 import threading
+from pathlib import Path
 from contextlib import contextmanager
 
 import funcy
@@ -63,8 +64,7 @@ def split_backslash_last(string):
 
 
 def generate_filepath(filename):
-    filepath = f"{os.path.expanduser('~')}/Downloads/{filename}"
-    return filepath
+    return Path('~').expanduser() / 'Downloads' / filename
 
 @cytoolz.curry
 def prefix_filename(old_name, new_name, number):

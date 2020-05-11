@@ -429,7 +429,6 @@ class Image:
         print(f'Opened {link} in browser')
 
     def download_image(self):
-        # Need to work on multi-image posts
         # Doing the same job as full_img_details
         large_url = pure.change_url_to_full(url=self.data.current_url())
         filename = pure.split_backslash_last(large_url)

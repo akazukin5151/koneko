@@ -272,7 +272,7 @@ def view_post_mode(image_id):
     idata = data.ImageJson(post_json, image_id)
 
     download.download_core(idata.large_dir, idata.url, idata.filename)
-    utils.display_image_vp(f'{idata.large_dir}{idata.filename}')
+    utils.display_image_vp(idata.large_dir / idata.filename)
 
     # Download the next page for multi-image posts
     if idata.number_of_pages != 1:

@@ -44,12 +44,13 @@ class ImageJson:
         self.number_of_pages, self.page_urls = pure.page_urls_in_post(self._raw, 'large')
         if self.number_of_pages == 1:
             self.downloaded_images = None
-            self.large_dir = f'{KONEKODIR}/{self.artist_user_id}/individual/'
+            self.large_dir = KONEKODIR / str(self.artist_user_id) / 'individual'
         else:
             self.downloaded_images = list(map(pure.split_backslash_last,
                                               self.page_urls[:2]))
             # So it won't be duplicated later
-            self.large_dir = f'{KONEKODIR}/{self.artist_user_id}/individual/{image_id}/'
+            self.large_dir = (KONEKODIR / str(self.artist_user_id) / 'individual' /
+                             str(image_id))
 
     def image_filename(self):
         return self.downloaded_images[self.img_post_page_num]

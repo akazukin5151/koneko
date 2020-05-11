@@ -412,9 +412,10 @@ class Image:
         p -- view previous image in post (same as above)
         d -- download this image
         o -- open pixiv post in browser
+        f -- show this image in full resolution
+
         h -- show keybindings
         m -- show this manual
-
         q -- quit (with confirmation)
 
     """
@@ -438,7 +439,7 @@ class Image:
         download.download_image_verified(url=large_url, filename=filename,
                                          filepath=filepath)
 
-    def show_large_res(self):
+    def show_full_res(self):
         large_url = pure.change_url_to_full(url=self.data.current_url())
         filename = pure.split_backslash_last(large_url)
         download.download_core(self.data.large_dir, large_url, filename)

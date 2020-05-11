@@ -485,15 +485,26 @@ class Image:
         print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
 
     def previous_image(self):
-        # FIXME
         if not self.data.page_urls:
             print('This is the only page in the post!')
+            return False
         elif self.data.img_post_page_num == 0:
             print('This is the first image in the post!')
+            return False
+
+        self.data.img_post_page_num -= 1
+
+        testpath = Path(self.data.large_dir) / Path(self.data.image_filename())
+        if testpath.is_file():
+            utils.display_image_vp(testpath)
         else:
-            self.data.img_post_page_num -= 1
-            utils.display_image_vp(f'{self.data.large_dir}{self.data.image_filename()}')
-            print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
+            utils.display_image_vp(
+                KONEKODIR / str(self.data.artist_user_id) /
+                str(self._current_page_num) / "large" /
+                self.data.image_filename()
+            )
+
+        print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
 
     def leave(self, force=False):
         if self._firstmode or force:

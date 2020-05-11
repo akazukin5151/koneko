@@ -147,6 +147,7 @@ def image_prompt(image):
         'd': image.download_image,
         'n': image.next_image,
         'p': image.previous_image,
+        'f': image.show_full_res,
     }
 
     with TERM.cbreak():
@@ -169,6 +170,7 @@ def image_prompt(image):
                     colors.p, 'revious image; ',
                     colors.d_, 'ownload image;',
                     colors.o_, 'pen image in browser;\n',
+                    'show image in', colors.f, 'ull res; ',
                     colors.q, 'uit (with confirmation); ',
                     'view ', colors.m, 'anual\n'
                 ]))

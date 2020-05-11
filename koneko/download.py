@@ -89,8 +89,7 @@ def user_download(data, preview_path, download_path, page_num):
     # Move artist profile pics to their correct dir
     to_move = sorted(os.listdir(preview_path))[:data.splitpoint()]
     with pure.cd(download_path):
-        [os.rename(f'{download_path}/previews/{pic}',
-                   f'{download_path}/{pic}')
+        [os.rename(download_path / 'previews' / pic, download_path / pic)
          for pic in to_move]
 
 def init_download(download_path, data, current_page_num, download_func, *args):

@@ -94,7 +94,6 @@ For more details refer to the [manual](#manual).
 
 ## Features
 
-* Show large version in image view - useful for 'landscape' pictures
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (but either it blocks the prompt or the prompt blocks)
 * Image and User views should use lscat.py to render so alternate renderers can be used
@@ -114,6 +113,10 @@ I'd like to fix this but I'd rather not use mechanize but I don't know how to do
 * What operating systems does it support?
 
 It supports all OSes that kitty supports, which means Linux and macOS. It should work on macOS, but I don't have a test device. If you do, please contribute!
+
+* Why use threading and not asyncio? There's a async version of pixivpy.
+
+If only I can understand how to use asyncio. See [I don't understand Python's Asyncio](https://lucumr.pocoo.org/2016/10/30/i-dont-understand-asyncio/). I only need to do two simple things. Start this function in the background, wait for its result somewhere later, in another function. Then keep the result so I can use it later. Asyncio is impossible to use.
 
 
 ## Image rendering with lscat
@@ -336,8 +339,10 @@ Image view commands (No need to press enter):
     p -- view previous image in post (same as above)
     d -- download this image
     o -- open pixiv post in browser
-    h -- show this help
+    f -- show this image in full resolution
 
+    h -- show keybindings
+    m -- show this manual
     q -- quit (with confirmation)
 ```
 

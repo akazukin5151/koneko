@@ -22,8 +22,8 @@ class AbstractGallery(ABC):
         # Defined in self.view_image
         self._selected_image_num: int
         # Defined in child classes
-        self._main_path: str
-        self._download_path = self._main_path + str(self._current_page_num)
+        self._main_path: 'Path'
+        self._download_path = self._main_path / str(self._current_page_num)
 
         self.start()
 
@@ -114,7 +114,7 @@ class AbstractGallery(ABC):
         raise NotImplementedError
 
     def next_page(self):
-        download_path = f'{self._main_path}/{self._current_page_num+1}/'
+        download_path = self._main_path / str(self._current_page_num+1)
         try:
             utils.show_artist_illusts(download_path)
         except FileNotFoundError:
@@ -137,9 +137,7 @@ class AbstractGallery(ABC):
         if self._current_page_num > 1:
             self._current_page_num -= 1
 
-            download_path = (
-                f'{self._main_path}/{self._current_page_num}/'
-            )
+            download_path = (self._main_path / str(self._current_page_num))
             utils.show_artist_illusts(download_path)
             pure.print_multiple_imgs(self.data.current_illusts(self._current_page_num))
             print(f'Page {self._current_page_num}')
@@ -164,7 +162,7 @@ class AbstractGallery(ABC):
         self.data.all_pages_cache[str(self._current_page_num + 1)] = next_page
         current_page_illusts = next_page['illusts']
 
-        download_path = f'{self._main_path}/{self._current_page_num+1}/'
+        download_path = self._main_path / str(self._current_page_num + 1)
         if not Path(download_path).is_dir():
             pbar = tqdm(total=len(current_page_illusts), smoothing=0)
             download.download_page(
@@ -226,7 +224,7 @@ class ArtistGallery(AbstractGallery):
 
     """
     def __init__(self, current_page_num, artist_user_id, **kwargs):
-        self._main_path = f'{KONEKODIR}/{artist_user_id}/'
+        self._main_path = KONEKODIR / str(artist_user_id)
         self._artist_user_id = artist_user_id
         self._kwargs = kwargs
         super().__init__(current_page_num)
@@ -305,7 +303,7 @@ class IllustFollowGallery(AbstractGallery):
 
     """
     def __init__(self, current_page_num):
-        self._main_path = f'{KONEKODIR}/illustfollow/'
+        self._main_path = KONEKODIR / 'illustfollow'
         super().__init__(current_page_num)
 
     def _pixivrequest(self, **kwargs):
@@ -387,12 +385,12 @@ def display_image(post_json, artist_user_id, number_prefix, current_page_num):
 
     # LSCAT
     os.system('clear')
-    arg = f'{KONEKODIR}/{artist_user_id}/{current_page_num}/{search_string}*'
+    arg = KONEKODIR / str(artist_user_id) / str(current_page_num) / search_string / "*"
     os.system(f'kitty +kitten icat --silent {arg}')
 
     url = pure.url_given_size(post_json, 'large')
     filename = pure.split_backslash_last(url)
-    large_dir = f'{KONEKODIR}/{artist_user_id}/{current_page_num}/large/'
+    large_dir = KONEKODIR / str(artist_user_id) / str(current_page_num) / "large"
     download.download_core(large_dir, url, filename)
 
     # BLOCKING: imput is blocking, will not display large image until input
@@ -400,7 +398,7 @@ def display_image(post_json, artist_user_id, number_prefix, current_page_num):
 
     # LSCAT
     os.system('clear')
-    arg = f'{KONEKODIR}/{artist_user_id}/{current_page_num}/large/{filename}'
+    arg = KONEKODIR / str(artist_user_id) / str(current_page_num) / "large" / filename
     os.system(f'kitty +kitten icat --silent {arg}')
 
 
@@ -533,11 +531,11 @@ class Users(ABC):
     @abstractmethod
     def __init__(self, user_or_id):
         # Defined in child classes
-        self._main_path: str
+        self._main_path: 'Path'
         self._input = user_or_id
         self._offset = 0
         self._page_num = 1
-        self.download_path = f'{self._main_path}/{self._input}/{self._page_num}'
+        self.download_path = self._main_path / self._input / str(self._page_num)
         self._show = True
         self.data: 'data.UserJson'
 
@@ -556,7 +554,7 @@ class Users(ABC):
         move the profile pics to the correct dir (less files to move)
         """
         self._parse_user_infos()
-        preview_path = f'{self._main_path}/{self._input}/{self._page_num}/previews/'
+        preview_path = self._main_path / self._input / str(self._page_num) / 'previews'
 
         download.init_download(self.download_path, self.data,
                                self._page_num, download.user_download,
@@ -583,7 +581,7 @@ class Users(ABC):
         except KeyError:
             print('This is the last page!')
             self._page_num -= 1
-            self.download_path = f'{self._main_path}/{self._input}/{self._page_num}'
+            self.download_path = self._main_path / self._input / str(self._page_num)
 
         else:
             names_prefixed = map(pure.prefix_artist_name, names, range(len(names)))
@@ -592,7 +590,7 @@ class Users(ABC):
             # LSCAT
             lscat.Card(
                 self.download_path,
-                f'{self._main_path}/{self._input}/{self._page_num}/previews/',
+                self._main_path / self._input / str(self._page_num) / 'previews',
                 messages=names_prefixed,
             ).render()
 
@@ -607,16 +605,16 @@ class Users(ABC):
             if int(next_offset) - int(self._offset) <= 30:
                 self._offset = next_offset
                 self._page_num = int(self._offset) // 30 + 1
-                self.download_path = f'{self._main_path}/{self._input}/{self._page_num}'
+                self.download_path = self._main_path / self._input / str(self._page_num)
 
                 self._parse_and_download()
 
         self._page_num = oldnum
-        self.download_path = f'{self._main_path}/{self._input}/{self._page_num}'
+        self.download_path = self._main_path / self._input / str(self._page_num)
 
     def next_page(self):
         self._page_num += 1
-        self.download_path = f'{self._main_path}/{self._input}/{self._page_num}'
+        self.download_path = self._main_path / self._input / str(self._page_num)
         self._show_page()
 
         self._prefetch_next_page()
@@ -625,7 +623,7 @@ class Users(ABC):
         if self._page_num > 1:
             self._page_num -= 1
             self._offset = int(self._offset) - 30
-            self.download_path = f'{self._main_path}/{self._input}/{self._page_num}'
+            self.download_path = self._main_path / self._input / str(self._page_num)
             self._show_page()
         else:
             print('This is the first page!')
@@ -657,7 +655,7 @@ class SearchUsers(Users):
     Parent directory for downloads should go to search/
     """
     def __init__(self, user):
-        self._main_path = f'{KONEKODIR}/search'
+        self._main_path = KONEKODIR / 'search'
         super().__init__(user)
 
     def _pixivrequest(self):
@@ -671,7 +669,7 @@ class FollowingUsers(Users):
     """
     def __init__(self, your_id, publicity='private'):
         self._publicity = publicity
-        self._main_path = f'{KONEKODIR}/following'
+        self._main_path = KONEKODIR / 'following'
         super().__init__(your_id)
 
     def _pixivrequest(self):

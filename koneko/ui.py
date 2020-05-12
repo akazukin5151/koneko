@@ -46,12 +46,13 @@ class AbstractGallery(ABC):
 
         current_page = self._pixivrequest()
         self.data = data.GalleryJson(current_page)
-        download.init_download(self._download_path, self.data,
-                               self._current_page_num, download.download_page_pbar,
-                               self.data.current_illusts(), self._download_path)
 
-        if self._show:
-            utils.show_artist_illusts(self._download_path)
+        tracker = lscat.TrackDownloads(self._download_path)
+        # Tracker will cause gallery to show each img as they finish downloading
+        download.init_download(self._download_path, self.data,
+                               self._current_page_num, download.download_page,
+                               self.data.current_illusts(), self._download_path,
+                               None, tracker)
 
         pure.print_multiple_imgs(self.data.current_illusts())
         print(f'Page {self._current_page_num}')

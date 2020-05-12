@@ -102,7 +102,7 @@ For more details refer to the [manual](#manual).
 
 ## Speed
 
-* Display each image as soon as they finish downloading (but due to lscat limitations, only one page at a time). Requires "integrating" (read: basically rewriting) lscat.py and threaded download functions
+* Display each image as soon as they finish downloading (but due to lscat limitations, only one page at a time). Requires "integrating" (read: basically rewriting) lscat.py and threaded download functions. **Doing now**
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!

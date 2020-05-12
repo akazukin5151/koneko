@@ -86,7 +86,7 @@ def main_loop(prompted, main_command, user_input, your_id=None, start=True):
             SearchUsersModeLoop(prompted, user_input).start(start)
 
         elif main_command == '5':
-            IllustFollowModeLoop()
+            IllustFollowModeLoop(start)
 
         elif main_command == '?':
             utils.info_screen_loop()

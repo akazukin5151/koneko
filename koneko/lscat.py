@@ -84,8 +84,8 @@ class View(ABC):
         self._pages_list = cytoolz.partition(self._rows_in_page, each_row, pad=None)
         self._pages_list = list(self._pages_list)
 
-        assert len(self._pages_list[0]) <= len(self._rowspaces) == self._rows_in_page
-        assert len(self._pages_list) <= len(self._page_spaces)
+        #assert len(self._pages_list[0]) <= len(self._rowspaces) == self._rows_in_page
+        #assert len(self._pages_list) <= len(self._page_spaces)
 
     @abstractmethod
     def render(self):
@@ -190,10 +190,11 @@ class Card(View):
 
 
 class TrackDownloads:
-    def __init__(self):
+    def __init__(self, path):
         self._downloaded = []
         self._lock = threading.Lock()
         self._counter = 0
+        self.path = path
 
     def update(self, new):
         with self._lock:
@@ -235,12 +236,47 @@ class TrackDownloads:
         """
         number = int(new[:3]) # Only for renamed images
         if number == self._counter:
-            #print(new) # TODO: display image
+            # Display page
+            if number == 0:
+                os.system('clear')
+                self.generator = generate_page(new, self.path, 0)
+                next(self.generator)
+            else:
+                self.generator.send((new, number))
+
             self._counter += 1
             self._downloaded.remove(new)
             self._downloaded.sort()
             if self._downloaded:
                 self._inspect(self._downloaded[0])
+
+
+@funcy.ignore(IndexError, TypeError)
+def generate_page(image, path, number):
+    """ (y-coordinate, x-coordinate) for every image
+    (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
+    (9, 2), (9, 29), (9, 38), (9, 56), (9, 74),
+    (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
+    (9, 2), (9, 29), (9, 38), (9, 56), (9, 74),
+    (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
+    (9, 2), (9, 29), (9, 38), (9, 56), (9, 74),
+    """
+    left_shifts = (2,20,38,56,74)
+    rowspaces = (0, 9)
+    #page_spaces=(26, 24, 24)
+    with cd(path):
+        while True:
+            x = number % 5
+            y = number // 5
+
+            if number % 10 == 0 and number != 0:
+                print('\n' * 25) #self._page_spaces[i])
+
+            Image(image).thumbnail(310).show(
+                align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
+            )
+
+            image, number = yield
 
 
 if __name__ == '__main__':

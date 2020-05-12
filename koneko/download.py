@@ -22,11 +22,13 @@ def async_download_spinner(download_path, urls, rename_images=False,
     )
 
 def async_download_core(download_path, urls, rename_images=False,
-                        file_names=None, pbar=None):
+                        file_names=None, pbar=None, tracker=None):
     """
     Rename files with given new name if needed.
     Submit each url to the ThreadPoolExecutor, so download and rename are concurrent
     """
+    os.makedirs(download_path, exist_ok=True)
+
     oldnames = list(map(pure.split_backslash_last, urls))
     if rename_images:
         newnames = map(pure.prefix_filename, oldnames, file_names, range(len(urls)))
@@ -36,10 +38,8 @@ def async_download_core(download_path, urls, rename_images=False,
 
     filtered = itertools.filterfalse(os.path.isfile, newnames)
     oldnames = itertools.filterfalse(os.path.isfile, oldnames)
-    tracker = lscat.TrackDownloads()
-    helper = downloadr(pbar=None, tracker=tracker)
+    helper = downloadr(pbar=pbar, tracker=tracker)
 
-    os.makedirs(download_path, exist_ok=True)
     with pure.cd(download_path):
         with ThreadPoolExecutor(max_workers=len(urls)) as executor:
             executor.map(helper, urls, oldnames, filtered)
@@ -64,7 +64,7 @@ def downloadr(url, img_name, new_file_name=None, pbar=None, tracker=None):
         tracker.update(img_name)
 
 
-def download_page(current_page_illusts, download_path, pbar=None):
+def download_page(current_page_illusts, download_path, pbar=None, tracker=None):
     """
     Download the illustrations on one page of given artist id (using threads),
     rename them based on the *post title*. Used for gallery modes (1 and 5)
@@ -73,11 +73,13 @@ def download_page(current_page_illusts, download_path, pbar=None):
     titles = pure.post_titles_in_page(current_page_illusts)
 
     async_download_core(
-        download_path, urls, rename_images=True, file_names=titles, pbar=pbar
+        download_path, urls, rename_images=True, file_names=titles, pbar=pbar,
+        tracker=tracker
     )
 
 # - Wrappers around above download functions, for downloading multi-images
 def download_page_pbar(current_illusts, download_path):
+    # TODO: no longer needed after instant gallery
     pbar = tqdm(total=len(current_illusts), smoothing=0)
     download_page(current_illusts, download_path, pbar=pbar)
     pbar.close()

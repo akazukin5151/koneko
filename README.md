@@ -224,7 +224,7 @@ Note: if you want to make some edits, you should install it in a conda environme
 ```sh
 # Use the latest stable version (recommended)
 # Make sure the version number is the latest
-git clone -b 'v0.5' --depth 1 https://github.com/twenty5151/koneko.git
+git clone -b 'v0.5.1' --depth 1 https://github.com/twenty5151/koneko.git
 # Use the master branch for upcoming features:
 git clone -b master https://github.com/twenty5151/koneko.git
 # Use the dev branch for latest features, fixes, and instability:

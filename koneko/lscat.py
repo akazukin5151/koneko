@@ -188,4 +188,5 @@ class Card(View):
                              self._cols, coord, self._preview_paths)
 
 if __name__ == '__main__':
-    Gallery('/tmp/koneko/2232374/1/')
+    from koneko import KONEKODIR
+    Gallery(KONEKODIR / '2232374' / '1').render()

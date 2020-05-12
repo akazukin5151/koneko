@@ -191,10 +191,10 @@ class Card(View):
 
 class TrackDownloads:
     def __init__(self, path):
+        self.path = path
         self._downloaded = []
         self._lock = threading.Lock()
         self._counter = 0
-        self.path = path
 
     def update(self, new):
         with self._lock:
@@ -251,7 +251,7 @@ class TrackDownloads:
                 self._inspect(self._downloaded[0])
 
 
-@funcy.ignore(IndexError, TypeError)
+#@funcy.ignore(IndexError, TypeError)
 def generate_page(image, path, number):
     """ (y-coordinate, x-coordinate) for every image
     (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
@@ -261,6 +261,7 @@ def generate_page(image, path, number):
     (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
     (9, 2), (9, 29), (9, 38), (9, 56), (9, 74),
     """
+    # TODO: These numbers are generated from the above View ABC
     left_shifts = (2,20,38,56,74)
     rowspaces = (0, 9)
     #page_spaces=(26, 24, 24)
@@ -276,6 +277,8 @@ def generate_page(image, path, number):
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
 
+            # Release control. When _inspect() sends another image,
+            # assign to the variables and display it again
             image, number = yield
 
 

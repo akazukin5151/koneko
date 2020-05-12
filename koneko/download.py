@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 import cytoolz
 from tqdm import tqdm
 
-from koneko import api, pure, utils, lscat
+from koneko import api, pure, utils
 
 
 @pure.spinner('')

@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 import cytoolz
 from tqdm import tqdm
 
-from koneko import api, pure, utils
+from koneko import api, pure, utils, lscat
 
 
 @pure.spinner('')
@@ -36,14 +36,17 @@ def async_download_core(download_path, urls, rename_images=False,
 
     filtered = itertools.filterfalse(os.path.isfile, newnames)
     oldnames = itertools.filterfalse(os.path.isfile, oldnames)
-    helper = downloadr(pbar=pbar)
+    tracker = lscat.TrackDownloads()
+    helper = downloadr(pbar=None, tracker=tracker)
+
     os.makedirs(download_path, exist_ok=True)
     with pure.cd(download_path):
         with ThreadPoolExecutor(max_workers=len(urls)) as executor:
             executor.map(helper, urls, oldnames, filtered)
 
+
 @cytoolz.curry
-def downloadr(url, img_name, new_file_name=None, pbar=None):
+def downloadr(url, img_name, new_file_name=None, pbar=None, tracker=None):
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)
 
@@ -55,6 +58,10 @@ def downloadr(url, img_name, new_file_name=None, pbar=None):
         if '/' in new_file_name:
             new_file_name = new_file_name.replace('/', '')
         os.rename(img_name, new_file_name)
+        img_name = new_file_name
+
+    if tracker:
+        tracker.update(img_name)
 
 
 def download_page(current_page_illusts, download_path, pbar=None):

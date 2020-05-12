@@ -4,6 +4,7 @@ The default image renderer for koneko.
 
 import os
 import fnmatch
+import threading
 from abc import ABC, abstractmethod
 
 import funcy
@@ -186,6 +187,61 @@ class Card(View):
             for (j, coord) in enumerate(self._preview_xcoords):
                 display_page(((self._preview_images[i][j],),), self._rowspaces,
                              self._cols, coord, self._preview_paths)
+
+
+class TrackDownloads:
+    def __init__(self):
+        self._downloaded = []
+        self._lock = threading.Lock()
+        self._counter = 0
+
+    def update(self, new):
+        with self._lock:
+            self._downloaded.append(new)
+
+        self._inspect(new)
+
+    def _inspect(self, new):
+        """
+        Counter always goes up, so every image to displayed in order
+        1. If image that was just submitted (just finished downloading) == counter,
+        2. Display it
+        3. Increment counter
+        4. Remove from the list
+        5. Sort
+        6. Inspect the first item in the list as if it was just submitted.
+            a. If it is == counter, display it, etc
+            b. Else, do nothing (continue to accept submissions)
+
+        Example with numbers submitted in this order: (3,8,4,7,0,1,9,5,2,6)
+        3
+        3,8
+        3,8,4
+        3,8,4,7         # Do nothing in all above lines
+        3,8,4,7,0       # New number == counter, take out 0, display it, sort the rest
+        3,4,7,8         # Counter is now 1 , but 1 != 3, so do nothing
+        3,4,7,8,1       # New number == counter, so take out 1, display, sort
+        3,4,7,8         # Counter is now 2, do nothing
+        3,4,7,8,9
+        3,4,7,8,9,5
+        3,4,7,8,9,5,2   # Take out 2, display, sort
+        3,4,5,7,8,9     # Counter is now 3; tds
+        4,5,7,8,9       # Counter is now 4; tds
+        5,7,8,9         # Counter is now 5; tds
+        7,8,9           # Counter is now 6, but 6 != 7, so do nothing
+        7,8,9,6         # New number == counter; tds
+        7,8,9           # Counter is now 7; tds
+        ...             # Done
+        """
+        number = int(new[:3]) # Only for renamed images
+        if number == self._counter:
+            #print(new) # TODO: display image
+            self._counter += 1
+            self._downloaded.remove(new)
+            self._downloaded.sort()
+            if self._downloaded:
+                self._inspect(self._downloaded[0])
+
 
 if __name__ == '__main__':
     from koneko import KONEKODIR

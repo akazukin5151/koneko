@@ -96,6 +96,11 @@ class UserJson:
     def names(self, page_num):
         return self.names_cache[page_num]
 
+    def names_prefixed(self, page_num):
+        names = self.names(page_num)
+        names_prefixed = map(pure.prefix_artist_name, names, range(len(names)))
+        return list(names_prefixed)
+
     def all_urls(self):
         return self.profile_pic_urls + self.image_urls
 

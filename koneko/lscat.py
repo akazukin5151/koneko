@@ -282,69 +282,107 @@ def generate_page(image, path, number):
             # assign to the variables and display it again
             image, number = yield
 
+
 class TrackDownloadsUsers(TrackDownloads):
     def __init__(self, path, messages):
         super().__init__(path)
         self.messages = messages
+        self.previews_counter = 30
+        self.orders = generate_orders(120, 30)
+        self.generator = generate_page_users(self.path)
+        self.generator.send(None)
 
-    def _inspect(self, new):
-        number = int(new[:3]) # Only for renamed images
-        if number == self._counter:
+    def _inspect(self, new):  # new is not used
+        """
+        images 0-29 are artist profile pics
+        images 30-119 are previews, 3 for each artist
+        so the valid order is:
+        0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
+
+        Simplified example of this algorithm, with 3 artists & 9 previews total:
+        numbers received in this order: [3, 8, 5, 4, 0, 1, 2, 11, 6, 9, 10, 7]
+        0-2 are artists and 3-10 are the previews, so the display order is:
+        (0, 3, 4, 5, 1, 6, 7, 8, 2, 9, 10, 11)
+        """
+        next_num = self.orders[self._counter]
+        numlist = [int(f[:3]) for f in self._downloaded]
+        pic = self._downloaded[numlist.index(next_num)]
+
+        if next_num in numlist:
             # Display page
-            if number == 0:
+            if next_num == 0:
                 os.system('clear')
-                self.generator = generate_page_users(new, self.path, 0,
-                                                     self.messages[number])
-                next(self.generator)
-
-            else:
-                self.generator.send((new, number, self.messages[number]))
+            self.generator.send((pic, next_num, self.messages[next_num]))
+            #time.sleep(2)
 
             self._counter += 1
-            self._downloaded.remove(new)
-            self._downloaded.sort()
+            self._downloaded.remove(pic)
+            numlist.remove(next_num)
             if self._downloaded:
-                self._inspect(self._downloaded[0])
+                self._inspect(None)
 
-# TODO: ui.py needs to pass message to lscat
 
-def generate_page_users(image, path, number, message):
+def generate_page_users(path):
     """ Given number, calculate its coordinates and display it, then yield
     """
     left_shift = 2
     rowspace = 0
     page_space = 20
-    preview_left_shifts = (40, 58, 75)
+    preview_left_shifts = (40, 57, 75)
 
-    with cd(path):
-        while True:
-            # There are four columns in total,
-            # first is always artist, rest are previews
-            if number % 4 == 0:
-                kind = 'artist'
-            else:
-                kind = 'previews'
+    while True:
+        # Release control. When _inspect() sends another image,
+        # assign to the variables and display it again
+        image, number, message = yield
 
+        if number < 30:
+            kind = 'artist'
+        else:
+            kind = 'previews'
+
+        if kind == 'artist':
+            print('\n' * 2)
+            print(' ' * 18, message)
             print('\n' * page_space)
 
-            if kind == 'artist':
-                Image(image).thumbnail(310).show(
-                    align='left', x=left_shift, y=rowspace
-                )
-                print('\n' * 2)
-                print(' ' * 18, message)
+            place = f"100x100@{left_shift}x{rowspace}"
+            options = f"--align=left --place={place} --silent"
+            with cd(path):
+                os.system(f"kitty +kitten icat {options} '{image}'")
+            #Image(image).thumbnail(310).show(
+            #    align='left', x=left_shift, y=rowspace
+            #)
 
-            else:
-                # Cycles in 0-1-2, for number % 4 != 0
-                x = (number - (number // 4) - 1) % 3
+        else:
+            x = number % 3
+            place = f"17x17@{preview_left_shifts[x]}x{rowspace}"
+            options = f"--align=left --place={place} --silent"
+            with cd(path):
+                os.system(f"kitty +kitten icat {options} '{image}'")
 
-                Image(image).thumbnail(310).show(
-                    align='left', x=preview_left_shifts[x], y=rowspace
-                )
+            # This doesn't work for some reason
+            #Image(image).thumbnail(310).show(
+            #    align='left', x=preview_left_shifts[x], y=rowspace
+            #)
 
-            # Release control. When _inspect() sends another image,
-            # assign to the variables and display it again
-            image, number, message = yield
+
+
+def generate_orders(total_pics, artists_count):
+    artist = list(range(artists_count))
+    prev = list(range(artists_count, total_pics))
+    order = []
+    a,p = 0,0
+
+    for i in range(total_pics):
+        if i % 4 == 0:
+            order.append(artist[a])
+            a += 1
+        else:
+            order.append(prev[p])
+            p += 1
+
+    return order
+
 
 if __name__ == '__main__':
     from koneko import KONEKODIR

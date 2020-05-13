@@ -78,16 +78,15 @@ def download_page(current_page_illusts, download_path, pbar=None, tracker=None):
     )
 
 # - Wrappers around above download functions, for downloading multi-images
-def user_download(data, preview_path, download_path, page_num):
-    pbar = tqdm(total=len(data.all_urls()), smoothing=0)
+def user_download(data, preview_path, download_path, page_num, tracker=None):
     async_download_core(
         preview_path,
         data.all_urls(),
         rename_images=True,
         file_names=data.all_names(page_num),
-        pbar=pbar
+        pbar=None,
+        tracker=tracker
     )
-    pbar.close()
 
     # Move artist profile pics to their correct dir
     to_move = sorted(os.listdir(preview_path))[:data.splitpoint()]

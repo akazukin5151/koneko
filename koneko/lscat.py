@@ -153,7 +153,7 @@ class Card(View):
     """
 
     def __init__(self, path, preview_paths, messages,
-                 preview_xcoords=[[40], [58], [75]], number_of_columns=1,
+                 preview_xcoords=((40,), (58,), (75,)), number_of_columns=1,
                  rowspaces=(0,), page_spaces=(20,) * 30, rows_in_page=1):
         # Set defaults ^^^
         self._preview_paths = preview_paths
@@ -253,7 +253,8 @@ class TrackDownloads:
 
 #@funcy.ignore(IndexError, TypeError)
 def generate_page(image, path, number):
-    """ (y-coordinate, x-coordinate) for every image
+    """ Given number, calculate its coordinates and display it, then yield
+    For reference, (y-coordinate, x-coordinate) for every image
     (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
     (9, 2), (9, 29), (9, 38), (9, 56), (9, 74),
     (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
@@ -281,6 +282,69 @@ def generate_page(image, path, number):
             # assign to the variables and display it again
             image, number = yield
 
+class TrackDownloadsUsers(TrackDownloads):
+    def __init__(self, path, messages):
+        super().__init__(path)
+        self.messages = messages
+
+    def _inspect(self, new):
+        number = int(new[:3]) # Only for renamed images
+        if number == self._counter:
+            # Display page
+            if number == 0:
+                os.system('clear')
+                self.generator = generate_page_users(new, self.path, 0,
+                                                     self.messages[number])
+                next(self.generator)
+
+            else:
+                self.generator.send((new, number, self.messages[number]))
+
+            self._counter += 1
+            self._downloaded.remove(new)
+            self._downloaded.sort()
+            if self._downloaded:
+                self._inspect(self._downloaded[0])
+
+# TODO: ui.py needs to pass message to lscat
+
+def generate_page_users(image, path, number, message):
+    """ Given number, calculate its coordinates and display it, then yield
+    """
+    left_shift = 2
+    rowspace = 0
+    page_space = 20
+    preview_left_shifts = (40, 58, 75)
+
+    with cd(path):
+        while True:
+            # There are four columns in total,
+            # first is always artist, rest are previews
+            if number % 4 == 0:
+                kind = 'artist'
+            else:
+                kind = 'previews'
+
+            print('\n' * page_space)
+
+            if kind == 'artist':
+                Image(image).thumbnail(310).show(
+                    align='left', x=left_shift, y=rowspace
+                )
+                print('\n' * 2)
+                print(' ' * 18, message)
+
+            else:
+                # Cycles in 0-1-2, for number % 4 != 0
+                x = (number - (number // 4) - 1) % 3
+
+                Image(image).thumbnail(310).show(
+                    align='left', x=preview_left_shifts[x], y=rowspace
+                )
+
+            # Release control. When _inspect() sends another image,
+            # assign to the variables and display it again
+            image, number, message = yield
 
 if __name__ == '__main__':
     from koneko import KONEKODIR

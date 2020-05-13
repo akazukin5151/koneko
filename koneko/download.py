@@ -78,12 +78,6 @@ def download_page(current_page_illusts, download_path, pbar=None, tracker=None):
     )
 
 # - Wrappers around above download functions, for downloading multi-images
-def download_page_pbar(current_illusts, download_path):
-    # TODO: no longer needed after instant gallery
-    pbar = tqdm(total=len(current_illusts), smoothing=0)
-    download_page(current_illusts, download_path, pbar=pbar)
-    pbar.close()
-
 def user_download(data, preview_path, download_path, page_num):
     pbar = tqdm(total=len(data.all_urls()), smoothing=0)
     async_download_core(

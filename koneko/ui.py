@@ -544,7 +544,7 @@ class Users(ABC):
         # because it needs to print the right message
         # Which means parsing is needed first
         self._parse_and_download()
-        if self._show:
+        if self._show:  # Is always true
             self._show_page()
         self._prefetch_next_page()
 

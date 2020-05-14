@@ -189,6 +189,7 @@ class Card(View):
                              self._cols, coord, self._preview_paths)
 
 class NewCard(Card):
+    # TODO: detach from Card
     @funcy.ignore(IndexError)
     def render(self):
         os.system('clear')

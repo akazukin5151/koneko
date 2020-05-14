@@ -97,6 +97,7 @@ class UserJson:
         return self.names_cache[page_num]
 
     def names_prefixed(self, page_num):
+        # TODO: use this in ui.py
         names = self.names(page_num)
         names_prefixed = map(pure.prefix_artist_name, names, range(len(names)))
         return list(names_prefixed)

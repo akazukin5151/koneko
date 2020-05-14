@@ -188,6 +188,40 @@ class Card(View):
                 display_page(((self._preview_images[i][j],),), self._rowspaces,
                              self._cols, coord, self._preview_paths)
 
+class NewCard(Card):
+    @funcy.ignore(IndexError)
+    def render(self):
+        os.system('clear')
+        while True:
+            # Wait for artist pic
+            a_img = yield
+            #breakpoint()
+            artist_name = a_img.split('.')[0].split('_')[-1]
+            number = a_img.split('_')[0][1:]
+            message = ''.join([number, '\n', ' ' * 18, artist_name])
+            a_img = ((a_img,),)
+
+            # Print the message (artist name)
+            print('\n' * 2)
+            print(' ' * 18, message)
+            print('\n' * 20)  # Scroll to new 'page'
+
+            # Display artist profile pic
+            display_page(a_img, self._rowspaces, self._cols, self._left_shifts,
+                         self._path)
+
+            # Display the three previews
+            j = 0
+            while True:
+                if j >= 3:
+                    break
+                coord = self._preview_xcoords[j]
+                img = yield  # Wait for preview pic
+                img = ((img,),)
+                display_page(img, self._rowspaces,
+                             self._cols, coord, self._path)
+                j += 1
+
 
 class TrackDownloads:
     def __init__(self, path):
@@ -284,12 +318,10 @@ def generate_page(image, path, number):
 
 
 class TrackDownloadsUsers(TrackDownloads):
-    def __init__(self, path, messages):
+    def __init__(self, path):
         super().__init__(path)
-        self.messages = messages
-        self.previews_counter = 30
         self.orders = generate_orders(120, 30)
-        self.generator = generate_page_users(self.path)
+        self.generator = NewCard(path, None, None).render()
         self.generator.send(None)
 
     def _inspect(self, new):  # new is not used
@@ -306,65 +338,19 @@ class TrackDownloadsUsers(TrackDownloads):
         """
         next_num = self.orders[self._counter]
         numlist = [int(f[:3]) for f in self._downloaded]
-        pic = self._downloaded[numlist.index(next_num)]
 
         if next_num in numlist:
+            pic = self._downloaded[numlist.index(next_num)]
             # Display page
             if next_num == 0:
                 os.system('clear')
-            self.generator.send((pic, next_num, self.messages[next_num]))
-            #time.sleep(2)
+            self.generator.send(pic)
 
             self._counter += 1
             self._downloaded.remove(pic)
             numlist.remove(next_num)
             if self._downloaded:
                 self._inspect(None)
-
-
-def generate_page_users(path):
-    """ Given number, calculate its coordinates and display it, then yield
-    """
-    left_shift = 2
-    rowspace = 0
-    page_space = 20
-    preview_left_shifts = (40, 57, 75)
-
-    while True:
-        # Release control. When _inspect() sends another image,
-        # assign to the variables and display it again
-        image, number, message = yield
-
-        if number < 30:
-            kind = 'artist'
-        else:
-            kind = 'previews'
-
-        if kind == 'artist':
-            print('\n' * 2)
-            print(' ' * 18, message)
-            print('\n' * page_space)
-
-            place = f"100x100@{left_shift}x{rowspace}"
-            options = f"--align=left --place={place} --silent"
-            with cd(path):
-                os.system(f"kitty +kitten icat {options} '{image}'")
-            #Image(image).thumbnail(310).show(
-            #    align='left', x=left_shift, y=rowspace
-            #)
-
-        else:
-            x = number % 3
-            place = f"17x17@{preview_left_shifts[x]}x{rowspace}"
-            options = f"--align=left --place={place} --silent"
-            with cd(path):
-                os.system(f"kitty +kitten icat {options} '{image}'")
-
-            # This doesn't work for some reason
-            #Image(image).thumbnail(310).show(
-            #    align='left', x=preview_left_shifts[x], y=rowspace
-            #)
-
 
 
 def generate_orders(total_pics, artists_count):
@@ -386,4 +372,16 @@ def generate_orders(total_pics, artists_count):
 
 if __name__ == '__main__':
     from koneko import KONEKODIR
-    Gallery(KONEKODIR / '2232374' / '1').render()
+    #Gallery(KONEKODIR / '2232374' / '1').render()
+    import time
+    import random
+
+    imgs = [f for f in os.listdir(KONEKODIR / 'following' / 'test')]
+    random.shuffle(imgs)
+
+    messages = ['test'] * len(imgs)
+    tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
+
+    for img in imgs:
+        tracker.update(img)
+        time.sleep(0.1)

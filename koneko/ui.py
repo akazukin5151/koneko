@@ -544,14 +544,11 @@ class Users(ABC):
         # because it needs to print the right message
         # Which means parsing is needed first
         self._parse_and_download()
-        # Is always true for now.
-        # Remove to disable show_page after 'display instantly after downloading'
-        # As the spacing of instant display is still buggy, better leave it True for now
         if self._show:
             self._show_page()
         self._prefetch_next_page()
 
-    def _parse_and_download(self):
+    def _parse_and_download(self, track=True):
         """
         Parse info, combine profile pics and previews, download all concurrently,
         move the profile pics to the correct dir (less files to move)
@@ -560,8 +557,10 @@ class Users(ABC):
         preview_path = self._main_path / self._input / str(self._page_num) / 'previews'
         os.makedirs(preview_path, exist_ok=True)
 
-        messages = self.data.names_prefixed(self._page_num) + [''] * 90
-        tracker = lscat.TrackDownloadsUsers(preview_path, messages)
+        if track:
+            tracker = lscat.TrackDownloadsUsers(preview_path)
+        else:
+            tracker = None
         download.init_download(self.download_path, self.data,
                                self._page_num, download.user_download,
                                self.data, preview_path, self.download_path,
@@ -613,7 +612,7 @@ class Users(ABC):
                 self._page_num = int(self._offset) // 30 + 1
                 self.download_path = self._main_path / self._input / str(self._page_num)
 
-                self._parse_and_download()
+                self._parse_and_download(track=False)
 
         self._page_num = oldnum
         self.download_path = self._main_path / self._input / str(self._page_num)

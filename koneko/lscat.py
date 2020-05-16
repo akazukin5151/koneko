@@ -296,11 +296,6 @@ class TrackDownloadsUsers(TrackDownloads):
         images 30-119 are previews, 3 for each artist
         so the valid order is:
         0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
-
-        Simplified example of this algorithm, with 3 artists & 9 previews total:
-        numbers received in this order: [3, 8, 5, 4, 0, 1, 2, 11, 6, 9, 10, 7]
-        0-2 are artists and 3-10 are the previews, so the display order is:
-        (0, 3, 4, 5, 1, 6, 7, 8, 2, 9, 10, 11)
         """
         next_num = self.orders[self._counter]
         numlist = [int(f[:3]) for f in self._downloaded]
@@ -374,12 +369,14 @@ if __name__ == '__main__':
     import time
     import random
 
-    imgs = [f for f in os.listdir(KONEKODIR / 'following' / 'test')]
+    imgs = os.listdir(KONEKODIR / 'following' / 'test')
     random.shuffle(imgs)
 
     messages = ['test'] * len(imgs)
     tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
 
+    # Simulates downloads finishing and updating the tracker
+    # Which will display the pictures in the correct order, waiting if needed
     for img in imgs:
         tracker.update(img)
         time.sleep(0.1)

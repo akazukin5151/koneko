@@ -28,8 +28,8 @@ class GalleryJson:
     def next_url(self, current_page_num):
         return self.all_pages_cache[str(current_page_num)]['next_url']
 
-    def first_img(self):
-        return pure.post_titles_in_page(self.current_illusts())[0]
+    def first_img(self, current_page_num=1):
+        return pure.post_titles_in_page(self.current_illusts(current_page_num))[0]
 
 
 class ImageJson:

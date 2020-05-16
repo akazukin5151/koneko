@@ -98,9 +98,10 @@ def init_download(download_path, data, current_page_num, download_func, *args):
     if not download_path.is_dir():
         download_func(*args)
 
-    elif (not data.first_img() in sorted(os.listdir(download_path))[0]):
-          #and current_page_num == 1):#FIXME breaks prefetch, but will reload on next
-        print('Cache is outdated, reloading...')
+    elif (not data.first_img(current_page_num) in sorted(os.listdir(download_path))[0]):
+        breakpoint()
+        if current_page_num == 1:
+            print('Cache is outdated, reloading...')
         # Remove old images
         os.system(f'rm -r {download_path}') # shutil.rmtree is better
         download_func(*args)

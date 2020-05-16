@@ -33,11 +33,11 @@ class AbstractGallery(ABC):
         for contents!)
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
-        if Path(self._download_path).is_dir():
+        if self._download_path.is_dir():
             try:
                 utils.show_artist_illusts(self._download_path)
             except IndexError: # Folder exists but no files
-                Path(self._download_path).rmdir()
+                self._download_path.rmdir()
                 self._show = True
             else:
                 self._show = False
@@ -138,7 +138,7 @@ class AbstractGallery(ABC):
         if self._current_page_num > 1:
             self._current_page_num -= 1
 
-            download_path = (self._main_path / str(self._current_page_num))
+            download_path = self._main_path / str(self._current_page_num)
             utils.show_artist_illusts(download_path)
             pure.print_multiple_imgs(self.data.current_illusts(self._current_page_num))
             print(f'Page {self._current_page_num}')
@@ -164,7 +164,7 @@ class AbstractGallery(ABC):
         current_page_illusts = next_page['illusts']
 
         download_path = self._main_path / str(self._current_page_num + 1)
-        if not Path(download_path).is_dir():
+        if not download_path.is_dir():
             pbar = tqdm(total=len(current_page_illusts), smoothing=0)
             download.download_page(
                 current_page_illusts, download_path, pbar=pbar
@@ -441,7 +441,7 @@ class Image:
         large_url = pure.change_url_to_full(url=self.data.current_url())
         filename = pure.split_backslash_last(large_url)
         download.download_core(self.data.large_dir, large_url, filename)
-        utils.display_image_vp(self.data.large_dir + filename)
+        utils.display_image_vp(self.data.large_dir / filename)
 
     def next_image(self):
         if not self.data.page_urls:
@@ -492,7 +492,7 @@ class Image:
 
         self.data.img_post_page_num -= 1
 
-        testpath = Path(self.data.large_dir) / Path(self.data.image_filename())
+        testpath = self.data.large_dir / Path(self.data.image_filename())
         if testpath.is_file():
             utils.display_image_vp(testpath)
         else:
@@ -555,7 +555,7 @@ class Users(ABC):
         """
         self._parse_user_infos()
         preview_path = self._main_path / self._input / str(self._page_num) / 'previews'
-        os.makedirs(preview_path, exist_ok=True)
+        preview_path.mkdir(exist_ok=True)
 
         if track:
             tracker = lscat.TrackDownloadsUsers(preview_path)

@@ -56,7 +56,7 @@ class ImageJson:
         return self.downloaded_images[self.img_post_page_num]
 
     def filepath(self):
-        return ''.join([str(self.large_dir), '/', self.image_filename()])
+        return self.large_dir / self.image_filename()
 
     def next_img_url(self):
         return self.page_urls[self.img_post_page_num + 1]

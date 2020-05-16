@@ -95,7 +95,7 @@ def user_download(data, preview_path, download_path, page_num, tracker=None):
          for pic in to_move]
 
 def init_download(download_path, data, current_page_num, download_func, *args):
-    if not Path(download_path).is_dir():
+    if not download_path.is_dir():
         download_func(*args)
 
     elif (not data.first_img() in sorted(os.listdir(download_path))[0]):

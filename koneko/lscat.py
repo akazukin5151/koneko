@@ -251,7 +251,6 @@ class TrackDownloads:
                 self._inspect(self._downloaded[0])
 
 
-#@funcy.ignore(IndexError, TypeError)
 def generate_page(image, path, number):
     """ Given number, calculate its coordinates and display it, then yield
     For reference, (y-coordinate, x-coordinate) for every image
@@ -332,21 +331,24 @@ def generate_users(path, rowspaces=(0,), cols=1, artist_xcoords=((2,),),
         print('\n' * 20)  # Scroll to new 'page'
 
         # Display artist profile pic
-        with funcy.suppress(IndexError):
-            display_page(a_img, rowspaces, cols, artist_xcoords, path)
+        display_page(a_img, rowspaces, cols, artist_xcoords, path)
 
         # Display the three previews
-        j = 0
-        while True:
-            if j >= 3:
-                break
+        i = 0  # Always resets for every artist
+        while i < 3:  # Every artist has only 3 previews
             p_img = yield  # Wait for preview pic
             p_img = ((p_img,),)
-            with funcy.suppress(IndexError):
-                display_page(p_img, rowspaces, cols, preview_xcoords[j], path)
-            j += 1
+            display_page(p_img, rowspaces, cols, preview_xcoords[i], path)
+            i += 1
 
 def generate_orders(total_pics, artists_count):
+    """
+    images 0-29 are artist profile pics
+    images 30-119 are previews, 3 for each artist
+    so the valid order is:
+    0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
+    a, p,  p,  p,  a, p,  p,  p,  a, ...
+    """
     artist = list(range(artists_count))
     prev = list(range(artists_count, total_pics))
     order = []

@@ -188,41 +188,6 @@ class Card(View):
                 display_page(((self._preview_images[i][j],),), self._rowspaces,
                              self._cols, coord, self._preview_paths)
 
-class NewCard(Card):
-    # TODO: detach from Card
-    @funcy.ignore(IndexError)
-    def render(self):
-        os.system('clear')
-        while True:
-            # Wait for artist pic
-            a_img = yield
-            #breakpoint()
-            artist_name = a_img.split('.')[0].split('_')[-1]
-            number = a_img.split('_')[0][1:]
-            message = ''.join([number, '\n', ' ' * 18, artist_name])
-            a_img = ((a_img,),)
-
-            # Print the message (artist name)
-            print('\n' * 2)
-            print(' ' * 18, message)
-            print('\n' * 20)  # Scroll to new 'page'
-
-            # Display artist profile pic
-            display_page(a_img, self._rowspaces, self._cols, self._left_shifts,
-                         self._path)
-
-            # Display the three previews
-            j = 0
-            while True:
-                if j >= 3:
-                    break
-                coord = self._preview_xcoords[j]
-                img = yield  # Wait for preview pic
-                img = ((img,),)
-                display_page(img, self._rowspaces,
-                             self._cols, coord, self._path)
-                j += 1
-
 
 class TrackDownloads:
     def __init__(self, path):
@@ -322,7 +287,7 @@ class TrackDownloadsUsers(TrackDownloads):
     def __init__(self, path):
         super().__init__(path)
         self.orders = generate_orders(120, 30)
-        self.generator = NewCard(path, None, None).render()
+        self.generator = generate_users(path)
         self.generator.send(None)
 
     def _inspect(self, new):  # new is not used
@@ -353,6 +318,38 @@ class TrackDownloadsUsers(TrackDownloads):
             if self._downloaded:
                 self._inspect(None)
 
+def generate_users(path, rowspaces=(0,), cols=1, artist_xcoords=((2,),),
+                   preview_xcoords=((40,), (58,), (75,))):
+
+    os.system('clear')
+    while True:
+        # Wait for artist pic
+        a_img = yield
+        #breakpoint()
+        artist_name = a_img.split('.')[0].split('_')[-1]
+        number = a_img.split('_')[0][1:]
+        message = ''.join([number, '\n', ' ' * 18, artist_name])
+        a_img = ((a_img,),)
+
+        # Print the message (artist name)
+        print('\n' * 2)
+        print(' ' * 18, message)
+        print('\n' * 20)  # Scroll to new 'page'
+
+        # Display artist profile pic
+        with funcy.suppress(IndexError):
+            display_page(a_img, rowspaces, cols, artist_xcoords, path)
+
+        # Display the three previews
+        j = 0
+        while True:
+            if j >= 3:
+                break
+            p_img = yield  # Wait for preview pic
+            p_img = ((p_img,),)
+            with funcy.suppress(IndexError):
+                display_page(p_img, rowspaces, cols, preview_xcoords[j], path)
+            j += 1
 
 def generate_orders(total_pics, artists_count):
     artist = list(range(artists_count))

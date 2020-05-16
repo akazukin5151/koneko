@@ -555,7 +555,7 @@ class Users(ABC):
         """
         self._parse_user_infos()
         preview_path = self._main_path / self._input / str(self._page_num) / 'previews'
-        preview_path.mkdir(exist_ok=True)
+        preview_path.mkdir(parents=True, exist_ok=True)
 
         if track:
             tracker = lscat.TrackDownloadsUsers(preview_path)

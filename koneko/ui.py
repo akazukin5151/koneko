@@ -100,7 +100,7 @@ class AbstractGallery(ABC):
             post_json,
             idata.artist_user_id,
             self._selected_image_num,
-            self.data.current_page_num
+            self.data
         )
 
         # blocking: no way to unblock prompt
@@ -369,31 +369,24 @@ class IllustFollowGallery(AbstractGallery):
             colors.q, 'uit (with confirmation); ',
             'view ', colors.m, 'anual\n']))
 
-def display_image(post_json, artist_user_id, number_prefix, current_page_num):
+def display_image(post_json, artist_user_id, number_prefix, data):
     """
     Opens image given by the number (medium-res), downloads large-res and
     then display that.
     Alternative to main.view_post_mode(). It does its own stuff before calling
     the Image class for the prompt.
-
-    Parameters
-    ----------
-    number_prefix : int
-        The number prefixed in each image
-    post_json : JsonDict
-    artist_user_id : int
-    current_page_num : int
     """
-    search_string = f"{str(number_prefix).rjust(3, '0')}_"
+    search_string = f"{str(number_prefix).rjust(3, '0')}_*"
 
     # LSCAT
     os.system('clear')
-    arg = KONEKODIR / str(artist_user_id) / str(current_page_num) / search_string / "*"
+    arg = KONEKODIR / str(artist_user_id) / str(data.current_page_num) / search_string
     os.system(f'kitty +kitten icat --silent {arg}')
 
     url = pure.url_given_size(post_json, 'large')
     filename = pure.split_backslash_last(url)
-    large_dir = KONEKODIR / str(artist_user_id) / str(current_page_num) / "large"
+    large_dir = (KONEKODIR / str(artist_user_id) / "individual" /
+                 str(data.image_id(number_prefix)))
     download.download_core(large_dir, url, filename)
 
     # BLOCKING: imput is blocking, will not display large image until input
@@ -401,7 +394,7 @@ def display_image(post_json, artist_user_id, number_prefix, current_page_num):
 
     # LSCAT
     os.system('clear')
-    arg = KONEKODIR / str(artist_user_id) / str(current_page_num) / "large" / filename
+    arg = large_dir / filename
     os.system(f'kitty +kitten icat --silent {arg}')
 
 

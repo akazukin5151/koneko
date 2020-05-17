@@ -101,10 +101,6 @@ For more details refer to the [manual](#manual).
 * Option to use pillow or wand to edit numbers on pics
 * Support [ueberzug](https://github.com/seebye/ueberzug)
 
-# Code structure
-
-* Move more things, like `current_page_num`, into data classes
-
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!

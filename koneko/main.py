@@ -205,6 +205,8 @@ class ViewPostModeLoop(Loop):
 
     def _go_to_mode(self):
         view_post_mode(self._user_input)
+        # After backing
+        main(start=False)
 
 
 class SearchUsersModeLoop(Loop):
@@ -279,7 +281,7 @@ def view_post_mode(image_id):
     if idata.number_of_pages != 1:
         download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
 
-    image = ui.Image(image_id, idata, 1, True)
+    image = ui.Image(image_id, idata, True)
     prompt.image_prompt(image)
 
 if __name__ == '__main__':

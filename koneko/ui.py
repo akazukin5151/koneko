@@ -6,8 +6,8 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from koneko import (KONEKODIR, api, data, main, pure, lscat, utils, colors,
-                    prompt, download)
+from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
+                    download)
 
 
 class AbstractGallery(ABC):
@@ -494,8 +494,6 @@ class Image:
             # Defaults to page 1
             mode = ArtistGallery(self.data.artist_user_id)
             prompt.gallery_like_prompt(mode)
-            # After backing
-            main.main(start=False)
         # Else: image prompt and class ends, goes back to previous mode
 
 

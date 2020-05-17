@@ -98,7 +98,7 @@ For more details refer to the [manual](#manual).
 
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (but either it blocks the prompt or the prompt blocks)
-* Image and User views should use lscat.py to render so alternate renderers can be used
+* Image view should use lscat.py to render so alternate renderers can be used
 * Option to use pillow or wand to edit numbers on pics
 * Support [ueberzug](https://github.com/seebye/ueberzug)
 

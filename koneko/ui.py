@@ -31,11 +31,11 @@ class AbstractGallery(ABC):
         for contents!)
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
-        if self.data.download_path().is_dir():
+        if self.data.download_path.is_dir():
             try:
-                utils.show_artist_illusts(self.data.download_path())
+                utils.show_artist_illusts(self.data.download_path)
             except IndexError: # Folder exists but no files
-                self.data.download_path().rmdir()
+                self.data.download_path.rmdir()
                 self._show = True
             else:
                 self._show = False
@@ -43,18 +43,18 @@ class AbstractGallery(ABC):
             self._show = True
 
         current_page = self._pixivrequest()
-        self.data.set_raw(current_page)
+        self.data.raw = current_page
 
-        tracker = lscat.TrackDownloads(self.data.download_path())
+        tracker = lscat.TrackDownloads(self.data.download_path)
         # Tracker will cause gallery to show each img as they finish downloading
         # TODO: clean up this mess
         # page info should be inside the data class
-        download.init_download(self.data.download_path(), self.data,
+        download.init_download(self.data.download_path, self.data,
                                self.data.current_page_num, download.download_page,
-                               self.data.current_illusts(), self.data.download_path(),
+                               self.data.current_illusts, self.data.download_path,
                                None, tracker)
 
-        pure.print_multiple_imgs(self.data.current_illusts())
+        pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
         # Make sure the following work:
         # Gallery -> next page -> image prompt -> back -> prev page
@@ -122,12 +122,12 @@ class AbstractGallery(ABC):
             print('This is the last page!')
         else:
             self.data.current_page_num += 1
-            pure.print_multiple_imgs(self.data.current_illusts())
+            pure.print_multiple_imgs(self.data.current_illusts)
             print(f'Page {self.data.current_page_num}')
             print('Enter a gallery command:\n')
 
         # Skip prefetching again for cases like next -> prev -> next
-        if str(self.data.current_page_num + 1) not in self.data.cached_pages():
+        if str(self.data.current_page_num + 1) not in self.data.cached_pages:
             try:
                 # After showing gallery, pre-fetch the next page
                 self._prefetch_next_page()
@@ -138,8 +138,8 @@ class AbstractGallery(ABC):
         if self.data.current_page_num > 1:
             self.data.current_page_num -= 1
 
-            utils.show_artist_illusts(self.data.download_path())
-            pure.print_multiple_imgs(self.data.current_illusts())
+            utils.show_artist_illusts(self.data.download_path)
+            pure.print_multiple_imgs(self.data.current_illusts)
             print(f'Page {self.data.current_page_num}')
             print('Enter a gallery command:\n')
 
@@ -153,7 +153,7 @@ class AbstractGallery(ABC):
     def _prefetch_next_page(self):
         # TODO: move this somewhere else
         # print("   Prefetching next page...", flush=True, end="\r")
-        next_url = self.data.next_url()
+        next_url = self.data.next_url
         if not next_url:  # this is the last page
             raise LastPageException
 
@@ -431,14 +431,14 @@ class Image:
 
     def download_image(self):
         # Doing the same job as full_img_details
-        large_url = pure.change_url_to_full(url=self.data.current_url())
+        large_url = pure.change_url_to_full(url=self.data.current_url)
         filename = pure.split_backslash_last(large_url)
         filepath = pure.generate_filepath(filename)
         download.download_image_verified(url=large_url, filename=filename,
                                          filepath=filepath)
 
     def show_full_res(self):
-        large_url = pure.change_url_to_full(url=self.data.current_url())
+        large_url = pure.change_url_to_full(url=self.data.current_url)
         filename = pure.split_backslash_last(large_url)
         download.download_core(self.data.large_dir, large_url, filename)
         utils.display_image_vp(self.data.large_dir / filename)
@@ -465,13 +465,13 @@ class Image:
         # First time from gallery; download next image
         if self.data.img_post_page_num == 1:
             download.async_download_spinner(self.data.large_dir,
-                                            [self.data.current_url()])
+                                            [self.data.current_url])
 
-        utils.display_image_vp(self.data.filepath())
+        utils.display_image_vp(self.data.filepath)
 
         # Downloads the next image
         try:
-            next_img_url = self.data.next_img_url()
+            next_img_url = self.data.next_img_url
         except IndexError: # Last page
             pass
         else:  # No error
@@ -492,14 +492,14 @@ class Image:
 
         self.data.img_post_page_num -= 1
 
-        testpath = self.data.large_dir / Path(self.data.image_filename())
+        testpath = self.data.large_dir / Path(self.data.image_filename)
         if testpath.is_file():
             utils.display_image_vp(testpath)
         else:
             utils.display_image_vp(
                 KONEKODIR / str(self.data.artist_user_id) /
                 str(self.data.img_post_page_num) / "large" /
-                self.data.image_filename()
+                self.data.image_filename
             )
 
         print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
@@ -552,16 +552,16 @@ class Users(ABC):
         move the profile pics to the correct dir (less files to move)
         """
         self._parse_user_infos()
-        preview_path = self.data.download_path() / 'previews'
+        preview_path = self.data.download_path / 'previews'
         preview_path.mkdir(parents=True, exist_ok=True)
 
         if track:
             tracker = lscat.TrackDownloadsUsers(preview_path)
         else:
             tracker = None
-        download.init_download(self.data.download_path(), self.data,
+        download.init_download(self.data.download_path, self.data,
                                self.data.page_num, download.user_download,
-                               self.data, preview_path, self.data.download_path(),
+                               self.data, preview_path, self.data.download_path,
                                self.data.page_num, tracker)
 
     @abstractmethod
@@ -580,7 +580,7 @@ class Users(ABC):
 
     def _show_page(self):
         try:
-            names = self.data.names()
+            names = self.data.names
         except KeyError:
             print('This is the last page!')
             self.data.page_num -= 1
@@ -588,9 +588,9 @@ class Users(ABC):
         else:
             # LSCAT
             lscat.Card(
-                self.data.download_path(),
-                self.data.download_path() / 'previews',
-                messages=self.data.names_prefixed(),
+                self.data.download_path,
+                self.data.download_path / 'previews',
+                messages=self.data.names_prefixed,
             ).render()
 
     def _prefetch_next_page(self):

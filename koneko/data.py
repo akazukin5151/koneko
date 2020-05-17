@@ -6,38 +6,48 @@ from koneko import KONEKODIR, pure
 
 class GalleryJson:
     """Stores data for gallery modes (mode 1 and 5)"""
-    # TODO: use properties
     def __init__(self, current_page_num, main_path):
         self.current_page_num = current_page_num
         self._main_path = main_path
+        self._raw = None
 
-    def set_raw(self, raw):
-        self.raw = raw
+    @property
+    def raw(self):
+        return self._raw
+
+    @raw.setter
+    def raw(self, raw):
+        self._raw = raw
         self.all_pages_cache = {str(self.current_page_num): self.raw}
 
+    @property
     def download_path(self):
         return self._main_path / str(self.current_page_num)
 
+    @property
     def current_illusts(self):
         return self.all_pages_cache[str(self.current_page_num)]['illusts']
 
     def post_json(self, post_number):
-        return self.current_illusts()[post_number]
+        return self.current_illusts[post_number]
 
     def artist_user_id(self, post_number):
         return self.post_json(post_number)['user']['id']
 
     def image_id(self, number):
-        return self.current_illusts()[number]['id']
+        return self.current_illusts[number]['id']
 
+    @property
     def cached_pages(self):
         return self.all_pages_cache.keys()
 
+    @property
     def next_url(self):
         return self.all_pages_cache[str(self.current_page_num)]['next_url']
 
+    @property
     def first_img(self):
-        return pure.post_titles_in_page(self.current_illusts())[0]
+        return pure.post_titles_in_page(self.current_illusts)[0]
 
 
 class ImageJson:
@@ -60,15 +70,19 @@ class ImageJson:
             self.large_dir = (KONEKODIR / str(self.artist_user_id) / 'individual' /
                               str(image_id))
 
+    @property
     def image_filename(self):
         return self.downloaded_images[self.img_post_page_num]
 
+    @property
     def filepath(self):
-        return self.large_dir / self.image_filename()
+        return self.large_dir / self.image_filename
 
+    @property
     def next_img_url(self):
         return self.page_urls[self.img_post_page_num + 1]
 
+    @property
     def current_url(self):
         return self.page_urls[self.img_post_page_num]
 
@@ -83,6 +97,7 @@ class UserJson:
         self.ids_cache, self.names_cache = {}, {}
         self.update(raw)
 
+    @property
     def download_path(self):
         return self.main_path / self._input / str(self.page_num)
 
@@ -108,28 +123,33 @@ class UserJson:
     def artist_user_id(self, selected_user_num):
         return self.ids_cache[self.page_num][selected_user_num]
 
+    @property
     def names(self):
         return self.names_cache[self.page_num]
 
+    @property
     def names_prefixed(self):
-        # TODO: use this in ui.py
-        names = self.names()
+        names = self.names
         names_prefixed = map(pure.prefix_artist_name, names, range(len(names)))
         return list(names_prefixed)
 
+    @property
     def all_urls(self):
         return self.profile_pic_urls + self.image_urls
 
+    @property
     def all_names(self):
         preview_names_ext = map(pure.split_backslash_last, self.image_urls)
         preview_names = [x.split('.')[0] for x in preview_names_ext]
-        return self.names() + preview_names
+        return self.names + preview_names
 
+    @property
     def splitpoint(self):
         return len(self.profile_pic_urls)
 
+    @property
     def first_img(self):
-        return self.all_names()[0]
+        return self.all_names[0]
 
     @staticmethod
     def _user_id(json):

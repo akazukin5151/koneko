@@ -75,10 +75,16 @@ class ImageJson:
 
 class UserJson:
     """Stores data for user views (modes 3 and 4)"""
-    def __init__(self, raw, page_num):
+    def __init__(self, raw, page_num, main_path, user_or_id):
         self.page_num = page_num
+        self.main_path = main_path
+        self._input = user_or_id
+
         self.ids_cache, self.names_cache = {}, {}
         self.update(raw)
+
+    def download_path(self):
+        return self.main_path / self._input / str(self.page_num)
 
     def update(self, raw):
         self.raw = raw

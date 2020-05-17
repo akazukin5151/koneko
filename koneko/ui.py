@@ -530,12 +530,11 @@ class Users(ABC):
 
     @abstractmethod
     def __init__(self, user_or_id):
-        # Defined in child classes
-        self._main_path: 'Path'
         self._input = user_or_id
         self._offset = 0
-        self.download_path = self._main_path / self._input / "1"
         self._show = True
+        # Defined in child classes
+        self._main_path: 'Path'
         self.data: 'data.UserJson'
 
     def start(self):
@@ -553,16 +552,16 @@ class Users(ABC):
         move the profile pics to the correct dir (less files to move)
         """
         self._parse_user_infos()
-        preview_path = self._main_path / self._input / str(self.data.page_num) / 'previews'
+        preview_path = self.data.download_path() / 'previews'
         preview_path.mkdir(parents=True, exist_ok=True)
 
         if track:
             tracker = lscat.TrackDownloadsUsers(preview_path)
         else:
             tracker = None
-        download.init_download(self.download_path, self.data,
+        download.init_download(self.data.download_path(), self.data,
                                self.data.page_num, download.user_download,
-                               self.data, preview_path, self.download_path,
+                               self.data, preview_path, self.data.download_path(),
                                self.data.page_num, tracker)
 
     @abstractmethod
@@ -575,7 +574,7 @@ class Users(ABC):
         """Parse json and get list of artist names, profile pic urls, and id"""
         result = self._pixivrequest()
         if not hasattr(self, 'data'):
-            self.data = data.UserJson(result, 1)
+            self.data = data.UserJson(result, 1, self._main_path, self._input)
         else:
             self.data.update(result)
 
@@ -585,13 +584,12 @@ class Users(ABC):
         except KeyError:
             print('This is the last page!')
             self.data.page_num -= 1
-            self.download_path = self._main_path / self._input / str(self.data.page_num)
 
         else:
             # LSCAT
             lscat.Card(
-                self.download_path,
-                self._main_path / self._input / str(self.data.page_num) / 'previews',
+                self.data.download_path(),
+                self.data.download_path() / 'previews',
                 messages=self.data.names_prefixed(),
             ).render()
 
@@ -606,16 +604,13 @@ class Users(ABC):
             if int(next_offset) - int(self._offset) <= 30:
                 self._offset = next_offset
                 self.data.page_num = int(self._offset) // 30 + 1
-                self.download_path = self._main_path / self._input / str(self.data.page_num)
 
                 self._parse_and_download(track=False)
 
         self.data.page_num = oldnum
-        self.download_path = self._main_path / self._input / str(self.data.page_num)
 
     def next_page(self):
         self.data.page_num += 1
-        self.download_path = self._main_path / self._input / str(self.data.page_num)
         self._show_page()
 
         self._prefetch_next_page()
@@ -624,7 +619,6 @@ class Users(ABC):
         if self.data.page_num > 1:
             self.data.page_num -= 1
             self._offset = int(self._offset) - 30
-            self.download_path = self._main_path / self._input / str(self.data.page_num)
             self._show_page()
         else:
             print('This is the first page!')
@@ -644,8 +638,8 @@ class Users(ABC):
     def reload(self):
         ans = input('This will delete cached images and redownload them. Proceed?\n')
         if ans == 'y' or not ans:
-            os.system(f'rm -r {self._main_path}') # shutil.rmtree is better
-            self.__init__(self._input)
+            os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
+            self.__init__(self.data._input)
             self.start()
         prompt.user_prompt(self)
 

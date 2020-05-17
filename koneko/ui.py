@@ -4,15 +4,11 @@ import os
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-import funcy
 from tqdm import tqdm
 
 from koneko import (KONEKODIR, api, data, main, pure, lscat, utils, colors,
                     prompt, download)
 
-
-class LastPageException(ValueError):
-    pass
 
 class AbstractGallery(ABC):
     def __init__(self):
@@ -55,8 +51,7 @@ class AbstractGallery(ABC):
         # Gallery -> next page -> image prompt -> back -> prev page
         if len(self.data.all_pages_cache) == 1:
             # Prefetch the next page on first gallery load
-            with funcy.suppress(LastPageException):
-                self._prefetch_next_page()
+            self._prefetch_next_page()
 
 
     def open_link_coords(self, first_num, second_num):
@@ -123,11 +118,7 @@ class AbstractGallery(ABC):
 
         # Skip prefetching again for cases like next -> prev -> next
         if str(self.data.current_page_num + 1) not in self.data.cached_pages:
-            try:
-                # After showing gallery, pre-fetch the next page
-                self._prefetch_next_page()
-            except LastPageException:
-                print('This is the last page!')
+            self._prefetch_next_page()
 
     def previous_page(self):
         if self.data.current_page_num > 1:
@@ -150,7 +141,7 @@ class AbstractGallery(ABC):
         # print("   Prefetching next page...", flush=True, end="\r")
         next_url = self.data.next_url
         if not next_url:  # this is the last page
-            raise LastPageException
+            return
 
         parse_page = api.myapi.parse_next(next_url)
         next_page = self._pixivrequest(**parse_page)

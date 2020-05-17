@@ -50,6 +50,7 @@ class AbstractGallery(ABC):
         tracker = lscat.TrackDownloads(self._download_path)
         # Tracker will cause gallery to show each img as they finish downloading
         # TODO: clean up this mess
+        # page info should be inside the data class
         download.init_download(self._download_path, self.data,
                                self._current_page_num, download.download_page,
                                self.data.current_illusts(), self._download_path,

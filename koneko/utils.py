@@ -3,6 +3,7 @@ import imghdr
 import shutil
 from getpass import getpass
 from pathlib import Path
+from subprocess import check_output
 from configparser import ConfigParser
 
 import pixcat
@@ -64,6 +65,13 @@ def begin_prompt(printmessage=True):
     ).thumbnail(550).show(
         align='left', y=0
     )
+
+    # Do it async? But the startup time sleeps to be slow regardless... TODO
+    cache_size = check_output(
+        f"du -hs --apparent-size {KONEKODIR} | cut -f1",
+        shell=True
+    ).decode('utf-8').rstrip()
+    print(f'Current cache size: {cache_size}')
 
     command = input('Enter a command: ')
     return command

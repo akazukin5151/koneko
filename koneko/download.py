@@ -69,7 +69,7 @@ def download_page(current_page_illusts, download_path, pbar=None, tracker=None):
     Download the illustrations on one page of given artist id (using threads),
     rename them based on the *post title*. Used for gallery modes (1 and 5)
     """
-    # Possible to move this to data?
+    # TODO: Possible to move this to data?
     urls = pure.medium_urls(current_page_illusts)
     titles = pure.post_titles_in_page(current_page_illusts)
 

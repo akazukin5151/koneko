@@ -236,9 +236,10 @@ class ArtistGallery(AbstractGallery):
             return api.myapi.artist_gallery_request(self._artist_user_id)
 
     def _back(self):
-        # TODO: gallery -> next -> image -> back needs to return to the correct page
         # After user 'back's from image prompt, start mode again
-        self.__init__(self._artist_user_id)
+        utils.show_artist_illusts(self.data.download_path)
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
         prompt.gallery_like_prompt(self)
 
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,

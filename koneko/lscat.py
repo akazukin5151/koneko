@@ -203,6 +203,7 @@ class TrackDownloads:
         self._inspect(new)
 
     def _inspect(self, new):
+        # TODO: adapt how users did it
         """
         Counter always goes up, so every image to displayed in order
         1. If image that was just submitted (just finished downloading) == counter,
@@ -271,7 +272,7 @@ def generate_page(image, path, number):
             y = number // 5
 
             if number % 10 == 0 and number != 0:
-                print('\n' * 25) #self._page_spaces[i])
+                print('\n' * 25)
 
             Image(image).thumbnail(310).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]

@@ -84,7 +84,7 @@ def user_download(data, preview_path, download_path, page_num, tracker=None):
         preview_path,
         data.all_urls(),
         rename_images=True,
-        file_names=data.all_names(page_num),
+        file_names=data.all_names(),
         pbar=None,
         tracker=tracker
     )

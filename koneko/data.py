@@ -76,19 +76,20 @@ class ImageJson:
 class UserJson:
     """Stores data for user views (modes 3 and 4)"""
     def __init__(self, raw, page_num):
+        self.page_num = page_num
         self.ids_cache, self.names_cache = {}, {}
-        self.update(raw, page_num)
+        self.update(raw)
 
-    def update(self, raw, page_num):
+    def update(self, raw):
         self.raw = raw
         self.next_url = self.raw['next_url']
         page = self.raw['user_previews']
 
         ids = list(map(self._user_id, page))
-        self.ids_cache.update({page_num: ids})
+        self.ids_cache.update({self.page_num: ids})
 
         names = list(map(self._user_name, page))
-        self.names_cache.update({page_num: names})
+        self.names_cache.update({self.page_num: names})
 
         self.profile_pic_urls = list(map(self._user_profile_pic, page))
 
@@ -98,31 +99,31 @@ class UserJson:
                            for i in range(len(page))
                            for j in range(len(page[i]['illusts']))]
 
-    def artist_user_id(self, page_num, selected_user_num):
-        return self.ids_cache[page_num][selected_user_num]
+    def artist_user_id(self, selected_user_num):
+        return self.ids_cache[self.page_num][selected_user_num]
 
-    def names(self, page_num):
-        return self.names_cache[page_num]
+    def names(self):
+        return self.names_cache[self.page_num]
 
-    def names_prefixed(self, page_num):
+    def names_prefixed(self):
         # TODO: use this in ui.py
-        names = self.names(page_num)
+        names = self.names()
         names_prefixed = map(pure.prefix_artist_name, names, range(len(names)))
         return list(names_prefixed)
 
     def all_urls(self):
         return self.profile_pic_urls + self.image_urls
 
-    def all_names(self, page_num):
+    def all_names(self):
         preview_names_ext = map(pure.split_backslash_last, self.image_urls)
         preview_names = [x.split('.')[0] for x in preview_names_ext]
-        return self.names(page_num) + preview_names
+        return self.names() + preview_names
 
     def splitpoint(self):
         return len(self.profile_pic_urls)
 
-    def first_img(self, page_num=1):
-        return self.all_names(page_num)[0]
+    def first_img(self):
+        return self.all_names()[0]
 
     @staticmethod
     def _user_id(json):

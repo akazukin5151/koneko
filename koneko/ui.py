@@ -534,8 +534,7 @@ class Users(ABC):
         self._main_path: 'Path'
         self._input = user_or_id
         self._offset = 0
-        self._page_num = 1
-        self.download_path = self._main_path / self._input / str(self._page_num)
+        self.download_path = self._main_path / self._input / "1"
         self._show = True
         self.data: 'data.UserJson'
 
@@ -554,7 +553,7 @@ class Users(ABC):
         move the profile pics to the correct dir (less files to move)
         """
         self._parse_user_infos()
-        preview_path = self._main_path / self._input / str(self._page_num) / 'previews'
+        preview_path = self._main_path / self._input / str(self.data.page_num) / 'previews'
         preview_path.mkdir(parents=True, exist_ok=True)
 
         if track:
@@ -562,9 +561,9 @@ class Users(ABC):
         else:
             tracker = None
         download.init_download(self.download_path, self.data,
-                               self._page_num, download.user_download,
+                               self.data.page_num, download.user_download,
                                self.data, preview_path, self.download_path,
-                               self._page_num, tracker)
+                               self.data.page_num, tracker)
 
     @abstractmethod
     def _pixivrequest(self):
@@ -576,32 +575,29 @@ class Users(ABC):
         """Parse json and get list of artist names, profile pic urls, and id"""
         result = self._pixivrequest()
         if not hasattr(self, 'data'):
-            self.data = data.UserJson(result, self._page_num)
+            self.data = data.UserJson(result, 1)
         else:
-            self.data.update(result, self._page_num)
+            self.data.update(result)
 
     def _show_page(self):
         try:
-            names = self.data.names(self._page_num)
+            names = self.data.names()
         except KeyError:
             print('This is the last page!')
-            self._page_num -= 1
-            self.download_path = self._main_path / self._input / str(self._page_num)
+            self.data.page_num -= 1
+            self.download_path = self._main_path / self._input / str(self.data.page_num)
 
         else:
-            names_prefixed = map(pure.prefix_artist_name, names, range(len(names)))
-            names_prefixed = list(names_prefixed)
-
             # LSCAT
             lscat.Card(
                 self.download_path,
-                self._main_path / self._input / str(self._page_num) / 'previews',
-                messages=names_prefixed,
+                self._main_path / self._input / str(self.data.page_num) / 'previews',
+                messages=self.data.names_prefixed(),
             ).render()
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
-        oldnum = self._page_num
+        oldnum = self.data.page_num
 
         if self.data.next_url:
             next_offset = api.myapi.parse_next(self.data.next_url)['offset']
@@ -609,33 +605,33 @@ class Users(ABC):
             # p1 (p2 downloaded) -> p2 (p3) -> p1 -> p2 (p4 won't download)
             if int(next_offset) - int(self._offset) <= 30:
                 self._offset = next_offset
-                self._page_num = int(self._offset) // 30 + 1
-                self.download_path = self._main_path / self._input / str(self._page_num)
+                self.data.page_num = int(self._offset) // 30 + 1
+                self.download_path = self._main_path / self._input / str(self.data.page_num)
 
                 self._parse_and_download(track=False)
 
-        self._page_num = oldnum
-        self.download_path = self._main_path / self._input / str(self._page_num)
+        self.data.page_num = oldnum
+        self.download_path = self._main_path / self._input / str(self.data.page_num)
 
     def next_page(self):
-        self._page_num += 1
-        self.download_path = self._main_path / self._input / str(self._page_num)
+        self.data.page_num += 1
+        self.download_path = self._main_path / self._input / str(self.data.page_num)
         self._show_page()
 
         self._prefetch_next_page()
 
     def previous_page(self):
-        if self._page_num > 1:
-            self._page_num -= 1
+        if self.data.page_num > 1:
+            self.data.page_num -= 1
             self._offset = int(self._offset) - 30
-            self.download_path = self._main_path / self._input / str(self._page_num)
+            self.download_path = self._main_path / self._input / str(self.data.page_num)
             self._show_page()
         else:
             print('This is the first page!')
 
     def go_artist_mode(self, selected_user_num):
         try:
-            artist_user_id = self.data.artist_user_id(self._page_num, selected_user_num)
+            artist_user_id = self.data.artist_user_id(selected_user_num)
         except IndexError:
             print('Invalid number!')
         else:

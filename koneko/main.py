@@ -25,6 +25,7 @@ def main(start=True):
     """Read config file, start login, process any cli arguments, go to main loop"""
     os.system('clear')
     credentials, your_id = utils.config()
+
     if not Path('~/.local/share/koneko').expanduser().exists():
         print('Please wait, downloading welcome image (this will only occur once)...')
         baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'

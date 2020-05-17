@@ -92,9 +92,10 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
+* Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
+
 ## Features
 
-* Startup time seems to be slow (but not import time)
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (but either it blocks the prompt or the prompt blocks)
 * Image and User views should use lscat.py to render so alternate renderers can be used

@@ -63,22 +63,22 @@ def downloadr(url, img_name, new_file_name=None, pbar=None, tracker=None):
         tracker.update(img_name)
 
 
-def download_page(current_page_illusts, download_path, pbar=None, tracker=None):
+def download_page(data, pbar=None, tracker=None):
     """
     Download the illustrations on one page of given artist id (using threads),
     rename them based on the *post title*. Used for gallery modes (1 and 5)
     """
-    # TODO: Possible to move this to data?
-    urls = pure.medium_urls(current_page_illusts)
-    titles = pure.post_titles_in_page(current_page_illusts)
+    urls = pure.medium_urls(data.current_illusts)
+    titles = pure.post_titles_in_page(data.current_illusts)
 
     async_download_core(
-        download_path, urls, rename_images=True, file_names=titles, pbar=pbar,
+        data.download_path, urls, rename_images=True, file_names=titles, pbar=pbar,
         tracker=tracker
     )
 
 # - Wrappers around above download functions, for downloading multi-images
-def user_download(data, preview_path, download_path, tracker=None):
+def user_download(data, tracker=None):
+    preview_path = data.download_path / 'previews'
     async_download_core(
         preview_path,
         data.all_urls,
@@ -90,21 +90,19 @@ def user_download(data, preview_path, download_path, tracker=None):
 
     # Move artist profile pics to their correct dir
     to_move = sorted(os.listdir(preview_path))[:data.splitpoint]
-    with pure.cd(download_path):
-        _ = [os.rename(download_path / 'previews' / pic, download_path / pic)
+    with pure.cd(data.download_path):
+        _ = [os.rename(data.download_path / 'previews' / pic, data.download_path / pic)
          for pic in to_move]
 
-def init_download(download_path, data, current_page_num, download_func, *args):
-    # TODO: get variables from the data object rather than directly
-    if not download_path.is_dir():
-        download_func(*args)
-
-    elif not data.first_img in sorted(os.listdir(download_path))[0]:
-        if current_page_num == 1:
-            print('Cache is outdated, reloading...')
+def init_download(data, download_func, tracker):
+    if (data.download_path.is_dir() and
+        data.first_img not in sorted(os.listdir(data.download_path))[0]):
         # Remove old images
-        os.system(f'rm -r {download_path}') # shutil.rmtree is better
-        download_func(*args)
+        if data.page_num == 1:
+            print('Cache is outdated, reloading...')
+        os.system(f'rm -r {data.download_path}') # shutil.rmtree is better
+
+    download_func(data, tracker=tracker)
 
 # - Wrappers around the core functions for downloading one image
 @pure.spinner('')

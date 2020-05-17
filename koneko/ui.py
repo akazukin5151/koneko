@@ -47,12 +47,7 @@ class AbstractGallery(ABC):
 
         tracker = lscat.TrackDownloads(self.data.download_path)
         # Tracker will cause gallery to show each img as they finish downloading
-        # TODO: clean up this mess
-        # page info should be inside the data class
-        download.init_download(self.data.download_path, self.data,
-                               self.data.current_page_num, download.download_page,
-                               self.data.current_illusts, self.data.download_path,
-                               None, tracker)
+        download.init_download(self.data, download.download_page, tracker)
 
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
@@ -160,15 +155,19 @@ class AbstractGallery(ABC):
         parse_page = api.myapi.parse_next(next_url)
         next_page = self._pixivrequest(**parse_page)
         self.data.all_pages_cache[str(self.data.current_page_num + 1)] = next_page
-        current_page_illusts = next_page['illusts']
 
+        current_page_illusts = next_page['illusts']
         download_path = self._main_path / str(self.data.current_page_num + 1)
+
         if not download_path.is_dir():
+            oldnum = self.data.current_page_num
+            self.data.current_page_num += 1
+
             pbar = tqdm(total=len(current_page_illusts), smoothing=0)
-            download.download_page(
-                current_page_illusts, download_path, pbar=pbar
-            )
+            download.download_page(self.data, pbar=pbar)
             pbar.close()
+
+            self.data.current_page_num = oldnum
 
     def reload(self):
         ans = input('This will delete cached images and redownload them. Proceed?\n')
@@ -554,10 +553,7 @@ class Users(ABC):
             tracker = lscat.TrackDownloadsUsers(preview_path)
         else:
             tracker = None
-        download.init_download(self.data.download_path, self.data,
-                               self.data.page_num, download.user_download,
-                               self.data, preview_path, self.data.download_path,
-                               tracker)
+        download.init_download(self.data, download.user_download, tracker)
 
     @abstractmethod
     def _pixivrequest(self):

@@ -49,6 +49,11 @@ class GalleryJson:
     def first_img(self):
         return pure.post_titles_in_page(self.current_illusts)[0]
 
+    @property
+    def page_num(self):
+        """Just a wrapper, for init_download"""
+        return self.current_page_num
+
 
 class ImageJson:
     """Stores data for image view (mode 2)"""

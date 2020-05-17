@@ -86,7 +86,7 @@ def main_loop(prompted, main_command, user_input, your_id=None, start=True):
             SearchUsersModeLoop(prompted, user_input).start(start)
 
         elif main_command == '5':
-            IllustFollowModeLoop(start)
+            illust_follow_mode_loop(start)
 
         elif main_command == '?':
             utils.info_screen_loop()
@@ -245,7 +245,7 @@ class FollowingUserModeLoop(Loop):
         self.mode.start()
         prompt.user_prompt(self.mode)
 
-def IllustFollowModeLoop(start):
+def illust_follow_mode_loop(start):
     """Immediately goes to IllustFollow()"""
     while True:
         if start:

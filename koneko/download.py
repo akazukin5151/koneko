@@ -4,7 +4,6 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 import cytoolz
-from tqdm import tqdm
 
 from koneko import api, pure, utils
 
@@ -79,7 +78,7 @@ def download_page(current_page_illusts, download_path, pbar=None, tracker=None):
     )
 
 # - Wrappers around above download functions, for downloading multi-images
-def user_download(data, preview_path, download_path, page_num, tracker=None):
+def user_download(data, preview_path, download_path, tracker=None):
     async_download_core(
         preview_path,
         data.all_urls,
@@ -92,7 +91,7 @@ def user_download(data, preview_path, download_path, page_num, tracker=None):
     # Move artist profile pics to their correct dir
     to_move = sorted(os.listdir(preview_path))[:data.splitpoint]
     with pure.cd(download_path):
-        [os.rename(download_path / 'previews' / pic, download_path / pic)
+        _ = [os.rename(download_path / 'previews' / pic, download_path / pic)
          for pic in to_move]
 
 def init_download(download_path, data, current_page_num, download_func, *args):
@@ -100,7 +99,7 @@ def init_download(download_path, data, current_page_num, download_func, *args):
     if not download_path.is_dir():
         download_func(*args)
 
-    elif (not data.first_img in sorted(os.listdir(download_path))[0]):
+    elif not data.first_img in sorted(os.listdir(download_path))[0]:
         if current_page_num == 1:
             print('Cache is outdated, reloading...')
         # Remove old images

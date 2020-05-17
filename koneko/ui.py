@@ -503,6 +503,7 @@ class Image:
             )
 
         print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
+        return True
 
     def leave(self, force=False):
         if self._firstmode or force:
@@ -562,7 +563,7 @@ class Users(ABC):
         download.init_download(self.data.download_path, self.data,
                                self.data.page_num, download.user_download,
                                self.data, preview_path, self.data.download_path,
-                               self.data.page_num, tracker)
+                               tracker)
 
     @abstractmethod
     def _pixivrequest(self):
@@ -580,7 +581,7 @@ class Users(ABC):
 
     def _show_page(self):
         try:
-            names = self.data.names
+            self.data.names_prefixed
         except KeyError:
             print('This is the last page!')
             self.data.page_num -= 1

@@ -104,7 +104,7 @@ class AbstractGallery(ABC):
         )
 
         # blocking: no way to unblock prompt
-        image = Image(image_id, idata, self.data.current_page_num, False)
+        image = Image(image_id, idata, False)
         prompt.image_prompt(image)
 
         # Image prompt ends, user presses back
@@ -236,6 +236,7 @@ class ArtistGallery(AbstractGallery):
             return api.myapi.artist_gallery_request(self._artist_user_id)
 
     def _back(self):
+        # TODO: gallery -> next -> image -> back needs to return to the correct page
         # After user 'back's from image prompt, start mode again
         self.__init__(self._artist_user_id)
         prompt.gallery_like_prompt(self)
@@ -418,10 +419,9 @@ class Image:
         q -- quit (with confirmation)
 
     """
-    def __init__(self, image_id, idata, current_page_num=1, firstmode=False):
+    def __init__(self, image_id, idata, firstmode=False):
         self.data = idata
         self._image_id = image_id
-        self._current_page_num = current_page_num
         self._firstmode = firstmode
 
     def open_image(self):
@@ -498,7 +498,7 @@ class Image:
         else:
             utils.display_image_vp(
                 KONEKODIR / str(self.data.artist_user_id) /
-                str(self._current_page_num) / "large" /
+                str(self.data.img_post_page_num) / "large" /
                 self.data.image_filename()
             )
 

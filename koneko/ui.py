@@ -174,10 +174,9 @@ class AbstractGallery(ABC):
         if ans == 'y' or not ans:
             os.system(f'rm -r {self._main_path}') # shutil.rmtree is better
             self.data.all_pages_cache = {} # Ensures prefetch after reloading
-            self._back()
-        else:
-            # After reloading, back will return to the same mode again
-            prompt.gallery_like_prompt(self)
+            self.start()
+        prompt.gallery_like_prompt(self)
+        # Regardless of confirmation, need to catch itself with a prompt
 
     @abstractmethod
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,

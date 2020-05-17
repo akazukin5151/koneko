@@ -24,6 +24,9 @@ class GalleryJson:
     def post_json(self, post_number):
         return self.current_illusts()[post_number]
 
+    def artist_user_id(self, post_number):
+        return self.post_json(post_number)['user']['id']
+
     def image_id(self, number):
         return self.current_illusts()[number]['id']
 

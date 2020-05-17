@@ -138,8 +138,7 @@ class AbstractGallery(ABC):
         if self.data.current_page_num > 1:
             self.data.current_page_num -= 1
 
-            download_path = self._main_path / str(self.data.current_page_num)
-            utils.show_artist_illusts(download_path)
+            utils.show_artist_illusts(self.data.download_path())
             pure.print_multiple_imgs(self.data.current_illusts())
             print(f'Page {self.data.current_page_num}')
             print('Enter a gallery command:\n')
@@ -238,7 +237,7 @@ class ArtistGallery(AbstractGallery):
 
     def _back(self):
         # After user 'back's from image prompt, start mode again
-        self.__init__(self.data.current_page_num, self._artist_user_id)
+        self.__init__(self._artist_user_id)
         prompt.gallery_like_prompt(self)
 
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
@@ -325,9 +324,8 @@ class IllustFollowGallery(AbstractGallery):
     def go_artist_gallery_num(self, selected_image_num):
         """Like self.view_image(), but goes to artist mode instead of image"""
         self._selected_image_num = selected_image_num
-        post_json = self.data.post_json(selected_image_num)
 
-        artist_user_id = post_json['user']['id']
+        artist_user_id = self.data.artist_user_id(selected_image_num)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # Gallery prompt ends, user presses back

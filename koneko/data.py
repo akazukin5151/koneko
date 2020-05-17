@@ -6,12 +6,17 @@ from koneko import KONEKODIR, pure
 
 class GalleryJson:
     """Stores data for gallery modes (mode 1 and 5)"""
-    def __init__(self, current_page_num):
+    # TODO: use properties
+    def __init__(self, current_page_num, main_path):
         self.current_page_num = current_page_num
+        self._main_path = main_path
 
     def set_raw(self, raw):
         self.raw = raw
         self.all_pages_cache = {str(self.current_page_num): self.raw}
+
+    def download_path(self):
+        return self._main_path / str(self.current_page_num)
 
     def current_illusts(self):
         return self.all_pages_cache[str(self.current_page_num)]['illusts']

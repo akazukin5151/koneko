@@ -16,8 +16,7 @@ class LastPageException(ValueError):
 
 class AbstractGallery(ABC):
     def __init__(self):
-        self.data = data.GalleryJson(1)
-        self._download_path = self._main_path / str(self.data.current_page_num)
+        self.data = data.GalleryJson(1, self._main_path)
         self._show = True
         # Defined in self.view_image
         self._selected_image_num: int
@@ -32,11 +31,11 @@ class AbstractGallery(ABC):
         for contents!)
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
-        if self._download_path.is_dir():
+        if self.data.download_path().is_dir():
             try:
-                utils.show_artist_illusts(self._download_path)
+                utils.show_artist_illusts(self.data.download_path())
             except IndexError: # Folder exists but no files
-                self._download_path.rmdir()
+                self.data.download_path().rmdir()
                 self._show = True
             else:
                 self._show = False
@@ -46,13 +45,13 @@ class AbstractGallery(ABC):
         current_page = self._pixivrequest()
         self.data.set_raw(current_page)
 
-        tracker = lscat.TrackDownloads(self._download_path)
+        tracker = lscat.TrackDownloads(self.data.download_path())
         # Tracker will cause gallery to show each img as they finish downloading
         # TODO: clean up this mess
         # page info should be inside the data class
-        download.init_download(self._download_path, self.data,
+        download.init_download(self.data.download_path(), self.data,
                                self.data.current_page_num, download.download_page,
-                               self.data.current_illusts(), self._download_path,
+                               self.data.current_illusts(), self.data.download_path(),
                                None, tracker)
 
         pure.print_multiple_imgs(self.data.current_illusts())

@@ -8,7 +8,7 @@ from configparser import ConfigParser
 
 import pixcat
 
-from koneko import __version__, KONEKODIR, main, pure, lscat
+from koneko import KONEKODIR, ui, cli, pure, lscat, __version__
 
 
 def verify_full_download(filepath):
@@ -85,15 +85,15 @@ def artist_user_id_prompt():
 @pure.catch_ctrl_c
 def show_man_loop():
     os.system('clear')
-    print(main.__doc__)
+    print(cli.__doc__)
     print(' ' * 3, '=' * 30)
-    print(main.ArtistGallery.__doc__)
+    print(ui.ArtistGallery.__doc__)
     print(' ' * 3, '=' * 30)
-    print(main.Image.__doc__)
+    print(ui.Image.__doc__)
     print(' ' * 3, '=' * 30)
-    print(main.Users.__doc__)
+    print(ui.Users.__doc__)
     print(' ' * 3, '=' * 30)
-    print(main.IllustFollowGallery.__doc__)
+    print(ui.IllustFollowGallery.__doc__)
     while True:
         help_command = input('\n\nEnter any key to return: ')
         if help_command or help_command == '':

@@ -33,8 +33,11 @@ Options:
 """
 
 import sys
+
 from docopt import docopt
+
 from koneko import pure
+
 
 def process_cli_args():
     args = docopt(__doc__)

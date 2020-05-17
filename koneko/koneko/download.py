@@ -96,10 +96,13 @@ def user_download(data, tracker=None):
 
 def init_download(data, download_func, tracker):
     if (data.download_path.is_dir() and
-        data.first_img not in sorted(os.listdir(data.download_path))[0]):
-        # Remove old images
-        if data.page_num == 1:
-            print('Cache is outdated, reloading...')
+        data.first_img in sorted(os.listdir(data.download_path))[0]):
+        return True
+
+    # Remove old images
+    if data.page_num == 1:
+        print('Cache is outdated, reloading...')
+    if data.download_path.is_dir():
         os.system(f'rm -r {data.download_path}') # shutil.rmtree is better
 
     download_func(data, tracker=tracker)

@@ -151,13 +151,13 @@ You might have problems with image positioning with lscat.py. I wrote it to fit 
 # Contributing
 * Fork it
 * Make a new branch with `git checkout -b myfeature` (a git pre-commit hook might prevent your git client from commiting to master, but github might let you. It doesn't matter which branch you edit, the pre-commit hook is just for me)
-* Edit the files on your fork and branch
-* Submit a pull request to master
+* Edit the files on your fork/branch
+* Test it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
+    * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
+* Submit a pull request
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
 * If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.
-* When testing your edit, don't forget to uninstall the pip version and do `python setup.py develop` (totally didn't happen to me).
 
-**NOTE:** running `koneko.py` with python or executing it will fail with an import error (circular import). Python imports are a mess, just use `python setup.py develop` when you want to test a change.
 
 ## Priorities
 (As in, what I think I need help on and what you might want to focus on, not what will only be accepted. All PRs will be considered, regardless if it's important or not)
@@ -209,7 +209,7 @@ which pip                       # and pip is in your conda directory
 # If you're using a separate conda env, you probably want to make some edits
 pip install koneko
 
-# Use anywhere:
+# Use anywhere (but only in this conda env):
 koneko
 
 # To remove the conda env:
@@ -221,12 +221,12 @@ conda remove --name koneko --all
 Note: if you want to make some edits, you should install it in a conda environment. See above
 
 ```sh
-# Use the latest stable version (recommended)
+# Use the latest stable version (recommended for usage)
 # Make sure the version number is the latest
 git clone -b 'v0.5' --depth 1 https://github.com/twenty5151/koneko.git
 # Use the master branch for upcoming features:
 git clone -b master https://github.com/twenty5151/koneko.git
-# Use the dev branch for latest features, fixes, and instability:
+# Use the dev branch for latest features, fixes, and instability (recommended for contributers):
 git clone -b dev https://github.com/twenty5151/koneko.git
 
 cd koneko
@@ -236,7 +236,7 @@ pip install .
 # or
 python setup.py install
 # or
-# Manually install for development
+# Manually install for development, changes will be immediately reflected
 python setup.py develop
 
 # On certain shells with implicit cd, typing `koneko` might cd into the dir

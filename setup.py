@@ -28,6 +28,7 @@ setup(
         "Environment :: Console"
     ],
     packages=["koneko"],
+    package_dir = {'': 'koneko'},
     include_package_data=True,
     install_requires=[
         "funcy==1.14",
@@ -42,7 +43,7 @@ setup(
     extras_requires = ["pytest==5.4.1"],
     entry_points={
         "console_scripts": [
-            "koneko=koneko.main:main",
+            "koneko=main:main",
         ]
     },
 )

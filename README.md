@@ -94,11 +94,17 @@ For more details refer to the [manual](#manual).
 
 ## Features
 
+* Startup time seems to be slow (but not import time)
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (but either it blocks the prompt or the prompt blocks)
 * Image and User views should use lscat.py to render so alternate renderers can be used
 * Option to use pillow or wand to edit numbers on pics
 * Support [ueberzug](https://github.com/seebye/ueberzug)
+
+# Code structure
+
+* Move more things, like `current_page_num`, into data classes
+
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!

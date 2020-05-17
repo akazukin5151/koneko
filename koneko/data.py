@@ -6,30 +6,30 @@ from koneko import KONEKODIR, pure
 
 class GalleryJson:
     """Stores data for gallery modes (mode 1 and 5)"""
-    def __init__(self, raw):
+    def __init__(self, current_page_num):
+        self.current_page_num = current_page_num
+
+    def set_raw(self, raw):
         self.raw = raw
-        self.all_pages_cache = {'1': self.raw}
+        self.all_pages_cache = {str(self.current_page_num): self.raw}
 
-    def current_page(self, current_page_num=1):
-        return self.all_pages_cache[str(current_page_num)]
+    def current_illusts(self):
+        return self.all_pages_cache[str(self.current_page_num)]['illusts']
 
-    def current_illusts(self, current_page_num=1):
-        return self.all_pages_cache[str(current_page_num)]['illusts']
+    def post_json(self, post_number):
+        return self.current_illusts()[post_number]
 
-    def post_json(self, current_page_num, post_number):
-        return self.current_illusts(current_page_num)[post_number]
-
-    def image_id(self, current_page_num, number):
-        return self.current_illusts(current_page_num)[number]['id']
+    def image_id(self, number):
+        return self.current_illusts()[number]['id']
 
     def cached_pages(self):
         return self.all_pages_cache.keys()
 
-    def next_url(self, current_page_num):
-        return self.all_pages_cache[str(current_page_num)]['next_url']
+    def next_url(self):
+        return self.all_pages_cache[str(self.current_page_num)]['next_url']
 
-    def first_img(self, current_page_num=1):
-        return pure.post_titles_in_page(self.current_illusts(current_page_num))[0]
+    def first_img(self):
+        return pure.post_titles_in_page(self.current_illusts())[0]
 
 
 class ImageJson:
@@ -50,7 +50,7 @@ class ImageJson:
                                               self.page_urls[:2]))
             # So it won't be duplicated later
             self.large_dir = (KONEKODIR / str(self.artist_user_id) / 'individual' /
-                             str(image_id))
+                              str(image_id))
 
     def image_filename(self):
         return self.downloaded_images[self.img_post_page_num]

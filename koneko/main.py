@@ -177,7 +177,7 @@ class ArtistModeLoop(Loop):
         self._url_or_id = utils.artist_user_id_prompt()
 
     def _go_to_mode(self):
-        self.mode = ui.ArtistGallery(1, self._user_input)
+        self.mode = ui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
         main(start=False)
@@ -250,7 +250,7 @@ def IllustFollowModeLoop(start):
     while True:
         if start:
             api.myapi.await_login()
-        mode = ui.IllustFollowGallery(1)
+        mode = ui.IllustFollowGallery()
         prompt.gallery_like_prompt(mode)
         # After backing
         main(start=False)

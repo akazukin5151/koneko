@@ -9,23 +9,31 @@ User --> ui: Pixiv id
 ui -> api ++: JSON request
 return JSON response
 database udata
+create udata
 ui -> udata: Stores response
+create lscat
+ui -> lscat: Add tracker
 ui -> download: Download images
 activate download
+download -> lscat ++: Image 2 done
+download -> lscat: Image 1 done
+lscat -> User: Display image 1
+lscat -> User: Display image 2
+download -> lscat: Image 3 done
 deactivate download
-ui -> udata ++: names
-return names
-ui --> User: display images
+lscat -> User: Display image 3
+deactivate lscat
 group prefetching
     ui -> udata ++: next_url
     return next_url
     ui -> api ++: parse_next()
     return JSON response
-    ui -> download: Download page
+    ui -> udata: Stores response
+    ui -> download: Download images
     activate download
     deactivate download
 end
-return
+return Prompt
 |||
 
 == Next page ==

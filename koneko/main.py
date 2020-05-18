@@ -15,6 +15,7 @@ import os
 import re
 import sys
 import time
+import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -278,10 +279,17 @@ def view_post_mode(image_id):
     utils.display_image_vp(idata.large_dir / idata.filename)
 
     # Download the next page for multi-image posts
-    if idata.number_of_pages != 1:
-        download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
+    # Do this after prompt
+    #if idata.number_of_pages != 1:
+    #    download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
 
     image = ui.Image(image_id, idata, True)
+    experimental = utils.get_settings('misc', 'experimental')
+    if experimental == 'on':
+        event = threading.Event()
+        thread = threading.Thread(target=image.preview)
+        image.set_thread_event(thread, event)
+        thread.start()
     prompt.image_prompt(image)
 
 if __name__ == '__main__':

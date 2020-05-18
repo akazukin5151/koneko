@@ -314,6 +314,54 @@ def generate_orders(total_pics, artists_count):
     return order
 
 
+class TrackDownloadsImage(Tracker):
+    """Experimental"""
+    def __init__(self, path):
+        super().__init__(path)
+        self.orders = list(range(1,30))
+        self.generator = generate_previews(path)
+        self.generator.send(None)
+
+    def _inspect(self):
+        next_num = self.orders[self._counter]
+        numlist = [int(f.split('_')[1].replace('p', '')) for f in self._downloaded]
+
+        if next_num in numlist:
+            pic = self._downloaded[numlist.index(next_num)]
+            # Display page
+            if next_num == 0:
+                os.system('clear')
+            self.generator.send(pic)
+
+            self._counter += 1
+            self._downloaded.remove(pic)
+            numlist.remove(next_num)
+            if self._downloaded:
+                self._inspect()
+
+def generate_previews(path):
+    """Experimental"""
+    rowspaces = (0, 9)
+    xcoords = (2, 75)
+    i = 0
+    while True:
+        # Release control. When _inspect() sends another image,
+        # assign to the variables and display it again
+        image = yield
+        i += 1
+
+        number = int(image.split('_')[1].replace('p', '')) - 1
+        y = number % 2
+        if i <= 2:
+            x = 0
+        else:
+            x = 1
+
+        with cd(path):
+            Image(image).thumbnail(310).show(
+                align='left', x=xcoords[x], y=rowspaces[y]
+            )
+
 if __name__ == '__main__':
     from koneko import KONEKODIR
     #Gallery(KONEKODIR / '2232374' / '1').render()

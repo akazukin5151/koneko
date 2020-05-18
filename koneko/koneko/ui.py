@@ -1,6 +1,7 @@
 """Handles user interaction inside all the modes. No knowledge of API needed"""
 
 import os
+import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -407,6 +408,28 @@ class Image:
         self._image_id = image_id
         self._firstmode = firstmode
 
+    def preview(self):
+        """Experimental"""
+        if self.data.number_of_pages == 1:
+            return True
+
+        tracker = lscat.TrackDownloadsImage(self.data.large_dir)
+        slicestart = self.data.img_post_page_num
+        while not self.event.is_set() and slicestart <= 4:
+            img = self.data.page_urls[slicestart:slicestart+1]
+
+            if os.path.isfile(self.data.large_dir / pure.split_backslash_last(img[0])):
+                tracker.update(pure.split_backslash_last(img[0]))
+            else:
+                download.async_download_core(self.data.large_dir, img, tracker=tracker)
+
+            slicestart += 1
+
+    def set_thread_event(self, thread, event):
+        """Experimental"""
+        self.thread = thread
+        self.event = event
+
     def open_image(self):
         link = f'https://www.pixiv.net/artworks/{self._image_id}'
         os.system(f'xdg-open {link}')
@@ -433,6 +456,7 @@ class Image:
             print('This is the last image in the post!')
 
         else:
+            #self.event.set()
             self.data.img_post_page_num += 1  # Be careful of 0 index
             self._go_next_image()
 

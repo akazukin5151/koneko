@@ -189,3 +189,14 @@ def config():
         os.system('clear')
 
     return credentials, your_id
+
+def get_settings(section, setting):
+    config_object = ConfigParser()
+    config_path = Path('~/.config/koneko/config.ini').expanduser()
+    if not config_path.exists():
+        raise FileNotFoundError
+
+    config_object.read(config_path)
+    section = config_object[section]
+    result = section.get(setting, None)
+    return result

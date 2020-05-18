@@ -100,8 +100,8 @@ def print_multiple_imgs(illusts_json):
     _r = Fore.RESET
     _blue = Fore.BLUE
     _ = [print(f'{_red}#{index}{_r} has {_blue}{pages}{_r} pages', end=', ')
-     for (index, json) in enumerate(illusts_json)
-     if (pages := json['page_count']) > 1]
+         for (index, json) in enumerate(illusts_json)
+         if (pages := json['page_count']) > 1]
     print('')
 
 

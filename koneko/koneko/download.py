@@ -96,6 +96,7 @@ def user_download(data, tracker=None):
 
 def init_download(data, download_func, tracker):
     if (data.download_path.is_dir() and
+        sorted(os.listdir(data.download_path)) and
         data.first_img in sorted(os.listdir(data.download_path))[0]):
         return True
 

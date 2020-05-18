@@ -188,8 +188,7 @@ class Card(View):
                 display_page(((self._preview_images[i][j],),), self._rowspaces,
                              self._cols, coord, self._preview_paths)
 
-
-class TrackDownloads:
+class Tracker(ABC):
     def __init__(self, path):
         self.path = path
         self._downloaded = []
@@ -200,97 +199,9 @@ class TrackDownloads:
         with self._lock:
             self._downloaded.append(new)
 
-        self._inspect(new)
+        self._inspect()
 
-    def _inspect(self, new):
-        # TODO: adapt how users did it
-        """
-        Counter always goes up, so every image to displayed in order
-        1. If image that was just submitted (just finished downloading) == counter,
-        2. Display it
-        3. Increment counter
-        4. Remove from the list
-        5. Sort
-        6. Inspect the first item in the list as if it was just submitted.
-            a. If it is == counter, display it, etc
-            b. Else, do nothing (continue to accept submissions)
-
-        Example with numbers submitted in this order: (3,8,4,7,0,1,9,5,2,6)
-        3
-        3,8
-        3,8,4
-        3,8,4,7         # Do nothing in all above lines
-        3,8,4,7,0       # New number == counter, take out 0, display it, sort the rest
-        3,4,7,8         # Counter is now 1 , but 1 != 3, so do nothing
-        3,4,7,8,1       # New number == counter, so take out 1, display, sort
-        3,4,7,8         # Counter is now 2, do nothing
-        3,4,7,8,9
-        3,4,7,8,9,5
-        3,4,7,8,9,5,2   # Take out 2, display, sort
-        3,4,5,7,8,9     # Counter is now 3; tds
-        4,5,7,8,9       # Counter is now 4; tds
-        5,7,8,9         # Counter is now 5; tds
-        7,8,9           # Counter is now 6, but 6 != 7, so do nothing
-        7,8,9,6         # New number == counter; tds
-        7,8,9           # Counter is now 7; tds
-        ...             # Done
-        """
-        number = int(new[:3]) # Only for renamed images
-        if number == self._counter:
-            # Display page
-            if number == 0:
-                os.system('clear')
-                self.generator = generate_page(new, self.path, 0)
-                next(self.generator)
-            else:
-                self.generator.send((new, number))
-
-            self._counter += 1
-            self._downloaded.remove(new)
-            self._downloaded.sort()
-            if self._downloaded:
-                self._inspect(self._downloaded[0])
-
-
-def generate_page(image, path, number):
-    """ Given number, calculate its coordinates and display it, then yield
-    For reference, (y-coordinate, x-coordinate) for every image
-    (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
-    (9, 2), (9, 29), (9, 38), (9, 56), (9, 74),
-    (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
-    (9, 2), (9, 29), (9, 38), (9, 56), (9, 74),
-    (0, 2), (0, 20), (0, 38), (0, 56), (0, 74),
-    (9, 2), (9, 29), (9, 38), (9, 56), (9, 74),
-    """
-    # TODO: These numbers are generated from the above View ABC
-    left_shifts = (2,20,38,56,74)
-    rowspaces = (0, 9)
-    #page_spaces=(26, 24, 24)
-    with cd(path):
-        while True:
-            x = number % 5
-            y = number // 5
-
-            if number % 10 == 0 and number != 0:
-                print('\n' * 25)
-
-            Image(image).thumbnail(310).show(
-                align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
-            )
-
-            # Release control. When _inspect() sends another image,
-            # assign to the variables and display it again
-            image, number = yield
-
-
-class TrackDownloadsUsers(TrackDownloads):
-    def __init__(self, path):
-        super().__init__(path)
-        self.orders = generate_orders(120, 30)
-        self.generator = generate_users(path)
-        self.generator.send(None)
-
-    def _inspect(self, new):  # new is not used
+    def _inspect(self):
         """
         images 0-29 are artist profile pics
         images 30-119 are previews, 3 for each artist
@@ -311,16 +222,53 @@ class TrackDownloadsUsers(TrackDownloads):
             self._downloaded.remove(pic)
             numlist.remove(next_num)
             if self._downloaded:
-                self._inspect(None)
+                self._inspect()
 
-def generate_users(path, rowspaces=(0,), cols=1, artist_xcoords=((2,),),
+class TrackDownloads(Tracker):
+    def __init__(self, path):
+        super().__init__(path)
+        self.orders = list(range(30))
+        self.generator = generate_page(path)
+        self.generator.send(None)
+
+class TrackDownloadsUsers(Tracker):
+    def __init__(self, path):
+        super().__init__(path)
+        self.orders = generate_orders(120, 30)
+        self.generator = generate_users(path)
+        self.generator.send(None)
+
+def generate_page(path):
+    """ Given number, calculate its coordinates and display it, then yield
+    """
+    # TODO: These numbers are generated from the above View ABC
+    left_shifts = (2,20,38,56,74)
+    rowspaces = (0, 9)
+    #page_spaces=(26, 24, 24)
+    while True:
+        # Release control. When _inspect() sends another image,
+        # assign to the variables and display it again
+        image = yield
+
+        number = int(image.split('_')[0])
+        x = number % 5
+        y = number // 5
+
+        if number % 10 == 0 and number != 0:
+            print('\n' * 25)
+
+        with cd(path):
+            Image(image).thumbnail(310).show(
+                align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
+            )
+
+def generate_users(path, rowspaces=(0,), cols=range(1), artist_xcoords=(2,),
                    preview_xcoords=((40,), (58,), (75,))):
 
     os.system('clear')
     while True:
         # Wait for artist pic
         a_img = yield
-        #breakpoint()
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * 18, artist_name])
@@ -376,7 +324,7 @@ if __name__ == '__main__':
     random.shuffle(imgs)
 
     messages = ['test'] * len(imgs)
-    tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
+    tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
 
     # Simulates downloads finishing and updating the tracker
     # Which will display the pictures in the correct order, waiting if needed

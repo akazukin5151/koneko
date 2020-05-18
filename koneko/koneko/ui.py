@@ -365,13 +365,18 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     then display that.
     Alternative to main.view_post_mode(). It does its own stuff before calling
     the Image class for the prompt.
+
+    Unlike the other modes, ui.Image does not handle the initial displaying of images
+    This is because coming from a gallery mode, the selected image already has a
+    square-medium preview downloaded, which can be displayed before the download
+    of the large-res completes. Thus, the initial displaying subroutine will be
+    different for a standalone mode or coming from a gallery mode.
     """
     search_string = f"{str(number_prefix).rjust(3, '0')}_*"
 
-    # LSCAT
     os.system('clear')
     arg = KONEKODIR / str(artist_user_id) / str(data.current_page_num) / search_string
-    os.system(f'kitty +kitten icat --silent {arg}')
+    lscat.icat(arg)
 
     url = pure.url_given_size(post_json, 'large')
     filename = pure.split_backslash_last(url)
@@ -382,10 +387,9 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     # BLOCKING: imput is blocking, will not display large image until input
     # received
 
-    # LSCAT
     os.system('clear')
     arg = large_dir / filename
-    os.system(f'kitty +kitten icat --silent {arg}')
+    lscat.icat(arg)
 
 
 class Image:
@@ -447,7 +451,7 @@ class Image:
         large_url = pure.change_url_to_full(url=self.data.current_url)
         filename = pure.split_backslash_last(large_url)
         download.download_core(self.data.large_dir, large_url, filename)
-        utils.display_image_vp(self.data.large_dir / filename)
+        lscat.icat(self.data.large_dir / filename)
 
     def next_image(self):
         if not self.data.page_urls:
@@ -474,7 +478,7 @@ class Image:
             download.async_download_spinner(self.data.large_dir,
                                             [self.data.current_url])
 
-        utils.display_image_vp(self.data.filepath)
+        lscat.icat(self.data.filepath)
 
         # Downloads the next image
         try:
@@ -501,9 +505,9 @@ class Image:
 
         testpath = self.data.large_dir / Path(self.data.image_filename)
         if testpath.is_file():
-            utils.display_image_vp(testpath)
+            lscat.icat(testpath)
         else:
-            utils.display_image_vp(
+            lscat.icat(
                 KONEKODIR / str(self.data.artist_user_id) /
                 str(self.data.img_post_page_num) / "large" /
                 self.data.image_filename
@@ -589,7 +593,6 @@ class Users(ABC):
             self.data.page_num -= 1
 
         else:
-            # LSCAT
             lscat.Card(
                 self.data.download_path,
                 self.data.download_path / 'previews',

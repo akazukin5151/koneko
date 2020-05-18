@@ -36,6 +36,9 @@ def number_prefix(myfile):
 
 
 # Impure functions
+def icat(args):
+    os.system(f'kitty +kitten icat --silent {args}')
+
 @funcy.ignore(IndexError, TypeError)
 def display_page(page, rowspaces, cols, left_shifts, path):
     with cd(path):

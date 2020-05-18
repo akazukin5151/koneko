@@ -19,7 +19,7 @@ import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, data, pure, utils, prompt, download
+from koneko import ui, api, cli, data, pure, lscat, utils, prompt, download
 
 
 def main(start=True):
@@ -265,6 +265,11 @@ def view_post_mode(image_id):
     Fetch all the illust info, download it in the correct directory, then display it.
     If it is a multi-image post, download the next image
     Else or otherwise, open image prompt
+    Unlike the other modes, ui.Image does not handle the initial displaying of images
+    This is because coming from a gallery mode, the selected image already has a
+    square-medium preview downloaded, which can be displayed before the download
+    of the large-res completes. Thus, the initial displaying subroutine will be
+    different for a standalone mode or coming from a gallery mode.
     """
     print('Fetching illust details...')
     try:
@@ -276,7 +281,7 @@ def view_post_mode(image_id):
     idata = data.ImageJson(post_json, image_id)
 
     download.download_core(idata.large_dir, idata.url, idata.filename)
-    utils.display_image_vp(idata.large_dir / idata.filename)
+    lscat.icat(idata.large_dir / idata.filename)
 
     # Download the next page for multi-image posts
     # Do this after prompt

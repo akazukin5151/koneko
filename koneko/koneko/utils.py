@@ -36,10 +36,6 @@ def show_artist_illusts(path, renderer='lscat', **kwargs):
             os.system(f'{Path(lscat_path).parent}/legacy/lsix')
 
 
-def display_image_vp(filepath):
-    os.system(f'kitty +kitten icat --silent {filepath}')
-
-
 # - Prompt functions
 def begin_prompt(printmessage=True):
     messages = (

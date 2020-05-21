@@ -1,6 +1,7 @@
 """Handles user interaction inside all the modes. No knowledge of API needed"""
 
 import os
+import sys
 import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -360,7 +361,7 @@ class IllustFollowGallery(AbstractGallery):
             'view ', colors.m, 'anual\n']))
 
 def display_image(post_json, artist_user_id, number_prefix, data):
-    """
+    """Image mode, from an artist mode (mode 1/5 -> mode 2)
     Opens image given by the number (medium-res), downloads large-res and
     then display that.
     Alternative to main.view_post_mode(). It does its own stuff before calling
@@ -391,6 +392,43 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     arg = large_dir / filename
     lscat.icat(arg)
 
+def view_post_mode(image_id):
+    """Image mode, from main (start -> mode 2)
+    Fetch all the illust info, download it in the correct directory, then display it.
+    If it is a multi-image post, download the next image
+    Else or otherwise, open image prompt
+    Unlike the other modes, ui.Image does not handle the initial displaying of images
+    This is because coming from a gallery mode, the selected image already has a
+    square-medium preview downloaded, which can be displayed before the download
+    of the large-res completes. Thus, the initial displaying subroutine will be
+    different for a standalone mode or coming from a gallery mode.
+    """
+    print('Fetching illust details...')
+    try:
+        post_json = api.myapi.protected_illust_detail(image_id)['illust']
+    except KeyError:
+        print('Work has been deleted or the ID does not exist!')
+        sys.exit(1)
+
+    idata = data.ImageJson(post_json, image_id)
+
+    download.download_core(idata.large_dir, idata.url, idata.filename)
+    lscat.icat(idata.large_dir / idata.filename)
+
+    # Download the next page for multi-image posts
+    # Do this after prompt
+    #if idata.number_of_pages != 1:
+    #    download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
+
+    image = Image(image_id, idata, True)
+    experimental = utils.get_settings('misc', 'experimental')
+    if experimental == 'on':
+        event = threading.Event()
+        thread = threading.Thread(target=image.preview)
+        image.set_thread_event(thread, event)
+        thread.start()
+
+    prompt.image_prompt(image)
 
 class Image:
     """

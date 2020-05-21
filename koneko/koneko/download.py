@@ -107,6 +107,7 @@ def init_download(data, download_func, tracker):
         os.system(f'rm -r {data.download_path}') # shutil.rmtree is better
 
     download_func(data, tracker=tracker)
+    return True
 
 # - Wrappers around the core functions for downloading one image
 @pure.spinner('')

@@ -10,6 +10,7 @@ from koneko import pure
 
 
 class APIHandler:
+    """Handles all the API interactions in the program"""
     def __init__(self):
         self.api_queue = queue.Queue()
         self.api_thread = threading.Thread(target=self._login)
@@ -17,6 +18,8 @@ class APIHandler:
         self.api: 'AppPixivAPI()'
 
     def add_credentials(self, credentials):
+        """Because the initiation of the class is before the config file is read
+        (and before main() starts)"""
         self._credentials = credentials
 
     def start(self):

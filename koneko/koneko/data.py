@@ -5,31 +5,35 @@ from koneko import KONEKODIR, pure
 
 
 class GalleryJson:
-    """Stores data for gallery modes (mode 1 and 5)"""
+    """Stores data for gallery modes (mode 1 and 5)
+    Structure of the JSON raw:
+        illust                  (list of posts)         self.current_illusts
+            0                   (the first post)        self.first_img & post_json(0)
+                id              (image id)              self.image_id
+                user
+                    id          (artist id)             self.artist_user_id
+                    ...
+                ...
+            1                   (the second post)       self.post_json(1)
+                ...
+            2                                           self.post_json(2)
+                ...
+            ...
+        next_url                (next JSON url)         self.next_url
+    """
     def __init__(self, current_page_num, main_path):
         self.current_page_num = current_page_num
         self._main_path = main_path
         self.all_pages_cache = {}
 
     def update(self, raw):
+        """Adds newly requested raw json into the cache"""
         self.all_pages_cache[str(self.current_page_num)] = raw
 
     @property
-    def download_path(self):
-        return self._main_path / str(self.current_page_num)
-
-    @property
     def current_illusts(self):
+        """Get the illusts json for this page"""
         return self.all_pages_cache[str(self.current_page_num)]['illusts']
-
-    def post_json(self, post_number):
-        return self.current_illusts[post_number]
-
-    def artist_user_id(self, post_number):
-        return self.post_json(post_number)['user']['id']
-
-    def image_id(self, number):
-        return self.current_illusts[number]['id']
 
     @property
     def cached_pages(self):
@@ -38,6 +42,23 @@ class GalleryJson:
     @property
     def next_url(self):
         return self.all_pages_cache[str(self.current_page_num)]['next_url']
+
+    @property
+    def download_path(self):
+        """Get the download path of the current page"""
+        return self._main_path / str(self.current_page_num)
+
+    def post_json(self, post_number):
+        """Get the post json for a specified post number"""
+        return self.current_illusts[post_number]
+
+    def artist_user_id(self, post_number):
+        """Get the artist user id for a specified post number"""
+        return self.post_json(post_number)['user']['id']
+
+    def image_id(self, post_number):
+        """Get the image id for a specified specified post number"""
+        return self.post_json(post_number)['id']
 
     @property
     def first_img(self):

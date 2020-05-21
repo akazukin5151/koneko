@@ -40,18 +40,24 @@ from koneko import pure
 
 
 def process_cli_args():
+    """Use docopt to process cli args, returning:
+    prompted: bool
+        if user needs to be asked for the mode
+    main_command: string, 1-5
+        if user has specified a mode number
+    user_input: string
+        if user has entered further information required for the mode
+        eg, modes 1/5 requires artist user id; mode 2, requires image id
+    """
     args = docopt(__doc__)
     if len(sys.argv) > 1:
         print('Logging in...')
         prompted = False
     else:  # No cli arguments
-        prompted = True
-        main_command = None
-        user_input = None
+        return True, None, None
 
-    # Direct command line arguments
+    # Argument given, no mode specified
     if url_or_str := args['<link>']:
-        # Link given, no mode specified
         if 'users' in url_or_str:
             user_input, main_command = pure.process_user_url(url_or_str)
 
@@ -72,8 +78,8 @@ def process_cli_args():
             user_input = url_or_str
             main_command = '4'
 
+    # Mode specified, argument can be link or id
     elif url_or_id := args['<link_or_id>']:
-        # Mode specified, argument can be link or id
         if args['1'] or args['a']:
             user_input, main_command = pure.process_user_url(url_or_id)
 

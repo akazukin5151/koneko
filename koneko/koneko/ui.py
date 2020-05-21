@@ -40,7 +40,7 @@ class AbstractGallery(ABC):
             self._show = True
 
         current_page = self._pixivrequest()
-        self.data.raw = current_page
+        self.data.update(current_page)
 
         tracker = lscat.TrackDownloads(self.data.download_path)
         # Tracker will cause gallery to show each img as they finish downloading

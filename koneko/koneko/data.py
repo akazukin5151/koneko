@@ -55,7 +55,7 @@ class ImageJson:
         self.url = pure.url_given_size(raw, 'large')
         self.filename = pure.split_backslash_last(self.url)
         self.artist_user_id = raw['user']['id']
-        self.img_post_page_num = 0
+        self.page_num = 0
 
         self.number_of_pages, self.page_urls = pure.page_urls_in_post(raw, 'large')
         if self.number_of_pages == 1:
@@ -70,7 +70,7 @@ class ImageJson:
 
     @property
     def image_filename(self):
-        return self.downloaded_images[self.img_post_page_num]
+        return self.downloaded_images[self.page_num]
 
     @property
     def filepath(self):
@@ -78,11 +78,11 @@ class ImageJson:
 
     @property
     def next_img_url(self):
-        return self.page_urls[self.img_post_page_num + 1]
+        return self.page_urls[self.page_num + 1]
 
     @property
     def current_url(self):
-        return self.page_urls[self.img_post_page_num]
+        return self.page_urls[self.page_num]
 
 
 class UserJson:

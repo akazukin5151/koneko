@@ -456,7 +456,7 @@ class Image:
             return True
 
         tracker = lscat.TrackDownloadsImage(self.data.large_dir)
-        slicestart = self.data.img_post_page_num
+        slicestart = self.data.page_num
         while not self.event.is_set() and slicestart <= 4:
             img = self.data.page_urls[slicestart:slicestart+1]
 
@@ -494,12 +494,12 @@ class Image:
     def next_image(self):
         if not self.data.page_urls:
             print('This is the only page in the post!')
-        elif self.data.img_post_page_num + 1 == self.data.number_of_pages:
+        elif self.data.page_num + 1 == self.data.number_of_pages:
             print('This is the last image in the post!')
 
         else:
             #self.event.set()
-            self.data.img_post_page_num += 1  # Be careful of 0 index
+            self.data.page_num += 1  # Be careful of 0 index
             self._go_next_image()
 
     def _go_next_image(self):
@@ -512,7 +512,7 @@ class Image:
         # to download when you load it
 
         # First time from gallery; download next image
-        if self.data.img_post_page_num == 1:
+        if self.data.page_num == 1:
             download.async_download_spinner(self.data.large_dir,
                                             [self.data.current_url])
 
@@ -529,17 +529,17 @@ class Image:
             )
             download.async_download_spinner(self.data.large_dir, [next_img_url])
 
-        print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
+        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
 
     def previous_image(self):
         if not self.data.page_urls:
             print('This is the only page in the post!')
             return False
-        elif self.data.img_post_page_num == 0:
+        elif self.data.page_num == 0:
             print('This is the first image in the post!')
             return False
 
-        self.data.img_post_page_num -= 1
+        self.data.page_num -= 1
 
         testpath = self.data.large_dir / Path(self.data.image_filename)
         if testpath.is_file():
@@ -547,11 +547,11 @@ class Image:
         else:
             lscat.icat(
                 KONEKODIR / str(self.data.artist_user_id) /
-                str(self.data.img_post_page_num) / "large" /
+                str(self.data.page_num) / "large" /
                 self.data.image_filename
             )
 
-        print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
+        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
         return True
 
     def leave(self, force=False):

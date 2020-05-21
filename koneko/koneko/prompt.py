@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko import main, pure, colors
+from koneko import ui, pure, colors
 
 TERM = Terminal()
 
@@ -245,7 +245,7 @@ def user_prompt(user_class):
                 ask_quit()
 
             elif user_prompt_command == 'm':
-                print(main.Users.__doc__)
+                print(ui.Users.__doc__)
 
             elif user_prompt_command == 'h':
                 print(''.join([

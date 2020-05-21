@@ -61,21 +61,21 @@ class APIHandler:
         return self.api.illust_detail(image_id)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    def search_user_request(self, searchstr, offset):
+    def following_user_request(self, user_id, publicity, offset):
         """Mode 3"""
-        return self.api.search_user(searchstr, offset=offset)
+        return self.api.user_following(user_id, restrict=publicity, offset=offset)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    def following_user_request(self, user_id, publicity, offset):
+    def search_user_request(self, searchstr, offset):
         """Mode 4"""
-        return self.api.user_following(user_id, restrict=publicity, offset=offset)
+        return self.api.search_user(searchstr, offset=offset)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @pure.spinner('')
     def illust_follow_request(self, **kwargs):
         """Mode 5
         **kwargs can be **parse_page (for _prefetch_next_page), but also contain
-        publicity='private' (for normal)
+        restrict='private' (for normal)
         """
         return self.api.illust_follow(**kwargs)
 

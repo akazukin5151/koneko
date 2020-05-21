@@ -15,16 +15,18 @@ import os
 import re
 import sys
 import time
+import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, data, pure, utils, prompt, download
+from koneko import ui, api, cli, data, pure, lscat, utils, prompt, download
 
 
 def main(start=True):
     """Read config file, start login, process any cli arguments, go to main loop"""
     os.system('clear')
     credentials, your_id = utils.config()
+
     if not Path('~/.local/share/koneko').expanduser().exists():
         print('Please wait, downloading welcome image (this will only occur once)...')
         baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
@@ -86,7 +88,7 @@ def main_loop(prompted, main_command, user_input, your_id=None, start=True):
             SearchUsersModeLoop(prompted, user_input).start(start)
 
         elif main_command == '5':
-            IllustFollowModeLoop(start)
+            illust_follow_mode_loop(start)
 
         elif main_command == '?':
             utils.info_screen_loop()
@@ -177,7 +179,7 @@ class ArtistModeLoop(Loop):
         self._url_or_id = utils.artist_user_id_prompt()
 
     def _go_to_mode(self):
-        self.mode = ui.ArtistGallery(1, self._user_input)
+        self.mode = ui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
         main(start=False)
@@ -204,6 +206,8 @@ class ViewPostModeLoop(Loop):
 
     def _go_to_mode(self):
         view_post_mode(self._user_input)
+        # After backing
+        main(start=False)
 
 
 class SearchUsersModeLoop(Loop):
@@ -245,12 +249,12 @@ class FollowingUserModeLoop(Loop):
         self.mode.start()
         prompt.user_prompt(self.mode)
 
-def IllustFollowModeLoop(start):
+def illust_follow_mode_loop(start):
     """Immediately goes to IllustFollow()"""
     while True:
         if start:
             api.myapi.await_login()
-        mode = ui.IllustFollowGallery(1)
+        mode = ui.IllustFollowGallery()
         prompt.gallery_like_prompt(mode)
         # After backing
         main(start=False)
@@ -261,6 +265,11 @@ def view_post_mode(image_id):
     Fetch all the illust info, download it in the correct directory, then display it.
     If it is a multi-image post, download the next image
     Else or otherwise, open image prompt
+    Unlike the other modes, ui.Image does not handle the initial displaying of images
+    This is because coming from a gallery mode, the selected image already has a
+    square-medium preview downloaded, which can be displayed before the download
+    of the large-res completes. Thus, the initial displaying subroutine will be
+    different for a standalone mode or coming from a gallery mode.
     """
     print('Fetching illust details...')
     try:
@@ -272,13 +281,20 @@ def view_post_mode(image_id):
     idata = data.ImageJson(post_json, image_id)
 
     download.download_core(idata.large_dir, idata.url, idata.filename)
-    utils.display_image_vp(idata.large_dir / idata.filename)
+    lscat.icat(idata.large_dir / idata.filename)
 
     # Download the next page for multi-image posts
-    if idata.number_of_pages != 1:
-        download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
+    # Do this after prompt
+    #if idata.number_of_pages != 1:
+    #    download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
 
-    image = ui.Image(image_id, idata, 1, True)
+    image = ui.Image(image_id, idata, True)
+    experimental = utils.get_settings('misc', 'experimental')
+    if experimental == 'on':
+        event = threading.Event()
+        thread = threading.Thread(target=image.preview)
+        image.set_thread_event(thread, event)
+        thread.start()
     prompt.image_prompt(image)
 
 if __name__ == '__main__':

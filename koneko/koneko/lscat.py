@@ -4,6 +4,7 @@ The default image renderer for koneko.
 
 import os
 import fnmatch
+import threading
 from abc import ABC, abstractmethod
 
 import funcy
@@ -35,6 +36,9 @@ def number_prefix(myfile):
 
 
 # Impure functions
+def icat(args):
+    os.system(f'kitty +kitten icat --silent {args}')
+
 @funcy.ignore(IndexError, TypeError)
 def display_page(page, rowspaces, cols, left_shifts, path):
     with cd(path):
@@ -83,8 +87,8 @@ class View(ABC):
         self._pages_list = cytoolz.partition(self._rows_in_page, each_row, pad=None)
         self._pages_list = list(self._pages_list)
 
-        assert len(self._pages_list[0]) <= len(self._rowspaces) == self._rows_in_page
-        assert len(self._pages_list) <= len(self._page_spaces)
+        #assert len(self._pages_list[0]) <= len(self._rowspaces) == self._rows_in_page
+        #assert len(self._pages_list) <= len(self._page_spaces)
 
     @abstractmethod
     def render(self):
@@ -152,7 +156,7 @@ class Card(View):
     """
 
     def __init__(self, path, preview_paths, messages,
-                 preview_xcoords=[[40], [58], [75]], number_of_columns=1,
+                 preview_xcoords=((40,), (58,), (75,)), number_of_columns=1,
                  rowspaces=(0,), page_spaces=(20,) * 30, rows_in_page=1):
         # Set defaults ^^^
         self._preview_paths = preview_paths
@@ -187,5 +191,194 @@ class Card(View):
                 display_page(((self._preview_images[i][j],),), self._rowspaces,
                              self._cols, coord, self._preview_paths)
 
+class Tracker(ABC):
+    def __init__(self, path):
+        self.path = path
+        self._downloaded = []
+        self._lock = threading.Lock()
+        self._counter = 0
+
+    def update(self, new):
+        with self._lock:
+            self._downloaded.append(new)
+
+        self._inspect()
+
+    def _inspect(self):
+        """
+        images 0-29 are artist profile pics
+        images 30-119 are previews, 3 for each artist
+        so the valid order is:
+        0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
+        """
+        next_num = self.orders[self._counter]
+        numlist = [int(f[:3]) for f in self._downloaded]
+
+        if next_num in numlist:
+            pic = self._downloaded[numlist.index(next_num)]
+            # Display page
+            if next_num == 0:
+                os.system('clear')
+            self.generator.send(pic)
+
+            self._counter += 1
+            self._downloaded.remove(pic)
+            numlist.remove(next_num)
+            if self._downloaded:
+                self._inspect()
+
+class TrackDownloads(Tracker):
+    def __init__(self, path):
+        super().__init__(path)
+        self.orders = list(range(30))
+        self.generator = generate_page(path)
+        self.generator.send(None)
+
+class TrackDownloadsUsers(Tracker):
+    def __init__(self, path):
+        super().__init__(path)
+        self.orders = generate_orders(120, 30)
+        self.generator = generate_users(path)
+        self.generator.send(None)
+
+def generate_page(path):
+    """ Given number, calculate its coordinates and display it, then yield
+    """
+    # TODO: These numbers are generated from the above View ABC
+    left_shifts = (2,20,38,56,74)
+    rowspaces = (0, 9)
+    #page_spaces=(26, 24, 24)
+    while True:
+        # Release control. When _inspect() sends another image,
+        # assign to the variables and display it again
+        image = yield
+
+        number = int(image.split('_')[0])
+        x = number % 5
+        y = number // 5
+
+        if number % 10 == 0 and number != 0:
+            print('\n' * 25)
+
+        with cd(path):
+            Image(image).thumbnail(310).show(
+                align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
+            )
+
+def generate_users(path, rowspaces=(0,), cols=range(1), artist_xcoords=(2,),
+                   preview_xcoords=((40,), (58,), (75,))):
+
+    os.system('clear')
+    while True:
+        # Wait for artist pic
+        a_img = yield
+        artist_name = a_img.split('.')[0].split('_')[-1]
+        number = a_img.split('_')[0][1:]
+        message = ''.join([number, '\n', ' ' * 18, artist_name])
+        a_img = ((a_img,),)
+
+        # Print the message (artist name)
+        print('\n' * 2)
+        print(' ' * 18, message)
+        print('\n' * 20)  # Scroll to new 'page'
+
+        # Display artist profile pic
+        display_page(a_img, rowspaces, cols, artist_xcoords, path)
+
+        # Display the three previews
+        i = 0  # Always resets for every artist
+        while i < 3:  # Every artist has only 3 previews
+            p_img = yield  # Wait for preview pic
+            p_img = ((p_img,),)
+            display_page(p_img, rowspaces, cols, preview_xcoords[i], path)
+            i += 1
+
+def generate_orders(total_pics, artists_count):
+    """
+    images 0-29 are artist profile pics
+    images 30-119 are previews, 3 for each artist
+    so the valid order is:
+    0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
+    a, p,  p,  p,  a, p,  p,  p,  a, ...
+    """
+    artist = list(range(artists_count))
+    prev = list(range(artists_count, total_pics))
+    order = []
+    a,p = 0,0
+
+    for i in range(total_pics):
+        if i % 4 == 0:
+            order.append(artist[a])
+            a += 1
+        else:
+            order.append(prev[p])
+            p += 1
+
+    return order
+
+
+class TrackDownloadsImage(Tracker):
+    """Experimental"""
+    def __init__(self, path):
+        super().__init__(path)
+        self.orders = list(range(1,30))
+        self.generator = generate_previews(path)
+        self.generator.send(None)
+
+    def _inspect(self):
+        next_num = self.orders[self._counter]
+        numlist = [int(f.split('_')[1].replace('p', '')) for f in self._downloaded]
+
+        if next_num in numlist:
+            pic = self._downloaded[numlist.index(next_num)]
+            # Display page
+            if next_num == 0:
+                os.system('clear')
+            self.generator.send(pic)
+
+            self._counter += 1
+            self._downloaded.remove(pic)
+            numlist.remove(next_num)
+            if self._downloaded:
+                self._inspect()
+
+def generate_previews(path):
+    """Experimental"""
+    rowspaces = (0, 9)
+    xcoords = (2, 75)
+    i = 0
+    while True:
+        # Release control. When _inspect() sends another image,
+        # assign to the variables and display it again
+        image = yield
+        i += 1
+
+        number = int(image.split('_')[1].replace('p', '')) - 1
+        y = number % 2
+        if i <= 2:
+            x = 0
+        else:
+            x = 1
+
+        with cd(path):
+            Image(image).thumbnail(310).show(
+                align='left', x=xcoords[x], y=rowspaces[y]
+            )
+
 if __name__ == '__main__':
-    Gallery('/tmp/koneko/2232374/1/')
+    from koneko import KONEKODIR
+    #Gallery(KONEKODIR / '2232374' / '1').render()
+    import time
+    import random
+
+    imgs = os.listdir(KONEKODIR / 'following' / 'test')
+    random.shuffle(imgs)
+
+    messages = ['test'] * len(imgs)
+    tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
+
+    # Simulates downloads finishing and updating the tracker
+    # Which will display the pictures in the correct order, waiting if needed
+    for img in imgs:
+        tracker.update(img)
+        time.sleep(0.1)

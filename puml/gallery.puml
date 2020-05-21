@@ -7,19 +7,26 @@ actor User
 User -> ui ++: Mode 1 or 5
 ui --> User: Ask for user id (mode 1 only)
 User --> ui: Pixiv id
+database gdata
+create gdata
+ui -> gdata: page_num, main_path
 ui -> api ++: JSON request
 return JSON response
-database gdata
 ui -> gdata: Stores response
+create lscat
+ui -> lscat: Add tracker
 ui -> download: Download images
 activate download
+download -> lscat ++: Image 2 done
+download -> lscat: Image 1 done
+lscat -> User: Display image 1
+lscat -> User: Display image 2
+download -> lscat: Image 3 done
 deactivate download
-ui --> User: Displays images, print info
+lscat -> User: Display image 3
+deactivate lscat
+ui --> User: Print info
 group prefetching
-    ui -> gdata ++: current_illusts()
-    return current_illusts()
-    ui -> gdata ++: cached_pages
-    return cached_pages
     ui -> gdata ++: next_url
     return next_url
     ui -> api ++: parse_next()
@@ -29,7 +36,7 @@ group prefetching
     activate download
     deactivate download
 end
-return
+return Prompt
 |||
 
 == Open image ==
@@ -76,7 +83,8 @@ return post_json
 database idata
 create idata
 ui -> idata: Stores response
-return display_image(), print info
+ui -> User: display_image(), print info
+return image_prompt()
 |||
 
 

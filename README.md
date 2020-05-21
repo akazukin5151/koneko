@@ -1,4 +1,4 @@
-# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
+# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)       [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/)
 
 Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
 
@@ -92,17 +92,15 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
+* Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
+
 ## Features
 
 * For multi-image posts in image view, enter a number to jump to the post's page
-* Image view should preview the next few images in multi-image posts (but either it blocks the prompt or the prompt blocks)
-* Image and User views should use lscat.py to render so alternate renderers can be used
+* Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
 * Option to use pillow or wand to edit numbers on pics
 * Support [ueberzug](https://github.com/seebye/ueberzug)
 
-## Speed
-
-* Display each image as soon as they finish downloading (but due to lscat limitations, only one page at a time). Requires "integrating" (read: basically rewriting) lscat.py and threaded download functions
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!
@@ -152,13 +150,13 @@ You might have problems with image positioning with lscat.py. I wrote it to fit 
 # Contributing
 * Fork it
 * Make a new branch with `git checkout -b myfeature` (a git pre-commit hook might prevent your git client from commiting to master, but github might let you. It doesn't matter which branch you edit, the pre-commit hook is just for me)
-* Edit the files on your fork and branch
-* Submit a pull request to master
+* Edit the files on your fork/branch
+* Test it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
+    * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
+* Submit a pull request
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
 * If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.
-* When testing your edit, don't forget to uninstall the pip version and do `python setup.py develop` (totally didn't happen to me).
 
-**NOTE:** running `koneko.py` with python or executing it will fail with an import error (circular import). Python imports are a mess, just use `python setup.py develop` when you want to test a change.
 
 ## Priorities
 (As in, what I think I need help on and what you might want to focus on, not what will only be accepted. All PRs will be considered, regardless if it's important or not)
@@ -179,7 +177,7 @@ Simplified UML diagram of the classes:
 <details>
   <summary>Actor-ish model of the ui.Gallery class</summary>
   
-  ![Gallery UML](http://plantuml.com:80/plantuml/png/bLLBRzim3BxhLt2t15qFFVHY85sB5XWmO6tGehiQciMaN1N9qoDjiEw_Jv9bnw-zSebCVY8_af_fI-kuSNudcICd4JvoAT4SOAS5MbZ4FpW3hWISBndZbTC67YqQnbOh-1oz5YLMZhI2rOf55vnUW2SuEIaQm1c4E-Sic4w39o8AkBBFi0bc7_4akaHQoSCoHqbX2bZJA-q39WMu05uteJyztDs2mUyUhMC6dJUgjTbQAujCSCU_SekmZQTyFPqBU0XrXFewRECK-aL9pKK1D_a4jEDRjB5msdE77OG9dDe69TwGhIK_s1pYFTI6b0DI6yssHliw6723hdeYjMKGVZs6gSJA6uFAbIIbjyukbWcLQvrtJaBmwWb5MQSY-hV7zl55XQ-kz4RsBmrimsdKt5Wi8s38SZYHKQ827ciH6nWqrr0f4wyURcOY4PWGq_v7wznSK8ai4VRszfQaUrUZQYOp8zkZautxagmbjV4cp_4g2lWXIJt_VDUb6-ff9kKGC4bRQ-lARrQhDi_HC6vKUoeRQdiqj24KOIx_9k9Hesx3J5FFPqWdtxhb-nVbsqRw3TtuOlVbFqgwDhWdxUtl4jVPdrGJAijD-MFYDlOzfZvFWvha2D4QYdbH6OI3zc2zmG-z6mLSQxKXi-DnzGsNoxL4RYQYpXplCMrScpPiH-eBuKlMncAhmUdy447B6Qv7_Fz8fTk8b3PYPJ1EddhhaURNOuuaclusobei1oijLS8kmwiMFoQC_G80)
+  ![Gallery UML](http://plantuml.com:80/plantuml/png/bLLDRzim3BthLt2t16qFQT6BWRGTMc3OWBL1Y-vgQ1QJQB4bJPBJ1il--_HbnuxT0CibClb4FZsHr9snLDkwAedbjaJuGiiIzGugoT30nF_13AXWS3qbX1PMQdWrg0cPp-6xzneiiR1S2fZFYNV1nGtK7CxEiWYOWTjpJPpfmday8eFFPWDBPwuzdhCsaHJbRfgYX30PBFWxtpeCOTJIdzGWhFoA51gfRJvyy9kupa3H5UQYhiwXebpaYjfr0b0LUNrxUNe4ZRzhD9PejBKMZSqeAGps0xwuKpirMcTANPg2seGCQtSkni1gMcoSGj71v9ie9MKPFAGLyCeHD5vCllLn6WXf5ct0GFQhXyEbWmaSGXh_BFhZjbRd1svKINSn9SnEkoy_ZdwLikEGzCcGLzqj1xrQz49pOO6BfIGhBMi5IkCIRR7cOaN0_Jht4CGG-6xpMfV1cMwkP-jVjABQk5fmWCcqkwL_sKU9CdXLp1DslP3xOZ9vGOjr5pTognuO44E9l7LCEXIigRw5bfMoPB_VXyvwKYYIXCEkEZZ9iJp1clCsxF6ttueC_fHSRFv-QjFrItCaPHymIAkaiVal8qMJvs0urgjPvP7Q5ZLVScJkUaRwOKIpcA1b_kYkDaW_GZhu5WtVumergG_FNSsv8ZIn2YDTFtUwbNYKTA5nosLjFagiaZyKZpjP4kLauYRsCmQTXq5rSBXeaMAQenfX9simjSRRpeuCxgLOSbrHFvdxq-o-HAe7jPquFcDu44nu05fIFpY-fTgOh2HOcJuyQ3h2zO3_dr9f1ppl3dZU6V1yV1vt5M5Hv5XUasaIEMhSQmeLEixf6Gv9xbmp-cUGa7y0)
   
 </details>
 
@@ -193,7 +191,7 @@ Simplified UML diagram of the classes:
 <details>
   <summary>Actor-ish model of the ui.User class</summary>
   
-  ![User UML](http://plantuml.com:80/plantuml/png/TLFBJiCm4BpxA_P8XNg2KwH0Av2Ga2WL5UV8DDjWaSJ1Q_SXzUFnEawQ4CWXScPdzZ5PByXAOrrL2gjiYV1EQ0YkAfqZt80sS3iJ8atXXG724hTMwHhILCYjzM7c2tx1_0wSWklhfEMsOk6XkOym8u4bVS7EmuxvAe-w84nWhOvgpoXBxa0sRRBdpUiA37ux92iCMcVg3gD6ruGYbrP-I49mV8hoS4vWutj4kd3ROAuFTQbbdi1ZF86gP874GwczjDXJH8vJR50Yz5ZBocjZS-t7QEvSKLFAKrUaCDerq1ZSeTr-gheGu9z9KZpQp9ao1BlSGspiKoCDOSQ4gzbGClRgell3WyPt5nZJYHdzomciypYtE9_FOLDMleMGYfVarsQ4s9hBZFoXJtt8ME9RZpRuXUWC-brWRN2ljAF_YZGntcMCHWoBTAcUDFZjLsGXBFmqLw6pbf0nuT9U_vTYb3SwKvqN_w3BW3x9iaHpwdjums3-jBO9WRvcl486uQGTa3DuFr0ayA3hdJALvFlPpyoNkvjNBFpVufikn0y0)
+  ![User UML](http://plantuml.com:80/plantuml/png/VLHDJzmm4BtxLymHX3Z0zXHfAQX8g9LALqKzHsuokrWaTZgs5rRQ7r-FFx9Pmf93vCnxRpuplhLEalDz9vno7S8VYsJXh3SjmW8CmPTp8PPB-Ca6YnqsJXaDowMGZGimymM_uF86l8ABYofnarW4qsL0c571dNs1TJ1xvgiswwAmWfLwKrksikG6v92S_NZwzGY4_pnQ9mYT9rriTZ3QecYbat-bHV1y4WsXTEKZ-Ohd2fv2mcWFmipiR2DTPiPpIBHjmP5iNa9n2MZDg-wCR2kupoTGlToWvJweBVif554EeyDOo7UcmtMWQPnJ2dwLy2GR6tUlxD39NGe9Lv_3rwUzBt9qd2VzgSl5L9BwjI7Z1nW8r-YQPwKt0i8pwNSiMkERgprr4SpJEx8T3tkGPB5cmjdvL78yy7U1veCz44wFZJdpBh3re-wWRilFjoBJ3qxiz_ku68yXsP1tQ5BOYNUB4B5Lm8xNm3wRrvebeSXSH_Z_Iojpd370Yd2hZBUdWWmPBnvpcjCWnTM3WR3ioZg8-pttjJ5r8jHCEAGtpZEZlC2r6bloiVKkMXzaro7jnXn-Ovp2F3P5O8oPRmn2s1aFrXD-dIWg-6RqMb4l-JeQQ-QxhDGhRiFG-68JuZy0)
   
 </details>
 
@@ -210,7 +208,7 @@ which pip                       # and pip is in your conda directory
 # If you're using a separate conda env, you probably want to make some edits
 pip install koneko
 
-# Use anywhere:
+# Use anywhere (but only in this conda env):
 koneko
 
 # To remove the conda env:
@@ -222,12 +220,12 @@ conda remove --name koneko --all
 Note: if you want to make some edits, you should install it in a conda environment. See above
 
 ```sh
-# Use the latest stable version (recommended)
+# Use the latest stable version (recommended for usage)
 # Make sure the version number is the latest
 git clone -b 'v0.5.1' --depth 1 https://github.com/twenty5151/koneko.git
 # Use the master branch for upcoming features:
 git clone -b master https://github.com/twenty5151/koneko.git
-# Use the dev branch for latest features, fixes, and instability:
+# Use the dev branch for latest features, fixes, and instability (recommended for contributers):
 git clone -b dev https://github.com/twenty5151/koneko.git
 
 cd koneko
@@ -237,7 +235,7 @@ pip install .
 # or
 python setup.py install
 # or
-# Manually install for development
+# Manually install for development, changes will be immediately reflected
 python setup.py develop
 
 # On certain shells with implicit cd, typing `koneko` might cd into the dir

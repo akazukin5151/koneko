@@ -96,6 +96,7 @@ For more details refer to the [manual](#manual).
 
 ## Features
 
+* Be responsive to terminal sizes, calculate number of columns and stuff, rather than hardcoding it.
 * Option for no download, no cache mode. icat supports loading pics from a URL instead of a filepath.
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)

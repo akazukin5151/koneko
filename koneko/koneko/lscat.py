@@ -284,8 +284,6 @@ def generate_page(path):
             Image(image).thumbnail(310).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
-        if not noprint:
-            print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
 
 def generate_users(path, noprint, rowspaces=(0,), cols=range(1),
                    artist_xcoords=(2,), preview_xcoords=((40,), (58,), (75,))):

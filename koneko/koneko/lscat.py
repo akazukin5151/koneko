@@ -10,9 +10,9 @@ from abc import ABC, abstractmethod
 import funcy
 import cytoolz
 from pixcat import Image
+from blessed import Terminal
 
 from koneko.pure import cd
-
 
 # - Pure functions
 def is_image(myfile):
@@ -35,12 +35,34 @@ def number_prefix(myfile):
     return int(myfile.split('_')[0])
 
 
+def xcoords(term_width, img_width=18, padding=2):
+    """Generates the x-coord for each column to pass into pixcat
+    If img_width == 18 and 90 > term_width > 110, there will be five columns,
+    with spaces of (2, 20, 38, 56, 74)
+    Meaning the first col has x-coordinates 2 and second col of 20
+    """
+    number_of_columns = round(term_width / (img_width + padding))
+    return [col % number_of_columns * img_width + padding
+            for col in range(number_of_columns)]
+
+def ycoords(term_height, img_height=8, padding=1):
+    """Generates the y-coord for each row to pass into pixcat
+    If img_height == 8 and 27 > term_height >= 18, there will be two rows,
+    with spaces of (0, 9)
+    Meaning the first row has y-coordinates 0 and second row of 9
+    """
+    number_of_rows = term_height // (img_height + padding)
+    return [row * (img_height + padding)
+            for row in range(number_of_rows)]
+
+
 # Impure functions
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
 @funcy.ignore(IndexError, TypeError)
 def display_page(page, rowspaces, cols, left_shifts, path):
+    """For every row, display the images in the row by iterating over every col"""
     with cd(path):
         for (index, space) in enumerate(rowspaces):
             for col in cols:
@@ -103,26 +125,18 @@ class Gallery(View):
 
     Parameters
     ========
-    rowspaces : tuple of ints
-        Vertical spacing between (the two) rows.
-        len must be >= number of rows
     page_spaces : tuple of ints
         Vertical spacing between pages. Number of newlines to print for every page
         len must be >= number of pages
-    rows_in_page : int
-        Number of rows in each page
-    print_rows : bool
-        Whether to print row numbers in the bottom
-
-    Info
-    ========
-    left_shifts : list of ints
-        Horizontal position of the image
     """
 
-    def __init__(self, path, number_of_columns=5, rowspaces=(0, 9),
-                 page_spaces=(26, 24, 24), rows_in_page=2):
+    def __init__(self, path, page_spaces=(26, 24, 24)):
         # Only to set default arguments here, no overriding
+        TERM = Terminal()
+        number_of_columns = round(TERM.width / (18 + 2))  # Temp xcoords(TERM.width)
+        rowspaces = ycoords(TERM.height)
+        rows_in_page = TERM.height // (8 + 1)  # Temp
+        # TODO: no need to directly calculate left shifts
         super().__init__(path, number_of_columns, rowspaces, page_spaces, rows_in_page)
 
     @funcy.ignore(IndexError)
@@ -369,18 +383,18 @@ def generate_previews(path):
 
 if __name__ == '__main__':
     from koneko import KONEKODIR
-    #Gallery(KONEKODIR / '2232374' / '1').render()
-    import time
-    import random
-
-    imgs = os.listdir(KONEKODIR / 'following' / 'test')
-    random.shuffle(imgs)
-
-    messages = ['test'] * len(imgs)
-    tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
-
-    # Simulates downloads finishing and updating the tracker
-    # Which will display the pictures in the correct order, waiting if needed
-    for img in imgs:
-        tracker.update(img)
-        time.sleep(0.1)
+    Gallery(KONEKODIR / '2232374' / '1').render()
+#    import time
+#    import random
+#
+#    imgs = os.listdir(KONEKODIR / 'following' / 'test')
+#    random.shuffle(imgs)
+#
+#    messages = ['test'] * len(imgs)
+#    tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
+#
+#    # Simulates downloads finishing and updating the tracker
+#    # Which will display the pictures in the correct order, waiting if needed
+#    for img in imgs:
+#        tracker.update(img)
+#        time.sleep(0.1)

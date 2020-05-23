@@ -114,6 +114,10 @@ I'd like to fix this but I'd rather not use mechanize but I don't know how to do
 
 It supports all OSes that kitty supports, which means Linux and macOS. It should work on macOS, but I don't have a test device. If you do, please contribute!
 
+* What versions of kitty does it support?
+
+It has been successfuly tested on version 0.17.2 onwards
+
 * Why use threading and not asyncio? There's a async version of pixivpy.
 
 If only I can understand how to use asyncio. See [I don't understand Python's Asyncio](https://lucumr.pocoo.org/2016/10/30/i-dont-understand-asyncio/). I only need to do two simple things. Start this function in the background, wait for its result somewhere later, in another function. Then keep the result so I can use it later. Asyncio is impossible to use.

@@ -15,6 +15,7 @@ def test_cd():
         testdir = os.getcwd()
 
     assert testdir == os.getcwd()
+    assert os.getcwd() == current_dir
 
 
 def test_split_backslash_last():
@@ -40,13 +41,9 @@ def test_prefix_filename():
 
 
 def test_find_number_map():
-    assert pure.find_number_map(1, 1) == 0
-    assert pure.find_number_map(5, 1) == 4
-    assert pure.find_number_map(2, 5) == 21
-    assert pure.find_number_map(5, 6) == 29
-    assert pure.find_number_map(5, 1) == 4
-    assert pure.find_number_map(-1, -1) == False
-    assert pure.find_number_map(0, 0) == False
+    assert ([pure.find_number_map(x, y)
+             for y in range(1,7)
+             for x in range(1,6)] == list(range(30)))
 
 
 def test_print_multiple_imgs(capsys):
@@ -104,6 +101,15 @@ def test_change_url_to_full():
         == "https://i.pximg.net/img-original/img/2020/03/10/04/07/08/80017594_p0.png"
     )
 
+def test_process_user_url():
+    assert (pure.process_user_url("https://www.pixiv.net/en/users/2232374") ==
+            ("2232374", "1"))
+    assert pure.process_user_url("2232374") == ("2232374", "1")
+
+def test_process_artwork_url():
+    assert (pure.process_artwork_url("https://www.pixiv.net/en/artworks/76695217") ==
+            ("76695217", "2"))
+    assert pure.process_artwork_url("76695217") == ("76695217", "2")
 
 # From lscat.py
 def test_is_image():
@@ -113,14 +119,13 @@ def test_is_image():
     assert lscat.is_image("testing/not_an_image.txt") == False
 
 
-def test_filter_jpg():
+def test_filter_img():
     # Run in main koneko dir
-    assert lscat.filter_jpg("testing/") == [
+    assert lscat.filter_img("testing/") == [
         "04_祝！！！.jpg",
         "17_ミコニャン.jpg",
         "77803142_p0.png",
     ]
-
 
 mywidth = 90 // 5  # == 18
 

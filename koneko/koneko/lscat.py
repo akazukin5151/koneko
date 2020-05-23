@@ -22,7 +22,7 @@ def is_image(myfile):
     return False
 
 
-def filter_jpg(path):
+def filter_img(path):
     with cd(path):
         return sorted(filter(is_image, os.listdir('.')))
 
@@ -95,7 +95,7 @@ class View(ABC):
         total_width = 90
         width = total_width // self._number_of_columns
 
-        file_list = filter_jpg(path)
+        file_list = filter_img(path)
         calc = xcoord(number_of_columns=self._number_of_columns, width=width)
         self._left_shifts = list(map(calc, self._cols))
 

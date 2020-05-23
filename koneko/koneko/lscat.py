@@ -175,8 +175,8 @@ class Card(View):
         self._messages = messages
         self._preview_xcoords = preview_xcoords
         self._preview_images: 'List[List[str]]'
-        super().__init__(path, number_of_columns=1, rowspaces=(0,), page_spaces,
-                         rows_in_page=1)
+        super().__init__(path, number_of_columns=1, rowspaces=(0,),
+                        page_spaces=page_spaces, rows_in_page=1)
 
     @funcy.ignore(IndexError)
     def render(self):

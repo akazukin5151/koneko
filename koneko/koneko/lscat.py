@@ -170,15 +170,13 @@ class Card(View):
     """
 
     def __init__(self, path, preview_paths, messages,
-                 preview_xcoords=((40,), (58,), (75,)), number_of_columns=1,
-                 rowspaces=(0,), page_spaces=(20,) * 30, rows_in_page=1):
-        # Set defaults ^^^
+                 preview_xcoords=((40,), (58,), (75,)), page_spaces=(20,) * 30):
         self._preview_paths = preview_paths
         self._messages = messages
         self._preview_xcoords = preview_xcoords
         self._preview_images: 'List[List[str]]'
-        super().__init__(path, number_of_columns, rowspaces, page_spaces,
-                         rows_in_page)
+        super().__init__(path, number_of_columns=1, rowspaces=(0,), page_spaces,
+                         rows_in_page=1)
 
     @funcy.ignore(IndexError)
     def render(self):

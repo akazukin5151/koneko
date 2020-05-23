@@ -161,9 +161,10 @@ You might have problems with image positioning with lscat.py. I wrote it to fit 
 
 # Contributing
 * Fork it
-* Make a new branch with `git checkout -b myfeature` (a git pre-commit hook might prevent your git client from commiting to master, but github might let you. It doesn't matter which branch you edit, the pre-commit hook is just for me)
 * Edit the files on your fork/branch
-* Test it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
+    * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
+* Run tests with `pytest testing/testing.py -vvvv -l`
+* Try it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
     * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
 * Submit a pull request
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
@@ -240,6 +241,9 @@ git clone -b master https://github.com/twenty5151/koneko.git
 # Use the dev branch for latest features, fixes, and instability (recommended for contributers):
 git clone -b dev https://github.com/twenty5151/koneko.git
 
+# Run the tests (for those who want to edit)
+pytest testing/testing.py -vvvv -l
+
 cd koneko
 # Manually install without PyPI; for general usage
 # Both will correctly copy the required pictures
@@ -255,15 +259,6 @@ python setup.py develop
 cd ~
 # Use anywhere:
 koneko
-```
-
-## Unit tests
-Use `pytest testing.py -vvvv -l`
-
-
-Here's a random shell command to get (but not download) and display any pixiv image url:
-```sh
-curl -e 'https://www.pixiv.net' "https://i.pximg.net/img-original/img/2019/12/21/20/13/12/78403815_p0.jpg" | kitty +kitten icat --align left --place 800x480@0x5
 ```
 
 ## Upload to PyPI

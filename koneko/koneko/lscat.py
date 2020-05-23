@@ -13,6 +13,7 @@ from pixcat import Image
 from blessed import Terminal
 
 from koneko.pure import cd
+from koneko import utils
 
 # - Pure functions
 def is_image(myfile):
@@ -141,13 +142,15 @@ class Gallery(View):
 
     @funcy.ignore(IndexError)
     def render(self):
+        noprint = utils.check_noprint()
         os.system('clear')
         for (i, page) in enumerate(self._pages_list):
             print('\n' * self._page_spaces[i])  # Scroll to new 'page'
             display_page(page, self._rowspaces, self._cols, self._left_shifts,
                          self._path)
 
-        print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
+        if not noprint:
+            print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
 
 
 class Card(View):
@@ -180,6 +183,7 @@ class Card(View):
 
     @funcy.ignore(IndexError)
     def render(self):
+        noprint = utils.check_noprint()
         assert self._rows_in_page == 1
         assert len(self._messages) >= self._rows_in_page
 
@@ -191,7 +195,8 @@ class Card(View):
         for (i, page) in enumerate(self._pages_list):
             # Print the message (artist name) first
             print('\n' * 2)
-            print(' ' * 18, self._messages[i])
+            if not noprint:
+                print(' ' * 18, self._messages[i])
             print('\n' * self._page_spaces[i])  # Scroll to new 'page'
 
             # Display artist profile pic
@@ -251,8 +256,9 @@ class TrackDownloads(Tracker):
 class TrackDownloadsUsers(Tracker):
     def __init__(self, path):
         super().__init__(path)
+        noprint = utils.check_noprint()
         self.orders = generate_orders(120, 30)
-        self.generator = generate_users(path)
+        self.generator = generate_users(path, noprint)
         self.generator.send(None)
 
 def generate_page(path):
@@ -278,9 +284,11 @@ def generate_page(path):
             Image(image).thumbnail(310).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
+        if not noprint:
+            print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
 
-def generate_users(path, rowspaces=(0,), cols=range(1), artist_xcoords=(2,),
-                   preview_xcoords=((40,), (58,), (75,))):
+def generate_users(path, noprint, rowspaces=(0,), cols=range(1),
+                   artist_xcoords=(2,), preview_xcoords=((40,), (58,), (75,))):
 
     os.system('clear')
     while True:
@@ -291,9 +299,10 @@ def generate_users(path, rowspaces=(0,), cols=range(1), artist_xcoords=(2,),
         message = ''.join([number, '\n', ' ' * 18, artist_name])
         a_img = ((a_img,),)
 
-        # Print the message (artist name)
         print('\n' * 2)
-        print(' ' * 18, message)
+        if not noprint:
+            # Print the message (artist name)
+            print(' ' * 18, message)
         print('\n' * 20)  # Scroll to new 'page'
 
         # Display artist profile pic

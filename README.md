@@ -258,7 +258,7 @@ koneko
 ```
 
 ## Unit tests
-Use `pytest testing.py -vvvv`. For type checking use mypy: `mypy koneko.py --ignore-missing-imports -v`
+Use `pytest testing.py -vvvv -l`
 
 
 Here's a random shell command to get (but not download) and display any pixiv image url:

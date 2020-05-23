@@ -241,3 +241,45 @@ def test_user():
     assert udata.first_img == "畳と桧"
 
 
+# utils.py
+def test_verify_full_download():
+    assert utils.verify_full_download("testing/77803142_p0.png") == True
+    assert utils.verify_full_download("testing/not_an_image.txt") == False
+    # The above code will remove the file
+    os.system("touch testing/not_an_image.txt")
+
+def test_show_artist_illusts(monkeypatch):
+    # Apparently monkeypatching the lscat function needs to start with
+    # the name of the current module...
+    monkeypatch.setattr("testing.lscat.Gallery.render", lambda x: "")
+    utils.show_artist_illusts(Path(f"{KONEKODIR}/2232374/1"))
+
+def test_begin_prompt(monkeypatch):
+    # Send a "1" as input
+    monkeypatch.setattr("builtins.input", lambda x: "1")
+    returned = utils.begin_prompt(False)
+    assert returned == "1"
+    os.system("kitty +kitten icat --clear")
+
+def test_show_man_loop(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda x: "")
+    monkeypatch.setattr("builtins.print", lambda *a, **k: "")
+    monkeypatch.setattr("os.system", lambda x: "")
+    utils.show_man_loop()
+    os.system("kitty +kitten icat --clear")
+
+def test_clear_cache_loop(monkeypatch):
+    monkeypatch.setattr("shutil.rmtree", lambda x: "")
+    monkeypatch.setattr("builtins.input", lambda x: "y")
+    monkeypatch.setattr("builtins.print", lambda *a, **k: "")
+    monkeypatch.setattr("os.system", lambda x: "")
+    utils.clear_cache_loop()
+    monkeypatch.setattr("builtins.input", lambda x: "n")
+    utils.clear_cache_loop()
+
+def test_info_screen_loop(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda x: "")
+    monkeypatch.setattr("os.system", lambda x: "")
+    utils.info_screen_loop()
+    os.system("kitty +kitten icat --clear")
+

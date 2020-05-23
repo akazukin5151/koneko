@@ -163,7 +163,7 @@ You might have problems with image positioning with lscat.py. I wrote it to fit 
 * Fork it
 * Edit the files on your fork/branch
     * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
-* Run tests with `pytest testing/testing.py -vvvv -l`
+* Run tests with `pytest testing/testing.py -vvvv -l -s`
 * Try it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
     * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
 * Submit a pull request
@@ -242,7 +242,7 @@ git clone -b master https://github.com/twenty5151/koneko.git
 git clone -b dev https://github.com/twenty5151/koneko.git
 
 # Run the tests (for those who want to edit)
-pytest testing/testing.py -vvvv -l
+pytest testing/testing.py -vvvv -l -s
 
 cd koneko
 # Manually install without PyPI; for general usage
@@ -262,8 +262,8 @@ koneko
 ```
 
 ## Unit tests
-* Run `pytest testing/testing.py -vvvv -l`
-* Or `coverage run pytest testing/testing.py -vvvv -l` to generate coverage...
+* Run `pytest testing/testing.py -vvvv -l -s`
+* Or `coverage run pytest testing/testing.py -vvvv -l -s` to generate coverage...
 * ...report, viewed by `coverage report`
 * Dig deeper with `coverage html -d testing/htmlcov/`
 * Generate badge with `rm coverage.svg; coverage-badge -o coverage.svg`

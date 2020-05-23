@@ -101,7 +101,6 @@ For more details refer to the [manual](#manual).
 
 ## Terminal reliability
 * Be responsive to terminal sizes, calculate number of columns and stuff, rather than hardcoding it. (1/2)
-* Option to disable all print statements in lscat
 * Option to use pillow or wand to edit numbers on pics
 * Support [ueberzug](https://github.com/seebye/ueberzug)
 

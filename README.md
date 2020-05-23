@@ -94,14 +94,20 @@ For more details refer to the [manual](#manual).
 
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
-## Features
-
-* Be responsive to terminal sizes, calculate number of columns and stuff, rather than hardcoding it. (1/2)
+## Speed
 * Option for no download, no cache mode. icat supports loading pics from a URL instead of a filepath.
-* For multi-image posts in image view, enter a number to jump to the post's page
-* Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
+    * `curl -e 'https://www.pixiv.net' "https://i.pximg.net/img-original/img/2019/12/21/20/13/12/78403815_p0.jpg" -s | kitty +kitten icat --align=left`
+
+## Terminal reliability
+* Be responsive to terminal sizes, calculate number of columns and stuff, rather than hardcoding it. (1/2)
+* Option to disable all print statements in lscat
 * Option to use pillow or wand to edit numbers on pics
 * Support [ueberzug](https://github.com/seebye/ueberzug)
+
+## Features
+
+* For multi-image posts in image view, enter a number to jump to the post's page
+* Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
 
 
 # FAQ

@@ -45,6 +45,7 @@ def test_find_number_map():
     assert ([pure.find_number_map(x, y)
              for y in range(1,7)
              for x in range(1,6)] == list(range(30)))
+    assert pure.find_number_map(0, 100) == False
 
 
 def test_print_multiple_imgs(capsys):

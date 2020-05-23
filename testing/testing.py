@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 
@@ -29,7 +30,7 @@ def test_split_backslash_last():
 def test_generate_filepath():
     assert (
         pure.generate_filepath("78823485_p0.jpg")
-        == f"{os.path.expanduser('~')}/Downloads/78823485_p0.jpg"
+        == Path('~/Downloads/78823485_p0.jpg').expanduser()
     )
 
 
@@ -51,7 +52,7 @@ def test_find_number_map():
 def test_print_multiple_imgs(capsys):
     assert pure.print_multiple_imgs(page_illusts) == None
     captured = capsys.readouterr()
-    assert captured.out == "#14 has 8 pages, #25 has 50 pages, \n"
+    assert captured.out == "\x1b[31m#14\x1b[39m has \x1b[34m8\x1b[39m pages, \x1b[31m#25\x1b[39m has \x1b[34m50\x1b[39m pages, \n"
 
 
 def test_url_given_size():

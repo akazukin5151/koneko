@@ -78,9 +78,8 @@ def download_page(data, pbar=None, tracker=None):
 
 # - Wrappers around above download functions, for downloading multi-images
 def user_download(data, tracker=None):
-    preview_path = data.download_path / 'previews'
     async_download_core(
-        preview_path,
+        data.download_path,
         data.all_urls,
         rename_images=True,
         file_names=data.all_names,
@@ -88,19 +87,10 @@ def user_download(data, tracker=None):
         tracker=tracker
     )
 
-    # Move artist profile pics to their correct dir
-    to_move = sorted(os.listdir(preview_path))[:data.splitpoint]
-    with pure.cd(data.download_path):
-        _ = [os.rename(data.download_path / 'previews' / pic, data.download_path / pic)
-             for pic in to_move]
-
 def init_download(data, download_func, tracker):
-    if data.download_path.is_dir():
-        all_files = sorted(os.listdir(data.download_path))
-        if data.first_img in all_files[0]:
-            return True
+    if utils.dir_not_empty(data.download_path):
+        return True
 
-    # Remove old images
     if data.page_num == 1:
         print('Cache is outdated, reloading...')
     if data.download_path.is_dir():

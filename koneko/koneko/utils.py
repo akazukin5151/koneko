@@ -18,6 +18,10 @@ def verify_full_download(filepath):
         return False
     return True
 
+def dir_not_empty(path):
+    if path.is_dir() and os.listdir(path):
+        return True
+    return False
 
 def show_artist_illusts(path, renderer='lscat', **kwargs):
     """

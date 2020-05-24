@@ -29,18 +29,12 @@ class AbstractGallery(ABC):
         for contents!)
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
-        # TODO: properly check for file in dir, so can batch the loop in lscat
-        if self.data.download_path.is_dir():
-            tracker = lscat.TrackDownloads(self.data.download_path)
-            try:
-                for img in os.listdir(self.data.download_path):
-                    tracker.update(img)
-            except IndexError: # Folder exists but no files
-                self.data.download_path.rmdir()
-                self._show = True
-            else:
-                self._show = False
+        if utils.dir_not_empty(self.data.download_path):
+            self._show = False
+            lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
         else:
+            if self.data.download_path.is_dir():
+                self.data.download_path.rmdir()
             self._show = True
 
         current_page = self._pixivrequest()
@@ -111,18 +105,17 @@ class AbstractGallery(ABC):
 
     def next_page(self):
         download_path = self._main_path / str(self.data.current_page_num+1)
-        # TODO: properly check for file in dir, so can batch the loop in lscat
-        tracker = lscat.TrackDownloads(download_path)
-        try:
-            for img in os.listdir(download_path):
-                tracker.update(img)
-        except FileNotFoundError:
-            print('This is the last page!')
+        if utils.dir_not_empty(download_path):
+            self._show = False
+            lscat.show_instant(lscat.TrackDownloads, download_path, True)
         else:
-            self.data.current_page_num += 1
-            pure.print_multiple_imgs(self.data.current_illusts)
-            print(f'Page {self.data.current_page_num}')
-            print('Enter a gallery command:\n')
+            print('This is the last page!')
+            return False
+
+        self.data.current_page_num += 1
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+        print('Enter a gallery command:\n')
 
         # Skip prefetching again for cases like next -> prev -> next
         if str(self.data.current_page_num + 1) not in self.data.cached_pages:
@@ -132,10 +125,7 @@ class AbstractGallery(ABC):
         if self.data.current_page_num > 1:
             self.data.current_page_num -= 1
 
-            # TODO: batch the loop in lscat
-            tracker = lscat.TrackDownloads(self.data.download_path)
-            for img in os.listdir(self.data.download_path):
-                tracker.update(img)
+            lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
 
             pure.print_multiple_imgs(self.data.current_illusts)
             print(f'Page {self.data.current_page_num}')
@@ -238,10 +228,7 @@ class ArtistGallery(AbstractGallery):
 
     def _back(self):
         # After user 'back's from image prompt, start mode again
-        # TODO: batch the loop in lscat
-        tracker = lscat.TrackDownloads(self.data.download_path)
-        for img in os.listdir(self.data.download_path):
-            tracker.update(img)
+        lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
 
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
@@ -614,15 +601,15 @@ class Users(ABC):
         move the profile pics to the correct dir (less files to move)
         """
         self._parse_user_infos()
-        preview_path = self.data.download_path / 'previews'
-        preview_path.mkdir(parents=True, exist_ok=True)
 
         if track:
-            tracker = lscat.TrackDownloadsUsers(preview_path)
+            tracker = lscat.TrackDownloadsUsers(self.data.download_path)
         else:
             tracker = None
         download.init_download(self.data, download.user_download, tracker)
-        self._show = False
+        # FIXME: If already cached, this will make it never show
+        # But after downloading (when needed), pics will show twice
+        #self._show = False
 
     @abstractmethod
     def _pixivrequest(self):
@@ -644,13 +631,9 @@ class Users(ABC):
         except KeyError:
             print('This is the last page!')
             self.data.page_num -= 1
+            return False
 
-        else:
-            lscat.Card(
-                self.data.download_path,
-                self.data.download_path / 'previews',
-                messages=self.data.names_prefixed,
-            ).render()
+        lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts

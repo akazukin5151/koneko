@@ -1,14 +1,8 @@
-"""
-The default image renderer for koneko.
-"""
-
+"""The default image renderer for koneko"""
 import os
-import fnmatch
 import threading
-from abc import ABC, abstractmethod
+from abc import ABC
 
-import funcy
-import cytoolz
 from pixcat import Image
 from blessed import Terminal
 
@@ -16,27 +10,6 @@ from koneko.pure import cd
 from koneko import utils
 
 TERM = Terminal()
-
-# - Pure functions
-def is_image(myfile):
-    if fnmatch.fnmatch(myfile, '*.jpg') or fnmatch.fnmatch(myfile, '*.png'):
-        return True
-    return False
-
-
-def filter_img(path):
-    with cd(path):
-        return sorted(filter(is_image, os.listdir('.')))
-
-
-@cytoolz.curry
-def xcoord(image_number, number_of_columns, width, increment=2):
-    return image_number % number_of_columns * width + increment
-
-
-def number_prefix(myfile):
-    return int(myfile.split('_')[0])
-
 
 def xcoords(term_width, img_width=18, padding=2, offset=0):
     """Generates the x-coord for each column to pass into pixcat
@@ -59,9 +32,17 @@ def ycoords(term_height, img_height=8, padding=1):
             for row in range(number_of_rows)]
 
 
-# Impure functions
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
+
+def show_instant(cls, download_path, check_noprint=False):
+    tracker = cls(download_path)
+    for img in os.listdir(download_path):
+        tracker.update(img)
+
+    if check_noprint and not utils.check_noprint():
+        print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
+
 
 class Tracker(ABC):
     def __init__(self, path):
@@ -241,25 +222,21 @@ def generate_previews(path):
 
 if __name__ == '__main__':
     from koneko import KONEKODIR
-    #Gallery(KONEKODIR / '2232374' / '1').render()
-
 #    import time
 #    import random
 
-    #tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
-    #imgs = sorted(os.listdir(KONEKODIR / 'following' / 'test'))
-    #imgs = os.listdir(KONEKODIR / 'following' / 'test')
+    # Gallery
+#    imgs = os.listdir(KONEKODIR / 'following' / 'test')
+#    imgs = sorted(os.listdir(KONEKODIR / '2232374' / '1'))
+#    tracker = TrackDownloads(KONEKODIR / '2232374' / '1')
+#    for img in imgs:
+#        tracker.update(img)
+#        time.sleep(0.1)
+
+    # Users
+    tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
+    imgs = sorted(os.listdir(KONEKODIR / 'following' / 'test'))
 #    random.shuffle(imgs)
-    #messages = ['test'] * len(imgs)
-
-    tracker = TrackDownloads(KONEKODIR / '2232374' / '1')
-    imgs = sorted(os.listdir(KONEKODIR / '2232374' / '1'))
-
     for img in imgs:
         tracker.update(img)
 #        time.sleep(0.1)
-
-    # TODO
-    noprint = utils.check_noprint()
-    if not noprint:
-        print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')

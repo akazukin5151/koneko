@@ -115,32 +115,6 @@ def test_process_artwork_url():
     assert pure.process_artwork_url("76695217") == ("76695217", "2")
 
 # From lscat.py
-def test_is_image():
-    assert lscat.is_image("testing/04_祝！！！.jpg") == True
-    assert lscat.is_image("testing/17_ミコニャン.jpg") == True
-    assert lscat.is_image("testing/77803142_p0.png") == True
-    assert lscat.is_image("testing/not_an_image.txt") == False
-
-
-def test_filter_img():
-    # Run in main koneko dir
-    assert lscat.filter_img("testing/") == [
-        "04_祝！！！.jpg",
-        "17_ミコニャン.jpg",
-        "77803142_p0.png",
-    ]
-
-mywidth = 90 // 5  # == 18
-
-
-def test_xcoord():
-    assert lscat.xcoord(1, 5, mywidth) == 20
-
-
-def test_number_prefix():
-    assert lscat.number_prefix("02_file.png") == 2
-    assert lscat.number_prefix("11_file.png") == 11
-
 def test_xcoords():
     assert lscat.xcoords(100) == [2, 20, 38, 56, 74]
 
@@ -251,12 +225,6 @@ def test_verify_full_download():
     # The above code will remove the file
     os.system("touch testing/not_an_image.txt")
 
-def test_show_artist_illusts(monkeypatch):
-    # Apparently monkeypatching the lscat function needs to start with
-    # the name of the current module...
-    monkeypatch.setattr("testing.lscat.Gallery.render", lambda x: "")
-    utils.show_artist_illusts(Path(f"{KONEKODIR}/2232374/1"))
-
 def test_begin_prompt(monkeypatch):
     # Send a "1" as input
     monkeypatch.setattr("builtins.input", lambda x: "1")
@@ -291,6 +259,8 @@ def test_info_screen_loop(monkeypatch):
     os.system("kitty +kitten icat --clear")
 
 def test_check_noprint(monkeypatch):
+    # Apparently monkeypatching the lscat function needs to start with
+    # the name of the current module...
     monkeypatch.setattr("testing.utils.get_settings", lambda x, y: "on")
     assert utils.check_noprint() == True
     monkeypatch.setattr("testing.utils.get_settings", lambda x, y: "off")

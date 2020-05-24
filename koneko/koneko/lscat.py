@@ -15,6 +15,8 @@ from blessed import Terminal
 from koneko.pure import cd
 from koneko import utils
 
+TERM = Terminal()
+
 # - Pure functions
 def is_image(myfile):
     if fnmatch.fnmatch(myfile, '*.jpg') or fnmatch.fnmatch(myfile, '*.png'):
@@ -36,14 +38,14 @@ def number_prefix(myfile):
     return int(myfile.split('_')[0])
 
 
-def xcoords(term_width, img_width=18, padding=2):
+def xcoords(term_width, img_width=18, padding=2, offset=0):
     """Generates the x-coord for each column to pass into pixcat
     If img_width == 18 and 90 > term_width > 110, there will be five columns,
     with spaces of (2, 20, 38, 56, 74)
     Meaning the first col has x-coordinates 2 and second col of 20
     """
     number_of_columns = round(term_width / (img_width + padding))
-    return [col % number_of_columns * img_width + padding
+    return [col % number_of_columns * img_width + padding + offset
             for col in range(number_of_columns)]
 
 def ycoords(term_height, img_height=8, padding=1):
@@ -132,8 +134,8 @@ class Gallery(View):
     """
 
     def __init__(self, path, page_spaces=(26, 24, 24)):
+        # TODO: page spaces
         # Only to set default arguments here, no overriding
-        TERM = Terminal()
         number_of_columns = round(TERM.width / (18 + 2))  # Temp xcoords(TERM.width)
         rowspaces = ycoords(TERM.height)
         rows_in_page = TERM.height // (8 + 1)  # Temp
@@ -174,10 +176,12 @@ class Card(View):
 
     def __init__(self, path, preview_paths, messages,
                  preview_xcoords=((40,), (58,), (75,)), page_spaces=(20,) * 30):
+        """TODO: preview_xcoords, page spaces: ?"""
         self._preview_paths = preview_paths
         self._messages = messages
         self._preview_xcoords = preview_xcoords
         self._preview_images: 'List[List[str]]'
+        # Row spaces is 0 because only one row in page
         super().__init__(path, number_of_columns=1, rowspaces=(0,),
                         page_spaces=page_spaces, rows_in_page=1)
 
@@ -263,7 +267,6 @@ class TrackDownloadsUsers(Tracker):
 
 def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
-    TERM = Terminal()
     left_shifts = xcoords(TERM.width)
     rowspaces = ycoords(TERM.height)
     while True:
@@ -283,17 +286,16 @@ def generate_page(path):
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
 
-def generate_users(path, noprint, rowspaces=(0,), cols=range(1),
-                   artist_xcoords=(2,), preview_xcoords=((40,), (58,), (75,))):
-
+def generate_users(path, noprint=False):
+    preview_xcoords = xcoords(TERM.width, offset=1)[-3:]
     os.system('clear')
+
     while True:
         # Wait for artist pic
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * 18, artist_name])
-        a_img = ((a_img,),)
 
         print('\n' * 2)
         if not noprint:
@@ -301,16 +303,17 @@ def generate_users(path, noprint, rowspaces=(0,), cols=range(1),
             print(' ' * 18, message)
         print('\n' * 20)  # Scroll to new 'page'
 
-        # Display artist profile pic
-        display_page(a_img, rowspaces, cols, artist_xcoords, path)
+        with cd(path):
+            # Display artist profile pic
+            Image(a_img).thumbnail(310).show(align='left', x=2, y=0)
 
-        # Display the three previews
-        i = 0  # Always resets for every artist
-        while i < 3:  # Every artist has only 3 previews
-            p_img = yield  # Wait for preview pic
-            p_img = ((p_img,),)
-            display_page(p_img, rowspaces, cols, preview_xcoords[i], path)
-            i += 1
+            # Display the three previews
+            i = 0                   # Always resets for every artist
+            while i < 3:            # Every artist has only 3 previews
+                p_img = yield       # Wait for preview pic
+                Image(p_img).thumbnail(310).show(align='left', y=0,
+                                                 x=preview_xcoords[i])
+                i += 1
 
 def generate_orders(total_pics, artists_count):
     """
@@ -363,7 +366,6 @@ class TrackDownloadsImage(Tracker):
 
 def generate_previews(path):
     """Experimental"""
-    TERM = Terminal()
     rowspaces = ycoords(TERM.height)
     left_shifts = xcoords(TERM.width)
     xcoords = (left_shifts[0], left_shifts[-1])
@@ -389,18 +391,19 @@ def generate_previews(path):
 
 if __name__ == '__main__':
     from koneko import KONEKODIR
-    Gallery(KONEKODIR / '2232374' / '1').render()
-#    import time
-#    import random
-#
-#    imgs = os.listdir(KONEKODIR / 'following' / 'test')
-#    random.shuffle(imgs)
-#
-#    messages = ['test'] * len(imgs)
-#    tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
-#
-#    # Simulates downloads finishing and updating the tracker
-#    # Which will display the pictures in the correct order, waiting if needed
-#    for img in imgs:
-#        tracker.update(img)
-#        time.sleep(0.1)
+#    Gallery(KONEKODIR / '2232374' / '1').render()
+    import time
+    import random
+
+    imgs = os.listdir(KONEKODIR / 'following' / 'test')
+    random.shuffle(imgs)
+
+    messages = ['test'] * len(imgs)
+    #tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
+    tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
+
+    # Simulates downloads finishing and updating the tracker
+    # Which will display the pictures in the correct order, waiting if needed
+    for img in imgs:
+        tracker.update(img)
+        time.sleep(0.1)

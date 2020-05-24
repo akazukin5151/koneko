@@ -608,6 +608,7 @@ class Users(ABC):
         else:
             tracker = None
         download.init_download(self.data, download.user_download, tracker)
+        self._show = False
 
     @abstractmethod
     def _pixivrequest(self):

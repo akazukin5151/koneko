@@ -140,13 +140,11 @@ def test_number_prefix():
     assert lscat.number_prefix("02_file.png") == 2
     assert lscat.number_prefix("11_file.png") == 11
 
+def test_xcoords():
+    assert lscat.xcoords(100) == [2, 20, 38, 56, 74]
 
-def test_artist_user_id_prompt(monkeypatch):
-    monkeypatch.setattr(
-        "builtins.input", lambda x: "https://www.pixiv.net/en/users/2232374"
-    )
-    myinput = utils.artist_user_id_prompt()
-    assert myinput == "https://www.pixiv.net/en/users/2232374"
+def test_icat():
+    assert lscat.icat("testing/04_祝！！！.jpg") == None
 
 
 # From data.py
@@ -257,9 +255,15 @@ def test_show_artist_illusts(monkeypatch):
 def test_begin_prompt(monkeypatch):
     # Send a "1" as input
     monkeypatch.setattr("builtins.input", lambda x: "1")
-    returned = utils.begin_prompt(False)
+    returned = utils.begin_prompt()
     assert returned == "1"
     os.system("kitty +kitten icat --clear")
+
+def test_artist_user_id_prompt(monkeypatch):
+    monkeypatch.setattr("builtins.input",
+                        lambda x: "https://www.pixiv.net/en/users/2232374")
+    myinput = utils.artist_user_id_prompt()
+    assert myinput == "https://www.pixiv.net/en/users/2232374"
 
 def test_show_man_loop(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda x: "")

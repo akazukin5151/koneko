@@ -2,11 +2,9 @@
 
 Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
 
-Gallery view, square medium
+Gallery view
 ![Gallery view_square_medium1](pics/gallery_view_square_medium1.png)
 ![Gallery view_square_medium2](pics/gallery_view_square_medium2.png)
-Gallery view, medium (non-square)
-![Gallery view](pics/gallery_view.png)
 Image view
 ![Image_view](pics/image_view.png)
 Artist search (artist profile picture on the left, 3 previews on right)
@@ -124,36 +122,11 @@ It has been successfuly tested on version 0.17.2 onwards
 
 If only I can understand how to use asyncio. See [I don't understand Python's Asyncio](https://lucumr.pocoo.org/2016/10/30/i-dont-understand-asyncio/). I only need to do two simple things. Start this function in the background, wait for its result somewhere later, in another function. Then keep the result so I can use it later. Asyncio is impossible to use.
 
+* I'm having problems with lscat
 
-## Image rendering with lscat
+First, koneko is intended to work for full screen terminals, so don't tile it around unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine.
 
-**Note on terminology**: [lsix](https://github.com/hackerb9/lsix/) is the name of the original shell script I used, which uses sixel. I edited it to use icat and renamed it **lscat**. Then I rewrote it with python, which is named **lscat.py**. **lscat.py is the default renderer and the fastest.**
-
-**Note on installation**: if you edit it, you'll need to install it manually (or send a PR), see [manual installation](#manual-installation)
-
-You might have problems with image positioning with lscat.py. I wrote it to fit my screen and my terminal size, so there is no functionality to adjust for different terminal size. There are also 'magic numbers' (numbers that just exist) around. If you encounter problems, there are four things you can do, in order of least to most effort:
-
-* Revert to the old lscat shell script.
-
-    1. In `show_artist_illusts()` (`utils.py`), change `renderer="lscat"` to `renderer="lscat old"`.
-    2. Note that Image and User views (mode 2, 3, 4) still use lscat. The responsible code are annotated with a `# LSCAT` comment.
-
-* Revert to the original lsix script. This would be more reliable than 1., because it has all the checks for terminal sizes. However, you cannot use kitty; xterm works.
-
-    1. Make sure you're cd'ed into the koneko dir, then `curl "https://raw.githubusercontent.com/hackerb9/lsix/master/lsix" -o legacy/lsix && chmod +x legacy/lsix`
-
-    2. In `show_artist_illusts()` (`utils.py`), change `renderer="lscat"` to `renderer="lsix"`.
-
-* Adjust the 'magic numbers'. They are commented in `lscat.py`.
-* You can contribute to `lscat.py` by checking terminal size and doing all the maths and send a PR
-
-| Feature  | lscat.py | legacy/lscat | [hackerb9/lsix](https://github.com/hackerb9/lsix/) |
-| --- | --- | --- | --- |
-| Speed  | :heavy_check_mark: | :x:\* | :x:\*
-| Reliability (eg, resizing the terminal) | :x: | :interrobang: | :heavy_check_mark:
-| Adaptability (eg, other terminals, tmux) | :x: | :x: | :interrobang:
-
-\* lsix will appear faster because the images are much smaller. Once you scale them up, lsix will be the slowest.
+You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards.
 
 # Contributing
 * Fork it

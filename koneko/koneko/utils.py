@@ -19,25 +19,10 @@ def verify_full_download(filepath):
     return True
 
 def dir_not_empty(path):
+    # If it breaks, try len([x for x in os.listdir(path) if os.is_file(x)])
     if path.is_dir() and os.listdir(path):
         return True
     return False
-
-def show_artist_illusts(path, renderer='lscat', **kwargs):
-    """
-    Use specified renderer to display all images in the given path
-    Default is "lscat"; can be "lscat old" or "lsix" (needs to install lsix first)
-    """
-    if renderer != 'lscat':
-        lscat_path = os.getcwd()
-
-    with pure.cd(path):
-        if renderer == 'lscat':
-            lscat.Gallery(path, **kwargs).render()
-        elif renderer == 'lscat old':
-            os.system(f'{Path(lscat_path).parent}/legacy/lscat')
-        elif renderer == 'lsix':
-            os.system(f'{Path(lscat_path).parent}/legacy/lsix')
 
 
 # - Prompt functions

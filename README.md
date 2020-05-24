@@ -259,7 +259,7 @@ koneko
 
 ## Unit tests
 * Run `pytest testing/testing.py -vvvv -l -s`
-* Or `coverage run pytest testing/testing.py -vvvv -l -s` to generate coverage...
+* Or `coverage run -m pytest testing/testing.py -vvvv -l -s` to generate coverage...
 * ...report, viewed by `coverage report`
 * Dig deeper with `coverage html -d testing/htmlcov/`
 * Generate badge with `rm coverage.svg; coverage-badge -o coverage.svg`

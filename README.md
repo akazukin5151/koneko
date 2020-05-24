@@ -95,10 +95,6 @@ For more details refer to the [manual](#manual).
 * Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
-## Speed
-* Option for no download, no cache mode. icat supports loading pics from a URL instead of a filepath.
-    * `curl -e 'https://www.pixiv.net' "https://i.pximg.net/img-original/img/2019/12/21/20/13/12/78403815_p0.jpg" -s | kitty +kitten icat --align=left`
-
 ## Terminal reliability
 * Be responsive to terminal sizes, calculate number of columns and stuff, rather than hardcoding it. (1/2)
 * Option to use pillow or wand to edit numbers on pics

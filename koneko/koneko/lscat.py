@@ -262,12 +262,10 @@ class TrackDownloadsUsers(Tracker):
         self.generator.send(None)
 
 def generate_page(path):
-    """ Given number, calculate its coordinates and display it, then yield
-    """
-    # TODO: These numbers are generated from the above View ABC
-    left_shifts = (2,20,38,56,74)
-    rowspaces = (0, 9)
-    #page_spaces=(26, 24, 24)
+    """Given number, calculate its coordinates and display it, then yield"""
+    TERM = Terminal()
+    left_shifts = xcoords(TERM.width)
+    rowspaces = ycoords(TERM.height)
     while True:
         # Release control. When _inspect() sends another image,
         # assign to the variables and display it again
@@ -365,8 +363,11 @@ class TrackDownloadsImage(Tracker):
 
 def generate_previews(path):
     """Experimental"""
-    rowspaces = (0, 9)
-    xcoords = (2, 75)
+    TERM = Terminal()
+    rowspaces = ycoords(TERM.height)
+    left_shifts = xcoords(TERM.width)
+    xcoords = (left_shifts[0], left_shifts[-1])
+
     i = 0
     while True:
         # Release control. When _inspect() sends another image,

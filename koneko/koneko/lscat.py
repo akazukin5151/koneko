@@ -10,9 +10,10 @@ from abc import ABC, abstractmethod
 import funcy
 import cytoolz
 from pixcat import Image
+from blessed import Terminal
 
 from koneko.pure import cd
-
+from koneko import utils
 
 # - Pure functions
 def is_image(myfile):
@@ -21,7 +22,7 @@ def is_image(myfile):
     return False
 
 
-def filter_jpg(path):
+def filter_img(path):
     with cd(path):
         return sorted(filter(is_image, os.listdir('.')))
 
@@ -35,12 +36,34 @@ def number_prefix(myfile):
     return int(myfile.split('_')[0])
 
 
+def xcoords(term_width, img_width=18, padding=2):
+    """Generates the x-coord for each column to pass into pixcat
+    If img_width == 18 and 90 > term_width > 110, there will be five columns,
+    with spaces of (2, 20, 38, 56, 74)
+    Meaning the first col has x-coordinates 2 and second col of 20
+    """
+    number_of_columns = round(term_width / (img_width + padding))
+    return [col % number_of_columns * img_width + padding
+            for col in range(number_of_columns)]
+
+def ycoords(term_height, img_height=8, padding=1):
+    """Generates the y-coord for each row to pass into pixcat
+    If img_height == 8 and 27 > term_height >= 18, there will be two rows,
+    with spaces of (0, 9)
+    Meaning the first row has y-coordinates 0 and second row of 9
+    """
+    number_of_rows = term_height // (img_height + padding)
+    return [row * (img_height + padding)
+            for row in range(number_of_rows)]
+
+
 # Impure functions
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
 @funcy.ignore(IndexError, TypeError)
 def display_page(page, rowspaces, cols, left_shifts, path):
+    """For every row, display the images in the row by iterating over every col"""
     with cd(path):
         for (index, space) in enumerate(rowspaces):
             for col in cols:
@@ -72,7 +95,7 @@ class View(ABC):
         total_width = 90
         width = total_width // self._number_of_columns
 
-        file_list = filter_jpg(path)
+        file_list = filter_img(path)
         calc = xcoord(number_of_columns=self._number_of_columns, width=width)
         self._left_shifts = list(map(calc, self._cols))
 
@@ -103,37 +126,31 @@ class Gallery(View):
 
     Parameters
     ========
-    rowspaces : tuple of ints
-        Vertical spacing between (the two) rows.
-        len must be >= number of rows
     page_spaces : tuple of ints
         Vertical spacing between pages. Number of newlines to print for every page
         len must be >= number of pages
-    rows_in_page : int
-        Number of rows in each page
-    print_rows : bool
-        Whether to print row numbers in the bottom
-
-    Info
-    ========
-    left_shifts : list of ints
-        Horizontal position of the image
     """
 
-    def __init__(self, path, number_of_columns=5, rowspaces=(0, 9),
-                 page_spaces=(26, 24, 24), rows_in_page=2):
+    def __init__(self, path, page_spaces=(26, 24, 24)):
         # Only to set default arguments here, no overriding
+        TERM = Terminal()
+        number_of_columns = round(TERM.width / (18 + 2))  # Temp xcoords(TERM.width)
+        rowspaces = ycoords(TERM.height)
+        rows_in_page = TERM.height // (8 + 1)  # Temp
+        # TODO: no need to directly calculate left shifts
         super().__init__(path, number_of_columns, rowspaces, page_spaces, rows_in_page)
 
     @funcy.ignore(IndexError)
     def render(self):
+        noprint = utils.check_noprint()
         os.system('clear')
         for (i, page) in enumerate(self._pages_list):
             print('\n' * self._page_spaces[i])  # Scroll to new 'page'
             display_page(page, self._rowspaces, self._cols, self._left_shifts,
                          self._path)
 
-        print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
+        if not noprint:
+            print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
 
 
 class Card(View):
@@ -156,18 +173,17 @@ class Card(View):
     """
 
     def __init__(self, path, preview_paths, messages,
-                 preview_xcoords=((40,), (58,), (75,)), number_of_columns=1,
-                 rowspaces=(0,), page_spaces=(20,) * 30, rows_in_page=1):
-        # Set defaults ^^^
+                 preview_xcoords=((40,), (58,), (75,)), page_spaces=(20,) * 30):
         self._preview_paths = preview_paths
         self._messages = messages
         self._preview_xcoords = preview_xcoords
         self._preview_images: 'List[List[str]]'
-        super().__init__(path, number_of_columns, rowspaces, page_spaces,
-                         rows_in_page)
+        super().__init__(path, number_of_columns=1, rowspaces=(0,),
+                        page_spaces=page_spaces, rows_in_page=1)
 
     @funcy.ignore(IndexError)
     def render(self):
+        noprint = utils.check_noprint()
         assert self._rows_in_page == 1
         assert len(self._messages) >= self._rows_in_page
 
@@ -179,7 +195,8 @@ class Card(View):
         for (i, page) in enumerate(self._pages_list):
             # Print the message (artist name) first
             print('\n' * 2)
-            print(' ' * 18, self._messages[i])
+            if not noprint:
+                print(' ' * 18, self._messages[i])
             print('\n' * self._page_spaces[i])  # Scroll to new 'page'
 
             # Display artist profile pic
@@ -197,6 +214,8 @@ class Tracker(ABC):
         self._downloaded = []
         self._lock = threading.Lock()
         self._counter = 0
+        self.orders: 'List[int]'
+        self.generator: 'Generator[string]'
 
     def update(self, new):
         with self._lock:
@@ -237,8 +256,9 @@ class TrackDownloads(Tracker):
 class TrackDownloadsUsers(Tracker):
     def __init__(self, path):
         super().__init__(path)
+        noprint = utils.check_noprint()
         self.orders = generate_orders(120, 30)
-        self.generator = generate_users(path)
+        self.generator = generate_users(path, noprint)
         self.generator.send(None)
 
 def generate_page(path):
@@ -265,8 +285,8 @@ def generate_page(path):
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
 
-def generate_users(path, rowspaces=(0,), cols=range(1), artist_xcoords=(2,),
-                   preview_xcoords=((40,), (58,), (75,))):
+def generate_users(path, noprint, rowspaces=(0,), cols=range(1),
+                   artist_xcoords=(2,), preview_xcoords=((40,), (58,), (75,))):
 
     os.system('clear')
     while True:
@@ -277,9 +297,10 @@ def generate_users(path, rowspaces=(0,), cols=range(1), artist_xcoords=(2,),
         message = ''.join([number, '\n', ' ' * 18, artist_name])
         a_img = ((a_img,),)
 
-        # Print the message (artist name)
         print('\n' * 2)
-        print(' ' * 18, message)
+        if not noprint:
+            # Print the message (artist name)
+            print(' ' * 18, message)
         print('\n' * 20)  # Scroll to new 'page'
 
         # Display artist profile pic
@@ -367,18 +388,18 @@ def generate_previews(path):
 
 if __name__ == '__main__':
     from koneko import KONEKODIR
-    #Gallery(KONEKODIR / '2232374' / '1').render()
-    import time
-    import random
-
-    imgs = os.listdir(KONEKODIR / 'following' / 'test')
-    random.shuffle(imgs)
-
-    messages = ['test'] * len(imgs)
-    tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
-
-    # Simulates downloads finishing and updating the tracker
-    # Which will display the pictures in the correct order, waiting if needed
-    for img in imgs:
-        tracker.update(img)
-        time.sleep(0.1)
+    Gallery(KONEKODIR / '2232374' / '1').render()
+#    import time
+#    import random
+#
+#    imgs = os.listdir(KONEKODIR / 'following' / 'test')
+#    random.shuffle(imgs)
+#
+#    messages = ['test'] * len(imgs)
+#    tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
+#
+#    # Simulates downloads finishing and updating the tracker
+#    # Which will display the pictures in the correct order, waiting if needed
+#    for img in imgs:
+#        tracker.update(img)
+#        time.sleep(0.1)

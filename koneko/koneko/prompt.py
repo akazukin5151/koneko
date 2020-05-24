@@ -249,7 +249,7 @@ def user_prompt(user_class):
 
             elif user_prompt_command == 'h':
                 print(''.join([
-                    "view ", colors.blue_n, "th artist's illusts ",
+                    "view ", colors.BLUE_N, "th artist's illusts ",
                     colors.n, 'ext page; ',
                     colors.p, 'revious page; ',
                     colors.r, 'eload and re-download all;\n',

@@ -1,6 +1,7 @@
 """Handles user interaction inside all the modes. No knowledge of API needed"""
 
 import os
+import sys
 import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -40,7 +41,7 @@ class AbstractGallery(ABC):
             self._show = True
 
         current_page = self._pixivrequest()
-        self.data.raw = current_page
+        self.data.update(current_page)
 
         tracker = lscat.TrackDownloads(self.data.download_path)
         # Tracker will cause gallery to show each img as they finish downloading
@@ -360,7 +361,7 @@ class IllustFollowGallery(AbstractGallery):
             'view ', colors.m, 'anual\n']))
 
 def display_image(post_json, artist_user_id, number_prefix, data):
-    """
+    """Image mode, from an artist mode (mode 1/5 -> mode 2)
     Opens image given by the number (medium-res), downloads large-res and
     then display that.
     Alternative to main.view_post_mode(). It does its own stuff before calling
@@ -391,6 +392,43 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     arg = large_dir / filename
     lscat.icat(arg)
 
+def view_post_mode(image_id):
+    """Image mode, from main (start -> mode 2)
+    Fetch all the illust info, download it in the correct directory, then display it.
+    If it is a multi-image post, download the next image
+    Else or otherwise, open image prompt
+    Unlike the other modes, ui.Image does not handle the initial displaying of images
+    This is because coming from a gallery mode, the selected image already has a
+    square-medium preview downloaded, which can be displayed before the download
+    of the large-res completes. Thus, the initial displaying subroutine will be
+    different for a standalone mode or coming from a gallery mode.
+    """
+    print('Fetching illust details...')
+    try:
+        post_json = api.myapi.protected_illust_detail(image_id)['illust']
+    except KeyError:
+        print('Work has been deleted or the ID does not exist!')
+        sys.exit(1)
+
+    idata = data.ImageJson(post_json, image_id)
+
+    download.download_core(idata.large_dir, idata.url, idata.filename)
+    lscat.icat(idata.large_dir / idata.filename)
+
+    # Download the next page for multi-image posts
+    # Do this after prompt
+    #if idata.number_of_pages != 1:
+    #    download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
+
+    image = Image(image_id, idata, True)
+    experimental = utils.get_settings('misc', 'experimental')
+    if experimental == 'on':
+        event = threading.Event()
+        thread = threading.Thread(target=image.preview)
+        image.set_thread_event(thread, event)
+        thread.start()
+
+    prompt.image_prompt(image)
 
 class Image:
     """
@@ -418,7 +456,7 @@ class Image:
             return True
 
         tracker = lscat.TrackDownloadsImage(self.data.large_dir)
-        slicestart = self.data.img_post_page_num
+        slicestart = self.data.page_num
         while not self.event.is_set() and slicestart <= 4:
             img = self.data.page_urls[slicestart:slicestart+1]
 
@@ -456,12 +494,12 @@ class Image:
     def next_image(self):
         if not self.data.page_urls:
             print('This is the only page in the post!')
-        elif self.data.img_post_page_num + 1 == self.data.number_of_pages:
+        elif self.data.page_num + 1 == self.data.number_of_pages:
             print('This is the last image in the post!')
 
         else:
             #self.event.set()
-            self.data.img_post_page_num += 1  # Be careful of 0 index
+            self.data.page_num += 1  # Be careful of 0 index
             self._go_next_image()
 
     def _go_next_image(self):
@@ -474,7 +512,7 @@ class Image:
         # to download when you load it
 
         # First time from gallery; download next image
-        if self.data.img_post_page_num == 1:
+        if self.data.page_num == 1:
             download.async_download_spinner(self.data.large_dir,
                                             [self.data.current_url])
 
@@ -491,17 +529,17 @@ class Image:
             )
             download.async_download_spinner(self.data.large_dir, [next_img_url])
 
-        print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
+        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
 
     def previous_image(self):
         if not self.data.page_urls:
             print('This is the only page in the post!')
             return False
-        elif self.data.img_post_page_num == 0:
+        elif self.data.page_num == 0:
             print('This is the first image in the post!')
             return False
 
-        self.data.img_post_page_num -= 1
+        self.data.page_num -= 1
 
         testpath = self.data.large_dir / Path(self.data.image_filename)
         if testpath.is_file():
@@ -509,11 +547,11 @@ class Image:
         else:
             lscat.icat(
                 KONEKODIR / str(self.data.artist_user_id) /
-                str(self.data.img_post_page_num) / "large" /
+                str(self.data.page_num) / "large" /
                 self.data.image_filename
             )
 
-        print(f'Page {self.data.img_post_page_num+1}/{self.data.number_of_pages}')
+        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
         return True
 
     def leave(self, force=False):

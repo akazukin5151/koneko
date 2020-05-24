@@ -1,4 +1,4 @@
-# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)       [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/)
+# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![Coverage](coverage.svg)]()
 
 Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
 
@@ -92,14 +92,18 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
+* Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
+
+## Terminal reliability
+* Be responsive to terminal sizes, calculate number of columns and stuff, rather than hardcoding it. (1/2)
+* Option to use pillow or wand to edit numbers on pics
+* Support [ueberzug](https://github.com/seebye/ueberzug)
 
 ## Features
 
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
-* Option to use pillow or wand to edit numbers on pics
-* Support [ueberzug](https://github.com/seebye/ueberzug)
 
 
 # FAQ
@@ -111,6 +115,10 @@ I'd like to fix this but I'd rather not use mechanize but I don't know how to do
 * What operating systems does it support?
 
 It supports all OSes that kitty supports, which means Linux and macOS. It should work on macOS, but I don't have a test device. If you do, please contribute!
+
+* What versions of kitty does it support?
+
+It has been successfuly tested on version 0.17.2 onwards
 
 * Why use threading and not asyncio? There's a async version of pixivpy.
 
@@ -149,9 +157,10 @@ You might have problems with image positioning with lscat.py. I wrote it to fit 
 
 # Contributing
 * Fork it
-* Make a new branch with `git checkout -b myfeature` (a git pre-commit hook might prevent your git client from commiting to master, but github might let you. It doesn't matter which branch you edit, the pre-commit hook is just for me)
 * Edit the files on your fork/branch
-* Test it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
+    * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
+* Run tests with `pytest testing/testing.py -vvvv -l -s`
+* Try it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
     * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
 * Submit a pull request
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
@@ -228,6 +237,9 @@ git clone -b master https://github.com/twenty5151/koneko.git
 # Use the dev branch for latest features, fixes, and instability (recommended for contributers):
 git clone -b dev https://github.com/twenty5151/koneko.git
 
+# Run the tests (for those who want to edit)
+pytest testing/testing.py -vvvv -l -s
+
 cd koneko
 # Manually install without PyPI; for general usage
 # Both will correctly copy the required pictures
@@ -246,13 +258,11 @@ koneko
 ```
 
 ## Unit tests
-Use `pytest testing.py -v`. For type checking use mypy: `mypy koneko.py --ignore-missing-imports -v`
-
-
-Here's a random shell command to get (but not download) and display any pixiv image url:
-```sh
-curl -e 'https://www.pixiv.net' "https://i.pximg.net/img-original/img/2019/12/21/20/13/12/78403815_p0.jpg" | kitty +kitten icat --align left --place 800x480@0x5
-```
+* Run `pytest testing/testing.py -vvvv -l -s`
+* Or `coverage run -m pytest testing/testing.py -vvvv -l -s` to generate coverage...
+* ...report, viewed by `coverage report`
+* Dig deeper with `coverage html -d testing/htmlcov/`
+* Generate badge with `coverage-badge -fpo coverage.svg`
 
 ## Upload to PyPI
 Bump version info in `__init__.py`, `setup.py`, and `README.md`

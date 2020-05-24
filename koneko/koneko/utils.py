@@ -196,3 +196,20 @@ def get_settings(section, setting):
     section = config_object[section]
     result = section.get(setting, None)
     return result
+
+def check_noprint():
+    noprint = get_settings('misc', 'noprint')
+    if noprint == 'on':
+        return True
+    return False
+
+def noprint(func, *args, **kwargs):
+    import contextlib
+    with open(os.devnull, "w") as null:
+        with contextlib.redirect_stdout(null):
+            func(*args, **kwargs)
+
+
+if __name__ == "__main__":
+    noprint(print, "hello")
+    print('world')

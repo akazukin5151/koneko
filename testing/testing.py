@@ -111,6 +111,7 @@ def test_process_user_url():
 def test_process_artwork_url():
     assert (pure.process_artwork_url("https://www.pixiv.net/en/artworks/76695217") ==
             ("76695217", "2"))
+    assert pure.process_artwork_url("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=76695217") == ("76695217", "2")
     assert pure.process_artwork_url("76695217") == ("76695217", "2")
 
 # From lscat.py
@@ -287,3 +288,15 @@ def test_info_screen_loop(monkeypatch):
     utils.info_screen_loop()
     os.system("kitty +kitten icat --clear")
 
+def test_check_noprint(monkeypatch):
+    monkeypatch.setattr("testing.utils.get_settings", lambda x, y: "on")
+    assert utils.check_noprint() == True
+    monkeypatch.setattr("testing.utils.get_settings", lambda x, y: "off")
+    assert utils.check_noprint() == False
+    monkeypatch.setattr("testing.utils.get_settings", lambda x, y: "false")
+    assert utils.check_noprint() == False
+
+def test_noprint(capsys):
+    utils.noprint(print, "hello")
+    captured = capsys.readouterr()
+    assert captured.out == ""

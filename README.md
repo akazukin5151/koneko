@@ -262,7 +262,7 @@ koneko
 * Or `coverage run -m pytest testing/testing.py -vvvv -l -s` to generate coverage...
 * ...report, viewed by `coverage report`
 * Dig deeper with `coverage html -d testing/htmlcov/`
-* Generate badge with `rm coverage.svg; coverage-badge -o coverage.svg`
+* Generate badge with `coverage-badge -fpo coverage.svg`
 
 ## Upload to PyPI
 Bump version info in `__init__.py`, `setup.py`, and `README.md`

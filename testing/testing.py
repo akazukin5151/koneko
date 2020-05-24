@@ -241,6 +241,10 @@ def test_user():
 
 
 # utils.py
+@pytest.fixture
+def turn_off_print(monkeypatch):
+    monkeypatch.setattr("builtins.print", lambda *a, **k: "")
+
 def test_verify_full_download():
     assert utils.verify_full_download("testing/77803142_p0.png") == True
     assert utils.verify_full_download("testing/not_an_image.txt") == False
@@ -266,17 +270,15 @@ def test_artist_user_id_prompt(monkeypatch):
     myinput = utils.artist_user_id_prompt()
     assert myinput == "https://www.pixiv.net/en/users/2232374"
 
-def test_show_man_loop(monkeypatch):
+def test_show_man_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("builtins.input", lambda x: "")
-    monkeypatch.setattr("builtins.print", lambda *a, **k: "")
     monkeypatch.setattr("os.system", lambda x: "")
     utils.show_man_loop()
     os.system("kitty +kitten icat --clear")
 
-def test_clear_cache_loop(monkeypatch):
+def test_clear_cache_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("shutil.rmtree", lambda x: "")
     monkeypatch.setattr("builtins.input", lambda x: "y")
-    monkeypatch.setattr("builtins.print", lambda *a, **k: "")
     monkeypatch.setattr("os.system", lambda x: "")
     utils.clear_cache_loop()
     monkeypatch.setattr("builtins.input", lambda x: "n")

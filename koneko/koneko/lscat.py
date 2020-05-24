@@ -63,155 +63,6 @@ def ycoords(term_height, img_height=8, padding=1):
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
-@funcy.ignore(IndexError, TypeError)
-def display_page(page, rowspaces, cols, left_shifts, path):
-    """For every row, display the images in the row by iterating over every col"""
-    with cd(path):
-        for (index, space) in enumerate(rowspaces):
-            for col in cols:
-                Image(page[index][col]).thumbnail(310).show(
-                    align='left', x=left_shifts[col], y=space
-                )
-
-
-class View(ABC):
-    """
-    The reason for using pages is because every time something in a different
-    row is displayed, the entire terminal shifts.
-    So if you try to naively plot every image as it loads, it would result
-    in a cascading gallery l
-                            i
-                             k
-                              e
-                                this.
-    Hence, the need to plot each row of images in order
-    """
-    def __init__(self, path, number_of_columns, rowspaces, page_spaces, rows_in_page):
-        self._path = path
-        self._number_of_columns = number_of_columns
-        self._rowspaces = rowspaces
-        self._page_spaces = page_spaces
-        self._rows_in_page = rows_in_page
-
-        self._cols = range(self._number_of_columns)
-        total_width = 90
-        width = total_width // self._number_of_columns
-
-        file_list = filter_img(path)
-        calc = xcoord(number_of_columns=self._number_of_columns, width=width)
-        self._left_shifts = list(map(calc, self._cols))
-
-        # partitions list of files into tuples with len == number_of_columns
-        # so each row will contain 5 files, if number_of_columns == 5
-        # [(file1, file2, ... , file5), (file6, ... , file10), ...]
-        each_row = cytoolz.partition_all(self._number_of_columns, file_list)
-
-        # each page has `rows_in_page` rows. every row is grouped with another.
-        # [(row1, row2), (row3, row4), ...]
-        # where row1 == (file1, file2, ...)
-        self._pages_list = cytoolz.partition(self._rows_in_page, each_row, pad=None)
-        self._pages_list = list(self._pages_list)
-
-        #assert len(self._pages_list[0]) <= len(self._rowspaces) == self._rows_in_page
-        #assert len(self._pages_list) <= len(self._page_spaces)
-
-    @abstractmethod
-    def render(self):
-        raise NotImplementedError
-
-
-class Gallery(View):
-    """
-    Each page has 2 rows by default. A page means printing blank lines to move
-    the cursor down (and the terminal screen). The number of blank lines to
-    print for each page is given by page_spaces.
-
-    Parameters
-    ========
-    page_spaces : tuple of ints
-        Vertical spacing between pages. Number of newlines to print for every page
-        len must be >= number of pages
-    """
-
-    def __init__(self, path, page_spaces=(26, 24, 24)):
-        # TODO: page spaces
-        # Only to set default arguments here, no overriding
-        number_of_columns = round(TERM.width / (18 + 2))  # Temp xcoords(TERM.width)
-        rowspaces = ycoords(TERM.height)
-        rows_in_page = TERM.height // (8 + 1)  # Temp
-        # TODO: no need to directly calculate left shifts
-        super().__init__(path, number_of_columns, rowspaces, page_spaces, rows_in_page)
-
-    @funcy.ignore(IndexError)
-    def render(self):
-        noprint = utils.check_noprint()
-        os.system('clear')
-        for (i, page) in enumerate(self._pages_list):
-            print('\n' * self._page_spaces[i])  # Scroll to new 'page'
-            display_page(page, self._rowspaces, self._cols, self._left_shifts,
-                         self._path)
-
-        if not noprint:
-            print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
-
-
-class Card(View):
-    """
-    Display each image (artist profile pic) in one row, their name, and three
-    preview images alongside.
-
-    Special parameters
-    ========
-    preview_xcoords : list of list of int
-        For printing previews next to artists. len == 3 (three previews)
-        len of inner list == 1 (one column only, only one int needed)
-    preview_paths : list of str
-        Path to where the preview images are downloaded to
-        len must be 3, for three previews. The number of images in each dir/path
-        must be == number of pages == len(page_spaces) == number of images
-    messages : list of str
-        List of text to print next to the images. Only for when rows_in_page = 1
-        len must be >= rows_in_page
-    """
-
-    def __init__(self, path, preview_paths, messages,
-                 preview_xcoords=((40,), (58,), (75,)), page_spaces=(20,) * 30):
-        """TODO: preview_xcoords, page spaces: ?"""
-        self._preview_paths = preview_paths
-        self._messages = messages
-        self._preview_xcoords = preview_xcoords
-        self._preview_images: 'List[List[str]]'
-        # Row spaces is 0 because only one row in page
-        super().__init__(path, number_of_columns=1, rowspaces=(0,),
-                        page_spaces=page_spaces, rows_in_page=1)
-
-    @funcy.ignore(IndexError)
-    def render(self):
-        noprint = utils.check_noprint()
-        assert self._rows_in_page == 1
-        assert len(self._messages) >= self._rows_in_page
-
-        self._preview_images = list(
-            cytoolz.partition_all(3, sorted(os.listdir(self._preview_paths)))
-        )
-
-        os.system('clear')
-        for (i, page) in enumerate(self._pages_list):
-            # Print the message (artist name) first
-            print('\n' * 2)
-            if not noprint:
-                print(' ' * 18, self._messages[i])
-            print('\n' * self._page_spaces[i])  # Scroll to new 'page'
-
-            # Display artist profile pic
-            display_page(page, self._rowspaces, self._cols, self._left_shifts,
-                         self._path)
-
-            # Display the three previews
-            for (j, coord) in enumerate(self._preview_xcoords):
-                display_page(((self._preview_images[i][j],),), self._rowspaces,
-                             self._cols, coord, self._preview_paths)
-
 class Tracker(ABC):
     def __init__(self, path):
         self.path = path
@@ -297,7 +148,6 @@ def generate_users(path, noprint=False):
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * 18, artist_name])
 
-        print('\n' * 2)
         if not noprint:
             # Print the message (artist name)
             print(' ' * 18, message)
@@ -391,19 +241,25 @@ def generate_previews(path):
 
 if __name__ == '__main__':
     from koneko import KONEKODIR
-#    Gallery(KONEKODIR / '2232374' / '1').render()
-    import time
-    import random
+    #Gallery(KONEKODIR / '2232374' / '1').render()
 
-    imgs = os.listdir(KONEKODIR / 'following' / 'test')
-    random.shuffle(imgs)
+#    import time
+#    import random
 
-    messages = ['test'] * len(imgs)
-    #tracker = TrackDownloads(KONEKODIR / 'following' / 'test')
-    tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
+    #tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
+    #imgs = sorted(os.listdir(KONEKODIR / 'following' / 'test'))
+    #imgs = os.listdir(KONEKODIR / 'following' / 'test')
+#    random.shuffle(imgs)
+    #messages = ['test'] * len(imgs)
 
-    # Simulates downloads finishing and updating the tracker
-    # Which will display the pictures in the correct order, waiting if needed
+    tracker = TrackDownloads(KONEKODIR / '2232374' / '1')
+    imgs = sorted(os.listdir(KONEKODIR / '2232374' / '1'))
+
     for img in imgs:
         tracker.update(img)
-        time.sleep(0.1)
+#        time.sleep(0.1)
+
+    # TODO
+    noprint = utils.check_noprint()
+    if not noprint:
+        print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')

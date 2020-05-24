@@ -29,9 +29,12 @@ class AbstractGallery(ABC):
         for contents!)
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
+        # TODO: properly check for file in dir, so can batch the loop in lscat
         if self.data.download_path.is_dir():
+            tracker = lscat.TrackDownloads(self.data.download_path)
             try:
-                utils.show_artist_illusts(self.data.download_path)
+                for img in os.listdir(self.data.download_path):
+                    tracker.update(img)
             except IndexError: # Folder exists but no files
                 self.data.download_path.rmdir()
                 self._show = True
@@ -108,8 +111,11 @@ class AbstractGallery(ABC):
 
     def next_page(self):
         download_path = self._main_path / str(self.data.current_page_num+1)
+        # TODO: properly check for file in dir, so can batch the loop in lscat
+        tracker = lscat.TrackDownloads(download_path)
         try:
-            utils.show_artist_illusts(download_path)
+            for img in os.listdir(download_path):
+                tracker.update(img)
         except FileNotFoundError:
             print('This is the last page!')
         else:
@@ -126,7 +132,11 @@ class AbstractGallery(ABC):
         if self.data.current_page_num > 1:
             self.data.current_page_num -= 1
 
-            utils.show_artist_illusts(self.data.download_path)
+            # TODO: batch the loop in lscat
+            tracker = lscat.TrackDownloads(self.data.download_path)
+            for img in os.listdir(self.data.download_path):
+                tracker.update(img)
+
             pure.print_multiple_imgs(self.data.current_illusts)
             print(f'Page {self.data.current_page_num}')
             print('Enter a gallery command:\n')
@@ -228,7 +238,11 @@ class ArtistGallery(AbstractGallery):
 
     def _back(self):
         # After user 'back's from image prompt, start mode again
-        utils.show_artist_illusts(self.data.download_path)
+        # TODO: batch the loop in lscat
+        tracker = lscat.TrackDownloads(self.data.download_path)
+        for img in os.listdir(self.data.download_path):
+            tracker.update(img)
+
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
         prompt.gallery_like_prompt(self)

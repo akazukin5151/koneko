@@ -591,25 +591,25 @@ class Users(ABC):
         # because it needs to print the right message
         # Which means parsing is needed first
         self._parse_and_download()
-        if self._show:  # Is always true
-            self._show_page()
         self._prefetch_next_page()
 
-    def _parse_and_download(self, track=True):
+    def _parse_and_download(self):
         """
         Parse info, combine profile pics and previews, download all concurrently,
         move the profile pics to the correct dir (less files to move)
         """
         self._parse_user_infos()
+        # FIXME: no need to parse if the following line is true,
+        # but parsing needed to access self.data.download_path
+        if utils.dir_not_empty(self.data.download_path):
+            lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
+            return True
 
-        if track:
-            tracker = lscat.TrackDownloadsUsers(self.data.download_path)
-        else:
-            tracker = None
+        if self.data.download_path.is_dir():
+            self.data.download_path.rmdir()
+
+        tracker = lscat.TrackDownloadsUsers(self.data.download_path)
         download.init_download(self.data, download.user_download, tracker)
-        # FIXME: If already cached, this will make it never show
-        # But after downloading (when needed), pics will show twice
-        #self._show = False
 
     @abstractmethod
     def _pixivrequest(self):
@@ -626,6 +626,8 @@ class Users(ABC):
             self.data.update(result)
 
     def _show_page(self):
+        # Names prefixed is no longer needed to feed into messages
+        # FIXME: more direct way to detect if this is the last page
         try:
             self.data.names_prefixed
         except KeyError:
@@ -647,7 +649,8 @@ class Users(ABC):
                 self._offset = next_offset
                 self.data.page_num = int(self._offset) // 30 + 1
 
-                self._parse_and_download(track=False)
+                self._parse_user_infos()
+                download.init_download(self.data, download.user_download, None)
 
         self.data.page_num = oldnum
 

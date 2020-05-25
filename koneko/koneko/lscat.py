@@ -100,14 +100,16 @@ class TrackDownloadsUsers(Tracker):
         noprint = utils.check_noprint()
 
         try:
-            total_imgs, splitpoint = data.total_imgs, data.splitpoint
-        except KeyError:
+            splitpoint = data.splitpoint
+        except AttributeError:
             with cd(data.download_path):
                 with open('.koneko', 'r') as f:
-                    text = f.read()
-            total_imgs, splitpoint = text.split(";")
+                    splitpoint = int(f.read())
 
-        self.orders = generate_orders(int(total_imgs), int(splitpoint))
+        # splitpoint == number of artists
+        # Each artist has 3 previews, so the total number of pics is
+        # splitpoint * 3 + splitpoint == splitpoint * 4
+        self.orders = generate_orders(splitpoint * 4, splitpoint)
 
         self.generator = generate_users(data.download_path, noprint)
         self.generator.send(None)

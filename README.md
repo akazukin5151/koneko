@@ -90,6 +90,7 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
+* FIXME: mode 5 seems to be not reloading automatically?
 * Get rid of all data in the ui classes
 * Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.

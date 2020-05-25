@@ -98,12 +98,12 @@ def init_download(data, download_func, tracker):
 
     download_func(data, tracker=tracker)
 
-    # Save the number of artists and splitpoint
+    # Save the number of artists == splitpoint
     # So later accesses, which will not request, can display properly
     if download_func == user_download:
         with pure.cd(data.download_path):
             with open('.koneko', 'w') as f:
-                f.write(f'{data.total_imgs};{data.splitpoint}')
+                f.write(str(data.splitpoint))
 
     return True
 

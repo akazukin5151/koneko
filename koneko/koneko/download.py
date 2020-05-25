@@ -97,6 +97,14 @@ def init_download(data, download_func, tracker):
         os.system(f'rm -r {data.download_path}') # shutil.rmtree is better
 
     download_func(data, tracker=tracker)
+
+    # Save the number of artists and splitpoint
+    # So later accesses, which will not request, can display properly
+    if download_func == user_download:
+        with pure.cd(data.download_path):
+            with open('.koneko', 'w') as f:
+                f.write(f'{data.total_imgs};{data.splitpoint}')
+
     return True
 
 # - Wrappers around the core functions for downloading one image

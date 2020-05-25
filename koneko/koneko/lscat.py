@@ -37,7 +37,11 @@ def icat(args):
 
 def show_instant(cls, data, check_noprint=False):
     tracker = cls(data)
-    list(map(tracker.update, os.listdir(data.download_path)))
+    # Filter out invisible files
+    # (used to save splitpoint and total_imgs without requesting)
+    _ = [tracker.update(x)
+         for x in os.listdir(data.download_path)
+         if not x.startswith('.')]
 
     if check_noprint and not utils.check_noprint():
         print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
@@ -94,7 +98,17 @@ class TrackDownloadsUsers(Tracker):
     def __init__(self, data):
         super().__init__(data)
         noprint = utils.check_noprint()
-        self.orders = generate_orders(data.total_imgs, data.splitpoint)
+
+        try:
+            total_imgs, splitpoint = data.total_imgs, data.splitpoint
+        except KeyError:
+            with cd(data.download_path):
+                with open('.koneko', 'r') as f:
+                    text = f.read()
+            total_imgs, splitpoint = text.split(";")
+
+        self.orders = generate_orders(int(total_imgs), int(splitpoint))
+
         self.generator = generate_users(data.download_path, noprint)
         self.generator.send(None)
 

@@ -156,7 +156,6 @@ class UserJson:
 
     @property
     def total_imgs(self):
-        # FIXME: doesn't work for cached images
         return len(self.names + self.image_urls)
 
     @property

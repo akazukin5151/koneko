@@ -182,4 +182,23 @@ data.GalleryJson *-up- ui.AbstractGallery: composes data
 data.ImageJson *-up- ui.Image: composes data
 data.UserJson *-up- ui.Users: composes data
 
+
+class api.APIHandler {
+    + api_queue
+    + api_thread
+    + api
+    +start()
+    +await_login()
+    +parse_next()
+    +artist_gallery_parse_next()
+    +artist_gallery_request()
+    +protected_illust_detail()
+    +following_user_request()
+    +search_user_request()
+    +illust_follow_request()
+    +protected_download()
+}
+
+api.APIHandler -right[hidden]-> ui.Users
+
 @enduml

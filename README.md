@@ -260,6 +260,8 @@ koneko
 * Generate badge with `coverage-badge -fpo coverage.svg`
 
 ## Upload to PyPI
+When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
+
 Bump version info in `__init__.py`, `setup.py`, and `README.md`
 
 ```sh

@@ -184,9 +184,10 @@ def test_image():
 
 
 def test_user():
-    udata = data.UserJson(mode3, 1, Path(f"{KONEKODIR}/following/"), "2232374")
+    udata = data.UserJson(1, Path(f"{KONEKODIR}/following/"), "2232374")
     assert udata
 
+    udata.update(mode3)
     assert udata.page_num == 1
     assert udata.main_path == Path(f"{KONEKODIR}/following/")
     assert udata._input == "2232374"
@@ -202,8 +203,6 @@ def test_user():
     assert udata.artist_user_id(0) == 219621
 
     assert udata.names == udata.names_cache[1]
-
-    assert udata.names_prefixed == ["00\n                   畳と桧", "01\n                   ざるつ", "02\n                   春夫", "03\n                   JAM", "04\n                   肋兵器", "05\n                   おてん!!!!!!!!", "06\n                   saber", "07\n                   sola7764", "08\n                   ￦ANKE", "09\n                   ToY", "10\n                   sigma99", "11\n                   アマガイタロー", "12\n                   望月けい", "13\n                   米山舞", "14\n                   にえあ@冬コミ新刊委託中です", "15\n                   白萝炖黑兔", "16\n                   Kelinch1", "17\n                   三崎二式.N3", "18\n                   ﾕｳｷ", "19\n                   sunhyunそんひょん선현", "20\n                   うまくち醤油", "21\n                   Prime", "22\n                   哦雅思密乃", "23\n                   ホリセイ", "24\n                   pattsk138", "25\n                   DELF", "26\n                   キンタ", "27\n                   cookies", "28\n                   Aluppia", "29\n                   うにゃりすたー"]
 
     assert len(udata.all_urls) == 117
 
@@ -225,6 +224,7 @@ def test_verify_full_download():
     # The above code will remove the file
     os.system("touch testing/not_an_image.txt")
 
+@pytest.mark.skipif(os.getlogin() != 'twenty', reason="needs kitty")
 def test_begin_prompt(monkeypatch):
     # Send a "1" as input
     monkeypatch.setattr("builtins.input", lambda x: "1")
@@ -238,6 +238,7 @@ def test_artist_user_id_prompt(monkeypatch):
     myinput = utils.artist_user_id_prompt()
     assert myinput == "https://www.pixiv.net/en/users/2232374"
 
+@pytest.mark.skipif(os.getlogin() != 'twenty', reason="needs kitty")
 def test_show_man_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("builtins.input", lambda x: "")
     monkeypatch.setattr("os.system", lambda x: "")
@@ -252,6 +253,7 @@ def test_clear_cache_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("builtins.input", lambda x: "n")
     utils.clear_cache_loop()
 
+@pytest.mark.skipif(os.getlogin() != 'twenty', reason="needs kitty")
 def test_info_screen_loop(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda x: "")
     monkeypatch.setattr("os.system", lambda x: "")

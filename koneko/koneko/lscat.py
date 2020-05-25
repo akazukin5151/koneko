@@ -1,5 +1,6 @@
 """The default image renderer for koneko"""
 import os
+import time
 import threading
 from abc import ABC
 
@@ -77,6 +78,7 @@ class Tracker(ABC):
             # Display page
             if next_num == 0:
                 os.system('clear')
+                time.sleep(1)
             self.generator.send(pic)
 
             self._counter += 1
@@ -239,12 +241,13 @@ def generate_previews(path):
 
 if __name__ == '__main__':
     from koneko import KONEKODIR
-#    import time  # for time.sleep(0.1) in for loop version of map
-#    import random  # for random.shuffle(imgs)
 
+    class FakeData:
+        def __init__(self):
+            self.download_path = KONEKODIR / 'test'
+
+    data = FakeData()
     # Use whichever mode you pasted into the test dir
-    tracker = TrackDownloadsUsers(KONEKODIR / 'test')
-    #tracker = TrackDownloads(KONEKODIR / 'test')
-    imgs = os.listdir(KONEKODIR / 'test')
-    list(map(tracker.update, imgs))
+    # For Users, make sure it has a .koneko file
+    show_instant(TrackDownloadsUsers, data)
 

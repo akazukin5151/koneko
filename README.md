@@ -104,6 +104,27 @@ For more details refer to the [manual](#manual).
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
 
+## Upcoming changelog (in dev branch)
+
+For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+
+### Version 0.6
+* **Depreciated** legacy lscat (the shell script) and lsix support.
+* If there are cached images in the users modes (3 & 4), it will be shown immediately before requesting and parsing.
+
+#### Terminal reliability
+* lscat now calculates params using terminal size
+* Add option to turn off printing messages in lscat
+
+#### Code
+* Removed the `raw` attribute from data classes
+* Moved view_post_mode() from main.py to ui.py
+* Renamed img_post_page_num to page_num
+* Updated unit tests and added more tests
+* Revamped lscat to use only the generators to display the images, rather than for loops, heavy classes, and fragile inheritance
+    * Users view actually got faster, because two yield statements are apparently faster than two nested for loops
+    * No significant speed difference for Galley views.
+
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!

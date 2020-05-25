@@ -223,22 +223,12 @@ def generate_previews(path):
 
 if __name__ == '__main__':
     from koneko import KONEKODIR
-#    import time
-#    import random
+#    import time  # for time.sleep(0.1) in for loop version of map
+#    import random  # for random.shuffle(imgs)
 
-    # Gallery
-#    imgs = os.listdir(KONEKODIR / 'following' / 'test')
-#    imgs = sorted(os.listdir(KONEKODIR / '2232374' / '1'))
-#    tracker = TrackDownloads(KONEKODIR / '2232374' / '1')
-#    for img in imgs:
-#        tracker.update(img)
-#        time.sleep(0.1)
-
-    # Users
-#    tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
-#    imgs = sorted(os.listdir(KONEKODIR / 'following' / 'test'))
-##    random.shuffle(imgs)
-#    for img in imgs:
-#        tracker.update(img)
-#        time.sleep(0.1)
+    # Use whichever mode you pasted into the test dir
+    tracker = TrackDownloadsUsers(KONEKODIR / 'test')
+    #tracker = TrackDownloads(KONEKODIR / 'test')
+    imgs = os.listdir(KONEKODIR / 'test')
+    list(map(tracker.update, imgs))
 

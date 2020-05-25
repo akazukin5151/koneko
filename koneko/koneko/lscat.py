@@ -200,7 +200,7 @@ def generate_previews(path):
     """Experimental"""
     rowspaces = ycoords(TERM.height)
     left_shifts = xcoords(TERM.width)
-    xcoords = (left_shifts[0], left_shifts[-1])
+    _xcoords = (left_shifts[0], left_shifts[-1])
 
     i = 0
     while True:
@@ -218,7 +218,7 @@ def generate_previews(path):
 
         with cd(path):
             Image(image).thumbnail(310).show(
-                align='left', x=xcoords[x], y=rowspaces[y]
+                align='left', x=_xcoords[x], y=rowspaces[y]
             )
 
 if __name__ == '__main__':

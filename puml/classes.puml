@@ -100,15 +100,14 @@ SearchUsersModeLoop*-down- ui.SearchUsers: composes mode
 
 
 abstract class lscat.Tracker <<(A, red)>>{
+    + path
     +update()
 }
 class lscat.TrackDownloads {
-    +update()
     + orders
     + generator
 }
 class lscat.TrackDownloadsUser {
-    +update()
     + orders
     + generator
 }
@@ -135,21 +134,23 @@ package prompt {
 
 
 class data.GalleryJson {
-    + raw
     + all_pages_cache
-    + titles
-    +current_page()
-    +current_illusts()
+    + current_page_num
+    + current_illusts
+    + cached_pages
+    + next_url
+    + download_path
+    + first_img
+    +update()
     +post_json()
+    +artist_user_id()
     +image_id()
-    +cached_pages()
-    +next_url()
 }
 class data.ImageJson {
     + url
     + filename
     + artist_illust_id
-    + img_post_page_num
+    + page_num
     + number_of_pages
     + page_urls
     + large_dir
@@ -160,17 +161,21 @@ class data.ImageJson {
     +current_url()
 }
 class data.UserJson {
+    + page_num
     + ids_cache
     + names_cache
-    + raw
+    + download_path
+    + names
+    + names_prefixed
+    + all_urls
+    + all_names
+    + splitpoint
+    + first_img
+    +update()
     + next_url
     + profile_pic_urls
     + image_urls
     +artist_user_id()
-    +names()
-    +all_urls()
-    +all_names()
-    +splitpoint()
 }
 
 data.GalleryJson *-up- ui.AbstractGallery: composes data

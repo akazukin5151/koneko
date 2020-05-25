@@ -31,7 +31,7 @@ class AbstractGallery(ABC):
         """
         if utils.dir_not_empty(self.data.download_path):
             self._show = False
-            lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
+            lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
             if self.data.download_path.is_dir():
                 self.data.download_path.rmdir()
@@ -40,7 +40,7 @@ class AbstractGallery(ABC):
         current_page = self._pixivrequest()
         self.data.update(current_page)
 
-        tracker = lscat.TrackDownloads(self.data.download_path)
+        tracker = lscat.TrackDownloads(self.data)
         # Tracker will cause gallery to show each img as they finish downloading
         download.init_download(self.data, download.download_page, tracker)
 
@@ -104,15 +104,15 @@ class AbstractGallery(ABC):
         raise NotImplementedError
 
     def next_page(self):
-        download_path = self._main_path / str(self.data.current_page_num+1)
-        if utils.dir_not_empty(download_path):
+        self.data.current_page_num += 1
+        if utils.dir_not_empty(self.data.download_path):
             self._show = False
-            lscat.show_instant(lscat.TrackDownloads, download_path, True)
+            lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
             print('This is the last page!')
+            self.data.current_page_num -= 1
             return False
 
-        self.data.current_page_num += 1
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
         print('Enter a gallery command:\n')
@@ -125,7 +125,7 @@ class AbstractGallery(ABC):
         if self.data.current_page_num > 1:
             self.data.current_page_num -= 1
 
-            lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
+            lscat.show_instant(lscat.TrackDownloads, self.data, True)
 
             pure.print_multiple_imgs(self.data.current_illusts)
             print(f'Page {self.data.current_page_num}')
@@ -228,7 +228,7 @@ class ArtistGallery(AbstractGallery):
 
     def _back(self):
         # After user 'back's from image prompt, start mode again
-        lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
+        lscat.show_instant(lscat.TrackDownloads, self.data, True)
 
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
@@ -597,7 +597,7 @@ class Users(ABC):
     def _parse_and_download(self):
         """If download path not empty, immediately show. Else parse & download"""
         if utils.dir_not_empty(self.data.download_path):
-            lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
+            lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
             self._parse_user_infos()
             return True
 
@@ -606,7 +606,7 @@ class Users(ABC):
             self.data.download_path.rmdir()
 
         self._parse_user_infos()
-        tracker = lscat.TrackDownloadsUsers(self.data.download_path)
+        tracker = lscat.TrackDownloadsUsers(self.data)
         download.init_download(self.data, download.user_download, tracker)
 
     @abstractmethod
@@ -629,7 +629,7 @@ class Users(ABC):
             self.data.page_num -= 1
             return False
 
-        lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
+        lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts

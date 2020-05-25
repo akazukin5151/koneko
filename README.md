@@ -90,6 +90,7 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
+* FIXME: mode 5 seems to be not reloading automatically?
 * Get rid of all data in the ui classes
 * Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
@@ -260,6 +261,8 @@ koneko
 * Generate badge with `coverage-badge -fpo coverage.svg`
 
 ## Upload to PyPI
+When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
+
 Bump version info in `__init__.py`, `setup.py`, and `README.md`
 
 ```sh

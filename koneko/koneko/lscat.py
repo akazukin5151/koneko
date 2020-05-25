@@ -35,17 +35,21 @@ def ycoords(term_height, img_height=8, padding=1):
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
-def show_instant(cls, download_path, check_noprint=False):
-    tracker = cls(download_path)
-    list(map(tracker.update, os.listdir(download_path)))
+def show_instant(cls, data, check_noprint=False):
+    tracker = cls(data)
+    # Filter out invisible files
+    # (used to save splitpoint and total_imgs without requesting)
+    _ = [tracker.update(x)
+         for x in os.listdir(data.download_path)
+         if not x.startswith('.')]
 
     if check_noprint and not utils.check_noprint():
         print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
 
 
 class Tracker(ABC):
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, data):
+        self.path = data.download_path
         self._downloaded = []
         self._lock = threading.Lock()
         self._counter = 0
@@ -83,19 +87,31 @@ class Tracker(ABC):
 
 class TrackDownloads(Tracker):
     """For gallery modes (1 & 5)"""
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, data):
+        super().__init__(data)
         self.orders = list(range(30))
-        self.generator = generate_page(path)
+        self.generator = generate_page(data.download_path)
         self.generator.send(None)
 
 class TrackDownloadsUsers(Tracker):
     """For user modes (3 & 4)"""
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, data):
+        super().__init__(data)
         noprint = utils.check_noprint()
-        self.orders = generate_orders(120, 30)
-        self.generator = generate_users(path, noprint)
+
+        try:
+            splitpoint = data.splitpoint
+        except AttributeError:
+            with cd(data.download_path):
+                with open('.koneko', 'r') as f:
+                    splitpoint = int(f.read())
+
+        # splitpoint == number of artists
+        # Each artist has 3 previews, so the total number of pics is
+        # splitpoint * 3 + splitpoint == splitpoint * 4
+        self.orders = generate_orders(splitpoint * 4, splitpoint)
+
+        self.generator = generate_users(data.download_path, noprint)
         self.generator.send(None)
 
 def generate_page(path):

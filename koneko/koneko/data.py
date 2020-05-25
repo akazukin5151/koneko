@@ -156,6 +156,7 @@ class UserJson:
 
     @property
     def splitpoint(self):
+        """Number of artists. The number where artists stop and previews start"""
         return len(self.profile_pic_urls)
 
     @property

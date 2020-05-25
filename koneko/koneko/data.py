@@ -129,7 +129,6 @@ class UserJson:
         names = list(map(self._user_name, page))
         self.names_cache.update({self.page_num: names})
 
-        # TODO: are these two attributes needed?
         self.profile_pic_urls = list(map(self._user_profile_pic, page))
 
         # max(i) == number of artists on this page
@@ -142,19 +141,12 @@ class UserJson:
         return self.ids_cache[self.page_num][selected_user_num]
 
     @property
-    def names(self):
-        return self.names_cache[self.page_num]
-
-    # TODO: remove unused methods
-    @property
-    def names_prefixed(self):
-        names = self.names
-        names_prefixed = map(pure.prefix_artist_name, names, range(len(names)))
-        return list(names_prefixed)
-
-    @property
     def all_urls(self):
         return self.profile_pic_urls + self.image_urls
+
+    @property
+    def names(self):
+        return self.names_cache[self.page_num]
 
     @property
     def all_names(self):

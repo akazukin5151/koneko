@@ -166,7 +166,6 @@ class data.UserJson {
     + names_cache
     + download_path
     + names
-    + names_prefixed
     + all_urls
     + all_names
     + splitpoint

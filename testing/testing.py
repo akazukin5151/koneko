@@ -1,8 +1,13 @@
 import os
+import sys
 import json
 from pathlib import Path
 
 import pytest
+
+# Lmao python
+sys.path.append('../koneko/koneko')
+sys.path.append('testing')
 
 from koneko import pure, lscat, utils, data, KONEKODIR
 from page_json import *  # Imports the current_page (dict) stored in disk
@@ -263,11 +268,11 @@ def test_info_screen_loop(monkeypatch):
 def test_check_noprint(monkeypatch):
     # Apparently monkeypatching the lscat function needs to start with
     # the name of the current module...
-    monkeypatch.setattr("testing.utils.get_settings", lambda x, y: "on")
+    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "on")
     assert utils.check_noprint() == True
-    monkeypatch.setattr("testing.utils.get_settings", lambda x, y: "off")
+    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "off")
     assert utils.check_noprint() == False
-    monkeypatch.setattr("testing.utils.get_settings", lambda x, y: "false")
+    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "false")
     assert utils.check_noprint() == False
 
 def test_noprint(capsys):

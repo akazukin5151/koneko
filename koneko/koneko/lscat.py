@@ -37,8 +37,7 @@ def icat(args):
 
 def show_instant(cls, download_path, check_noprint=False):
     tracker = cls(download_path)
-    for img in os.listdir(download_path):
-        tracker.update(img)
+    list(map(tracker.update, os.listdir(download_path)))
 
     if check_noprint and not utils.check_noprint():
         print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
@@ -83,6 +82,7 @@ class Tracker(ABC):
                 self._inspect()
 
 class TrackDownloads(Tracker):
+    """For gallery modes (1 & 5)"""
     def __init__(self, path):
         super().__init__(path)
         self.orders = list(range(30))
@@ -90,6 +90,7 @@ class TrackDownloads(Tracker):
         self.generator.send(None)
 
 class TrackDownloadsUsers(Tracker):
+    """For user modes (3 & 4)"""
     def __init__(self, path):
         super().__init__(path)
         noprint = utils.check_noprint()
@@ -234,9 +235,10 @@ if __name__ == '__main__':
 #        time.sleep(0.1)
 
     # Users
-    tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
-    imgs = sorted(os.listdir(KONEKODIR / 'following' / 'test'))
-#    random.shuffle(imgs)
-    for img in imgs:
-        tracker.update(img)
+#    tracker = TrackDownloadsUsers(KONEKODIR / 'following' / 'test')
+#    imgs = sorted(os.listdir(KONEKODIR / 'following' / 'test'))
+##    random.shuffle(imgs)
+#    for img in imgs:
+#        tracker.update(img)
 #        time.sleep(0.1)
+

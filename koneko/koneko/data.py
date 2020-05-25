@@ -108,13 +108,12 @@ class ImageJson:
 
 class UserJson:
     """Stores data for user views (modes 3 and 4)"""
-    def __init__(self, raw, page_num, main_path, user_or_id):
+    def __init__(self, page_num, main_path, user_or_id):
         self.page_num = page_num
         self.main_path = main_path
         self._input = user_or_id
 
         self.ids_cache, self.names_cache = {}, {}
-        self.update(raw)
 
     @property
     def download_path(self):
@@ -142,18 +141,12 @@ class UserJson:
         return self.ids_cache[self.page_num][selected_user_num]
 
     @property
-    def names(self):
-        return self.names_cache[self.page_num]
-
-    @property
-    def names_prefixed(self):
-        names = self.names
-        names_prefixed = map(pure.prefix_artist_name, names, range(len(names)))
-        return list(names_prefixed)
-
-    @property
     def all_urls(self):
         return self.profile_pic_urls + self.image_urls
+
+    @property
+    def names(self):
+        return self.names_cache[self.page_num]
 
     @property
     def all_names(self):

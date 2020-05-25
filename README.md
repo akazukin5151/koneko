@@ -2,11 +2,9 @@
 
 Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
 
-Gallery view, square medium
+Gallery view
 ![Gallery view_square_medium1](pics/gallery_view_square_medium1.png)
 ![Gallery view_square_medium2](pics/gallery_view_square_medium2.png)
-Gallery view, medium (non-square)
-![Gallery view](pics/gallery_view.png)
 Image view
 ![Image_view](pics/image_view.png)
 Artist search (artist profile picture on the left, 3 previews on right)
@@ -92,6 +90,7 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
+* Get rid of all data in the ui classes
 * Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
@@ -104,6 +103,27 @@ For more details refer to the [manual](#manual).
 
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
+
+## Upcoming changelog (in dev branch)
+
+For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+
+### Version 0.6
+* **Depreciated** legacy lscat (the shell script) and lsix support.
+* If there are cached images in the users modes (3 & 4), it will be shown immediately before requesting and parsing.
+
+#### Terminal reliability
+* lscat now calculates params using terminal size
+* Add option to turn off printing messages in lscat
+
+#### Code
+* Removed the `raw` attribute from data classes
+* Moved view_post_mode() from main.py to ui.py
+* Renamed img_post_page_num to page_num
+* Updated unit tests and added more tests
+* Revamped lscat to use only the generators to display the images, rather than for loops, heavy classes, and fragile inheritance
+    * Users view actually got faster, because two yield statements are apparently faster than two nested for loops
+    * No significant speed difference for Galley views.
 
 
 # FAQ
@@ -124,36 +144,11 @@ It has been successfuly tested on version 0.17.2 onwards
 
 If only I can understand how to use asyncio. See [I don't understand Python's Asyncio](https://lucumr.pocoo.org/2016/10/30/i-dont-understand-asyncio/). I only need to do two simple things. Start this function in the background, wait for its result somewhere later, in another function. Then keep the result so I can use it later. Asyncio is impossible to use.
 
+* I'm having problems with lscat
 
-## Image rendering with lscat
+First, koneko is intended to work for full screen terminals, so don't tile it around unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine.
 
-**Note on terminology**: [lsix](https://github.com/hackerb9/lsix/) is the name of the original shell script I used, which uses sixel. I edited it to use icat and renamed it **lscat**. Then I rewrote it with python, which is named **lscat.py**. **lscat.py is the default renderer and the fastest.**
-
-**Note on installation**: if you edit it, you'll need to install it manually (or send a PR), see [manual installation](#manual-installation)
-
-You might have problems with image positioning with lscat.py. I wrote it to fit my screen and my terminal size, so there is no functionality to adjust for different terminal size. There are also 'magic numbers' (numbers that just exist) around. If you encounter problems, there are four things you can do, in order of least to most effort:
-
-* Revert to the old lscat shell script.
-
-    1. In `show_artist_illusts()` (`utils.py`), change `renderer="lscat"` to `renderer="lscat old"`.
-    2. Note that Image and User views (mode 2, 3, 4) still use lscat. The responsible code are annotated with a `# LSCAT` comment.
-
-* Revert to the original lsix script. This would be more reliable than 1., because it has all the checks for terminal sizes. However, you cannot use kitty; xterm works.
-
-    1. Make sure you're cd'ed into the koneko dir, then `curl "https://raw.githubusercontent.com/hackerb9/lsix/master/lsix" -o legacy/lsix && chmod +x legacy/lsix`
-
-    2. In `show_artist_illusts()` (`utils.py`), change `renderer="lscat"` to `renderer="lsix"`.
-
-* Adjust the 'magic numbers'. They are commented in `lscat.py`.
-* You can contribute to `lscat.py` by checking terminal size and doing all the maths and send a PR
-
-| Feature  | lscat.py | legacy/lscat | [hackerb9/lsix](https://github.com/hackerb9/lsix/) |
-| --- | --- | --- | --- |
-| Speed  | :heavy_check_mark: | :x:\* | :x:\*
-| Reliability (eg, resizing the terminal) | :x: | :interrobang: | :heavy_check_mark:
-| Adaptability (eg, other terminals, tmux) | :x: | :x: | :interrobang:
-
-\* lsix will appear faster because the images are much smaller. Once you scale them up, lsix will be the slowest.
+You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards.
 
 # Contributing
 * Fork it
@@ -181,7 +176,7 @@ Flowchart of modes and their connections:
 
 Simplified UML diagram of the classes:
 
-![Classes UML](http://plantuml.com:80/plantuml/png/bLVRJjmm47ttL-GHjYGVW1028RLgrKgLglQbgYAJc8t1YItROOie_rvV4u_ZfVHjCpdZcJENu-oLqbZgUMG8QQePgKPCfqOy8OHlbPQuqrN7i5BLPyv5TN5nSdrMITAVNbu-ewfwznnHB-wSarFqWf1tk9QQAls5zyIvMhXng4PZy3zN3-_maR5PwVUSCNvuavjFwK_TyyDKP_7EApeDH5Aj0EpdGFkUJB_gOhJ4AQS_q-OwM3vWneXysXJ3v3QHtxeLU4zCViuW97cav01iN92fPNHwQ3lEPQ-szcaUez4cpJZkMpgQ8pAFx6NYve8wQxH8Of7nQUtRWAUUaLP8FWhGFylObJJXUtDMTKzuMWbllHVdjC2l7R7dBNPnshr7PIItxnEUs_Xm37PXE78ovrLdFBWYoayMAer3ubmWipcYD2B_E64TjzUTizoX6sXIBUb-qCkONnu97Plymyp9L_x6DUMtzyGiX1zeuzGwqDfmEsx55bTmK6FpAZVnqEGs29hS3l5PPMP6y2Fn0mk58EUKr6j3jsboEl3H0Y8r58lcAqcd_NT5fFeFXVj6iEo6jtj1NkMmHuIkBWLB9sTf6pmMzcz59QTbaArGBgXS7jTLjcnZ9ykYQHikZkhNMgCrtheka5B2kWHEc2N8Sh5tnsD0CIWKVtSaPAOYUJsPwh1kxE2MAhhgk2HJJsGoRDxn1ii-pjWHI9IEBGgbmRsorCcvIRa0qFC4XsUQvQZl6Wjim85BCUmQ5aHnrymYFndwe8HtFOj42O4RW47SDYf20dSFLjtyHHDA5VHmDcJ23UJCov1PxKZUfJxnAeDk-GqG2fI1qtFynGzFyJhiVHi0U5aahCSQnr9yKdnQP4ZYG_XbNhe5L6s7ko5eK-K-4fL_w6PfXWNkRhHHT-SibxWJr7iJA1fyNdHPQ1UZzm61CCoI9HFhydO4GTO657xTKKOcFCPqWzpuR4ouOARZtcky2DzDyVQPnrlJC7xd4uaNa0MP4F6POMaCFPNPxKR2_QPIYZ6XICe-2wm7GDBcuuc28XQusya2r6aF6sHZGSlQqbZGvMBbDfjMq2wbv_DU3Q66RfJNXhauyS7EYdL8dm502KQru7GAdvYR-TkP7QmBEv2ij_L1sG0iRivK12yLMx2vy3eikZAwP_y7_GK0)
+![Classes UML](http://plantuml.com:80/plantuml/png/bLXjZzmc4FxEh-1Ziitw1qIdLKwjsYPAfKXz-L9L5cVONNAieO1pEQNttpk0mO3ntkNRUZpF33CyyupltXbBj9qk0Y7BhM3uGlZOgKU4o9sncWmM3u8OWpzAgV3DpQlRDrWp-lfm-8Om_k5Rz7hoSLwzHay81S2jjjpOtoHb7khS0O0lO0W_5uIy-ymW4HTYChO_IY7aG-ySUm5GX4Bk__PKFepxAl1RpCSpqzoQmktlCwUKZV_ijw9ck0qFlDVyTBOfqW7_nTd39xdaVZcoF3Eg0-6zOCVlygyJ_Cw87iv_6gRDTw1-zWVduwa4rdS_yUvsjln2X63wSSK4kC-HVRMz8YS6T-eDIhClS8J29XKRUy77-twGKbEpje_J9HhTHGf9QCyl4A92L2ypc4_ghT6YcVECJmjfpsIaWlLAouigoEigzbUGrVlZ6pmyad4fU8rEuFUU6A6zrqASP4zydluKlAeYr--pEjVvIzhive6fYtcB1q18mqoOnYqQP_X6FQieBPOy4o6Du3FWwlW5hDNg5T7h6F6ULoDoJQOK6Uw1L11iTfjrAv0SelG9DR-Xt2X17WCP2tuuGvCHkEHrl6li1wGq-O4hJNxav6Ggis3a2mlyBhMqhZ_hxQerNNUeIoqVlKSi3XMrNtjrqtKDXK7nYjeQTVMY0h0XYLTHPMVQQJUspRwLBETfklWoRCc0nIkBLhcibJbvrNgyQ8UhDdAXhTAECcfJC9SUBVcMuInBogfkEMULPPxjPk-sSvJIqsZ-RYDbfLbrFuKPYEt-0CizqwscOaNiEVoS52MMPOJBm3_DGsmIuq3LuG3pmucDJ1ChzLMiE_BpU5ITURyPAsluYp2LqFeExZhNr-vAZjHX9muDNTzrazf8LqBHPa_saygqlULs1Lk2My8JTJuirbBh9uWnRrnlNZZk5IvxcwFYyYw1guKNUdketVD8uMEdZ3Clau06UE7pb8GKs4gwETS78yT4BJ3vuJVzG8Rph8jucBHcOz0AzzLHcSCtGoIa1z8G9TzEanRrMbi621-vDcw3dQg12hharifdE6Sqp6BcUyoJDeLY_VDJNgXlIb7cSfOZ5smabrZf77Z-2k8qJNfHEFowWypoM5JfdI1oV1P4Wu5oNPNDvdrkybF7SyHQtBDhJw7Lq1wN8DfY_uEfADaHiQYuge3JyePTwjBIkYJlLI1WOnpvLqOp-cGTS8yv1bOzjqhoqRxarclQ08jTLth5Xpn9wDzYM743QB_Y-mv6VzyOl4nu70PL_4amRsewfyudtthTUDyuYKJ16Jwz_zL_loyI3-R-tubDB7ksPyq8NGpbGWwrFn1kuOFznDEeAA8Dt3oqiXgUf2pFEMW69p5s-KYG5kJ7iJXC2MMMy4JAOrpFuGOgiF4BkFcg_CjZCsdaPRZOgdsjZttVVeJUiP6w_sty3m00)
 
 <details>
   <summary>Actor-ish model of the ui.Gallery class</summary>
@@ -231,7 +226,7 @@ Note: if you want to make some edits, you should install it in a conda environme
 ```sh
 # Use the latest stable version (recommended for usage)
 # Make sure the version number is the latest
-git clone -b 'v0.5.1' --depth 1 https://github.com/twenty5151/koneko.git
+git clone -b 'v0.6' --depth 1 https://github.com/twenty5151/koneko.git
 # Use the master branch for upcoming features:
 git clone -b master https://github.com/twenty5151/koneko.git
 # Use the dev branch for latest features, fixes, and instability (recommended for contributers):

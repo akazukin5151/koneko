@@ -127,7 +127,7 @@ class Loop(ABC):
         self._user_input = user_input
         # Defined by classes that inherit this in _prompt_url_id()
         self._url_or_id: str
-        self.mode: 'Any'
+        self.mode: 'Any'  # noqa: F821
 
     def start(self, start):
         """Ask for further info if not provided; wait for log in then proceed"""

@@ -10,12 +10,15 @@ class ArtistModeLoop {
     + mode
     +start()
 }
-class IllustFollowModeLoop {
-    + mode
-    +start()
-}
+object illust_follow_mode_loop
+
 Loop <|-down- ArtistModeLoop: inherits
-Loop <|-down[hidden]- IllustFollowModeLoop: inherits
+Loop <|-down[hidden]- illust_follow_mode_loop: inherits
+illust_follow_mode_loop -right[hidden]-> ViewPostModeLoop
+illust_follow_mode_loop -right[hidden]-> ArtistModeLoop
+ViewPostModeLoop -left[hidden]-> ArtistModeLoop
+ViewPostModeLoop -right[hidden]-> SearchUsersModeLoop
+ViewPostModeLoop -right[hidden]-> FollowingUsersModeLoop
 
 abstract class ui.AbstractGallery <<(A, red)>>{
     +next_page()
@@ -39,19 +42,22 @@ class ui.IllustFollowGallery <<(C, cyan)>>{
 }
 ArtistModeLoop*-down- ui.ArtistGallery: composes mode
 
-IllustFollowModeLoop*-down- ui.IllustFollowGallery: composes mode
+illust_follow_mode_loop*-down- ui.IllustFollowGallery: composes mode
 
 ui.AbstractGallery <-down- ui.IllustFollowGallery: inherits
 
 ui.AbstractGallery <-down- ui.ArtistGallery: inherits
 
-ui.ArtistGallery -right[hidden]-> ui.IllustFollowGallery
+ui.IllustFollowGallery -right[hidden]-> ui.ArtistGallery
 
 class ViewPostModeLoop {
     + mode
     +start()
 }
-object view_post_mode
+package ui {
+    object view_post_mode
+    object display_image
+}
 class ui.Image <<(C, cyan)>>{
     + download_image()
     + open_image()
@@ -61,8 +67,10 @@ class ui.Image <<(C, cyan)>>{
 }
 
 Loop <|-down- ViewPostModeLoop: inherits
-ViewPostModeLoop .. view_post_mode
-view_post_mode .. ui.Image
+ViewPostModeLoop ..> view_post_mode
+view_post_mode ..> ui.Image
+display_image ..> ui.Image
+display_image <.. ui.AbstractGallery
 
 
 class FollowingUsersModeLoop {
@@ -91,53 +99,58 @@ FollowingUsersModeLoop*-down- ui.FollowingUsers: composes mode
 SearchUsersModeLoop*-down- ui.SearchUsers: composes mode
 
 
-abstract class lscat.View <<(A, red)>>{
-    +{abstract}render()
+abstract class lscat.Tracker <<(A, red)>>{
+    + path
+    +update()
 }
-class lscat.Card {
-    +render()
+class lscat.TrackDownloads {
+    + orders
+    + generator
 }
-class lscat.Gallery {
-    +render()
+class lscat.TrackDownloadsUser {
+    + orders
+    + generator
 }
 
-lscat.View <-right- lscat.Card: inherits
-lscat.View <-down- lscat.Gallery: inherits
+lscat.Tracker <- lscat.TrackDownloadsUser: inherits
+lscat.Tracker <- lscat.TrackDownloads: inherits
 
-ui.Users*.down. lscat.Card: composes view
-ui.AbstractGallery*.up lscat.Gallery: composes view
+ui.Users*.down. lscat.TrackDownloadsUser: composes view
+ui.AbstractGallery*.up lscat.TrackDownloads: composes view
 
-lscat.Card -up[hidden]-> lscat.Gallery
-lscat.Card --up[hidden]-> ui.AbstractGallery
+lscat.TrackDownloadsUser -up[hidden]-> lscat.TrackDownloads
+lscat.TrackDownloadsUser --up[hidden]-> ui.AbstractGallery
 
 package prompt {
     object user_prompt
-    ui.Users .. user_prompt
+    ui.Users <..> user_prompt
 
     object gallery_prompt
-    ui.AbstractGallery .down. gallery_prompt
+    ui.AbstractGallery <.down.> gallery_prompt
 
     object image_prompt
-    ui.Image .down..image_prompt
+    ui.Image <.down..> image_prompt
 }
 
 
 class data.GalleryJson {
-    + raw
     + all_pages_cache
-    + titles
-    +current_page()
-    +current_illusts()
+    + current_page_num
+    + current_illusts
+    + cached_pages
+    + next_url
+    + download_path
+    + first_img
+    +update()
     +post_json()
+    +artist_user_id()
     +image_id()
-    +cached_pages()
-    +next_url()
 }
 class data.ImageJson {
     + url
     + filename
     + artist_illust_id
-    + img_post_page_num
+    + page_num
     + number_of_pages
     + page_urls
     + large_dir
@@ -148,21 +161,43 @@ class data.ImageJson {
     +current_url()
 }
 class data.UserJson {
+    + page_num
     + ids_cache
     + names_cache
-    + raw
+    + download_path
+    + names
+    + all_urls
+    + all_names
+    + splitpoint
+    + first_img
+    +update()
     + next_url
     + profile_pic_urls
     + image_urls
     +artist_user_id()
-    +names()
-    +all_urls()
-    +all_names()
-    +splitpoint()
 }
 
 data.GalleryJson *-up- ui.AbstractGallery: composes data
 data.ImageJson *-up- ui.Image: composes data
 data.UserJson *-up- ui.Users: composes data
+
+
+class api.APIHandler {
+    + api_queue
+    + api_thread
+    + api
+    +start()
+    +await_login()
+    +parse_next()
+    +artist_gallery_parse_next()
+    +artist_gallery_request()
+    +protected_illust_detail()
+    +following_user_request()
+    +search_user_request()
+    +illust_follow_request()
+    +protected_download()
+}
+
+api.APIHandler -right[hidden]-> ui.Users
 
 @enduml

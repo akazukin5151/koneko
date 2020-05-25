@@ -29,15 +29,12 @@ class AbstractGallery(ABC):
         for contents!)
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
-        if self.data.download_path.is_dir():
-            try:
-                utils.show_artist_illusts(self.data.download_path)
-            except IndexError: # Folder exists but no files
-                self.data.download_path.rmdir()
-                self._show = True
-            else:
-                self._show = False
+        if utils.dir_not_empty(self.data.download_path):
+            self._show = False
+            lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
         else:
+            if self.data.download_path.is_dir():
+                self.data.download_path.rmdir()
             self._show = True
 
         current_page = self._pixivrequest()
@@ -108,15 +105,17 @@ class AbstractGallery(ABC):
 
     def next_page(self):
         download_path = self._main_path / str(self.data.current_page_num+1)
-        try:
-            utils.show_artist_illusts(download_path)
-        except FileNotFoundError:
-            print('This is the last page!')
+        if utils.dir_not_empty(download_path):
+            self._show = False
+            lscat.show_instant(lscat.TrackDownloads, download_path, True)
         else:
-            self.data.current_page_num += 1
-            pure.print_multiple_imgs(self.data.current_illusts)
-            print(f'Page {self.data.current_page_num}')
-            print('Enter a gallery command:\n')
+            print('This is the last page!')
+            return False
+
+        self.data.current_page_num += 1
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+        print('Enter a gallery command:\n')
 
         # Skip prefetching again for cases like next -> prev -> next
         if str(self.data.current_page_num + 1) not in self.data.cached_pages:
@@ -126,7 +125,8 @@ class AbstractGallery(ABC):
         if self.data.current_page_num > 1:
             self.data.current_page_num -= 1
 
-            utils.show_artist_illusts(self.data.download_path)
+            lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
+
             pure.print_multiple_imgs(self.data.current_illusts)
             print(f'Page {self.data.current_page_num}')
             print('Enter a gallery command:\n')
@@ -228,7 +228,8 @@ class ArtistGallery(AbstractGallery):
 
     def _back(self):
         # After user 'back's from image prompt, start mode again
-        utils.show_artist_illusts(self.data.download_path)
+        lscat.show_instant(lscat.TrackDownloads, self.data.download_path, True)
+
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
         prompt.gallery_like_prompt(self)
@@ -589,24 +590,23 @@ class Users(ABC):
         # It can't show first (including if cache is outdated),
         # because it needs to print the right message
         # Which means parsing is needed first
+        self.data = data.UserJson(1, self._main_path, self._input)
         self._parse_and_download()
-        if self._show:  # Is always true
-            self._show_page()
         self._prefetch_next_page()
 
-    def _parse_and_download(self, track=True):
-        """
-        Parse info, combine profile pics and previews, download all concurrently,
-        move the profile pics to the correct dir (less files to move)
-        """
-        self._parse_user_infos()
-        preview_path = self.data.download_path / 'previews'
-        preview_path.mkdir(parents=True, exist_ok=True)
+    def _parse_and_download(self):
+        """If download path not empty, immediately show. Else parse & download"""
+        if utils.dir_not_empty(self.data.download_path):
+            lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
+            self._parse_user_infos()
+            return True
 
-        if track:
-            tracker = lscat.TrackDownloadsUsers(preview_path)
-        else:
-            tracker = None
+        # No valid cached images, download all from scratch
+        if self.data.download_path.is_dir():
+            self.data.download_path.rmdir()
+
+        self._parse_user_infos()
+        tracker = lscat.TrackDownloadsUsers(self.data.download_path)
         download.init_download(self.data, download.user_download, tracker)
 
     @abstractmethod
@@ -619,23 +619,17 @@ class Users(ABC):
         """Parse json and get list of artist names, profile pic urls, and id"""
         result = self._pixivrequest()
         if not hasattr(self, 'data'):
-            self.data = data.UserJson(result, 1, self._main_path, self._input)
+            self.data = data.UserJson(1, self._main_path, self._input)
         else:
             self.data.update(result)
 
     def _show_page(self):
-        try:
-            self.data.names_prefixed
-        except KeyError:
+        if not utils.dir_not_empty(self.data.download_path):
             print('This is the last page!')
             self.data.page_num -= 1
+            return False
 
-        else:
-            lscat.Card(
-                self.data.download_path,
-                self.data.download_path / 'previews',
-                messages=self.data.names_prefixed,
-            ).render()
+        lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
@@ -649,7 +643,8 @@ class Users(ABC):
                 self._offset = next_offset
                 self.data.page_num = int(self._offset) // 30 + 1
 
-                self._parse_and_download(track=False)
+                self._parse_user_infos()
+                download.init_download(self.data, download.user_download, None)
 
         self.data.page_num = oldnum
 

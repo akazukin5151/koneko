@@ -590,24 +590,22 @@ class Users(ABC):
         # It can't show first (including if cache is outdated),
         # because it needs to print the right message
         # Which means parsing is needed first
+        self.data = data.UserJson(1, self._main_path, self._input)
         self._parse_and_download()
         self._prefetch_next_page()
 
     def _parse_and_download(self):
-        """
-        Parse info, combine profile pics and previews, download all concurrently,
-        move the profile pics to the correct dir (less files to move)
-        """
-        self._parse_user_infos()
-        # FIXME: no need to parse if the following line is true,
-        # but parsing needed to access self.data.download_path
+        """If download path not empty, immediately show. Else parse & download"""
         if utils.dir_not_empty(self.data.download_path):
             lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
+            self._parse_user_infos()
             return True
 
+        # No valid cached images, download all from scratch
         if self.data.download_path.is_dir():
             self.data.download_path.rmdir()
 
+        self._parse_user_infos()
         tracker = lscat.TrackDownloadsUsers(self.data.download_path)
         download.init_download(self.data, download.user_download, tracker)
 
@@ -621,16 +619,12 @@ class Users(ABC):
         """Parse json and get list of artist names, profile pic urls, and id"""
         result = self._pixivrequest()
         if not hasattr(self, 'data'):
-            self.data = data.UserJson(result, 1, self._main_path, self._input)
+            self.data = data.UserJson(1, self._main_path, self._input)
         else:
             self.data.update(result)
 
     def _show_page(self):
-        # Names prefixed is no longer needed to feed into messages
-        # FIXME: more direct way to detect if this is the last page
-        try:
-            self.data.names_prefixed
-        except KeyError:
+        if not utils.dir_not_empty(self.data.download_path):
             print('This is the last page!')
             self.data.page_num -= 1
             return False

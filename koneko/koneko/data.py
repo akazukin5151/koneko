@@ -155,6 +155,11 @@ class UserJson:
         return self.names + preview_names
 
     @property
+    def total_imgs(self):
+        # FIXME: doesn't work for cached images
+        return len(self.names + self.image_urls)
+
+    @property
     def splitpoint(self):
         return len(self.profile_pic_urls)
 

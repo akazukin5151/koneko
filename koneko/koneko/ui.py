@@ -597,7 +597,7 @@ class Users(ABC):
     def _parse_and_download(self):
         """If download path not empty, immediately show. Else parse & download"""
         if utils.dir_not_empty(self.data.download_path):
-            lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
+            lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path, self.data)
             self._parse_user_infos()
             return True
 
@@ -606,7 +606,7 @@ class Users(ABC):
             self.data.download_path.rmdir()
 
         self._parse_user_infos()
-        tracker = lscat.TrackDownloadsUsers(self.data.download_path)
+        tracker = lscat.TrackDownloadsUsers(self.data.download_path, self.data)
         download.init_download(self.data, download.user_download, tracker)
 
     @abstractmethod
@@ -629,7 +629,7 @@ class Users(ABC):
             self.data.page_num -= 1
             return False
 
-        lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path)
+        lscat.show_instant(lscat.TrackDownloadsUsers, self.data.download_path, self.data)
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts

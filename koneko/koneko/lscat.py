@@ -35,8 +35,8 @@ def ycoords(term_height, img_height=8, padding=1):
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
-def show_instant(cls, download_path, check_noprint=False):
-    tracker = cls(download_path)
+def show_instant(cls, download_path, data, check_noprint=False):
+    tracker = cls(download_path, data)
     list(map(tracker.update, os.listdir(download_path)))
 
     if check_noprint and not utils.check_noprint():
@@ -91,10 +91,10 @@ class TrackDownloads(Tracker):
 
 class TrackDownloadsUsers(Tracker):
     """For user modes (3 & 4)"""
-    def __init__(self, path):
+    def __init__(self, path, data):
         super().__init__(path)
         noprint = utils.check_noprint()
-        self.orders = generate_orders(120, 30)
+        self.orders = generate_orders(data.total_imgs, data.splitpoint)
         self.generator = generate_users(path, noprint)
         self.generator.send(None)
 

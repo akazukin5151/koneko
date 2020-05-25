@@ -49,8 +49,8 @@ class Tracker(ABC):
         self._downloaded = []
         self._lock = threading.Lock()
         self._counter = 0
-        self.orders: 'List[int]'
-        self.generator: 'Generator[string]'
+        self.orders: 'List[int]'  # noqa: F821
+        self.generator: 'Generator[string]'  # noqa: F821
 
     def update(self, new):
         with self._lock:

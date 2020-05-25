@@ -14,7 +14,7 @@ class APIHandler:
     def __init__(self):
         self.api_queue = queue.Queue()
         self.api_thread = threading.Thread(target=self._login)
-        self._credentials: 'Dict'
+        self._credentials: 'Dict'  # noqa: F821
         self.api: 'AppPixivAPI()'
 
     def add_credentials(self, credentials):

@@ -20,8 +20,7 @@ def verify_full_download(filepath):
 
 def dir_not_empty(data):
     # If it breaks, try len([x for x in os.listdir(path) if os.is_file(x)])
-    _dir = os.listdir(data.download_path)
-    if data.download_path.is_dir() and _dir:
+    if data.download_path.is_dir() and (_dir := os.listdir(data.download_path)):
         try:
             first_img = data.first_img
         except (KeyError, AttributeError):

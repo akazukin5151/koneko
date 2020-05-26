@@ -16,8 +16,6 @@ class AbstractGallery(ABC):
     def __init__(self):
         self.data = data.GalleryJson(1, self._main_path)
         self._show = True
-        # Defined in self.view_image
-        self._selected_image_num: int
         # Defined in child classes
         self._main_path: 'Path'
 
@@ -81,7 +79,6 @@ class AbstractGallery(ABC):
         download.download_image_verified(post_json=post_json)
 
     def view_image(self, selected_image_num):
-        self._selected_image_num = selected_image_num
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
         idata = data.ImageJson(post_json, image_id)
@@ -89,7 +86,7 @@ class AbstractGallery(ABC):
         display_image(
             post_json,
             idata.artist_user_id,
-            self._selected_image_num,
+            selected_image_num,
             self.data
         )
 
@@ -100,9 +97,12 @@ class AbstractGallery(ABC):
         # Image prompt ends, user presses back
         self._back()
 
-    @abstractmethod
     def _back(self):
-        raise NotImplementedError
+        """After user 'back's from image prompt or artist gallery, start mode again"""
+        lscat.show_instant(lscat.TrackDownloads, self.data, True)
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+        prompt.gallery_like_prompt(self)
 
     def next_page(self):
         self.data.current_page_num += 1
@@ -227,14 +227,6 @@ class ArtistGallery(AbstractGallery):
         else:
             return api.myapi.artist_gallery_request(self._artist_user_id)
 
-    def _back(self):
-        # After user 'back's from image prompt, start mode again
-        lscat.show_instant(lscat.TrackDownloads, self.data, True)
-
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
-        prompt.gallery_like_prompt(self)
-
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
                       first_num, second_num):
         # Display image (using either coords or image number), the show this prompt
@@ -318,17 +310,11 @@ class IllustFollowGallery(AbstractGallery):
 
     def go_artist_gallery_num(self, selected_image_num):
         """Like self.view_image(), but goes to artist mode instead of image"""
-        self._selected_image_num = selected_image_num
-
         artist_user_id = self.data.artist_user_id(selected_image_num)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # Gallery prompt ends, user presses back
         self._back()
-
-    def _back(self):
-        # User 'back's out of artist gallery, start current mode again
-        IllustFollowGallery(self.data)
 
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
                       first_num, second_num):

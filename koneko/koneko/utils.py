@@ -8,7 +8,7 @@ from configparser import ConfigParser
 
 import pixcat
 
-from koneko import KONEKODIR, ui, cli, pure, lscat, __version__
+from koneko import KONEKODIR, ui, cli, pure, __version__
 
 
 def verify_full_download(filepath):
@@ -28,7 +28,7 @@ def dir_not_empty(data):
             return True
 
         if '.koneko' in sorted(_dir)[0] and first_img in sorted(_dir)[1]:
-                return True
+            return True
         if first_img in sorted(_dir)[0]:
             return True
 

@@ -15,11 +15,10 @@ import os
 import re
 import sys
 import time
-import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, data, pure, lscat, utils, prompt, download
+from koneko import ui, api, cli, pure, utils, prompt
 
 
 def main(start=True):

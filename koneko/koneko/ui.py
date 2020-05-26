@@ -401,13 +401,10 @@ def view_post_mode(image_id):
 
     download.download_core(idata.large_dir, idata.url, idata.filename)
     lscat.icat(idata.large_dir / idata.filename)
-
-    # Download the next page for multi-image posts
-    # Do this after prompt
-    #if idata.number_of_pages != 1:
-    #    download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
+    print(f'Page 1/{idata.number_of_pages}')
 
     image = Image(image_id, idata, True)
+
     experimental = utils.get_settings('misc', 'experimental')
     if experimental == 'on':
         event = threading.Event()

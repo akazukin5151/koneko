@@ -136,7 +136,6 @@ def page_urls_in_post(post_json, size='medium'):
     """Get the number of pages and each of their urls in a multi-image post."""
     number_of_pages = post_json['page_count']
     if number_of_pages > 1:
-        print(f'Page 1/{number_of_pages}')
         list_of_pages = post_json['meta_pages']
         page_urls = [url_given_size(list_of_pages[i], size)
                      for i in range(number_of_pages)]

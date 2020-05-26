@@ -112,6 +112,7 @@ class UserJson:
         self.page_num = page_num
         self.main_path = main_path
         self._input = user_or_id
+        self.offset = 0
 
         self.ids_cache, self.names_cache = {}, {}
 

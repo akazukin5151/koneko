@@ -566,12 +566,11 @@ class Users(ABC):
 
     @abstractmethod
     def __init__(self, user_or_id):
+        self.data: 'data.UserJson'
         self._input = user_or_id
-        self._offset = 0
         self._show = True
         # Defined in child classes
         self._main_path: 'Path'
-        self.data: 'data.UserJson'
 
     def start(self):
         # It can't show first (including if cache is outdated),
@@ -626,9 +625,9 @@ class Users(ABC):
             next_offset = api.myapi.parse_next(self.data.next_url)['offset']
             # Won't download if not immediately next page, eg
             # p1 (p2 downloaded) -> p2 (p3) -> p1 -> p2 (p4 won't download)
-            if int(next_offset) - int(self._offset) <= 30:
-                self._offset = next_offset
-                self.data.page_num = int(self._offset) // 30 + 1
+            if int(next_offset) - int(self.data.offset) <= 30:
+                self.data.offset = next_offset
+                self.data.page_num = int(self.data.offset) // 30 + 1
 
                 self._parse_user_infos()
                 download.init_download(self.data, download.user_download, None)
@@ -644,7 +643,7 @@ class Users(ABC):
     def previous_page(self):
         if self.data.page_num > 1:
             self.data.page_num -= 1
-            self._offset = int(self._offset) - 30
+            self.data.offset = int(self.data.offset) - 30
             self._show_page()
         else:
             print('This is the first page!')
@@ -680,7 +679,7 @@ class SearchUsers(Users):
         super().__init__(user)
 
     def _pixivrequest(self):
-        return api.myapi.search_user_request(self._input, self._offset)
+        return api.myapi.search_user_request(self._input, self.data.offset)
 
 class FollowingUsers(Users):
     """
@@ -694,4 +693,5 @@ class FollowingUsers(Users):
         super().__init__(your_id)
 
     def _pixivrequest(self):
-        return api.myapi.following_user_request(self._input, self._publicity, self._offset)
+        return api.myapi.following_user_request(self._input, self._publicity,
+                                                self.data.offset)

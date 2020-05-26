@@ -88,7 +88,7 @@ def user_download(data, tracker=None):
     )
 
 def init_download(data, download_func, tracker):
-    if utils.dir_not_empty(data.download_path):
+    if utils.dir_not_empty(data):
         return True
 
     if data.page_num == 1:

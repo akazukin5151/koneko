@@ -18,10 +18,20 @@ def verify_full_download(filepath):
         return False
     return True
 
-def dir_not_empty(path):
+def dir_not_empty(data):
     # If it breaks, try len([x for x in os.listdir(path) if os.is_file(x)])
-    if path.is_dir() and os.listdir(path):
-        return True
+    _dir = os.listdir(data.download_path)
+    if data.download_path.is_dir() and _dir:
+        try:
+            first_img = data.first_img
+        except (KeyError, AttributeError):
+            return True
+
+        if '.koneko' in sorted(_dir)[0] and first_img in sorted(_dir)[1]:
+                return True
+        if first_img in sorted(_dir)[0]:
+            return True
+
     return False
 
 

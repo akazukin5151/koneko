@@ -29,7 +29,7 @@ class AbstractGallery(ABC):
         for contents!)
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
-        if utils.dir_not_empty(self.data.download_path):
+        if utils.dir_not_empty(self.data):
             self._show = False
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
@@ -46,6 +46,7 @@ class AbstractGallery(ABC):
 
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
+
         # Make sure the following work:
         # Gallery -> next page -> image prompt -> back -> prev page
         if len(self.data.all_pages_cache) == 1:
@@ -105,7 +106,7 @@ class AbstractGallery(ABC):
 
     def next_page(self):
         self.data.current_page_num += 1
-        if utils.dir_not_empty(self.data.download_path):
+        if utils.dir_not_empty(self.data):
             self._show = False
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
@@ -596,7 +597,7 @@ class Users(ABC):
 
     def _parse_and_download(self):
         """If download path not empty, immediately show. Else parse & download"""
-        if utils.dir_not_empty(self.data.download_path):
+        if utils.dir_not_empty(self.data):
             lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
             self._parse_user_infos()
             return True
@@ -624,7 +625,7 @@ class Users(ABC):
             self.data.update(result)
 
     def _show_page(self):
-        if not utils.dir_not_empty(self.data.download_path):
+        if not utils.dir_not_empty(self.data):
             print('This is the last page!')
             self.data.page_num -= 1
             return False

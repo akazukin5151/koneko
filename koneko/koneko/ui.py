@@ -16,6 +16,7 @@ class AbstractGallery(ABC):
     def __init__(self):
         self.data = data.GalleryJson(1, self._main_path)
         self._show = True
+        self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
         self._main_path: 'Path'
 
@@ -49,7 +50,8 @@ class AbstractGallery(ABC):
         # Gallery -> next page -> image prompt -> back -> prev page
         if len(self.data.all_pages_cache) == 1:
             # Prefetch the next page on first gallery load
-            self._prefetch_next_page()
+            self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+            self.prefetch_thread.start()
 
 
     def open_link_coords(self, first_num, second_num):
@@ -105,6 +107,7 @@ class AbstractGallery(ABC):
         prompt.gallery_like_prompt(self)
 
     def next_page(self):
+        self.prefetch_thread.join()
         self.data.current_page_num += 1
         if utils.dir_not_empty(self.data):
             self._show = False
@@ -156,11 +159,7 @@ class AbstractGallery(ABC):
         if not download_path.is_dir():
             oldnum = self.data.current_page_num
             self.data.current_page_num += 1
-
-            pbar = tqdm(total=len(current_page_illusts), smoothing=0)
-            download.download_page(self.data, pbar=pbar)
-            pbar.close()
-
+            download.download_page(self.data)
             self.data.current_page_num = oldnum
 
     def reload(self):

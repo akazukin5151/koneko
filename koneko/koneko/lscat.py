@@ -1,6 +1,5 @@
 """The default image renderer for koneko"""
 import os
-import time
 import threading
 from abc import ABC
 
@@ -78,7 +77,6 @@ class Tracker(ABC):
             # Display page
             if next_num == 0:
                 os.system('clear')
-                time.sleep(1)
             self.generator.send(pic)
 
             self._counter += 1

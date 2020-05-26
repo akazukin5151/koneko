@@ -564,6 +564,7 @@ class Users(ABC):
         self.data: 'data.UserJson'
         self._input = user_or_id
         self._show = True
+        self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
         self._main_path: 'Path'
 
@@ -573,13 +574,15 @@ class Users(ABC):
         # Which means parsing is needed first
         self.data = data.UserJson(1, self._main_path, self._input)
         self._parse_and_download()
-        self._prefetch_next_page()
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self.prefetch_thread.start()
 
     def _parse_and_download(self):
         """If download path not empty, immediately show. Else parse & download"""
         if utils.dir_not_empty(self.data):
             lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
-            self._parse_user_infos()
+            self.parse_thread = threading.Thread(target=self._parse_user_infos)
+            self.parse_thread.start()
             return True
 
         # No valid cached images, download all from scratch
@@ -614,6 +617,8 @@ class Users(ABC):
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
+        # Wait for initial request to finish, so the data object is instantiated
+        self.parse_thread.join()
         oldnum = self.data.page_num
 
         if self.data.next_url:
@@ -630,6 +635,7 @@ class Users(ABC):
         self.data.page_num = oldnum
 
     def next_page(self):
+        self.prefetch_thread.join()
         self.data.page_num += 1
         self._show_page()
 

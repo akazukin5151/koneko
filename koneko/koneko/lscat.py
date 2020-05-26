@@ -130,7 +130,7 @@ def generate_page(path):
         y = number // 5
 
         if number % 10 == 0 and number != 0:
-            print('\n' * 25)
+            print('\n' * 23)
 
         with cd(path):
             Image(image).thumbnail(310).show(
@@ -244,10 +244,12 @@ if __name__ == '__main__':
 
     class FakeData:
         def __init__(self):
-            self.download_path = KONEKODIR / 'test'
+            # Either testuser or testgallery
+            self.download_path = KONEKODIR / 'testgallery'
 
     data = FakeData()
     # Use whichever mode you pasted into the test dir
     # For Users, make sure it has a .koneko file
-    show_instant(TrackDownloadsUsers, data)
+    #show_instant(TrackDownloadsUsers, data)
+    show_instant(TrackDownloads, data)
 

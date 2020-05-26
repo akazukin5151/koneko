@@ -90,7 +90,7 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
-* Get rid of all data in the ui classes
+* Consider if prefetching after displaying images can be ran in the background, so the prompt doesn't need to be blocked
 * Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 

@@ -435,7 +435,6 @@ class Image:
     """
     def __init__(self, image_id, idata, firstmode=False):
         self.data = idata
-        self._image_id = image_id
         self._firstmode = firstmode
 
     def preview(self):
@@ -461,7 +460,7 @@ class Image:
         self.event = event
 
     def open_image(self):
-        link = f'https://www.pixiv.net/artworks/{self._image_id}'
+        link = f'https://www.pixiv.net/artworks/{self.data.image_id}'
         os.system(f'xdg-open {link}')
         print(f'Opened {link} in browser')
 

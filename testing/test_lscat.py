@@ -56,10 +56,16 @@ def test_TrackDownloads():
 
     data = FakeData()
     data.download_path.mkdir()
-    for pic in ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png'):
+    pics = ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png')
+    for pic in pics:
         os.system(f'cp testing/files/{pic} testing/files/gallery/')
 
     lscat.show_instant(lscat.TrackDownloads, data)
+
+    # TODO: as the numbers aren't in the required order, it displays nothing
+    tracker = lscat.TrackDownloads(data)
+    for pic in pics:
+        tracker.update(pic)
 
     os.system(f'rm -r {data.download_path}')
 
@@ -71,7 +77,8 @@ def test_TrackDownloadsUser():
 
     data = FakeData()
     data.download_path.mkdir()
-    for pic in ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png'):
+    pics = ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png')
+    for pic in pics:
         os.system(f'cp testing/files/{pic} testing/files/user/')
 
     os.system('touch testing/files/user/.koneko')
@@ -79,5 +86,10 @@ def test_TrackDownloadsUser():
         f.write("3")
 
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
+
+    # TODO: as the numbers aren't in the required order, it displays nothing
+    tracker = lscat.TrackDownloadsUsers(data)
+    for pic in pics:
+        tracker.update(pic)
 
     os.system(f'rm -r {data.download_path}')

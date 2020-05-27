@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 
 # Lmao python
-sys.path.append('../koneko/koneko')
 sys.path.append('testing')
 
 from koneko import lscat

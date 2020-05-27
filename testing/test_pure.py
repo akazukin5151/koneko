@@ -5,10 +5,9 @@ from pathlib import Path
 import pytest
 
 # Lmao python
-sys.path.append('../koneko/koneko')
 sys.path.append('testing')
 
-from koneko.koneko import pure, lscat, utils, data, KONEKODIR
+from koneko import pure, lscat, utils, data, KONEKODIR
 from page_json import *  # Imports the current_page (dict) stored in disk
 
 page_illusts = page_json["illusts"]

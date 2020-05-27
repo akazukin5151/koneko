@@ -47,7 +47,7 @@ def show_instant(cls, data, check_noprint=False):
         print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
 
 
-class Tracker(ABC):
+class AbstractTracker(ABC):
     def __init__(self, data):
         self.path = data.download_path
         self._downloaded = []
@@ -85,7 +85,7 @@ class Tracker(ABC):
             if self._downloaded:
                 self._inspect()
 
-class TrackDownloads(Tracker):
+class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
     def __init__(self, data):
         super().__init__(data)
@@ -93,7 +93,7 @@ class TrackDownloads(Tracker):
         self.generator = generate_page(data.download_path)
         self.generator.send(None)
 
-class TrackDownloadsUsers(Tracker):
+class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
         super().__init__(data)
@@ -187,7 +187,7 @@ def generate_orders(total_pics, artists_count):
     return order
 
 
-class TrackDownloadsImage(Tracker):
+class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
     def __init__(self, path):
         super().__init__(path)

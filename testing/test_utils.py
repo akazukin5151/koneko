@@ -58,12 +58,16 @@ def test_info_screen_loop(monkeypatch):
     os.system("kitty +kitten icat --clear")
 
 def test_check_noprint(monkeypatch):
-    # Test with an actual cfg
     monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "on")
     assert utils.check_noprint() == True
     monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "off")
     assert utils.check_noprint() == False
     monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "false")
+    assert utils.check_noprint() == False
+
+    # Test with an actual cfg
+    monkeypatch.setattr('koneko.utils.Path.expanduser',
+                        lambda x: Path('example_config.ini'))
     assert utils.check_noprint() == False
 
 def test_noprint(capsys):

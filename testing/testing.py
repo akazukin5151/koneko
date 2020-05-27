@@ -324,3 +324,49 @@ def test_config(monkeypatch):
 
     assert utils.get_settings('Credentials', 'username') == 'myusername'
     assert utils.get_settings('Credentials', 'password') == 'mypassword'
+
+def test_dir_not_empty():
+    class FakeData:
+        def __init__(self):
+            self.download_path = Path('testing/')
+            self.first_img = "04_祝！！！.jpg"
+
+    # Assert current dir is not empty
+    data = FakeData()
+    assert utils.dir_not_empty(data)
+
+    # Dir exists but is empty
+    Path('testing/empty_dir').mkdir()
+    data.download_path = Path('testing/empty_dir')
+    assert utils.dir_not_empty(data) is False
+
+    # .koneko in dir and first image in dir
+    os.system('touch testing/empty_dir/.koneko')
+    os.system('cp testing/04_祝！！！.jpg testing/empty_dir/')
+
+    assert utils.dir_not_empty(data)
+
+    os.system('rm -r testing/empty_dir')
+
+    # Throw some errors
+    class FakeData:
+        def __init__(self):
+            self.download_path = Path('testing/')
+
+        @property
+        def first_img(self):
+            raise KeyError
+
+    data = FakeData()
+    assert utils.dir_not_empty(data)
+
+    class FakeData:
+        def __init__(self):
+            self.download_path = Path('testing/')
+
+        @property
+        def first_img(self):
+            raise AttributeError
+
+    data = FakeData()
+    assert utils.dir_not_empty(data)

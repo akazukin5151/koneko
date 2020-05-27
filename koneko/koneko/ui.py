@@ -548,7 +548,7 @@ class Image:
         # Else: image prompt and class ends, goes back to previous mode
 
 
-class Users(ABC):
+class AbstractUsers(ABC):
     """
     User view commands (No need to press enter):
         {digit1}{digit2}   -- display artist illusts on column digit1 and row digit2
@@ -671,9 +671,9 @@ class Users(ABC):
         prompt.user_prompt(self)
 
 
-class SearchUsers(Users):
+class SearchUsers(AbstractUsers):
     """
-    Inherits from Users class, define self._input as the search string (user)
+    Inherits from AbstractUsers class, define self._input as the search string (user)
     Parent directory for downloads should go to search/
     """
     def __init__(self, user):
@@ -683,9 +683,9 @@ class SearchUsers(Users):
     def _pixivrequest(self):
         return api.myapi.search_user_request(self._input, self.data.offset)
 
-class FollowingUsers(Users):
+class FollowingUsers(AbstractUsers):
     """
-    Inherits from Users class, define self._input as the user's pixiv ID
+    Inherits from AbstractUsers class, define self._input as the user's pixiv ID
     (Or any other pixiv ID that the user wants to look at their following users)
     Parent directory for downloads should go to following/
     """

@@ -6,7 +6,7 @@ import threading
 import funcy
 from pixivpy3 import PixivError, AppPixivAPI
 
-from koneko import pure
+from koneko.koneko import pure
 
 
 class APIHandler:

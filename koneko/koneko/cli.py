@@ -36,7 +36,7 @@ import sys
 
 from docopt import docopt
 
-from koneko import pure
+from koneko.koneko import pure
 
 
 def process_cli_args():

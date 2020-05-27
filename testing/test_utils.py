@@ -9,7 +9,7 @@ import pytest
 sys.path.append('../koneko/koneko')
 sys.path.append('testing')
 
-from koneko import utils
+from koneko.koneko import utils
 
 @pytest.fixture
 def turn_off_print(monkeypatch):
@@ -58,15 +58,15 @@ def test_info_screen_loop(monkeypatch):
     os.system("kitty +kitten icat --clear")
 
 def test_check_noprint(monkeypatch):
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "on")
+    monkeypatch.setattr("koneko.koneko.utils.get_settings", lambda x, y: "on")
     assert utils.check_noprint() == True
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "off")
+    monkeypatch.setattr("koneko.koneko.utils.get_settings", lambda x, y: "off")
     assert utils.check_noprint() == False
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "false")
+    monkeypatch.setattr("koneko.koneko.utils.get_settings", lambda x, y: "false")
     assert utils.check_noprint() == False
 
     # Test with an actual cfg
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
+    monkeypatch.setattr('koneko.koneko.utils.Path.expanduser',
                         lambda x: Path('example_config.ini'))
     assert utils.check_noprint() == False
 
@@ -77,7 +77,7 @@ def test_noprint(capsys):
 
 def test_get_settings(monkeypatch):
     # Redivert the config path
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
+    monkeypatch.setattr('koneko.koneko.utils.Path.expanduser',
                         lambda x: Path('example_config.ini'))
 
     assert utils.get_settings('Credentials', 'username') == 'koneko'
@@ -89,7 +89,7 @@ def test_get_settings(monkeypatch):
 def test_config(monkeypatch):
     # If config exists
     example_path = Path('example_config.ini')
-    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: example_path)
+    monkeypatch.setattr('koneko.koneko.utils.Path.expanduser', lambda x: example_path)
 
     creds, your_id = utils.config()
     assert your_id == '1234'
@@ -101,12 +101,12 @@ def test_config(monkeypatch):
     if test_cfg_path.exists():
         os.system(f'rm {test_cfg_path}')
 
-    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
+    monkeypatch.setattr('koneko.koneko.utils.Path.expanduser', lambda x: test_cfg_path)
 
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'y', 'myid'])
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
-    monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
+    monkeypatch.setattr('koneko.koneko.utils.getpass', lambda: 'mypassword')
 
     creds, your_id = utils.config()
     assert your_id == 'myid'

@@ -36,6 +36,7 @@ class AbstractGallery(ABC):
                 self.data.download_path.rmdir()
             self._show = True
 
+        api.myapi.await_login()
         current_page = self._pixivrequest()
         self.data.update(current_page)
 
@@ -391,6 +392,7 @@ def view_post_mode(image_id):
     different for a standalone mode or coming from a gallery mode.
     """
     print('Fetching illust details...')
+    api.myapi.await_login()
     try:
         post_json = api.myapi.protected_illust_detail(image_id)['illust']
     except KeyError:
@@ -569,9 +571,6 @@ class Users(ABC):
         self._main_path: 'Path'
 
     def start(self):
-        # It can't show first (including if cache is outdated),
-        # because it needs to print the right message
-        # Which means parsing is needed first
         self.data = data.UserJson(1, self._main_path, self._input)
         self._parse_and_download()
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
@@ -581,6 +580,7 @@ class Users(ABC):
         """If download path not empty, immediately show. Else parse & download"""
         if utils.dir_not_empty(self.data):
             lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
+            api.myapi.await_login()
             self.parse_thread = threading.Thread(target=self._parse_user_infos)
             self.parse_thread.start()
             return True
@@ -589,6 +589,7 @@ class Users(ABC):
         if self.data.download_path.is_dir():
             self.data.download_path.rmdir()
 
+        api.myapi.await_login()
         self._parse_user_infos()
         tracker = lscat.TrackDownloadsUsers(self.data)
         download.init_download(self.data, download.user_download, tracker)

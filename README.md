@@ -91,6 +91,7 @@ For more details refer to the [manual](#manual).
 # Roadmap
 
 * Complete unit tests
+* Speed: if cache is valid, display images immediately, before logging in (before calling `api.myapi.await_login()`)
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Terminal reliability

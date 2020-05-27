@@ -137,8 +137,6 @@ class Loop(ABC):
                 self._validate_input()
                 os.system('clear')
 
-            if start:
-                api.myapi.await_login()
             self._go_to_mode()
 
     @abstractmethod
@@ -251,8 +249,6 @@ class FollowingUserModeLoop(Loop):
 def illust_follow_mode_loop(start):
     """Immediately goes to IllustFollow()"""
     while True:
-        if start:
-            api.myapi.await_login()
         mode = ui.IllustFollowGallery()
         prompt.gallery_like_prompt(mode)
         # After backing

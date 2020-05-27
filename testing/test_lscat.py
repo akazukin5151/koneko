@@ -56,7 +56,7 @@ def test_TrackDownloads():
 
     data = FakeData()
     data.download_path.mkdir()
-    for pic in ('04_祝！！！.jpg', '17_ミコニャン.jpg', '77803142_p0.png'):
+    for pic in ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png'):
         os.system(f'cp testing/files/{pic} testing/files/gallery/')
 
     lscat.show_instant(lscat.TrackDownloads, data)
@@ -71,7 +71,7 @@ def test_TrackDownloadsUser():
 
     data = FakeData()
     data.download_path.mkdir()
-    for pic in ('04_祝！！！.jpg', '17_ミコニャン.jpg', '77803142_p0.png'):
+    for pic in ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png'):
         os.system(f'cp testing/files/{pic} testing/files/user/')
 
     os.system('touch testing/files/user/.koneko')

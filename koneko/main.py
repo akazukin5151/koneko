@@ -66,6 +66,7 @@ def main_loop(prompted, main_command, user_input, your_id=None):
     while True:
         if prompted and not user_input:
             main_command = utils.begin_prompt(printmessage)
+            printmessage = False
 
         if main_command == '1':
             ArtistModeLoop(prompted, user_input).start()
@@ -107,8 +108,7 @@ def main_loop(prompted, main_command, user_input, your_id=None):
 
         else:
             print('\nInvalid command!')
-            printmessage = False
-            continue
+
 
 
 #- Loop classes
@@ -129,13 +129,12 @@ class Loop(ABC):
 
     def start(self):
         """Ask for further info if not provided; wait for log in then proceed"""
-        # TODO: validate input should return bool, if False then return
-        # back to main_loop
         while True:
             if self._prompted and not self._user_input:
                 self._prompt_url_id()
                 self._process_url_or_input()
-                self._validate_input()
+                if not self._validate_input():
+                    return False
                 os.system('clear')
 
             self._go_to_mode()
@@ -146,6 +145,7 @@ class Loop(ABC):
         raise NotImplementedError
 
     def _process_url_or_input(self):
+        # TODO: use the functions in pure.py
         if 'pixiv' in self._url_or_id:
             self._user_input = pure.split_backslash_last(self._url_or_id)
         else:
@@ -155,12 +155,9 @@ class Loop(ABC):
         try:
             int(self._user_input)
         except ValueError:
-            print('Invalid image ID! Returning to main...')
-            # If ctrl+c pressed before a mode is selected, thread will never join
-            # Get it to join first so that modes still work
-            api.myapi.await_login()
-            time.sleep(2)
-            main()
+            print('Invalid image ID!')
+            return False
+        return True
 
     @abstractmethod
     def _go_to_mode(self):
@@ -221,9 +218,7 @@ class SearchUsersModeLoop(Loop):
         self._user_input = self._url_or_id
 
     def _validate_input(self):
-        """Overriding base class: search string doesn't need to be int
-        Technically it doesn't violate LSP because all inputs are valid
-        """
+        """Overriding base class: all inputs are valid"""
         return True
 
     def _go_to_mode(self):

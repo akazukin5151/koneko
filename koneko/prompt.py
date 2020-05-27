@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko.koneko import ui, pure, colors
+from koneko import ui, pure, colors
 
 TERM = Terminal()
 

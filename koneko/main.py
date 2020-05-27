@@ -145,11 +145,7 @@ class Loop(ABC):
         raise NotImplementedError
 
     def _process_url_or_input(self):
-        # TODO: use the functions in pure.py
-        if 'pixiv' in self._url_or_id:
-            self._user_input = pure.split_backslash_last(self._url_or_id)
-        else:
-            self._user_input = self._url_or_id
+        self._user_input, _ = pure.process_user_url(self._url_or_id)
 
     def _validate_input(self):
         try:
@@ -190,14 +186,7 @@ class ViewPostModeLoop(Loop):
 
     def _process_url_or_input(self):
         """Overriding base class to account for 'illust_id' cases"""
-        if 'illust_id' in self._url_or_id:
-            reg = re.findall(r'&illust_id.*', self._url_or_id)
-            self._user_input = reg[0].split('=')[-1]
-
-        elif 'pixiv' in self._url_or_id:
-            self._user_input = pure.split_backslash_last(self._url_or_id)
-        else:
-            self._user_input = self._url_or_id
+        self._user_input, _ = pure.process_artwork_url(self._url_or_id)
 
     def _go_to_mode(self):
         ui.view_post_mode(self._user_input)

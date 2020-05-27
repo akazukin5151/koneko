@@ -49,9 +49,9 @@ def test_generate_orders():
 
 
 def test_TrackDownloads():
+    """Just running it to make sure it doesn't crash"""
     class FakeData:
         def __init__(self):
-            # Either testuser or testgallery
             self.download_path = Path('testing/files/gallery')
 
     data = FakeData()
@@ -60,5 +60,24 @@ def test_TrackDownloads():
         os.system(f'cp testing/files/{pic} testing/files/gallery/')
 
     lscat.show_instant(lscat.TrackDownloads, data)
+
+    os.system(f'rm -r {data.download_path}')
+
+def test_TrackDownloadsUser():
+    """Just running it to make sure it doesn't crash"""
+    class FakeData:
+        def __init__(self):
+            self.download_path = Path('testing/files/user')
+
+    data = FakeData()
+    data.download_path.mkdir()
+    for pic in ('04_祝！！！.jpg', '17_ミコニャン.jpg', '77803142_p0.png'):
+        os.system(f'cp testing/files/{pic} testing/files/user/')
+
+    os.system('touch testing/files/user/.koneko')
+    with open('testing/files/user/.koneko', 'w') as f:
+        f.write("3")
+
+    lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
     os.system(f'rm -r {data.download_path}')

@@ -47,6 +47,9 @@ def test_prefix_filename():
     assert pure.prefix_filename("old.jpg", "new", 2) == "002_new.jpg"
     assert pure.prefix_filename("old.jpg", "new", 10) == "010_new.jpg"
 
+def test_prefix_artist_name():
+    assert pure.prefix_artist_name("name1", 2) == f"02\n{' ' * 19}name1"
+    assert pure.prefix_artist_name("name2", 10) == f"10\n{' ' * 19}name2"
 
 def test_find_number_map():
     assert ([pure.find_number_map(x, y)

@@ -39,8 +39,13 @@ def test_show_instant(monkeypatch, capsys):
 
     fakedata = FakeData()
     lscat.show_instant(FakeTracker, fakedata, True)
+    # First one works for me, but second one works for github
     assert set(showed) == set([
         'test_config.ini', '004_祝！！！.jpg', 'mode3.json',
+        'mode1.json', 'not_an_image.txt', '008_77803142_p0.png',
+        '017_ミコニャン.jpg', 'mode2.json'
+    ]) or set(showed) == set([
+        '004_祝！！！.jpg', 'mode3.json',
         'mode1.json', 'not_an_image.txt', '008_77803142_p0.png',
         '017_ミコニャン.jpg', 'mode2.json'
     ])

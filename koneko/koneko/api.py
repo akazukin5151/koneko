@@ -14,6 +14,8 @@ class APIHandler:
     def __init__(self):
         self.api_queue = queue.Queue()
         self.api_thread = threading.Thread(target=self._login)
+        self._started = False
+        self._awaited = False
         self._credentials: 'Dict'  # noqa: F821
         self.api: 'AppPixivAPI()'
 
@@ -24,12 +26,16 @@ class APIHandler:
 
     def start(self):
         """Start logging in"""
-        self.api_thread.start()
+        if not self._started:
+            self._started = True
+            self.api_thread.start()
 
     def await_login(self):
         """Wait for login to finish, then assign PixivAPI session to API"""
-        self.api_thread.join()
-        self.api = self.api_queue.get()
+        if not self._awaited:
+            self._awaited = True
+            self.api_thread.join()
+            self.api = self.api_queue.get()
 
     def _login(self):
         """

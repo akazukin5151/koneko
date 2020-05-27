@@ -1,4 +1,4 @@
-# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![Coverage](coverage.svg)]()
+# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) ![Build](https://github.com/twenty5151/koneko/workflows/Python%20application/badge.svg)
 
 Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
 
@@ -90,8 +90,6 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
-* FIXME: mode 5 seems to be not reloading automatically?
-* Get rid of all data in the ui classes
 * Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
@@ -111,7 +109,13 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ### Version 0.6
 * **Depreciated** legacy lscat (the shell script) and lsix support.
+
+#### Features
 * If there are cached images in the users modes (3 & 4), it will be shown immediately before requesting and parsing.
+* Gallery and User modes (all modes except mode 2) now prefetch the next page in another thread/in the background, freeing up the prompt to respond to user key presses.
+* If the cache dir has images, it will display the images before waiting for login, making it much faster.
+* Improved experience of invalid input: it will no longer reload to main after 2 seconds.
+* Fixed bug in Image mode where the first picture of a multi-picture post prints the current page indicator before the picture is displayed
 
 #### Terminal reliability
 * lscat now calculates params using terminal size
@@ -125,6 +129,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Revamped lscat to use only the generators to display the images, rather than for loops, heavy classes, and fragile inheritance
     * Users view actually got faster, because two yield statements are apparently faster than two nested for loops
     * No significant speed difference for Galley views.
+* Continuous integration tested on linux and macos
 
 
 # FAQ
@@ -155,7 +160,7 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 * Fork it
 * Edit the files on your fork/branch
     * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
-* Run tests with `pytest testing/testing.py -vvvv -l -s`
+* Run tests with `pytest testing/testing.py -vvvv -l -s --icat`
 * Try it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
     * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
 * Submit a pull request
@@ -177,7 +182,7 @@ Flowchart of modes and their connections:
 
 Simplified UML diagram of the classes:
 
-![Classes UML](http://plantuml.com:80/plantuml/png/bLXjZzmc4FxEh-1Ziitw1qIdLKwjsYPAfKXz-L9L5cVONNAieO1pEQNttpk0mO3ntkNRUZpF33CyyupltXbBj9qk0Y7BhM3uGlZOgKU4o9sncWmM3u8OWpzAgV3DpQlRDrWp-lfm-8Om_k5Rz7hoSLwzHay81S2jjjpOtoHb7khS0O0lO0W_5uIy-ymW4HTYChO_IY7aG-ySUm5GX4Bk__PKFepxAl1RpCSpqzoQmktlCwUKZV_ijw9ck0qFlDVyTBOfqW7_nTd39xdaVZcoF3Eg0-6zOCVlygyJ_Cw87iv_6gRDTw1-zWVduwa4rdS_yUvsjln2X63wSSK4kC-HVRMz8YS6T-eDIhClS8J29XKRUy77-twGKbEpje_J9HhTHGf9QCyl4A92L2ypc4_ghT6YcVECJmjfpsIaWlLAouigoEigzbUGrVlZ6pmyad4fU8rEuFUU6A6zrqASP4zydluKlAeYr--pEjVvIzhive6fYtcB1q18mqoOnYqQP_X6FQieBPOy4o6Du3FWwlW5hDNg5T7h6F6ULoDoJQOK6Uw1L11iTfjrAv0SelG9DR-Xt2X17WCP2tuuGvCHkEHrl6li1wGq-O4hJNxav6Ggis3a2mlyBhMqhZ_hxQerNNUeIoqVlKSi3XMrNtjrqtKDXK7nYjeQTVMY0h0XYLTHPMVQQJUspRwLBETfklWoRCc0nIkBLhcibJbvrNgyQ8UhDdAXhTAECcfJC9SUBVcMuInBogfkEMULPPxjPk-sSvJIqsZ-RYDbfLbrFuKPYEt-0CizqwscOaNiEVoS52MMPOJBm3_DGsmIuq3LuG3pmucDJ1ChzLMiE_BpU5ITURyPAsluYp2LqFeExZhNr-vAZjHX9muDNTzrazf8LqBHPa_saygqlULs1Lk2My8JTJuirbBh9uWnRrnlNZZk5IvxcwFYyYw1guKNUdketVD8uMEdZ3Clau06UE7pb8GKs4gwETS78yT4BJ3vuJVzG8Rph8jucBHcOz0AzzLHcSCtGoIa1z8G9TzEanRrMbi621-vDcw3dQg12hharifdE6Sqp6BcUyoJDeLY_VDJNgXlIb7cSfOZ5smabrZf77Z-2k8qJNfHEFowWypoM5JfdI1oV1P4Wu5oNPNDvdrkybF7SyHQtBDhJw7Lq1wN8DfY_uEfADaHiQYuge3JyePTwjBIkYJlLI1WOnpvLqOp-cGTS8yv1bOzjqhoqRxarclQ08jTLth5Xpn9wDzYM743QB_Y-mv6VzyOl4nu70PL_4amRsewfyudtthTUDyuYKJ16Jwz_zL_loyI3-R-tubDB7ksPyq8NGpbGWwrFn1kuOFznDEeAA8Dt3oqiXgUf2pFEMW69p5s-KYG5kJ7iJXC2MMMy4JAOrpFuGOgiF4BkFcg_CjZCsdaPRZOgdsjZttVVeJUiP6w_sty3m00)
+![Classes UML](http://plantuml.com:80/plantuml/png/bLXVZzmc47_dK_2OR6D_WEYqIjIeRQfMYjG_BrLbSJQxIuur572kf_I-UmSm633svbwYOpo_6MRcDpDitcb3b9ck72733AVuIjZOoYU4oBqsYlG6zvneZT_Fnr-4aFZkxjNxDrZHuVNn-1LX_DtNeFtixBrwZPuHce7AC6r-5GDrKAiE07m5WVzpGOZxpnGSCiudRRgJu5myTbQnum15AB_3VyqW7iUcSF0Mi_525JEwglxNXGq37Vzkjhma-0qDt2XslfXewOZ_PFJnarZkyEt8_EweD8GRJaylqYyT_4Q9wYz_QAhq2r0_k8kpyPm3IqvCh0qv_f5mJjNJYXbGtv7-Qpf9pXHgx0HIqIzmXKmc91qxpiQ7hXT23Nej7wTh4Df2Sa66Zbt1H84eFYOmvzH9WqHHgnbE2ualP1muxQGILvcHsKRiIf34-_qRt3-HSGbuZOxWZuuOFhrx9iwY8yvFT_PQHP3hxqcSQ_yvRGvpuvJ1lCKz88IcsdVd5eqJV2MUbPKQIsvOY2ru0rnSFuFLKhqYUcaZr7dL8djZIvB-0KW5ncQrUOvvaeELBgBcBmFJafCdJyQC7rPGPGJEUHrgZLs3v2BNSBd8jPoOT27cb7oXdj_rsLhc8SdnAaLjUon3pezE8mI9iXpiVRfhsygaGQ5KzLcrMp0Fh8p6NLGzGtNtDxPGKtEUyZSI8ZUVCsFHIgmLAjiJEsgNytgPBJOBWIlrAMuf9JS7wfAxjT-bYVCGaopiWPA84qIz68TjN_cegXJbiE6oc75bdhdkYOct_nt-UQ2gbcmiYRduFoSv44CJWdeZ3lnXRduT6GhR02uo7yvqf8eOeNQnzkgtyMZZxiscpQG0By9kp7cNuKDhyzxk-8mLi4EciYSExIGttEPGj9chPfB9hgYfxM1pS6s0XRtX5tM-EoQmCMzm9rxtWfkOYLQA3e-2ke6uI7sEZwLwQia_ed8xyvBoQ81dEiznC0ERIJlx-bcBCL8FH6vewAud_MMUixYVbAAZdp7sDLE8_Lia4DO11sybtNgJukMwN1eCdvZITZEUYuRpyyokgSzmpo2OXw3BCOippGVhpizfe2ufMPZBNKwCqv5SGwIpuVbrnOOu2RB0uQzxy2nEMPHE2Io7CoSA10DJHTXqVYVezDRX7Y4MUxRfoMOyfCSw2BAGVo_AGhP4p28k8c13Nc7hEfVKYkIq4gOamTfZ-XbU2Sn8mKRpBGKk6GA4jGde9EjJ9pvLYs150s3uYje7wFQcqcF9hB4OL50bmfoegXoJl79HRYA72Sr792X--lYJ-ocmJ7qGT_zCTAB9sLmK9SCYo7Utpy4ZOGRU_cSMkqCIfQ7OaDAYN-8mkQMWADn4c-Kz8GnC74jStnW3DOH57fx2vlQLAC3QxURgf_n7pARJG4LVu29zrTyDQHaGUaV7mVutoly0)
 
 <details>
   <summary>Actor-ish model of the ui.Gallery class</summary>
@@ -234,7 +239,7 @@ git clone -b master https://github.com/twenty5151/koneko.git
 git clone -b dev https://github.com/twenty5151/koneko.git
 
 # Run the tests (for those who want to edit)
-pytest testing/testing.py -vvvv -l -s
+pytest testing/testing.py -vvvv -l -s --icat
 
 cd koneko
 # Manually install without PyPI; for general usage
@@ -254,11 +259,7 @@ koneko
 ```
 
 ## Unit tests
-* Run `pytest testing/testing.py -vvvv -l -s`
-* Or `coverage run -m pytest testing/testing.py -vvvv -l -s` to generate coverage...
-* ...report, viewed by `coverage report`
-* Dig deeper with `coverage html -d testing/htmlcov/`
-* Generate badge with `coverage-badge -fpo coverage.svg`
+Run `pytest testing/testing.py -vvvv -l -s --icat`. If icat fails, skip the three offending tests by omitting the `--icat` argument
 
 ## Upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)

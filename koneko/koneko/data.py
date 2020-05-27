@@ -73,6 +73,7 @@ class GalleryJson:
 class ImageJson:
     """Stores data for image view (mode 2)"""
     def __init__(self, raw, image_id):
+        self.image_id = image_id
         self.url = pure.url_given_size(raw, 'large')
         self.filename = pure.split_backslash_last(self.url)
         self.artist_user_id = raw['user']['id']
@@ -112,6 +113,7 @@ class UserJson:
         self.page_num = page_num
         self.main_path = main_path
         self._input = user_or_id
+        self.offset = 0
 
         self.ids_cache, self.names_cache = {}, {}
 

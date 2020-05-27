@@ -1,6 +1,5 @@
 """The default image renderer for koneko"""
 import os
-import time
 import threading
 from abc import ABC
 
@@ -48,7 +47,7 @@ def show_instant(cls, data, check_noprint=False):
         print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
 
 
-class Tracker(ABC):
+class AbstractTracker(ABC):
     def __init__(self, data):
         self.path = data.download_path
         self._downloaded = []
@@ -78,7 +77,6 @@ class Tracker(ABC):
             # Display page
             if next_num == 0:
                 os.system('clear')
-                time.sleep(1)
             self.generator.send(pic)
 
             self._counter += 1
@@ -87,7 +85,7 @@ class Tracker(ABC):
             if self._downloaded:
                 self._inspect()
 
-class TrackDownloads(Tracker):
+class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
     def __init__(self, data):
         super().__init__(data)
@@ -95,7 +93,7 @@ class TrackDownloads(Tracker):
         self.generator = generate_page(data.download_path)
         self.generator.send(None)
 
-class TrackDownloadsUsers(Tracker):
+class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
         super().__init__(data)
@@ -130,7 +128,7 @@ def generate_page(path):
         y = number // 5
 
         if number % 10 == 0 and number != 0:
-            print('\n' * 25)
+            print('\n' * 23)
 
         with cd(path):
             Image(image).thumbnail(310).show(
@@ -189,7 +187,7 @@ def generate_orders(total_pics, artists_count):
     return order
 
 
-class TrackDownloadsImage(Tracker):
+class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
     def __init__(self, path):
         super().__init__(path)
@@ -244,10 +242,12 @@ if __name__ == '__main__':
 
     class FakeData:
         def __init__(self):
-            self.download_path = KONEKODIR / 'test'
+            # Either testuser or testgallery
+            self.download_path = KONEKODIR / 'testgallery'
 
     data = FakeData()
     # Use whichever mode you pasted into the test dir
     # For Users, make sure it has a .koneko file
-    show_instant(TrackDownloadsUsers, data)
+    #show_instant(TrackDownloadsUsers, data)
+    show_instant(TrackDownloads, data)
 

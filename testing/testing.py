@@ -14,15 +14,6 @@ from page_json import *  # Imports the current_page (dict) stored in disk
 
 page_illusts = page_json["illusts"]
 
-try:
-    name = os.getlogin()
-except OSError:
-    kitty = False
-else:
-    if name == 'twenty':
-        kitty = True
-    else:
-        kitty = False
 
 # From pure.py
 def test_cd():
@@ -239,7 +230,7 @@ def test_verify_full_download():
     # The above code will remove the file
     os.system("touch testing/not_an_image.txt")
 
-@pytest.mark.skipif(not kitty, reason="needs kitty")
+@pytest.mark.icat
 def test_begin_prompt(monkeypatch):
     # Send a "1" as input
     monkeypatch.setattr("builtins.input", lambda x: "1")
@@ -253,7 +244,7 @@ def test_artist_user_id_prompt(monkeypatch):
     myinput = utils.artist_user_id_prompt()
     assert myinput == "https://www.pixiv.net/en/users/2232374"
 
-@pytest.mark.skipif(not kitty, reason="needs kitty")
+@pytest.mark.icat
 def test_show_man_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("builtins.input", lambda x: "")
     monkeypatch.setattr("os.system", lambda x: "")
@@ -268,7 +259,7 @@ def test_clear_cache_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("builtins.input", lambda x: "n")
     utils.clear_cache_loop()
 
-@pytest.mark.skipif(not kitty, reason="needs kitty")
+@pytest.mark.icat
 def test_info_screen_loop(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda x: "")
     monkeypatch.setattr("os.system", lambda x: "")

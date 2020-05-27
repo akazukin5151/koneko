@@ -16,8 +16,7 @@ class AbstractGallery(ABC):
     def __init__(self):
         self.data = data.GalleryJson(1, self._main_path)
         self._show = True
-        # Defined in self.view_image
-        self._selected_image_num: int
+        self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
         self._main_path: 'Path'
 
@@ -29,7 +28,7 @@ class AbstractGallery(ABC):
         for contents!)
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
-        if utils.dir_not_empty(self.data.download_path):
+        if utils.dir_not_empty(self.data):
             self._show = False
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
@@ -37,6 +36,7 @@ class AbstractGallery(ABC):
                 self.data.download_path.rmdir()
             self._show = True
 
+        api.myapi.await_login()
         current_page = self._pixivrequest()
         self.data.update(current_page)
 
@@ -46,11 +46,13 @@ class AbstractGallery(ABC):
 
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
+
         # Make sure the following work:
         # Gallery -> next page -> image prompt -> back -> prev page
         if len(self.data.all_pages_cache) == 1:
             # Prefetch the next page on first gallery load
-            self._prefetch_next_page()
+            self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+            self.prefetch_thread.start()
 
 
     def open_link_coords(self, first_num, second_num):
@@ -80,7 +82,6 @@ class AbstractGallery(ABC):
         download.download_image_verified(post_json=post_json)
 
     def view_image(self, selected_image_num):
-        self._selected_image_num = selected_image_num
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
         idata = data.ImageJson(post_json, image_id)
@@ -88,7 +89,7 @@ class AbstractGallery(ABC):
         display_image(
             post_json,
             idata.artist_user_id,
-            self._selected_image_num,
+            selected_image_num,
             self.data
         )
 
@@ -99,13 +100,17 @@ class AbstractGallery(ABC):
         # Image prompt ends, user presses back
         self._back()
 
-    @abstractmethod
     def _back(self):
-        raise NotImplementedError
+        """After user 'back's from image prompt or artist gallery, start mode again"""
+        lscat.show_instant(lscat.TrackDownloads, self.data, True)
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+        prompt.gallery_like_prompt(self)
 
     def next_page(self):
+        self.prefetch_thread.join()
         self.data.current_page_num += 1
-        if utils.dir_not_empty(self.data.download_path):
+        if utils.dir_not_empty(self.data):
             self._show = False
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
@@ -155,11 +160,7 @@ class AbstractGallery(ABC):
         if not download_path.is_dir():
             oldnum = self.data.current_page_num
             self.data.current_page_num += 1
-
-            pbar = tqdm(total=len(current_page_illusts), smoothing=0)
-            download.download_page(self.data, pbar=pbar)
-            pbar.close()
-
+            download.download_page(self.data)
             self.data.current_page_num = oldnum
 
     def reload(self):
@@ -225,14 +226,6 @@ class ArtistGallery(AbstractGallery):
             return api.myapi.artist_gallery_parse_next(**kwargs) # Parse next
         else:
             return api.myapi.artist_gallery_request(self._artist_user_id)
-
-    def _back(self):
-        # After user 'back's from image prompt, start mode again
-        lscat.show_instant(lscat.TrackDownloads, self.data, True)
-
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
-        prompt.gallery_like_prompt(self)
 
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
                       first_num, second_num):
@@ -317,17 +310,11 @@ class IllustFollowGallery(AbstractGallery):
 
     def go_artist_gallery_num(self, selected_image_num):
         """Like self.view_image(), but goes to artist mode instead of image"""
-        self._selected_image_num = selected_image_num
-
         artist_user_id = self.data.artist_user_id(selected_image_num)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # Gallery prompt ends, user presses back
         self._back()
-
-    def _back(self):
-        # User 'back's out of artist gallery, start current mode again
-        IllustFollowGallery(self.data)
 
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
                       first_num, second_num):
@@ -405,6 +392,7 @@ def view_post_mode(image_id):
     different for a standalone mode or coming from a gallery mode.
     """
     print('Fetching illust details...')
+    api.myapi.await_login()
     try:
         post_json = api.myapi.protected_illust_detail(image_id)['illust']
     except KeyError:
@@ -415,13 +403,10 @@ def view_post_mode(image_id):
 
     download.download_core(idata.large_dir, idata.url, idata.filename)
     lscat.icat(idata.large_dir / idata.filename)
-
-    # Download the next page for multi-image posts
-    # Do this after prompt
-    #if idata.number_of_pages != 1:
-    #    download.async_download_spinner(idata.large_dir, idata.page_urls[:2])
+    print(f'Page 1/{idata.number_of_pages}')
 
     image = Image(image_id, idata, True)
+
     experimental = utils.get_settings('misc', 'experimental')
     if experimental == 'on':
         event = threading.Event()
@@ -448,7 +433,6 @@ class Image:
     """
     def __init__(self, image_id, idata, firstmode=False):
         self.data = idata
-        self._image_id = image_id
         self._firstmode = firstmode
 
     def preview(self):
@@ -474,7 +458,7 @@ class Image:
         self.event = event
 
     def open_image(self):
-        link = f'https://www.pixiv.net/artworks/{self._image_id}'
+        link = f'https://www.pixiv.net/artworks/{self.data.image_id}'
         os.system(f'xdg-open {link}')
         print(f'Opened {link} in browser')
 
@@ -564,7 +548,7 @@ class Image:
         # Else: image prompt and class ends, goes back to previous mode
 
 
-class Users(ABC):
+class AbstractUsers(ABC):
     """
     User view commands (No need to press enter):
         {digit1}{digit2}   -- display artist illusts on column digit1 and row digit2
@@ -579,32 +563,33 @@ class Users(ABC):
 
     @abstractmethod
     def __init__(self, user_or_id):
+        self.data: 'data.UserJson'
         self._input = user_or_id
-        self._offset = 0
         self._show = True
+        self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
         self._main_path: 'Path'
-        self.data: 'data.UserJson'
 
     def start(self):
-        # It can't show first (including if cache is outdated),
-        # because it needs to print the right message
-        # Which means parsing is needed first
         self.data = data.UserJson(1, self._main_path, self._input)
         self._parse_and_download()
-        self._prefetch_next_page()
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self.prefetch_thread.start()
 
     def _parse_and_download(self):
         """If download path not empty, immediately show. Else parse & download"""
-        if utils.dir_not_empty(self.data.download_path):
+        if utils.dir_not_empty(self.data):
             lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
-            self._parse_user_infos()
+            api.myapi.await_login()
+            self.parse_thread = threading.Thread(target=self._parse_user_infos)
+            self.parse_thread.start()
             return True
 
         # No valid cached images, download all from scratch
         if self.data.download_path.is_dir():
             self.data.download_path.rmdir()
 
+        api.myapi.await_login()
         self._parse_user_infos()
         tracker = lscat.TrackDownloadsUsers(self.data)
         download.init_download(self.data, download.user_download, tracker)
@@ -624,7 +609,7 @@ class Users(ABC):
             self.data.update(result)
 
     def _show_page(self):
-        if not utils.dir_not_empty(self.data.download_path):
+        if not utils.dir_not_empty(self.data):
             print('This is the last page!')
             self.data.page_num -= 1
             return False
@@ -633,15 +618,17 @@ class Users(ABC):
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
+        # Wait for initial request to finish, so the data object is instantiated
+        self.parse_thread.join()
         oldnum = self.data.page_num
 
         if self.data.next_url:
             next_offset = api.myapi.parse_next(self.data.next_url)['offset']
             # Won't download if not immediately next page, eg
             # p1 (p2 downloaded) -> p2 (p3) -> p1 -> p2 (p4 won't download)
-            if int(next_offset) - int(self._offset) <= 30:
-                self._offset = next_offset
-                self.data.page_num = int(self._offset) // 30 + 1
+            if int(next_offset) - int(self.data.offset) <= 30:
+                self.data.offset = next_offset
+                self.data.page_num = int(self.data.offset) // 30 + 1
 
                 self._parse_user_infos()
                 download.init_download(self.data, download.user_download, None)
@@ -649,6 +636,7 @@ class Users(ABC):
         self.data.page_num = oldnum
 
     def next_page(self):
+        self.prefetch_thread.join()
         self.data.page_num += 1
         self._show_page()
 
@@ -657,7 +645,7 @@ class Users(ABC):
     def previous_page(self):
         if self.data.page_num > 1:
             self.data.page_num -= 1
-            self._offset = int(self._offset) - 30
+            self.data.offset = int(self.data.offset) - 30
             self._show_page()
         else:
             print('This is the first page!')
@@ -683,9 +671,9 @@ class Users(ABC):
         prompt.user_prompt(self)
 
 
-class SearchUsers(Users):
+class SearchUsers(AbstractUsers):
     """
-    Inherits from Users class, define self._input as the search string (user)
+    Inherits from AbstractUsers class, define self._input as the search string (user)
     Parent directory for downloads should go to search/
     """
     def __init__(self, user):
@@ -693,11 +681,11 @@ class SearchUsers(Users):
         super().__init__(user)
 
     def _pixivrequest(self):
-        return api.myapi.search_user_request(self._input, self._offset)
+        return api.myapi.search_user_request(self._input, self.data.offset)
 
-class FollowingUsers(Users):
+class FollowingUsers(AbstractUsers):
     """
-    Inherits from Users class, define self._input as the user's pixiv ID
+    Inherits from AbstractUsers class, define self._input as the user's pixiv ID
     (Or any other pixiv ID that the user wants to look at their following users)
     Parent directory for downloads should go to following/
     """
@@ -707,4 +695,5 @@ class FollowingUsers(Users):
         super().__init__(your_id)
 
     def _pixivrequest(self):
-        return api.myapi.following_user_request(self._input, self._publicity, self._offset)
+        return api.myapi.following_user_request(self._input, self._publicity,
+                                                self.data.offset)

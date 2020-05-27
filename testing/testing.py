@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from pathlib import Path
+import configparser
 
 import pytest
 
@@ -280,3 +281,43 @@ def test_noprint(capsys):
     utils.noprint(print, "hello")
     captured = capsys.readouterr()
     assert captured.out == ""
+
+def test_get_settings(monkeypatch):
+    # Redivert the config path
+    monkeypatch.setattr('koneko.utils.Path.expanduser',
+                        lambda x: Path('example_config.ini'))
+
+    assert utils.get_settings('Credentials', 'username') == 'koneko'
+    assert utils.get_settings('Credentials', 'password') == '1234'
+    assert utils.get_settings('Credentials', 'ID') == '1234'
+    assert utils.get_settings('misc', 'experimental') == 'off'
+    assert utils.get_settings('misc', 'noprint') == 'off'
+
+def test_config(monkeypatch):
+    # If config exists
+    example_path = Path('example_config.ini')
+    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: example_path)
+
+    creds, your_id = utils.config()
+    assert your_id == '1234'
+    assert type(creds) is configparser.SectionProxy
+
+
+    # If config doesn't exist
+    test_cfg_path = Path('testing/test_config.ini')
+    if test_cfg_path.exists():
+        os.system(f'rm {test_cfg_path}')
+
+    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
+
+    # It asks for multiple inputs: username, whether to save user id, user id
+    responses = iter(['myusername', 'y', 'myid'])
+    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
+    monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
+
+    creds, your_id = utils.config()
+    assert your_id == 'myid'
+    assert type(creds) is configparser.SectionProxy
+
+    assert utils.get_settings('Credentials', 'username') == 'myusername'
+    assert utils.get_settings('Credentials', 'password') == 'mypassword'

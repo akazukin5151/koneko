@@ -85,7 +85,7 @@ def show_man_loop():
     print(' ' * 3, '=' * 30)
     print(ui.Image.__doc__)
     print(' ' * 3, '=' * 30)
-    print(ui.Users.__doc__)
+    print(ui.AbstractUsers.__doc__)
     print(' ' * 3, '=' * 30)
     print(ui.IllustFollowGallery.__doc__)
     while True:
@@ -188,7 +188,7 @@ def get_settings(section, setting):
     config_object = ConfigParser()
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     if not config_path.exists():
-        raise FileNotFoundError
+        return False
 
     config_object.read(config_path)
     section = config_object[section]

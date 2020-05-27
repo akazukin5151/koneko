@@ -1,4 +1,8 @@
-# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) ![build](https://github.com/twenty5151/koneko/workflows/build/badge.svg) [![commits since](https://img.shields.io/github/commits-since/twenty5151/koneko/latest)](https://GitHub.com/twenty5151/koneko/commit/) [![Coverage](coverage.svg)]()
+# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![commits since](https://img.shields.io/github/commits-since/twenty5151/koneko/latest)](https://GitHub.com/twenty5151/koneko/commit/) [![Coverage](coverage.svg)]()
+
+| master | dev
+| --- | ---
+|![build](https://github.com/twenty5151/koneko/workflows/build/badge.svg?branch=master) |![build](https://github.com/twenty5151/koneko/workflows/build/badge.svg?branch=dev)
 
 Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
 

@@ -188,7 +188,7 @@ def get_settings(section, setting):
     config_object = ConfigParser()
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     if not config_path.exists():
-        raise FileNotFoundError
+        return False
 
     config_object.read(config_path)
     section = config_object[section]

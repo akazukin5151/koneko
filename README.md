@@ -132,7 +132,7 @@ If only I can understand how to use asyncio. See [I don't understand Python's As
 
 First, koneko is intended to work for full screen terminals, so don't tile it around unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine.
 
-You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6.1 onwards.
+You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6.2 onwards.
 
 # Contributing
 * Fork it
@@ -210,7 +210,7 @@ Note: if you want to make some edits, you should install it in a conda environme
 ```sh
 # Use the latest stable version (recommended for usage)
 # Make sure the version number is the latest
-git clone -b 'v0.6.1' --depth 1 https://github.com/twenty5151/koneko.git
+git clone -b 'v0.6.2' --depth 1 https://github.com/twenty5151/koneko.git
 # Use the master branch for upcoming features:
 git clone -b master https://github.com/twenty5151/koneko.git
 # Use the dev branch for latest features, fixes, and instability (recommended for contributers):
@@ -242,7 +242,7 @@ Run `pytest testing/ -vvvv -l -s --icat`. If icat fails, skip the three offendin
 ## Upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
 
-**Warning:** you *must* test installing with `pip install .`, `python setup.py install`, `python setup.py develop` and `python koneko/main.py`
+**Warning:** you *must* test installing with `pip install .`, `python setup.py install`, and `python setup.py develop`.
 
 Bump version info in `__init__.py`, `setup.py`, and `README.md`
 

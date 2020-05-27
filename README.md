@@ -1,4 +1,4 @@
-# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![Coverage](coverage.svg)]()
+# koneko [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) ![Build](https://github.com/twenty5151/koneko/workflows/Python%20application/badge.svg)
 
 Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
 
@@ -259,11 +259,7 @@ koneko
 ```
 
 ## Unit tests
-* Run `pytest testing/testing.py -vvvv -l -s --icat`
-* Or `coverage run -m pytest testing/testing.py -vvvv -l -s --icat` to generate coverage...
-* ...report, viewed by `coverage report`
-* Dig deeper with `coverage html -d testing/htmlcov/`
-* Generate badge with `coverage-badge -fpo coverage.svg`
+Run `pytest testing/testing.py -vvvv -l -s --icat`. If icat fails, skip the three offending tests by omitting the `--icat` argument
 
 ## Upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)

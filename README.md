@@ -103,6 +103,12 @@ For more details refer to the [manual](#manual).
 * For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
 
+## Upcoming changelog (in dev branch)
+
+For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+
+### Version 0.7
+
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!
@@ -236,7 +242,7 @@ Run `pytest testing/ -vvvv -l -s --icat`. If icat fails, skip the three offendin
 ## Upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
 
-**Warning:** you *must* test installing with both `pip install .` and `python setup.py install`.
+**Warning:** you *must* test installing with `pip install .`, `python setup.py install`, `python setup.py develop` and `python koneko/main.py`
 
 Bump version info in `__init__.py`, `setup.py`, and `README.md`
 

@@ -112,7 +112,7 @@ def main_loop(prompted, main_command, user_input, your_id=None):
 
 
 #- Loop classes
-class Loop(ABC):
+class AbstractLoop(ABC):
     """Ask for details relevant to mode then go to mode
     prompt user for details, if no command line arguments supplied
     process input (can be overridden)
@@ -161,7 +161,7 @@ class Loop(ABC):
         raise NotImplementedError
 
 
-class ArtistModeLoop(Loop):
+class ArtistModeLoop(AbstractLoop):
     """
     Ask for artist ID and process it, wait for API to finish logging in
     before proceeding
@@ -176,7 +176,7 @@ class ArtistModeLoop(Loop):
         main()
 
 
-class ViewPostModeLoop(Loop):
+class ViewPostModeLoop(AbstractLoop):
     """
     Ask for post ID and process it, wait for API to finish logging in
     before proceeding
@@ -194,7 +194,7 @@ class ViewPostModeLoop(Loop):
         main()
 
 
-class SearchUsersModeLoop(Loop):
+class SearchUsersModeLoop(AbstractLoop):
     """
     Ask for search string and process it, wait for API to finish logging in
     before proceeding
@@ -217,7 +217,7 @@ class SearchUsersModeLoop(Loop):
         main()
 
 
-class FollowingUserModeLoop(Loop):
+class FollowingUserModeLoop(AbstractLoop):
     """
     Ask for pixiv ID or url and process it, wait for API to finish logging in
     before proceeding

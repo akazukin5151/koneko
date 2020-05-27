@@ -21,7 +21,7 @@ from pathlib import Path
 from koneko import ui, api, cli, pure, utils, prompt
 
 
-def main(start=True):
+def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
     os.system('clear')
     credentials, your_id = utils.config()
@@ -38,21 +38,20 @@ def main(start=True):
         os.system('clear')
 
     api.myapi.add_credentials(credentials)
-    if start:
-        api.myapi.start()
+    api.myapi.start()
 
     # After this part, the API is logging in in the background and we can proceed
     prompted, main_command, user_input = cli.process_cli_args()
 
     try:
-        main_loop(prompted, main_command, user_input, your_id, start)
+        main_loop(prompted, main_command, user_input, your_id)
     except KeyboardInterrupt:
         # If ctrl+c pressed before a mode is selected, thread will never join
         # Get it to join first so that modes still work
         api.myapi.await_login()
-        main(start=False)
+        main()
 
-def main_loop(prompted, main_command, user_input, your_id=None, start=True):
+def main_loop(prompted, main_command, user_input, your_id=None):
     """
     Ask for mode selection, if no command line arguments supplied
     call the right function depending on the mode
@@ -69,25 +68,25 @@ def main_loop(prompted, main_command, user_input, your_id=None, start=True):
             main_command = utils.begin_prompt(printmessage)
 
         if main_command == '1':
-            ArtistModeLoop(prompted, user_input).start(start)
+            ArtistModeLoop(prompted, user_input).start()
 
         elif main_command == '2':
-            ViewPostModeLoop(prompted, user_input).start(start)
+            ViewPostModeLoop(prompted, user_input).start()
 
         elif main_command == '3':
             if your_id and not user_input: # your_id stored in config file
                 ans = input('Do you want to use the Pixiv ID saved in your config?\n')
                 if ans in {'y', ''}:
-                    FollowingUserModeLoop(prompted, your_id).start(start)
+                    FollowingUserModeLoop(prompted, your_id).start()
 
             # If your_id not stored, or if ans is no, or if id provided, via cli
-            FollowingUserModeLoop(prompted, user_input).start(start)
+            FollowingUserModeLoop(prompted, user_input).start()
 
         elif main_command == '4':
-            SearchUsersModeLoop(prompted, user_input).start(start)
+            SearchUsersModeLoop(prompted, user_input).start()
 
         elif main_command == '5':
-            illust_follow_mode_loop(start)
+            illust_follow_mode_loop()
 
         elif main_command == '?':
             utils.info_screen_loop()
@@ -99,7 +98,7 @@ def main_loop(prompted, main_command, user_input, your_id=None, start=True):
             utils.clear_cache_loop()
 
         elif main_command == 'q':
-            answer = input('Are you sure you want to exit? [y/N]:\n')
+            answer = input('Are you sure you want to exit? [Y/n]:\n')
             if answer == 'y' or not answer:
                 sys.exit(0)
             else:
@@ -128,8 +127,10 @@ class Loop(ABC):
         self._url_or_id: str
         self.mode: 'Any'  # noqa: F821
 
-    def start(self, start):
+    def start(self):
         """Ask for further info if not provided; wait for log in then proceed"""
+        # TODO: validate input should return bool, if False then return
+        # back to main_loop
         while True:
             if self._prompted and not self._user_input:
                 self._prompt_url_id()
@@ -159,7 +160,7 @@ class Loop(ABC):
             # Get it to join first so that modes still work
             api.myapi.await_login()
             time.sleep(2)
-            main(start=False)
+            main()
 
     @abstractmethod
     def _go_to_mode(self):
@@ -179,7 +180,7 @@ class ArtistModeLoop(Loop):
         self.mode = ui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
-        main(start=False)
+        main()
 
 
 class ViewPostModeLoop(Loop):
@@ -204,7 +205,7 @@ class ViewPostModeLoop(Loop):
     def _go_to_mode(self):
         ui.view_post_mode(self._user_input)
         # After backing
-        main(start=False)
+        main()
 
 
 class SearchUsersModeLoop(Loop):
@@ -229,6 +230,7 @@ class SearchUsersModeLoop(Loop):
         self.mode = ui.SearchUsers(self._user_input)
         self.mode.start()
         prompt.user_prompt(self.mode)
+        main()
 
 
 class FollowingUserModeLoop(Loop):
@@ -245,14 +247,15 @@ class FollowingUserModeLoop(Loop):
         self.mode = ui.FollowingUsers(self._user_input)
         self.mode.start()
         prompt.user_prompt(self.mode)
+        main()
 
-def illust_follow_mode_loop(start):
+def illust_follow_mode_loop():
     """Immediately goes to IllustFollow()"""
     while True:
         mode = ui.IllustFollowGallery()
         prompt.gallery_like_prompt(mode)
         # After backing
-        main(start=False)
+        main()
 
 if __name__ == '__main__':
     main()

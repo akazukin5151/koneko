@@ -85,7 +85,7 @@ def show_man_loop():
     print(' ' * 3, '=' * 30)
     print(ui.Image.__doc__)
     print(' ' * 3, '=' * 30)
-    print(ui.Users.__doc__)
+    print(ui.AbstractUsers.__doc__)
     print(' ' * 3, '=' * 30)
     print(ui.IllustFollowGallery.__doc__)
     while True:

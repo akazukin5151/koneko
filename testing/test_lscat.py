@@ -8,7 +8,7 @@ import pytest
 sys.path.append('../koneko/koneko')
 sys.path.append('testing')
 
-from koneko import lscat
+from koneko.koneko import lscat
 
 def test_xcoords():
     assert lscat.xcoords(100) == [2, 20, 38, 56, 74]
@@ -34,7 +34,7 @@ def test_show_instant(monkeypatch, capsys):
             self.download_path = Path('testing/files/')
 
     # This config has noprint = False
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
+    monkeypatch.setattr('koneko.koneko.utils.Path.expanduser',
                         lambda x: Path('example_config.ini'))
 
     fakedata = FakeData()

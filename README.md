@@ -133,7 +133,7 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 * Edit the files on your fork/branch
     * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
 * Run tests with `pytest testing/ -vvvv -l -s --icat`
-* Try it with `python koneko/main.py`, or `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
+* Try it with `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
     * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
 * Submit a pull request
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.

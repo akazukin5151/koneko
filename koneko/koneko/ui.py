@@ -8,7 +8,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
+from koneko.koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
                     download)
 
 

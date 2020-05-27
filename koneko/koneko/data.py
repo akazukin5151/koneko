@@ -1,7 +1,7 @@
 """Stores json data from the api. Acts as frontend to access data in a single line.
 Functionally pure, no side effects (but stores state)
 """
-from koneko import KONEKODIR, pure
+from koneko.koneko import KONEKODIR, pure
 
 
 class GalleryJson:

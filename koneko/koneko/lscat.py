@@ -6,8 +6,8 @@ from abc import ABC
 from pixcat import Image
 from blessed import Terminal
 
-from koneko.pure import cd
-from koneko import utils
+from koneko.koneko.pure import cd
+from koneko.koneko import utils
 
 TERM = Terminal()
 

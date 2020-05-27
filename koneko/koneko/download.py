@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import cytoolz
 
-from koneko import api, pure, utils
+from koneko.koneko import api, pure, utils
 
 
 @pure.spinner('')

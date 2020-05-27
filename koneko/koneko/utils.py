@@ -8,7 +8,7 @@ from configparser import ConfigParser
 
 import pixcat
 
-from koneko import KONEKODIR, ui, cli, pure, __version__
+from koneko.koneko import KONEKODIR, ui, cli, pure, __version__
 
 
 def verify_full_download(filepath):

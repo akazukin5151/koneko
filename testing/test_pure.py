@@ -8,7 +8,7 @@ import pytest
 sys.path.append('../koneko/koneko')
 sys.path.append('testing')
 
-from koneko import pure, lscat, utils, data, KONEKODIR
+from koneko.koneko import pure, lscat, utils, data, KONEKODIR
 from page_json import *  # Imports the current_page (dict) stored in disk
 
 page_illusts = page_json["illusts"]

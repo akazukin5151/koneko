@@ -2,7 +2,7 @@
 
 title main.py
 
-abstract class Loop <<(A, red)>>{
+abstract class AbstractLoop <<(A, red)>>{
   +{abstract}start()
 }
 
@@ -12,8 +12,8 @@ class ArtistModeLoop {
 }
 object illust_follow_mode_loop
 
-Loop <|-down- ArtistModeLoop: inherits
-Loop <|-down[hidden]- illust_follow_mode_loop: inherits
+AbstractLoop <|-down- ArtistModeLoop: inherits
+AbstractLoop <|-down[hidden]- illust_follow_mode_loop: inherits
 illust_follow_mode_loop -right[hidden]-> ViewPostModeLoop
 illust_follow_mode_loop -right[hidden]-> ArtistModeLoop
 ViewPostModeLoop -left[hidden]-> ArtistModeLoop
@@ -66,7 +66,7 @@ class ui.Image <<(C, cyan)>>{
     + leave()
 }
 
-Loop <|-down- ViewPostModeLoop: inherits
+AbstractLoop <|-down- ViewPostModeLoop: inherits
 ViewPostModeLoop ..> view_post_mode
 view_post_mode ..> ui.Image
 display_image ..> ui.Image
@@ -81,25 +81,25 @@ class SearchUsersModeLoop {
     + mode
     +start()
 }
-Loop <|-down- FollowingUsersModeLoop: inherits
-Loop <|-down- SearchUsersModeLoop: inherits
+AbstractLoop <|-down- FollowingUsersModeLoop: inherits
+AbstractLoop <|-down- SearchUsersModeLoop: inherits
 
 class ui.FollowingUsers <<(C, cyan)>>
 class ui.SearchUsers <<(C, cyan)>>
-abstract class ui.Users <<(A, red)>>{
+abstract class ui.AbstractUsers <<(A, red)>>{
     +go_artist_mode()
     +next_page()
     +previous_page()
     +reload()
     +start()
 }
-ui.Users <-down- ui.FollowingUsers: inherits
-ui.Users <-down- ui.SearchUsers: inherits
+ui.AbstractUsers <-down- ui.FollowingUsers: inherits
+ui.AbstractUsers <-down- ui.SearchUsers: inherits
 FollowingUsersModeLoop*-down- ui.FollowingUsers: composes mode
 SearchUsersModeLoop*-down- ui.SearchUsers: composes mode
 
 
-abstract class lscat.Tracker <<(A, red)>>{
+abstract class lscat.AbstractTracker <<(A, red)>>{
     + path
     +update()
 }
@@ -112,10 +112,10 @@ class lscat.TrackDownloadsUser {
     + generator
 }
 
-lscat.Tracker <- lscat.TrackDownloadsUser: inherits
-lscat.Tracker <- lscat.TrackDownloads: inherits
+lscat.AbstractTracker <- lscat.TrackDownloadsUser: inherits
+lscat.AbstractTracker <- lscat.TrackDownloads: inherits
 
-ui.Users*.down. lscat.TrackDownloadsUser: composes view
+ui.AbstractUsers*.down. lscat.TrackDownloadsUser: composes view
 ui.AbstractGallery*.up lscat.TrackDownloads: composes view
 
 lscat.TrackDownloadsUser -up[hidden]-> lscat.TrackDownloads
@@ -123,7 +123,7 @@ lscat.TrackDownloadsUser --up[hidden]-> ui.AbstractGallery
 
 package prompt {
     object user_prompt
-    ui.Users <..> user_prompt
+    ui.AbstractUsers <..> user_prompt
 
     object gallery_prompt
     ui.AbstractGallery <.down.> gallery_prompt
@@ -179,7 +179,7 @@ class data.UserJson {
 
 data.GalleryJson *-up- ui.AbstractGallery: composes data
 data.ImageJson *-up- ui.Image: composes data
-data.UserJson *-up- ui.Users: composes data
+data.UserJson *-up- ui.AbstractUsers: composes data
 
 
 class api.APIHandler {
@@ -198,6 +198,6 @@ class api.APIHandler {
     +protected_download()
 }
 
-api.APIHandler -right[hidden]-> ui.Users
+api.APIHandler -right[hidden]-> ui.AbstractUsers
 
 @enduml

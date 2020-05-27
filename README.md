@@ -109,7 +109,13 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ### Version 0.6
 * **Depreciated** legacy lscat (the shell script) and lsix support.
+
+#### Features
 * If there are cached images in the users modes (3 & 4), it will be shown immediately before requesting and parsing.
+* Gallery and User modes (all modes except mode 2) now prefetch the next page in another thread/in the background, freeing up the prompt to respond to user key presses.
+* If the cache dir has images, it will display the images before waiting for login, making it much faster.
+* Improved experience of invalid input: it will no longer reload to main after 2 seconds.
+* Fixed bug in Image mode where the first picture of a multi-picture post prints the current page indicator before the picture is displayed
 
 #### Terminal reliability
 * lscat now calculates params using terminal size
@@ -123,6 +129,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Revamped lscat to use only the generators to display the images, rather than for loops, heavy classes, and fragile inheritance
     * Users view actually got faster, because two yield statements are apparently faster than two nested for loops
     * No significant speed difference for Galley views.
+* Continuous integration tested on linux and macos
 
 
 # FAQ

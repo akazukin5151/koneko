@@ -129,15 +129,15 @@ def test_xcoords():
     assert lscat.xcoords(100) == [2, 20, 38, 56, 74]
 
 def test_icat():
-    assert lscat.icat("testing/04_祝！！！.jpg") == None
+    assert lscat.icat("testing/files/04_祝！！！.jpg") == None
 
 
 # From data.py
-with open('testing/mode1.json', 'r') as json_file:
+with open('testing/files/mode1.json', 'r') as json_file:
     mode1 = json.load(json_file)
-with open('testing/mode2.json', 'r') as json_file:
+with open('testing/files/mode2.json', 'r') as json_file:
     mode2 = json.load(json_file)
-with open('testing/mode3.json', 'r') as json_file:
+with open('testing/files/mode3.json', 'r') as json_file:
     mode3 = json.load(json_file)
 
 
@@ -229,10 +229,10 @@ def turn_off_print(monkeypatch):
     monkeypatch.setattr("builtins.print", lambda *a, **k: "")
 
 def test_verify_full_download():
-    assert utils.verify_full_download("testing/77803142_p0.png") == True
-    assert utils.verify_full_download("testing/not_an_image.txt") == False
+    assert utils.verify_full_download("testing/files/77803142_p0.png") == True
+    assert utils.verify_full_download("testing/files/not_an_image.txt") == False
     # The above code will remove the file
-    os.system("touch testing/not_an_image.txt")
+    os.system("touch testing/files/not_an_image.txt")
 
 @pytest.mark.icat
 def test_begin_prompt(monkeypatch):
@@ -307,7 +307,7 @@ def test_config(monkeypatch):
 
 
     # If config doesn't exist
-    test_cfg_path = Path('testing/test_config.ini')
+    test_cfg_path = Path('testing/files/test_config.ini')
     if test_cfg_path.exists():
         os.system(f'rm {test_cfg_path}')
 
@@ -328,7 +328,7 @@ def test_config(monkeypatch):
 def test_dir_not_empty():
     class FakeData:
         def __init__(self):
-            self.download_path = Path('testing/')
+            self.download_path = Path('testing/files/')
             self.first_img = "04_祝！！！.jpg"
 
     # Assert current dir is not empty
@@ -336,22 +336,22 @@ def test_dir_not_empty():
     assert utils.dir_not_empty(data)
 
     # Dir exists but is empty
-    Path('testing/empty_dir').mkdir()
-    data.download_path = Path('testing/empty_dir')
+    Path('testing/files/empty_dir').mkdir()
+    data.download_path = Path('testing/files/empty_dir')
     assert utils.dir_not_empty(data) is False
 
     # .koneko in dir and first image in dir
-    os.system('touch testing/empty_dir/.koneko')
-    os.system('cp testing/04_祝！！！.jpg testing/empty_dir/')
+    os.system('touch testing/files/empty_dir/.koneko')
+    os.system('cp testing/files/04_祝！！！.jpg testing/files/empty_dir/')
 
     assert utils.dir_not_empty(data)
 
-    os.system('rm -r testing/empty_dir')
+    os.system('rm -r testing/files/empty_dir')
 
     # Throw some errors
     class FakeData:
         def __init__(self):
-            self.download_path = Path('testing/')
+            self.download_path = Path('testing/files/')
 
         @property
         def first_img(self):
@@ -362,7 +362,7 @@ def test_dir_not_empty():
 
     class FakeData:
         def __init__(self):
-            self.download_path = Path('testing/')
+            self.download_path = Path('testing/files/')
 
         @property
         def first_img(self):

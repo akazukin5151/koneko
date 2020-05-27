@@ -16,7 +16,7 @@ def turn_off_print(monkeypatch):
     monkeypatch.setattr("builtins.print", lambda *a, **k: "")
 
 def test_verify_full_download():
-    assert utils.verify_full_download("testing/files/77803142_p0.png") == True
+    assert utils.verify_full_download("testing/files/008_77803142_p0.png") == True
     assert utils.verify_full_download("testing/files/not_an_image.txt") == False
     # The above code will remove the file
     os.system("touch testing/files/not_an_image.txt")
@@ -116,7 +116,7 @@ def test_dir_not_empty():
     class FakeData:
         def __init__(self):
             self.download_path = Path('testing/files/')
-            self.first_img = "04_祝！！！.jpg"
+            self.first_img = "004_祝！！！.jpg"
 
     # Assert current dir is not empty
     data = FakeData()
@@ -129,7 +129,7 @@ def test_dir_not_empty():
 
     # .koneko in dir and first image in dir
     os.system('touch testing/files/empty_dir/.koneko')
-    os.system('cp testing/files/04_祝！！！.jpg testing/files/empty_dir/')
+    os.system('cp testing/files/004_祝！！！.jpg testing/files/empty_dir/')
 
     assert utils.dir_not_empty(data)
 

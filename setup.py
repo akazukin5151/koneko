@@ -28,7 +28,6 @@ setup(
         "Environment :: Console"
     ],
     packages=["koneko"],
-    package_dir = {"": "koneko"},
     include_package_data=True,
     install_requires=[
         "funcy~=1.14",

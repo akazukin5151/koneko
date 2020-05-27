@@ -13,7 +13,7 @@ os.system("cp -r ./pics/ ~/.local/share/koneko/")
 
 setup(
     name="koneko",
-    version="0.6",
+    version="0.6.1",
     description="Browse pixiv in the terminal",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -28,7 +28,6 @@ setup(
         "Environment :: Console"
     ],
     packages=["koneko"],
-    package_dir = {'': 'koneko'},
     include_package_data=True,
     install_requires=[
         "funcy~=1.14",
@@ -43,7 +42,7 @@ setup(
     extras_requires = ["pytest~=5.4"],
     entry_points={
         "console_scripts": [
-            "koneko=main:main",
+            "koneko=koneko.main:main",
         ]
     },
 )

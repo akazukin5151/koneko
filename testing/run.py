@@ -2,7 +2,7 @@
 import os
 
 os.system("pip install .")
-os.chdir('~')
+os.system("cd ~")
 try:
     os.system("koneko")
 except EOFError:

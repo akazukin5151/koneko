@@ -43,4 +43,9 @@ jobs:
     - name: Test with pytest
       run: |
         pytest testing/ -vvvv -l -s
+    - name: Try launching the application
+      run: |
+        pip install .
+        cd ~
+        koneko
 

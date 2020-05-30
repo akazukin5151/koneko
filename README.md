@@ -95,7 +95,6 @@ For more details refer to the [manual](#manual).
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Terminal reliability
-* Allow user to specify image height/width, row spacing, page spacing, padding, thumbnail size
 * Option to use pillow or wand to edit numbers on pics
 * Support [ueberzug](https://github.com/seebye/ueberzug)
 

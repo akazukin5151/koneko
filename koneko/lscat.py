@@ -52,6 +52,20 @@ def ycoords_config():
     paddingy = settings.getint('images_y_spacing', fallback=1)
     return ycoords(TERM.height, img_height, paddingy)
 
+def page_spacing_config(fallback):
+    settings = utils.get_config_section('lscat')
+    return settings.getint('gallery_page_spacing', fallback=fallback)
+
+def thumbnail_size_config():
+    settings = utils.get_config_section('lscat')
+    return settings.getint('image_thumbnail_size', fallback=310)
+
+def get_gen_users_settings():
+    settings = utils.get_config_section('lscat')
+    message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
+    padding = settings.getint('images_x_spacing', fallback=2)
+    return message_xcoord, padding
+
 
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
@@ -153,9 +167,8 @@ def generate_page(path):
     number_of_cols = ncols_config()
 
     # Does not catch if config doesn't exist, because it must exist
-    settings = utils.get_config_section('lscat')
-    page_spacing = settings.getint('gallery_page_spacing', fallback=23)
-    thumbnail_size = settings.getint('image_thumbnail_size', fallback=310)
+    page_spacing = page_spacing_config(23)
+    thumbnail_size = thumbnail_size_config()
 
     while True:
         # Release control. When _inspect() sends another image,
@@ -178,11 +191,9 @@ def generate_users(path, noprint=False):
     preview_xcoords = xcoords_config(offset=1)[-3:]
     os.system('clear')
 
-    settings = utils.get_config_section('lscat')
-    message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
-    page_spacing = settings.getint('users_page_spacing', fallback=20)
-    thumbnail_size = settings.getint('image_thumbnail_size', fallback=310)
-    padding = settings.getint('images_x_spacing', fallback=2)
+    message_xcoord, padding = get_gen_users_settings()
+    page_spacing = page_spacing_config(20)
+    thumbnail_size = thumbnail_size_config()
 
     while True:
         # Wait for artist pic
@@ -263,8 +274,7 @@ def generate_previews(path):
     left_shifts = xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
 
-    settings = utils.get_config_section('lscat')
-    thumbnail_size = settings.getint('image_thumbnail_size', fallback=310)
+    thumbnail_size = thumbnail_size_config()
 
     i = 0
     while True:

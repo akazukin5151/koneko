@@ -11,7 +11,7 @@ sys.path.append('testing')
 
 from koneko import utils
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def turn_off_print(monkeypatch):
     monkeypatch.setattr("builtins.print", lambda *a, **k: "")
 
@@ -25,37 +25,6 @@ def test_verify_full_download():
     assert utils.verify_full_download("testing/files/not_an_image.txt") == False
     # The above code will remove the file
     os.system("touch testing/files/not_an_image.txt")
-
-def test_begin_prompt(monkeypatch):
-    # pixcat.Image now won't bother us with AttributeErrors and do nothing
-    monkeypatch.setattr("koneko.utils.pixcat.Image", lambda *a, **k: Mock())
-    # Send a "1" as input
-    monkeypatch.setattr("builtins.input", lambda x: "1")
-    returned = utils.begin_prompt()
-    assert returned == "1"
-
-def test_artist_user_id_prompt(monkeypatch):
-    monkeypatch.setattr("builtins.input",
-                        lambda x: "https://www.pixiv.net/en/users/2232374")
-    myinput = utils.artist_user_id_prompt()
-    assert myinput == "https://www.pixiv.net/en/users/2232374"
-
-def test_show_man_loop(monkeypatch, turn_off_print):
-    monkeypatch.setattr("koneko.utils.pixcat.Image", lambda *a, **k: Mock())
-    monkeypatch.setattr("builtins.input", lambda x: "")
-    utils.show_man_loop()
-
-def test_clear_cache_loop(monkeypatch, turn_off_print):
-    monkeypatch.setattr("shutil.rmtree", lambda x: "")
-    monkeypatch.setattr("builtins.input", lambda x: "y")
-    utils.clear_cache_loop()
-    monkeypatch.setattr("builtins.input", lambda x: "n")
-    utils.clear_cache_loop()
-
-def test_info_screen_loop(monkeypatch):
-    monkeypatch.setattr("koneko.utils.pixcat.Image", lambda *a, **k: Mock())
-    monkeypatch.setattr("builtins.input", lambda x: "")
-    utils.info_screen_loop()
 
 def test_check_noprint(monkeypatch, use_example_cfg):
     # noprint is off in example config

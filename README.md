@@ -138,7 +138,7 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 * Fork it
 * Edit the files on your fork/branch
     * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
-* Run tests with `pytest testing/ -vvvv -l -s --icat`
+* Run tests with `pytest testing/ -vvvv -l -s`
 * Try it with `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
     * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
 * Submit a pull request
@@ -217,7 +217,7 @@ git clone -b master https://github.com/twenty5151/koneko.git
 git clone -b dev https://github.com/twenty5151/koneko.git
 
 # Run the tests (for those who want to edit)
-pytest testing/ -vvvv -l -s --icat
+pytest testing/ -vvvv -l -s 
 
 cd koneko
 # Manually install without PyPI; for general usage
@@ -237,7 +237,7 @@ koneko
 ```
 
 ## Unit tests
-Run `pytest testing/ -vvvv -l -s --icat`. If icat fails, skip the three offending tests by omitting the `--icat` argument
+Run `pytest testing/ -vvvv -l -s`
 
 ## Build and upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)

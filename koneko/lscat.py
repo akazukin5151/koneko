@@ -34,17 +34,18 @@ def ycoords(term_height, img_height=8, padding=1):
     return [row * (img_height + padding)
             for row in range(number_of_rows)]
 
-def ncols_config():
+
+def _width_paddingx():
     settings = utils.get_config_section('lscat')
     img_width = settings.getint('image_width', fallback=18)
     paddingx = settings.getint('images_x_spacing', fallback=2)
-    return ncols(TERM.width, img_width, paddingx)
+    return img_width, paddingx
+
+def ncols_config():
+    return ncols(TERM.width, *_width_paddingx())
 
 def xcoords_config(offset=0):
-    settings = utils.get_config_section('lscat')
-    img_width = settings.getint('image_width', fallback=18)
-    paddingx = settings.getint('images_x_spacing', fallback=2)
-    return xcoords(TERM.width, img_width, paddingx, offset)
+    return xcoords(TERM.width, *_width_paddingx(), offset)
 
 def ycoords_config():
     settings = utils.get_config_section('lscat')

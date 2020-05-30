@@ -115,12 +115,13 @@ def test_config(monkeypatch):
     responses = iter(['myusername', 'y', 'myid'])
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
     monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
+    monkeypatch.setattr('koneko.utils.os.system',
+                        lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
 
     creds, your_id = utils.config()
     assert your_id == 'myid'
     assert type(creds) is configparser.SectionProxy
 
-    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
     try:
         assert utils.get_settings('Credentials', 'username') == 'myusername'
         assert utils.get_settings('Credentials', 'password') == 'mypassword'

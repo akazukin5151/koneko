@@ -34,37 +34,41 @@ def ycoords(term_height, img_height=8, padding=1):
     return [row * (img_height + padding)
             for row in range(number_of_rows)]
 
-def ncols_config():
-    settings = utils.get_config_section('lscat')
-    img_width = settings.getint('image_width', fallback=18)
-    paddingx = settings.getint('images_x_spacing', fallback=2)
-    return ncols(TERM.width, img_width, paddingx)
+class Config:
+    def __init__(self):
+        self.settings = utils.get_config_section('lscat')
 
-def xcoords_config(offset=0):
-    settings = utils.get_config_section('lscat')
-    img_width = settings.getint('image_width', fallback=18)
-    paddingx = settings.getint('images_x_spacing', fallback=2)
-    return xcoords(TERM.width, img_width, paddingx, offset)
+    def _width_paddingx(self):
+        img_width = self.settings.getint('image_width', fallback=18)
+        paddingx = self.settings.getint('images_x_spacing', fallback=2)
+        return img_width, paddingx
 
-def ycoords_config():
-    settings = utils.get_config_section('lscat')
-    img_height = settings.getint('image_height', fallback=8)
-    paddingy = settings.getint('images_y_spacing', fallback=1)
-    return ycoords(TERM.height, img_height, paddingy)
+    def ncols(self):
+        return ncols(TERM.width, *self._width_paddingx())
 
-def page_spacing_config(fallback):
-    settings = utils.get_config_section('lscat')
-    return settings.getint('gallery_page_spacing', fallback=fallback)
+    def xcoords(self, offset=0):
+        return xcoords(TERM.width, *self._width_paddingx(), offset)
 
-def thumbnail_size_config():
-    settings = utils.get_config_section('lscat')
-    return settings.getint('image_thumbnail_size', fallback=310)
+    def ycoords(self):
+        img_height = self.settings.getint('image_height', fallback=8)
+        paddingy = self.settings.getint('images_y_spacing', fallback=1)
+        return ycoords(TERM.height, img_height, paddingy)
 
-def get_gen_users_settings():
-    settings = utils.get_config_section('lscat')
-    message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
-    padding = settings.getint('images_x_spacing', fallback=2)
-    return message_xcoord, padding
+    def gallery_page_spacing(self):
+        return self.settings.getint('gallery_page_spacing', fallback=23)
+
+    def users_page_spacing(self):
+        return self.settings.getint('users_page_spacing', fallback=20)
+
+    def thumbnail_size(self):
+        return self.settings.getint('image_thumbnail_size', fallback=310)
+
+    def users_settings(self):
+        message_xcoord = self.settings.getint('cards_print_name_xcoord', fallback=18)
+        padding = self.settings.getint('images_x_spacing', fallback=2)
+        return message_xcoord, padding
+
+cfg = Config()
 
 
 def icat(args):
@@ -79,7 +83,7 @@ def show_instant(cls, data, check_noprint=False):
          if not x.startswith('.')]
 
     if check_noprint and not utils.check_noprint():
-        number_of_cols = ncols_config()
+        number_of_cols = cfg.ncols()
 
         spacing = utils.get_settings('lscat', 'gallery_print_spacing')
         if spacing:
@@ -162,13 +166,13 @@ class TrackDownloadsUsers(AbstractTracker):
 
 def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
-    left_shifts = xcoords_config()
-    rowspaces = ycoords_config()
-    number_of_cols = ncols_config()
+    left_shifts = cfg.xcoords()
+    rowspaces = cfg.ycoords()
+    number_of_cols = cfg.ncols()
 
     # Does not catch if config doesn't exist, because it must exist
-    page_spacing = page_spacing_config(23)
-    thumbnail_size = thumbnail_size_config()
+    page_spacing = cfg.gallery_page_spacing()
+    thumbnail_size = cfg.thumbnail_size()
 
     while True:
         # Release control. When _inspect() sends another image,
@@ -188,12 +192,12 @@ def generate_page(path):
             )
 
 def generate_users(path, noprint=False):
-    preview_xcoords = xcoords_config(offset=1)[-3:]
+    preview_xcoords = cfg.xcoords(offset=1)[-3:]
     os.system('clear')
 
-    message_xcoord, padding = get_gen_users_settings()
-    page_spacing = page_spacing_config(20)
-    thumbnail_size = thumbnail_size_config()
+    message_xcoord, padding = cfg.users_settings()
+    page_spacing = cfg.users_page_spacing()
+    thumbnail_size = cfg.thumbnail_size()
 
     while True:
         # Wait for artist pic
@@ -270,11 +274,11 @@ class TrackDownloadsImage(AbstractTracker):
 
 def generate_previews(path):
     """Experimental"""
-    rowspaces = ycoords_config()
-    left_shifts = xcoords_config()
+    rowspaces = cfg.ycoords()
+    left_shifts = cfg.xcoords()
     _xcoords = (left_shifts[0], left_shifts[-1])
 
-    thumbnail_size = thumbnail_size_config()
+    thumbnail_size = cfg.thumbnail_size()
 
     i = 0
     while True:

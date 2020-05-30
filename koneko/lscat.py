@@ -126,6 +126,9 @@ def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
     left_shifts = xcoords(TERM.width)
     rowspaces = ycoords(TERM.height)
+    settings = utils.get_config_section('lscat')
+    page_spacing = settings.getint('gallery_page_spacing', fallback=23)
+
     while True:
         # Release control. When _inspect() sends another image,
         # assign to the variables and display it again
@@ -136,8 +139,7 @@ def generate_page(path):
         y = number // 5
 
         if number % 10 == 0 and number != 0:
-            # Magic
-            print('\n' * 23)
+            print('\n' * page_spacing)
 
         with cd(path):
             # Magic
@@ -150,6 +152,7 @@ def generate_users(path, noprint=False):
     os.system('clear')
     settings = utils.get_config_section('lscat')
     message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
+    page_spacing = settings.getint('users_page_spacing', fallback=20)
 
     while True:
         # Wait for artist pic
@@ -158,11 +161,10 @@ def generate_users(path, noprint=False):
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
-        # Magic
         if not noprint:
             # Print the message (artist name)
             print(' ' * message_xcoord, message)
-        print('\n' * 20)  # Scroll to new 'page'
+        print('\n' * page_spacing)  # Scroll to new 'page'
 
         with cd(path):
             # Display artist profile pic

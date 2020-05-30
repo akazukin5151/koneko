@@ -59,28 +59,28 @@ def test_info_screen_loop(monkeypatch):
 def test_check_noprint(monkeypatch):
     # noprint is off in example config
     monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('example_config.ini'))
+                        lambda x: Path('testing/test_config.ini'))
 
     assert utils.check_noprint() == False
 
     cfg = configparser.ConfigParser()
-    cfg.read('example_config.ini')
+    cfg.read('testing/test_config.ini')
 
     for setting in ('1', 'yes', 'true', 'on'):
         cfg.set('misc', 'noprint', setting)
-        with open('example_config.ini', 'w') as f:
+        with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
         assert utils.check_noprint() == True
 
     for setting in ('off', 'no', 'asdf'):
         cfg.set('misc', 'noprint', setting)
-        with open('example_config.ini', 'w') as f:
+        with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
         assert utils.check_noprint() == False
 
     # Restore default
     cfg.set('misc', 'noprint', 'off')
-    with open('example_config.ini', 'w') as f:
+    with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
 
 def test_noprint(capsys):
@@ -91,7 +91,7 @@ def test_noprint(capsys):
 def test_get_settings(monkeypatch):
     # Redivert the config path
     monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('example_config.ini'))
+                        lambda x: Path('testing/test_config.ini'))
 
     assert utils.get_settings('Credentials', 'username') == 'koneko'
     assert utils.get_settings('Credentials', 'password') == 'mypassword'
@@ -101,7 +101,7 @@ def test_get_settings(monkeypatch):
 
 def test_config(monkeypatch):
     # If config exists
-    example_path = Path('example_config.ini')
+    example_path = Path('testing/test_config.ini')
     monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: example_path)
 
     creds, your_id = utils.config()

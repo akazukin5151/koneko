@@ -18,7 +18,7 @@ def test_ycoords():
 def test_icat():
     assert lscat.icat("testing/files/04_祝！！！.jpg") == None
 
-def test_show_instant(monkeypatch, capsys):
+def test_show_instant(monkeypatch):
     showed = []
 
     class FakeTracker:
@@ -34,7 +34,7 @@ def test_show_instant(monkeypatch, capsys):
 
     # This config has noprint = False
     monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('example_config.ini'))
+                        lambda x: Path('testing/test_config.ini'))
 
     fakedata = FakeData()
     lscat.show_instant(FakeTracker, fakedata, True)
@@ -48,8 +48,6 @@ def test_show_instant(monkeypatch, capsys):
         'mode1.json', 'not_an_image.txt', '008_77803142_p0.png',
         '017_ミコニャン.jpg', 'mode2.json'
     ])
-    captured = capsys.readouterr()
-    assert captured.out == '         1                 2                 3                 4                 5\n\n'
 
 
 def test_generate_orders():
@@ -59,7 +57,7 @@ def test_generate_orders():
 def test_TrackDownloads(monkeypatch):
     """Just running it to make sure it doesn't crash"""
     monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('example_config.ini'))
+                        lambda x: Path('testing/test_config.ini'))
 
     class FakeData:
         def __init__(self):
@@ -83,7 +81,7 @@ def test_TrackDownloads(monkeypatch):
 def test_TrackDownloadsUser(monkeypatch):
     """Just running it to make sure it doesn't crash"""
     monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('example_config.ini'))
+                        lambda x: Path('testing/test_config.ini'))
 
     class FakeData:
         def __init__(self):

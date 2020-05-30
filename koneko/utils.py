@@ -1,6 +1,7 @@
 import os
 import imghdr
 import itertools
+import threading
 from getpass import getpass
 from pathlib import Path
 from contextlib import contextmanager
@@ -72,6 +73,7 @@ def dir_not_empty(data):
     return False
 
 
+# If config functions get longer/more, consider moving them to a seperate module
 def config():
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()

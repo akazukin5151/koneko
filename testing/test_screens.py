@@ -3,10 +3,11 @@ from unittest.mock import Mock
 
 import pytest
 
+from koneko import screens
+
 # Lmao python
 sys.path.append('testing')
 
-from koneko import screens
 
 def test_begin_prompt(monkeypatch):
     # pixcat.Image now won't bother us with AttributeErrors and do nothing

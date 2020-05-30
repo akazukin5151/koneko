@@ -4,10 +4,11 @@ from pathlib import Path
 
 import pytest
 
+from koneko import lscat
+
 # Lmao python
 sys.path.append('testing')
 
-from koneko import lscat
 
 def test_xcoords():
     assert lscat.xcoords(100) == [2, 20, 38, 56, 74]

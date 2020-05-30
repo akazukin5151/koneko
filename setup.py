@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from setuptools import setup
 
 # The directory containing this file
@@ -47,4 +48,3 @@ setup(
         ]
     },
 )
-

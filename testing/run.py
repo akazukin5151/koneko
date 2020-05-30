@@ -8,6 +8,7 @@ hang forever. So this is only for github actions, not for you
 
 import os
 
+
 def test_launch():
     curdir = os.getcwd()
     os.system("cd ~")

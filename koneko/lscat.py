@@ -6,8 +6,8 @@ from abc import ABC
 from pixcat import Image
 from blessed import Terminal
 
-from koneko.pure import cd
 from koneko import utils
+from koneko.pure import cd
 
 TERM = Terminal()
 
@@ -309,4 +309,3 @@ if __name__ == '__main__':
     # For Users, make sure it has a .koneko file
     #show_instant(TrackDownloadsUsers, data)
     show_instant(TrackDownloads, data)
-

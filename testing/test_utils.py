@@ -1,15 +1,16 @@
 import os
 import sys
-from pathlib import Path
 import configparser
+from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
 
+from koneko import utils
+
 # Lmao python
 sys.path.append('testing')
 
-from koneko import utils
 
 @pytest.fixture(scope='module')
 def turn_off_print(monkeypatch):

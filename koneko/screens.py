@@ -4,7 +4,7 @@ from subprocess import check_output
 
 import pixcat
 
-from koneko import KONEKODIR, __version__, pure, cli, ui
+from koneko import KONEKODIR, ui, cli, pure, __version__
 
 
 def begin_prompt(printmessage=True):

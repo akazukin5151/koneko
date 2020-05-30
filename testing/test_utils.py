@@ -25,13 +25,12 @@ def test_verify_full_download():
     # The above code will remove the file
     os.system("touch testing/files/not_an_image.txt")
 
-@pytest.mark.icat
 def test_begin_prompt(monkeypatch):
     # Send a "1" as input
+    monkeypatch.setattr("koneko.utils.pixcat.Image.show", lambda *a, **k: "")
     monkeypatch.setattr("builtins.input", lambda x: "1")
     returned = utils.begin_prompt()
     assert returned == "1"
-    os.system("kitty +kitten icat --clear")
 
 def test_artist_user_id_prompt(monkeypatch):
     monkeypatch.setattr("builtins.input",
@@ -39,11 +38,10 @@ def test_artist_user_id_prompt(monkeypatch):
     myinput = utils.artist_user_id_prompt()
     assert myinput == "https://www.pixiv.net/en/users/2232374"
 
-@pytest.mark.icat
 def test_show_man_loop(monkeypatch, turn_off_print):
+    monkeypatch.setattr("koneko.utils.pixcat.Image.show", lambda *a, **k: "")
     monkeypatch.setattr("builtins.input", lambda x: "")
     utils.show_man_loop()
-    os.system("kitty +kitten icat --clear")
 
 def test_clear_cache_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("shutil.rmtree", lambda x: "")
@@ -52,11 +50,10 @@ def test_clear_cache_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("builtins.input", lambda x: "n")
     utils.clear_cache_loop()
 
-@pytest.mark.icat
 def test_info_screen_loop(monkeypatch):
+    monkeypatch.setattr("koneko.utils.pixcat.Image.show", lambda *a, **k: "")
     monkeypatch.setattr("builtins.input", lambda x: "")
     utils.info_screen_loop()
-    os.system("kitty +kitten icat --clear")
 
 def test_check_noprint(monkeypatch, use_example_cfg):
     # noprint is off in example config
@@ -115,6 +112,7 @@ def test_config(monkeypatch):
     responses = iter(['myusername', 'y', 'myid'])
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
     monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
+    # fix for macOS
     monkeypatch.setattr('koneko.utils.os.system',
                         lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
 

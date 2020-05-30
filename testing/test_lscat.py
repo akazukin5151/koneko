@@ -49,7 +49,7 @@ def test_show_instant(monkeypatch, capsys):
         '017_ミコニャン.jpg', 'mode2.json'
     ])
     captured = capsys.readouterr()
-    assert captured.out == '         1                 2                 3                 4                 5 \n\n'
+    assert captured.out == '         1                 2                 3                 4                 5\n\n'
 
 
 def test_generate_orders():

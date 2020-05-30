@@ -80,7 +80,7 @@ def test_get_settings(monkeypatch):
                         lambda x: Path('example_config.ini'))
 
     assert utils.get_settings('Credentials', 'username') == 'koneko'
-    assert utils.get_settings('Credentials', 'password') == '1234'
+    assert utils.get_settings('Credentials', 'password') == 'mypassword'
     assert utils.get_settings('Credentials', 'ID') == '1234'
     assert utils.get_settings('experimental', 'image_mode_previews') == 'off'
     assert utils.get_settings('misc', 'noprint') == 'off'

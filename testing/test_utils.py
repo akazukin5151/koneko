@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 import configparser
+from unittest.mock import Mock
 
 import pytest
 
@@ -26,8 +27,9 @@ def test_verify_full_download():
     os.system("touch testing/files/not_an_image.txt")
 
 def test_begin_prompt(monkeypatch):
+    # pixcat.Image now won't bother us with AttributeErrors and do nothing
+    monkeypatch.setattr("koneko.utils.pixcat.Image", lambda *a, **k: Mock())
     # Send a "1" as input
-    monkeypatch.setattr("koneko.utils.pixcat.Image.show", lambda *a, **k: "")
     monkeypatch.setattr("builtins.input", lambda x: "1")
     returned = utils.begin_prompt()
     assert returned == "1"
@@ -39,7 +41,7 @@ def test_artist_user_id_prompt(monkeypatch):
     assert myinput == "https://www.pixiv.net/en/users/2232374"
 
 def test_show_man_loop(monkeypatch, turn_off_print):
-    monkeypatch.setattr("koneko.utils.pixcat.Image.show", lambda *a, **k: "")
+    monkeypatch.setattr("koneko.utils.pixcat.Image", lambda *a, **k: Mock())
     monkeypatch.setattr("builtins.input", lambda x: "")
     utils.show_man_loop()
 
@@ -51,7 +53,7 @@ def test_clear_cache_loop(monkeypatch, turn_off_print):
     utils.clear_cache_loop()
 
 def test_info_screen_loop(monkeypatch):
-    monkeypatch.setattr("koneko.utils.pixcat.Image.show", lambda *a, **k: "")
+    monkeypatch.setattr("koneko.utils.pixcat.Image", lambda *a, **k: Mock())
     monkeypatch.setattr("builtins.input", lambda x: "")
     utils.info_screen_loop()
 

@@ -198,10 +198,10 @@ def generate_orders(total_pics, artists_count):
 
 class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, data):
+        super().__init__(data)
         self.orders = list(range(1,30))
-        self.generator = generate_previews(path)
+        self.generator = generate_previews(data.download_path)
         self.generator.send(None)
 
     def _inspect(self):

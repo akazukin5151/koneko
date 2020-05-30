@@ -369,15 +369,15 @@ def display_image(post_json, artist_user_id, number_prefix, data):
 
     url = pure.url_given_size(post_json, 'large')
     filename = pure.split_backslash_last(url)
-    large_dir = (KONEKODIR / str(artist_user_id) / "individual" /
+    download_path = (KONEKODIR / str(artist_user_id) / "individual" /
                  str(data.image_id(number_prefix)))
-    download.download_core(large_dir, url, filename)
+    download.download_core(download_path, url, filename)
 
     # BLOCKING: imput is blocking, will not display large image until input
     # received
 
     os.system('clear')
-    arg = large_dir / filename
+    arg = download_path / filename
     lscat.icat(arg)
 
 def view_post_mode(image_id):
@@ -401,13 +401,13 @@ def view_post_mode(image_id):
 
     idata = data.ImageJson(post_json, image_id)
 
-    download.download_core(idata.large_dir, idata.url, idata.filename)
-    lscat.icat(idata.large_dir / idata.filename)
+    download.download_core(idata.download_path, idata.url, idata.filename)
+    lscat.icat(idata.download_path / idata.filename)
     print(f'Page 1/{idata.number_of_pages}')
 
     image = Image(image_id, idata, True)
 
-    experimental = utils.get_settings('misc', 'experimental')
+    experimental = utils.get_settings('experimental', 'image_mode_previews')
     if experimental == 'on':
         event = threading.Event()
         thread = threading.Thread(target=image.preview)
@@ -440,15 +440,15 @@ class Image:
         if self.data.number_of_pages == 1:
             return True
 
-        tracker = lscat.TrackDownloadsImage(self.data.large_dir)
+        tracker = lscat.TrackDownloadsImage(self.data)
         slicestart = self.data.page_num
         while not self.event.is_set() and slicestart <= 4:
             img = self.data.page_urls[slicestart:slicestart+1]
 
-            if os.path.isfile(self.data.large_dir / pure.split_backslash_last(img[0])):
+            if os.path.isfile(self.data.download_path / pure.split_backslash_last(img[0])):
                 tracker.update(pure.split_backslash_last(img[0]))
             else:
-                download.async_download_core(self.data.large_dir, img, tracker=tracker)
+                download.async_download_core(self.data.download_path, img, tracker=tracker)
 
             slicestart += 1
 
@@ -473,8 +473,8 @@ class Image:
     def show_full_res(self):
         large_url = pure.change_url_to_full(url=self.data.current_url)
         filename = pure.split_backslash_last(large_url)
-        download.download_core(self.data.large_dir, large_url, filename)
-        lscat.icat(self.data.large_dir / filename)
+        download.download_core(self.data.download_path, large_url, filename)
+        lscat.icat(self.data.download_path / filename)
 
     def next_image(self):
         if not self.data.page_urls:
@@ -498,7 +498,7 @@ class Image:
 
         # First time from gallery; download next image
         if self.data.page_num == 1:
-            download.async_download_spinner(self.data.large_dir,
+            download.async_download_spinner(self.data.download_path,
                                             [self.data.current_url])
 
         lscat.icat(self.data.filepath)
@@ -512,7 +512,7 @@ class Image:
             self.data.downloaded_images.append(
                 pure.split_backslash_last(next_img_url)
             )
-            download.async_download_spinner(self.data.large_dir, [next_img_url])
+            download.async_download_spinner(self.data.download_path, [next_img_url])
 
         print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
 
@@ -526,7 +526,7 @@ class Image:
 
         self.data.page_num -= 1
 
-        testpath = self.data.large_dir / Path(self.data.image_filename)
+        testpath = self.data.download_path / Path(self.data.image_filename)
         if testpath.is_file():
             lscat.icat(testpath)
         else:

@@ -82,7 +82,7 @@ def test_get_settings(monkeypatch):
     assert utils.get_settings('Credentials', 'username') == 'koneko'
     assert utils.get_settings('Credentials', 'password') == '1234'
     assert utils.get_settings('Credentials', 'ID') == '1234'
-    assert utils.get_settings('misc', 'experimental') == 'off'
+    assert utils.get_settings('experimental', 'image_mode_previews') == 'off'
     assert utils.get_settings('misc', 'noprint') == 'off'
 
 def test_config(monkeypatch):

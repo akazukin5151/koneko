@@ -184,7 +184,7 @@ def config():
 
     return credentials, your_id
 
-def get_settings(section, setting):
+def get_config_section(section: str):
     config_object = ConfigParser()
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     if not config_path.exists():
@@ -192,8 +192,13 @@ def get_settings(section, setting):
 
     config_object.read(config_path)
     section = config_object[section]
-    result = section.get(setting, None)
-    return result
+    return section
+
+def get_settings(section: str, setting: str):
+    cfgsection = get_config_section(section)
+    if not cfgsection:
+        return False
+    return cfgsection.get(setting, None)
 
 def check_noprint():
     noprint = get_settings('misc', 'noprint')

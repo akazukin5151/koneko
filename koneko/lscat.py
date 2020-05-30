@@ -45,9 +45,14 @@ def show_instant(cls, data, check_noprint=False):
          for x in os.listdir(data.download_path)
          if not x.startswith('.')]
 
-    # Magic
     if check_noprint and not utils.check_noprint():
-        print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
+        spacing = utils.get_settings('lscat', 'gallery_print_spacing').split(',')
+        # TODO: check for num of columns
+        # TODO: provide a fallback
+        for (idx, space) in enumerate(spacing):
+            print(' ' * int(space), end='')
+            print(idx+1, end='')
+        print('\n')
 
 
 class AbstractTracker(ABC):
@@ -143,19 +148,20 @@ def generate_page(path):
 def generate_users(path, noprint=False):
     preview_xcoords = xcoords(TERM.width, offset=1)[-3:]
     os.system('clear')
+    settings = utils.get_config_section('lscat')
+    message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
 
     while True:
         # Wait for artist pic
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
-        # Magic
-        message = ''.join([number, '\n', ' ' * 18, artist_name])
+        message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
         # Magic
         if not noprint:
             # Print the message (artist name)
-            print(' ' * 18, message)
+            print(' ' * message_xcoord, message)
         print('\n' * 20)  # Scroll to new 'page'
 
         with cd(path):

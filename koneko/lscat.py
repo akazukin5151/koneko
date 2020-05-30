@@ -160,6 +160,7 @@ def generate_users(path, noprint=False):
     message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
     page_spacing = settings.getint('users_page_spacing', fallback=20)
     thumbnail_size = settings.getint('image_thumbnail_size', fallback=310)
+    padding = settings.getint('images_x_spacing', fallback=2)
 
     while True:
         # Wait for artist pic
@@ -175,8 +176,7 @@ def generate_users(path, noprint=False):
 
         with cd(path):
             # Display artist profile pic
-            # Magic
-            Image(a_img).thumbnail(thumbnail_size).show(align='left', x=2, y=0)
+            Image(a_img).thumbnail(thumbnail_size).show(align='left', x=padding, y=0)
 
             # Display the three previews
             i = 0                   # Always resets for every artist

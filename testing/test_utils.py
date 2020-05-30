@@ -120,11 +120,12 @@ def test_config(monkeypatch):
     assert your_id == 'myid'
     assert type(creds) is configparser.SectionProxy
 
+    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
     try:
         assert utils.get_settings('Credentials', 'username') == 'myusername'
         assert utils.get_settings('Credentials', 'password') == 'mypassword'
     except configparser.DuplicateSectionError:
-        os.system('cat testing/test_config.ini')
+        os.system(f'cat {test_cfg_path}')
 
 
 def test_dir_not_empty():

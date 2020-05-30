@@ -27,4 +27,4 @@ cmds = (
 for cmd in cmds:
     os.system(cmd)
     test_launch()
-    os.system('pip uninstall koneko')
+    os.system('pip uninstall koneko -y')

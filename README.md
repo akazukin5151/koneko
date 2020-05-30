@@ -90,6 +90,7 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
+* I wonder what happens if you enter invalid credentials
 * Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 

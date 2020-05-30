@@ -96,11 +96,8 @@ def test_config(monkeypatch):
     assert your_id == 'myid'
     assert type(creds) is configparser.SectionProxy
 
-    try:
-        assert utils.get_settings('Credentials', 'username') == 'myusername'
-        assert utils.get_settings('Credentials', 'password') == 'mypassword'
-    except configparser.DuplicateSectionError:
-        os.system(f'cat {test_cfg_path}')
+    assert utils.get_settings('Credentials', 'username') == 'myusername'
+    assert utils.get_settings('Credentials', 'password') == 'mypassword'
 
 
 def test_dir_not_empty():

@@ -12,9 +12,13 @@ from koneko import utils
 sys.path.append('testing')
 
 
-@pytest.fixture(scope='module')
-def turn_off_print(monkeypatch):
-    monkeypatch.setattr("builtins.print", lambda *a, **k: "")
+def test_cd():
+    current_dir = os.getcwd()
+    with utils.cd(current_dir):
+        testdir = os.getcwd()
+
+    assert testdir == os.getcwd()
+    assert os.getcwd() == current_dir
 
 @pytest.fixture
 def use_example_cfg(monkeypatch):

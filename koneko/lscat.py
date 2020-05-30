@@ -7,7 +7,6 @@ from pixcat import Image
 from blessed import Terminal
 
 from koneko import utils
-from koneko.pure import cd
 
 TERM = Terminal()
 
@@ -149,7 +148,7 @@ class TrackDownloadsUsers(AbstractTracker):
         try:
             splitpoint = data.splitpoint
         except AttributeError:
-            with cd(data.download_path):
+            with utils.cd(data.download_path):
                 with open('.koneko', 'r') as f:
                     splitpoint = int(f.read())
 
@@ -183,7 +182,7 @@ def generate_page(path):
         if number % 10 == 0 and number != 0:
             print('\n' * page_spacing)
 
-        with cd(path):
+        with utils.cd(path):
             Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
@@ -208,7 +207,7 @@ def generate_users(path, noprint=False):
             print(' ' * message_xcoord, message)
         print('\n' * page_spacing)  # Scroll to new 'page'
 
-        with cd(path):
+        with utils.cd(path):
             # Display artist profile pic
             Image(a_img).thumbnail(thumbnail_size).show(align='left', x=padding, y=0)
 
@@ -291,7 +290,7 @@ def generate_previews(path):
         else:
             x = 1
 
-        with cd(path):
+        with utils.cd(path):
             Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=_xcoords[x], y=rowspaces[y]
             )

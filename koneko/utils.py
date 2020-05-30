@@ -1,9 +1,53 @@
 import os
 import imghdr
+import itertools
 from getpass import getpass
 from pathlib import Path
+from contextlib import contextmanager
 from configparser import ConfigParser
 
+import funcy
+
+
+@contextmanager
+def cd(newdir):
+    """
+    Change current script directory, do something, change back to old directory
+    See https://stackoverflow.com/questions/431684/how-do-i-change-the-working-directory-in-python/24176022#24176022
+
+    Parameters
+    ----------
+    newdir : str
+        New directory to cd into inside 'with'
+    """
+    prevdir = os.getcwd()
+    os.chdir(os.path.expanduser(newdir))
+    try:
+        yield
+    finally:
+        os.chdir(prevdir)
+
+
+def _spin(done, message):
+    for char in itertools.cycle('|/-\\'):  # Infinite loop
+        print(message, char, flush=True, end='\r')
+        if done.wait(0.1):
+            break
+    print(' ' * len(char), end='\r')  # clears the spinner
+
+
+@funcy.decorator
+def spinner(call, message=''):
+    """
+    See http://hackflow.com/blog/2013/11/03/painless-decorators/
+    """
+    done = threading.Event()
+    spinner_thread = threading.Thread(target=_spin, args=(done, message))
+    spinner_thread.start()
+    result = call()  # Run the wrapped function
+    done.set()
+    spinner_thread.join()
+    return result
 
 def verify_full_download(filepath):
     verified = imghdr.what(filepath)

@@ -13,17 +13,6 @@ sys.path.append('testing')
 
 page_illusts = page_json["illusts"]
 
-
-# From pure.py
-def test_cd():
-    current_dir = os.getcwd()
-    with pure.cd(current_dir):
-        testdir = os.getcwd()
-
-    assert testdir == os.getcwd()
-    assert os.getcwd() == current_dir
-
-
 def test_split_backslash_last():
     assert (
         pure.split_backslash_last("https://www.pixiv.net/en/users/2232374") == "2232374"

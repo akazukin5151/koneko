@@ -11,13 +11,16 @@ from koneko import utils
 
 TERM = Terminal()
 
+def ncols(term_width, img_width, padding):
+    return round(term_width / (img_width + padding))
+
 def xcoords(term_width, img_width=18, padding=2, offset=0):
     """Generates the x-coord for each column to pass into pixcat
     If img_width == 18 and 90 > term_width > 110, there will be five columns,
     with spaces of (2, 20, 38, 56, 74)
     Meaning the first col has x-coordinates 2 and second col of 20
     """
-    number_of_columns = round(term_width / (img_width + padding))
+    number_of_columns = ncols(term_width, img_width, padding)
     return [col % number_of_columns * img_width + padding + offset
             for col in range(number_of_columns)]
 
@@ -30,6 +33,12 @@ def ycoords(term_height, img_height=8, padding=1):
     number_of_rows = term_height // (img_height + padding)
     return [row * (img_height + padding)
             for row in range(number_of_rows)]
+
+def ncols_config():
+    settings = utils.get_config_section('lscat')
+    img_width = settings.getint('image_width', fallback=18)
+    paddingx = settings.getint('images_x_spacing', fallback=2)
+    return ncols(TERM.width, img_width, paddingx)
 
 def xcoords_config(offset=0):
     settings = utils.get_config_section('lscat')
@@ -56,14 +65,15 @@ def show_instant(cls, data, check_noprint=False):
          if not x.startswith('.')]
 
     if check_noprint and not utils.check_noprint():
+        number_of_cols = ncols_config()
+
         spacing = utils.get_settings('lscat', 'gallery_print_spacing')
         if spacing:
             spacing = spacing.split(',')
         else:
             spacing = (9, 17, 17, 17, 17)
 
-        # TODO: check for num of columns
-        for (idx, space) in enumerate(spacing):
+        for (idx, space) in enumerate(spacing[:number_of_cols]):
             print(' ' * int(space), end='')
             print(idx+1, end='')
         print('\n')
@@ -140,6 +150,7 @@ def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
     left_shifts = xcoords_config()
     rowspaces = ycoords_config()
+    number_of_cols = ncols_config()
 
     # Does not catch if config doesn't exist, because it must exist
     settings = utils.get_config_section('lscat')
@@ -152,9 +163,8 @@ def generate_page(path):
         image = yield
 
         number = int(image.split('_')[0])
-        # Magic FIXME: fails for anything other than 5 columns
-        x = number % 5
-        y = number // 5
+        x = number % number_of_cols
+        y = number // number_of_cols
 
         if number % 10 == 0 and number != 0:
             print('\n' * page_spacing)

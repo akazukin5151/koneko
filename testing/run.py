@@ -17,8 +17,14 @@ def test_launch():
         pass
     os.chdir(curdir)
 
+cmds = (
+    "pip install .",
+    "python setup.py install",
+    "python setup.py develop",
+    "python -m koneko.main"
+)
 
-for cmd in ("pip install .", "python setup.py install", "python setup.py develop"):
+for cmd in cmds:
     os.system(cmd)
     test_launch()
     os.system('pip uninstall koneko')

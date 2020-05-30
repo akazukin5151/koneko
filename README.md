@@ -239,10 +239,10 @@ koneko
 ## Unit tests
 Run `pytest testing/ -vvvv -l -s --icat`. If icat fails, skip the three offending tests by omitting the `--icat` argument
 
-## Upload to PyPI
+## Build and upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
 
-**Warning:** you *must* test installing with `pip install .`, `python setup.py install`, and `python setup.py develop`.
+**Warning:** you *must* test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main`.
 
 Bump version info in `__init__.py`, `setup.py`, and `README.md`
 

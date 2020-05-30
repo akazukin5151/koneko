@@ -201,10 +201,11 @@ def get_settings(section: str, setting: str):
     return cfgsection.get(setting, None)
 
 def check_noprint():
-    noprint = get_settings('misc', 'noprint')
-    if noprint == 'on':
-        return True
-    return False
+    section = get_config_section('misc')
+    try:
+        return section.getboolean('noprint', fallback=False)
+    except ValueError:
+        return False
 
 def noprint(func, *args, **kwargs):
     import contextlib

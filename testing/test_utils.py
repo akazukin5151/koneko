@@ -57,17 +57,31 @@ def test_info_screen_loop(monkeypatch):
     os.system("kitty +kitten icat --clear")
 
 def test_check_noprint(monkeypatch):
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "on")
-    assert utils.check_noprint() == True
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "off")
-    assert utils.check_noprint() == False
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "false")
-    assert utils.check_noprint() == False
-
-    # Test with an actual cfg
+    # noprint is off in example config
     monkeypatch.setattr('koneko.utils.Path.expanduser',
                         lambda x: Path('example_config.ini'))
+
     assert utils.check_noprint() == False
+
+    cfg = configparser.ConfigParser()
+    cfg.read('example_config.ini')
+
+    for setting in ('1', 'yes', 'true', 'on'):
+        cfg.set('misc', 'noprint', setting)
+        with open('example_config.ini', 'w') as f:
+            cfg.write(f)
+        assert utils.check_noprint() == True
+
+    for setting in ('off', 'no', 'asdf'):
+        cfg.set('misc', 'noprint', setting)
+        with open('example_config.ini', 'w') as f:
+            cfg.write(f)
+        assert utils.check_noprint() == False
+
+    # Restore default
+    cfg.set('misc', 'noprint', 'off')
+    with open('example_config.ini', 'w') as f:
+        cfg.write(f)
 
 def test_noprint(capsys):
     utils.noprint(print, "hello")

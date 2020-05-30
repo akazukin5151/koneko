@@ -11,6 +11,7 @@ from koneko import utils
 
 TERM = Terminal()
 
+# Magic
 def xcoords(term_width, img_width=18, padding=2, offset=0):
     """Generates the x-coord for each column to pass into pixcat
     If img_width == 18 and 90 > term_width > 110, there will be five columns,
@@ -21,6 +22,7 @@ def xcoords(term_width, img_width=18, padding=2, offset=0):
     return [col % number_of_columns * img_width + padding + offset
             for col in range(number_of_columns)]
 
+# Magic
 def ycoords(term_height, img_height=8, padding=1):
     """Generates the y-coord for each row to pass into pixcat
     If img_height == 8 and 27 > term_height >= 18, there will be two rows,
@@ -43,6 +45,7 @@ def show_instant(cls, data, check_noprint=False):
          for x in os.listdir(data.download_path)
          if not x.startswith('.')]
 
+    # Magic
     if check_noprint and not utils.check_noprint():
         print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
 
@@ -128,9 +131,11 @@ def generate_page(path):
         y = number // 5
 
         if number % 10 == 0 and number != 0:
+            # Magic
             print('\n' * 23)
 
         with cd(path):
+            # Magic
             Image(image).thumbnail(310).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
@@ -144,8 +149,10 @@ def generate_users(path, noprint=False):
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
+        # Magic
         message = ''.join([number, '\n', ' ' * 18, artist_name])
 
+        # Magic
         if not noprint:
             # Print the message (artist name)
             print(' ' * 18, message)
@@ -153,12 +160,14 @@ def generate_users(path, noprint=False):
 
         with cd(path):
             # Display artist profile pic
+            # Magic
             Image(a_img).thumbnail(310).show(align='left', x=2, y=0)
 
             # Display the three previews
             i = 0                   # Always resets for every artist
             while i < 3:            # Every artist has only 3 previews
                 p_img = yield       # Wait for preview pic
+                # Magic
                 Image(p_img).thumbnail(310).show(align='left', y=0,
                                                  x=preview_xcoords[i])
                 i += 1
@@ -233,6 +242,7 @@ def generate_previews(path):
             x = 1
 
         with cd(path):
+            # Magic
             Image(image).thumbnail(310).show(
                 align='left', x=_xcoords[x], y=rowspaces[y]
             )

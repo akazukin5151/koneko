@@ -67,6 +67,15 @@ def test_get_settings(monkeypatch, use_example_cfg):
     assert utils.get_settings('experimental', 'image_mode_previews') == 'off'
     assert utils.get_settings('misc', 'noprint') == 'off'
 
+    # If config doesn't exist
+    test_cfg_path = Path('testing/files/test_config.ini')
+    if test_cfg_path.exists():
+        os.system(f'rm {test_cfg_path}')
+
+    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
+
+    assert utils.get_settings('wewr', 'asda') is False
+
 def test_config(monkeypatch):
     # If config exists
     example_path = Path('testing/test_config.ini')

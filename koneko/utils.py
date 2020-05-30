@@ -150,8 +150,9 @@ def info_screen_loop():
 
 
 def config():
+    config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
-    if Path('~/.config/koneko/config.ini').expanduser().exists():
+    if config_path.exists():
         config_object.read(Path('~/.config/koneko/config.ini').expanduser())
         credentials = config_object['Credentials']
         # If your_id is stored in the config
@@ -172,15 +173,20 @@ def config():
         else:
             your_id = None
 
-        config_path = Path('~/.config/koneko/config.ini').expanduser()
+        os.system('clear')
+
         config_path.parent.mkdir(exist_ok=True)
         config_path.touch()
         with open(config_path, 'w') as c:
             config_object.write(c)
 
-        credentials = config_object['Credentials']
+        # Append the default settings to the config file
+        # Why not use python? Because it's functional, readable, and
+        # this one liner defeats any potential speed benefits
+        example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
+        os.system(f'tail {example_cfg} -n +9 >> {config_path}')
 
-        os.system('clear')
+        credentials = config_object['Credentials']
 
     return credentials, your_id
 

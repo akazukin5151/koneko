@@ -10,6 +10,7 @@ README = (HERE / "README.md").read_text()
 # The pythonic way is so unnecessarily complicated for two lines of shell...
 os.system("mkdir -p ~/.local/share/koneko")
 os.system("cp -r ./pics/ ~/.local/share/koneko/")
+os.system("cp example_config.ini ~/.local/share/koneko/")
 
 setup(
     name="koneko",

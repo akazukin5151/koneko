@@ -46,9 +46,13 @@ def show_instant(cls, data, check_noprint=False):
          if not x.startswith('.')]
 
     if check_noprint and not utils.check_noprint():
-        spacing = utils.get_settings('lscat', 'gallery_print_spacing').split(',')
+        spacing = utils.get_settings('lscat', 'gallery_print_spacing')
+        if spacing:
+            spacing = spacing.split(',')
+        else:
+            spacing = (9, 17, 17, 17, 17)
+
         # TODO: check for num of columns
-        # TODO: provide a fallback
         for (idx, space) in enumerate(spacing):
             print(' ' * int(space), end='')
             print(idx+1, end='')
@@ -126,8 +130,10 @@ def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
     left_shifts = xcoords(TERM.width)
     rowspaces = ycoords(TERM.height)
+
     settings = utils.get_config_section('lscat')
     page_spacing = settings.getint('gallery_page_spacing', fallback=23)
+    thumbnail_size = settings.getint('image_thumbnail_size', fallback=310)
 
     while True:
         # Release control. When _inspect() sends another image,
@@ -142,17 +148,18 @@ def generate_page(path):
             print('\n' * page_spacing)
 
         with cd(path):
-            # Magic
-            Image(image).thumbnail(310).show(
+            Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
 
 def generate_users(path, noprint=False):
     preview_xcoords = xcoords(TERM.width, offset=1)[-3:]
     os.system('clear')
+
     settings = utils.get_config_section('lscat')
     message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
     page_spacing = settings.getint('users_page_spacing', fallback=20)
+    thumbnail_size = settings.getint('image_thumbnail_size', fallback=310)
 
     while True:
         # Wait for artist pic
@@ -169,14 +176,13 @@ def generate_users(path, noprint=False):
         with cd(path):
             # Display artist profile pic
             # Magic
-            Image(a_img).thumbnail(310).show(align='left', x=2, y=0)
+            Image(a_img).thumbnail(thumbnail_size).show(align='left', x=2, y=0)
 
             # Display the three previews
             i = 0                   # Always resets for every artist
             while i < 3:            # Every artist has only 3 previews
                 p_img = yield       # Wait for preview pic
-                # Magic
-                Image(p_img).thumbnail(310).show(align='left', y=0,
+                Image(p_img).thumbnail(thumbnail_size).show(align='left', y=0,
                                                  x=preview_xcoords[i])
                 i += 1
 
@@ -250,7 +256,6 @@ def generate_previews(path):
             x = 1
 
         with cd(path):
-            # Magic
             Image(image).thumbnail(310).show(
                 align='left', x=_xcoords[x], y=rowspaces[y]
             )

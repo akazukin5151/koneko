@@ -37,14 +37,12 @@ def test_artist_user_id_prompt(monkeypatch):
 @pytest.mark.icat
 def test_show_man_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("builtins.input", lambda x: "")
-    monkeypatch.setattr("os.system", lambda x: "")
     utils.show_man_loop()
     os.system("kitty +kitten icat --clear")
 
 def test_clear_cache_loop(monkeypatch, turn_off_print):
     monkeypatch.setattr("shutil.rmtree", lambda x: "")
     monkeypatch.setattr("builtins.input", lambda x: "y")
-    monkeypatch.setattr("os.system", lambda x: "")
     utils.clear_cache_loop()
     monkeypatch.setattr("builtins.input", lambda x: "n")
     utils.clear_cache_loop()
@@ -52,7 +50,6 @@ def test_clear_cache_loop(monkeypatch, turn_off_print):
 @pytest.mark.icat
 def test_info_screen_loop(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda x: "")
-    monkeypatch.setattr("os.system", lambda x: "")
     utils.info_screen_loop()
     os.system("kitty +kitten icat --clear")
 

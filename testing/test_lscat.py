@@ -33,6 +33,7 @@ def test_show_instant(monkeypatch):
             self.download_path = Path('testing/files/')
 
     # This config has noprint = False
+    # Can't use shared fixture because pathlib is used in FakeData
     monkeypatch.setattr('koneko.utils.Path.expanduser',
                         lambda x: Path('testing/test_config.ini'))
 
@@ -56,12 +57,12 @@ def test_generate_orders():
 
 def test_TrackDownloads(monkeypatch):
     """Just running it to make sure it doesn't crash"""
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
-
     class FakeData:
         def __init__(self):
             self.download_path = Path('testing/files/gallery')
+
+    monkeypatch.setattr('koneko.utils.Path.expanduser',
+                        lambda x: Path('testing/test_config.ini'))
 
     data = FakeData()
     data.download_path.mkdir()
@@ -80,12 +81,13 @@ def test_TrackDownloads(monkeypatch):
 
 def test_TrackDownloadsUser(monkeypatch):
     """Just running it to make sure it doesn't crash"""
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
-
     class FakeData:
         def __init__(self):
             self.download_path = Path('testing/files/user')
+
+    # Can't use shared fixture because pathlib is used in FakeData
+    monkeypatch.setattr('koneko.utils.Path.expanduser',
+                        lambda x: Path('testing/test_config.ini'))
 
     data = FakeData()
     data.download_path.mkdir()

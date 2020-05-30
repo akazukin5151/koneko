@@ -14,6 +14,11 @@ from koneko import utils
 def turn_off_print(monkeypatch):
     monkeypatch.setattr("builtins.print", lambda *a, **k: "")
 
+@pytest.fixture
+def use_example_cfg(monkeypatch):
+    monkeypatch.setattr('koneko.utils.Path.expanduser',
+                        lambda x: Path('testing/test_config.ini'))
+
 def test_verify_full_download():
     assert utils.verify_full_download("testing/files/008_77803142_p0.png") == True
     assert utils.verify_full_download("testing/files/not_an_image.txt") == False
@@ -53,11 +58,8 @@ def test_info_screen_loop(monkeypatch):
     utils.info_screen_loop()
     os.system("kitty +kitten icat --clear")
 
-def test_check_noprint(monkeypatch):
+def test_check_noprint(monkeypatch, use_example_cfg):
     # noprint is off in example config
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
-
     assert utils.check_noprint() == False
 
     cfg = configparser.ConfigParser()
@@ -85,11 +87,7 @@ def test_noprint(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
 
-def test_get_settings(monkeypatch):
-    # Redivert the config path
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
-
+def test_get_settings(monkeypatch, use_example_cfg):
     assert utils.get_settings('Credentials', 'username') == 'koneko'
     assert utils.get_settings('Credentials', 'password') == 'mypassword'
     assert utils.get_settings('Credentials', 'ID') == '1234'

@@ -1,6 +1,8 @@
 import os
 import sys
+import random
 from pathlib import Path
+from unittest.mock import Mock, call
 
 import pytest
 
@@ -57,31 +59,62 @@ def test_generate_orders():
 
 
 def test_TrackDownloads(monkeypatch):
-    """Just running it to make sure it doesn't crash"""
-    class FakeData:
-        def __init__(self):
-            self.download_path = Path('testing/files/gallery')
+    mocked_data = Mock()
+    mocked_generator = Mock()
+    tracker = lscat.TrackDownloads(mocked_data)
+    tracker.generator = mocked_generator
 
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
+    correct_order = list(range(30))
+    test_pics = [f"{str(idx).rjust(3, '0')}_test"
+                 for idx in list(range(30))]
 
-    data = FakeData()
-    data.download_path.mkdir()
-    pics = ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png')
-    for pic in pics:
-        os.system(f'cp testing/files/{pic} testing/files/gallery/')
-
-    lscat.show_instant(lscat.TrackDownloads, data)
-
-    # TODO: as the numbers aren't in the required order, it displays nothing
-    tracker = lscat.TrackDownloads(data)
-    for pic in pics:
+    # Shuffle list of pics
+    for pic in random.sample(test_pics, 30):
         tracker.update(pic)
 
-    os.system(f'rm -r {data.download_path}')
+    assert len(mocked_generator.mock_calls) == 30
+    methods_called = [mocked_generator.mock_calls[i][0] for i in range(30)]
+    # Only thing the tracker does is to call send() on the generator
+    assert methods_called == ['send'] * 30
+
+    #         first value in tuple (eg '020_test') <--|
+    #                                                 |  |--> convert digits to int
+    #  arg passed into generator.send, is tuple <--|  |  |
+    #                                              |  |  |
+    sent_img = [int(mocked_generator.mock_calls[i][1][0][:3]) for i in range(30)]
+    assert correct_order == sent_img
+
 
 def test_TrackDownloadsUser(monkeypatch):
-    """Just running it to make sure it doesn't crash"""
+    mocked_data = Mock()
+    mocked_data.splitpoint = 30
+    mocked_generator = Mock()
+    tracker = lscat.TrackDownloadsUsers(mocked_data)
+    tracker.generator = mocked_generator
+
+    correct_order = lscat.generate_orders(120, 30)
+    test_pics = [f"{str(idx).rjust(3, '0')}_test"
+                 for idx in list(range(120))]
+
+    # Shuffle list of pics
+    for pic in random.sample(test_pics, 120):
+        tracker.update(pic)
+
+    assert len(mocked_generator.mock_calls) == 120
+    methods_called = [mocked_generator.mock_calls[i][0] for i in range(120)]
+    # Only thing the tracker does is to call send() on the generator
+    assert methods_called == ['send'] * 120
+
+    #         first value in tuple (eg '020_test') <--|
+    #                                                 |  |--> convert digits to int
+    #  arg passed into generator.send, is tuple <--|  |  |
+    #                                              |  |  |
+    sent_img = [int(mocked_generator.mock_calls[i][1][0][:3]) for i in range(120)]
+    assert correct_order == sent_img
+
+
+def test_TrackDownloadsUser2(monkeypatch):
+    """Test with .koneko file"""
     class FakeData:
         def __init__(self):
             self.download_path = Path('testing/files/user')

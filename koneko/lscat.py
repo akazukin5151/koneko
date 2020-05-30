@@ -11,7 +11,6 @@ from koneko import utils
 
 TERM = Terminal()
 
-# Magic
 def xcoords(term_width, img_width=18, padding=2, offset=0):
     """Generates the x-coord for each column to pass into pixcat
     If img_width == 18 and 90 > term_width > 110, there will be five columns,
@@ -22,7 +21,6 @@ def xcoords(term_width, img_width=18, padding=2, offset=0):
     return [col % number_of_columns * img_width + padding + offset
             for col in range(number_of_columns)]
 
-# Magic
 def ycoords(term_height, img_height=8, padding=1):
     """Generates the y-coord for each row to pass into pixcat
     If img_height == 8 and 27 > term_height >= 18, there will be two rows,
@@ -32,6 +30,18 @@ def ycoords(term_height, img_height=8, padding=1):
     number_of_rows = term_height // (img_height + padding)
     return [row * (img_height + padding)
             for row in range(number_of_rows)]
+
+def xcoords_config(offset=0):
+    settings = utils.get_config_section('lscat')
+    img_width = settings.getint('image_width', fallback=18)
+    paddingx = settings.getint('images_x_spacing', fallback=2)
+    return xcoords(TERM.width, img_width, paddingx, offset)
+
+def ycoords_config():
+    settings = utils.get_config_section('lscat')
+    img_height = settings.getint('image_height', fallback=8)
+    paddingy = settings.getint('images_y_spacing', fallback=1)
+    return ycoords(TERM.height, img_height, paddingy)
 
 
 def icat(args):
@@ -128,9 +138,10 @@ class TrackDownloadsUsers(AbstractTracker):
 
 def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
-    left_shifts = xcoords(TERM.width)
-    rowspaces = ycoords(TERM.height)
+    left_shifts = xcoords_config()
+    rowspaces = ycoords_config()
 
+    # Does not catch if config doesn't exist, because it must exist
     settings = utils.get_config_section('lscat')
     page_spacing = settings.getint('gallery_page_spacing', fallback=23)
     thumbnail_size = settings.getint('image_thumbnail_size', fallback=310)
@@ -141,6 +152,7 @@ def generate_page(path):
         image = yield
 
         number = int(image.split('_')[0])
+        # Magic FIXME: fails for anything other than 5 columns
         x = number % 5
         y = number // 5
 
@@ -153,7 +165,7 @@ def generate_page(path):
             )
 
 def generate_users(path, noprint=False):
-    preview_xcoords = xcoords(TERM.width, offset=1)[-3:]
+    preview_xcoords = xcoords_config(offset=1)[-3:]
     os.system('clear')
 
     settings = utils.get_config_section('lscat')
@@ -237,9 +249,12 @@ class TrackDownloadsImage(AbstractTracker):
 
 def generate_previews(path):
     """Experimental"""
-    rowspaces = ycoords(TERM.height)
-    left_shifts = xcoords(TERM.width)
+    rowspaces = ycoords_config()
+    left_shifts = xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
+
+    settings = utils.get_config_section('lscat')
+    thumbnail_size = settings.getint('image_thumbnail_size', fallback=310)
 
     i = 0
     while True:
@@ -256,7 +271,7 @@ def generate_previews(path):
             x = 1
 
         with cd(path):
-            Image(image).thumbnail(310).show(
+            Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=_xcoords[x], y=rowspaces[y]
             )
 

@@ -51,7 +51,7 @@ def xcoords_config(offset=0):
 def ycoords_config():
     settings = utils.get_config_section('lscat')
     if not settings:
-        return 8, 1
+        return ycoords(TERM.height, 8, 1)
     img_height = settings.getint('image_height', fallback=8)
     paddingy = settings.getint('images_y_spacing', fallback=1)
     return ycoords(TERM.height, img_height, paddingy)

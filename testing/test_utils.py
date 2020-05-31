@@ -103,6 +103,28 @@ def test_config(monkeypatch):
     assert utils.get_settings('Credentials', 'username') == 'myusername'
     assert utils.get_settings('Credentials', 'password') == 'mypassword'
 
+def test_config2(monkeypatch):
+    """Config path does not exist, user does not save their ID"""
+    test_cfg_path = Path('testing/files/test_config.ini')
+    os.system(f'rm {test_cfg_path}')
+
+    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
+
+    # It asks for multiple inputs: username, whether to save user id, user id
+    responses = iter(['myusername', 'n'])
+    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
+    monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
+    # fix for macOS
+    monkeypatch.setattr('koneko.utils.os.system',
+                        lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
+
+    creds, your_id = utils.config()
+    assert your_id is None
+    assert type(creds) is configparser.SectionProxy
+
+    assert utils.get_settings('Credentials', 'username') == 'myusername'
+    assert utils.get_settings('Credentials', 'password') == 'mypassword'
+
 
 def test_dir_not_empty():
     class FakeData:

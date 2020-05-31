@@ -135,7 +135,10 @@ def check_noprint():
     section = get_config_section('misc')
     if not section:
         return False
-    return section.getboolean('noprint', fallback=False)
+    try:
+        return section.getboolean('noprint', fallback=False)
+    except ValueError:
+        return False
 
 def noprint(func, *args, **kwargs):
     import contextlib

@@ -44,16 +44,11 @@ def test_check_noprint(monkeypatch, use_example_cfg):
             cfg.write(f)
         assert utils.check_noprint() == True
 
-    for setting in ('off', 'no', 'asdf'):
+    for setting in ('off', 'no', 'asdf', 'off'):
         cfg.set('misc', 'noprint', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
         assert utils.check_noprint() == False
-
-    # Restore default
-    cfg.set('misc', 'noprint', 'off')
-    with open('testing/test_config.ini', 'w') as f:
-        cfg.write(f)
 
 def test_noprint(capsys):
     utils.noprint(print, "hello")

@@ -108,6 +108,22 @@ For more details refer to the [manual](#manual).
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
 ### Version 0.7
+#### Features
+* Users can now configure lscat numbers, including:
+    * Image width
+    * Image height
+    * Image thumbnail size (For pixcat; the above two are more accurate)
+    * x and y spacing/padding between images
+    * Spacing between printed text
+    * Spacing between pages
+    * See README.md and example_config.ini for more details
+    * TODO: document the settings in terms of what they actually are
+* Boolean settings in the config now accepts ('1', 'yes', 'true', or 'on') for True, and anything else as False.
+
+#### Internal code
+* Added lots of tests
+* CI now tries to launch the application to make sure it doesn't crash on start and I didn't make any silly mistakes when building
+* Updated requirements.txt
 
 
 # FAQ

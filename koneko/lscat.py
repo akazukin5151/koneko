@@ -36,6 +36,8 @@ def ycoords(term_height, img_height=8, padding=1):
 
 def _width_paddingx():
     settings = utils.get_config_section('lscat')
+    if not settings:
+        return 18, 2
     img_width = settings.getint('image_width', fallback=18)
     paddingx = settings.getint('images_x_spacing', fallback=2)
     return img_width, paddingx
@@ -48,20 +50,28 @@ def xcoords_config(offset=0):
 
 def ycoords_config():
     settings = utils.get_config_section('lscat')
+    if not settings:
+        return 8, 1
     img_height = settings.getint('image_height', fallback=8)
     paddingy = settings.getint('images_y_spacing', fallback=1)
     return ycoords(TERM.height, img_height, paddingy)
 
 def page_spacing_config(fallback):
     settings = utils.get_config_section('lscat')
+    if not settings:
+        return fallback
     return settings.getint('gallery_page_spacing', fallback=fallback)
 
 def thumbnail_size_config():
     settings = utils.get_config_section('lscat')
+    if not settings:
+        return 310
     return settings.getint('image_thumbnail_size', fallback=310)
 
 def get_gen_users_settings():
     settings = utils.get_config_section('lscat')
+    if not settings:
+        return 18, 2
     message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
     padding = settings.getint('images_x_spacing', fallback=2)
     return message_xcoord, padding

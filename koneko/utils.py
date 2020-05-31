@@ -1,15 +1,54 @@
 import os
 import imghdr
-import shutil
+import itertools
+import threading
 from getpass import getpass
 from pathlib import Path
-from subprocess import check_output
+from contextlib import contextmanager
 from configparser import ConfigParser
 
-import pixcat
+import funcy
 
-from koneko import KONEKODIR, ui, cli, pure, __version__
 
+@contextmanager
+def cd(newdir):
+    """
+    Change current script directory, do something, change back to old directory
+    See https://stackoverflow.com/questions/431684/how-do-i-change-the-working-directory-in-python/24176022#24176022
+
+    Parameters
+    ----------
+    newdir : str
+        New directory to cd into inside 'with'
+    """
+    prevdir = os.getcwd()
+    os.chdir(os.path.expanduser(newdir))
+    try:
+        yield
+    finally:
+        os.chdir(prevdir)
+
+
+def _spin(done, message):
+    for char in itertools.cycle('|/-\\'):  # Infinite loop
+        print(message, char, flush=True, end='\r')
+        if done.wait(0.1):
+            break
+    print(' ' * len(char), end='\r')  # clears the spinner
+
+
+@funcy.decorator
+def spinner(call, message=''):
+    """
+    See http://hackflow.com/blog/2013/11/03/painless-decorators/
+    """
+    done = threading.Event()
+    spinner_thread = threading.Thread(target=_spin, args=(done, message))
+    spinner_thread.start()
+    result = call()  # Run the wrapped function
+    done.set()
+    spinner_thread.join()
+    return result
 
 def verify_full_download(filepath):
     verified = imghdr.what(filepath)
@@ -34,124 +73,11 @@ def dir_not_empty(data):
     return False
 
 
-# - Prompt functions
-def begin_prompt(printmessage=True):
-    messages = (
-        '',
-        f'Welcome to koneko v{__version__}\n',
-        'Select an action:',
-        '1. View artist illustrations',
-        '2. Open pixiv post',
-        '3. View following artists',
-        '4. Search for artists',
-        '5. View illustrations of all following artists\n',
-        '?. Info',
-        'm. Manual',
-        'c. Clear koneko cache',
-        'q. Quit',
-    )
-    if printmessage:
-        for message in messages:
-            print(' ' * 27, message)
-
-    pixcat.Image(
-        KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(550).show(
-        align='left', y=0
-    )
-
-    # Do it async? But the startup time sleeps to be slow regardless... TODO
-    cache_size = check_output(
-        f"du -hs --apparent-size {KONEKODIR} | cut -f1",
-        shell=True
-    ).decode('utf-8').rstrip()
-    print(f'Current cache size: {cache_size}')
-
-    command = input('Enter a command: ')
-    return command
-
-
-def artist_user_id_prompt():
-    artist_user_id = input('Enter artist ID or url:\n')
-    return artist_user_id
-
-
-@pure.catch_ctrl_c
-def show_man_loop():
-    os.system('clear')
-    print(cli.__doc__)
-    print(' ' * 3, '=' * 30)
-    print(ui.ArtistGallery.__doc__)
-    print(' ' * 3, '=' * 30)
-    print(ui.Image.__doc__)
-    print(' ' * 3, '=' * 30)
-    print(ui.AbstractUsers.__doc__)
-    print(' ' * 3, '=' * 30)
-    print(ui.IllustFollowGallery.__doc__)
-    while True:
-        help_command = input('\n\nEnter any key to return: ')
-        if help_command or help_command == '':
-            os.system('clear')
-            break
-
-
-@pure.catch_ctrl_c
-def clear_cache_loop():
-    print('Do you want to remove all cached images?')
-    print('This will not remove images you explicitly downloaded.')
-    while True:
-        help_command = input('\nEnter y to confirm: ')
-        if help_command == 'y':
-            shutil.rmtree('/tmp/koneko/')
-            os.system('clear')
-            break
-        else:
-            print('Operation aborted!')
-            os.system('clear')
-            break
-
-
-@pure.catch_ctrl_c
-def info_screen_loop():
-    os.system('clear')
-    messages = (
-        '',
-        f'koneko こねこ version {__version__} beta\n',
-        "Browse pixiv in the terminal using kitty's icat to display",
-        'images with images embedded in the terminal\n',
-        "1. View an artist's illustrations",
-        '2. View a post (support multiple images)',
-        '3. View artists you followed',
-        '4. Search for artists and browse their works.',
-        '5. View latest illustrations from artist you follow.\n',
-        'Thank you for using koneko!',
-        'Please star, report bugs and contribute in:',
-        'https://github.com/twenty5151/koneko',
-        'GPLv3 licensed\n',
-        'Credits to amasyrup (甘城なつき):',
-        'Welcome image: https://www.pixiv.net/en/artworks/71471144',
-        'Current image: https://www.pixiv.net/en/artworks/79494300',
-    )
-
-    for message in messages:
-        print(' ' * 26, message)
-
-    pixcat.Image(
-        KONEKODIR.parent / 'pics' / '79494300_p0.png'
-    ).thumbnail(750).show(
-        align='left', y=0
-    )
-
-    while True:
-        help_command = input('\nEnter any key to return: ')
-        if help_command or help_command == '':
-            os.system('clear')
-            break
-
-
+# If config functions get longer/more, consider moving them to a seperate module
 def config():
+    config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
-    if Path('~/.config/koneko/config.ini').expanduser().exists():
+    if config_path.exists():
         config_object.read(Path('~/.config/koneko/config.ini').expanduser())
         credentials = config_object['Credentials']
         # If your_id is stored in the config
@@ -172,19 +98,24 @@ def config():
         else:
             your_id = None
 
-        config_path = Path('~/.config/koneko/config.ini').expanduser()
+        os.system('clear')
+
         config_path.parent.mkdir(exist_ok=True)
         config_path.touch()
         with open(config_path, 'w') as c:
             config_object.write(c)
 
-        credentials = config_object['Credentials']
+        # Append the default settings to the config file
+        # Why not use python? Because it's functional, readable, and
+        # this one liner defeats any potential speed benefits
+        example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
+        os.system(f'tail {example_cfg} -n +9 >> {config_path}')
 
-        os.system('clear')
+        credentials = config_object['Credentials']
 
     return credentials, your_id
 
-def get_settings(section, setting):
+def get_config_section(section: str):
     config_object = ConfigParser()
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     if not config_path.exists():
@@ -192,14 +123,22 @@ def get_settings(section, setting):
 
     config_object.read(config_path)
     section = config_object[section]
-    result = section.get(setting, None)
-    return result
+    return section
+
+def get_settings(section: str, setting: str):
+    cfgsection = get_config_section(section)
+    if not cfgsection:
+        return False
+    return cfgsection.get(setting, None)
 
 def check_noprint():
-    noprint = get_settings('misc', 'noprint')
-    if noprint == 'on':
-        return True
-    return False
+    section = get_config_section('misc')
+    if not section:
+        return False
+    try:
+        return section.getboolean('noprint', fallback=False)
+    except ValueError:
+        return False
 
 def noprint(func, *args, **kwargs):
     import contextlib

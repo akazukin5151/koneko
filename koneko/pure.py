@@ -5,55 +5,12 @@ Collection of functions that are pure and side effect free
 
 import os
 import re
-import itertools
 import threading
 from pathlib import Path
-from contextlib import contextmanager
 
 import funcy
 import cytoolz
 from colorama import Fore
-
-
-@contextmanager
-def cd(newdir):
-    """
-    Change current script directory, do something, change back to old directory
-    See https://stackoverflow.com/questions/431684/how-do-i-change-the-working-directory-in-python/24176022#24176022
-
-    Parameters
-    ----------
-    newdir : str
-        New directory to cd into inside 'with'
-    """
-    prevdir = os.getcwd()
-    os.chdir(os.path.expanduser(newdir))
-    try:
-        yield
-    finally:
-        os.chdir(prevdir)
-
-
-def spin(done, message):
-    for char in itertools.cycle('|/-\\'):  # Infinite loop
-        print(message, char, flush=True, end='\r')
-        if done.wait(0.1):
-            break
-    print(' ' * len(char), end='\r')  # clears the spinner
-
-
-@funcy.decorator
-def spinner(call, message=''):
-    """
-    See http://hackflow.com/blog/2013/11/03/painless-decorators/
-    """
-    done = threading.Event()
-    spinner_thread = threading.Thread(target=spin, args=(done, message))
-    spinner_thread.start()
-    result = call()
-    done.set()
-    spinner_thread.join()
-    return result
 
 
 def split_backslash_last(string):
@@ -131,7 +88,6 @@ def post_titles_in_page(current_page_illusts):
     return titles
 
 
-@spinner('')
 def page_urls_in_post(post_json, size='medium'):
     """Get the number of pages and each of their urls in a multi-image post."""
     number_of_pages = post_json['page_count']

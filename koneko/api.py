@@ -6,7 +6,7 @@ import threading
 import funcy
 from pixivpy3 import PixivError, AppPixivAPI
 
-from koneko import pure
+from koneko import utils
 
 
 class APIHandler:
@@ -53,13 +53,13 @@ class APIHandler:
         return self.api.parse_qs(next_url)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    @pure.spinner('')
+    @utils.spinner('')
     def artist_gallery_parse_next(self, **kwargs):
         """Mode 1, feed in next page"""
         return self.api.user_illusts(**kwargs)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    @pure.spinner('')
+    @utils.spinner('')
     def artist_gallery_request(self, artist_user_id):
         """Mode 1, normal usage"""
         return self.api.user_illusts(artist_user_id)
@@ -80,7 +80,7 @@ class APIHandler:
         return self.api.search_user(searchstr, offset=offset)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    @pure.spinner('')
+    @utils.spinner('')
     def illust_follow_request(self, **kwargs):
         """Mode 5
         **kwargs can be **parse_page (for _prefetch_next_page), but also contain

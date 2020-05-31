@@ -18,7 +18,7 @@ import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, utils, prompt
+from koneko import ui, api, cli, pure, utils, prompt, screens
 
 
 def main():
@@ -65,7 +65,7 @@ def main_loop(prompted, main_command, user_input, your_id=None):
     printmessage = True
     while True:
         if prompted and not user_input:
-            main_command = utils.begin_prompt(printmessage)
+            main_command = screens.begin_prompt(printmessage)
             printmessage = False
 
         if main_command == '1':
@@ -90,13 +90,13 @@ def main_loop(prompted, main_command, user_input, your_id=None):
             illust_follow_mode_loop()
 
         elif main_command == '?':
-            utils.info_screen_loop()
+            screens.info_screen_loop()
 
         elif main_command == 'm':
-            utils.show_man_loop()
+            screens.show_man_loop()
 
         elif main_command == 'c':
-            utils.clear_cache_loop()
+            screens.clear_cache_loop()
 
         elif main_command == 'q':
             answer = input('Are you sure you want to exit? [Y/n]:\n')
@@ -167,7 +167,7 @@ class ArtistModeLoop(AbstractLoop):
     before proceeding
     """
     def _prompt_url_id(self):
-        self._url_or_id = utils.artist_user_id_prompt()
+        self._url_or_id = input('Enter artist ID or url:\n')
 
     def _go_to_mode(self):
         self.mode = ui.ArtistGallery(self._user_input)

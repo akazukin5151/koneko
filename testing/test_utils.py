@@ -1,18 +1,29 @@
 import os
 import sys
-from pathlib import Path
 import configparser
+from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
+
+from koneko import utils
 
 # Lmao python
 sys.path.append('testing')
 
-from koneko import utils
+
+def test_cd():
+    current_dir = os.getcwd()
+    with utils.cd(current_dir):
+        testdir = os.getcwd()
+
+    assert testdir == os.getcwd()
+    assert os.getcwd() == current_dir
 
 @pytest.fixture
-def turn_off_print(monkeypatch):
-    monkeypatch.setattr("builtins.print", lambda *a, **k: "")
+def use_example_cfg(monkeypatch):
+    monkeypatch.setattr('koneko.utils.Path.expanduser',
+                        lambda x: Path('testing/test_config.ini'))
 
 def test_verify_full_download():
     assert utils.verify_full_download("testing/files/008_77803142_p0.png") == True
@@ -20,74 +31,49 @@ def test_verify_full_download():
     # The above code will remove the file
     os.system("touch testing/files/not_an_image.txt")
 
-@pytest.mark.icat
-def test_begin_prompt(monkeypatch):
-    # Send a "1" as input
-    monkeypatch.setattr("builtins.input", lambda x: "1")
-    returned = utils.begin_prompt()
-    assert returned == "1"
-    os.system("kitty +kitten icat --clear")
-
-def test_artist_user_id_prompt(monkeypatch):
-    monkeypatch.setattr("builtins.input",
-                        lambda x: "https://www.pixiv.net/en/users/2232374")
-    myinput = utils.artist_user_id_prompt()
-    assert myinput == "https://www.pixiv.net/en/users/2232374"
-
-@pytest.mark.icat
-def test_show_man_loop(monkeypatch, turn_off_print):
-    monkeypatch.setattr("builtins.input", lambda x: "")
-    monkeypatch.setattr("os.system", lambda x: "")
-    utils.show_man_loop()
-    os.system("kitty +kitten icat --clear")
-
-def test_clear_cache_loop(monkeypatch, turn_off_print):
-    monkeypatch.setattr("shutil.rmtree", lambda x: "")
-    monkeypatch.setattr("builtins.input", lambda x: "y")
-    monkeypatch.setattr("os.system", lambda x: "")
-    utils.clear_cache_loop()
-    monkeypatch.setattr("builtins.input", lambda x: "n")
-    utils.clear_cache_loop()
-
-@pytest.mark.icat
-def test_info_screen_loop(monkeypatch):
-    monkeypatch.setattr("builtins.input", lambda x: "")
-    monkeypatch.setattr("os.system", lambda x: "")
-    utils.info_screen_loop()
-    os.system("kitty +kitten icat --clear")
-
-def test_check_noprint(monkeypatch):
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "on")
-    assert utils.check_noprint() == True
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "off")
-    assert utils.check_noprint() == False
-    monkeypatch.setattr("koneko.utils.get_settings", lambda x, y: "false")
+def test_check_noprint(monkeypatch, use_example_cfg):
+    # noprint is off in example config
     assert utils.check_noprint() == False
 
-    # Test with an actual cfg
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('example_config.ini'))
-    assert utils.check_noprint() == False
+    cfg = configparser.ConfigParser()
+    cfg.read('testing/test_config.ini')
+
+    for setting in ('1', 'yes', 'true', 'on'):
+        cfg.set('misc', 'noprint', setting)
+        with open('testing/test_config.ini', 'w') as f:
+            cfg.write(f)
+        assert utils.check_noprint() == True
+
+    for setting in ('off', 'no', 'asdf', 'off'):
+        cfg.set('misc', 'noprint', setting)
+        with open('testing/test_config.ini', 'w') as f:
+            cfg.write(f)
+        assert utils.check_noprint() == False
 
 def test_noprint(capsys):
     utils.noprint(print, "hello")
     captured = capsys.readouterr()
     assert captured.out == ""
 
-def test_get_settings(monkeypatch):
-    # Redivert the config path
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('example_config.ini'))
-
+def test_get_settings(monkeypatch, use_example_cfg):
     assert utils.get_settings('Credentials', 'username') == 'koneko'
-    assert utils.get_settings('Credentials', 'password') == '1234'
+    assert utils.get_settings('Credentials', 'password') == 'mypassword'
     assert utils.get_settings('Credentials', 'ID') == '1234'
-    assert utils.get_settings('misc', 'experimental') == 'off'
+    assert utils.get_settings('experimental', 'image_mode_previews') == 'off'
     assert utils.get_settings('misc', 'noprint') == 'off'
+
+    # If config doesn't exist
+    test_cfg_path = Path('testing/files/test_config.ini')
+    if test_cfg_path.exists():
+        os.system(f'rm {test_cfg_path}')
+
+    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
+
+    assert utils.get_settings('wewr', 'asda') is False
 
 def test_config(monkeypatch):
     # If config exists
-    example_path = Path('example_config.ini')
+    example_path = Path('testing/test_config.ini')
     monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: example_path)
 
     creds, your_id = utils.config()
@@ -106,6 +92,9 @@ def test_config(monkeypatch):
     responses = iter(['myusername', 'y', 'myid'])
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
     monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
+    # fix for macOS
+    monkeypatch.setattr('koneko.utils.os.system',
+                        lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
 
     creds, your_id = utils.config()
     assert your_id == 'myid'
@@ -113,6 +102,7 @@ def test_config(monkeypatch):
 
     assert utils.get_settings('Credentials', 'username') == 'myusername'
     assert utils.get_settings('Credentials', 'password') == 'mypassword'
+
 
 def test_dir_not_empty():
     class FakeData:

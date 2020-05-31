@@ -90,11 +90,11 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
+* I wonder what happens if you enter invalid credentials
 * Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Terminal reliability
-* Be responsive to terminal sizes, calculate number of columns and stuff, rather than hardcoding it. (1/2)
 * Option to use pillow or wand to edit numbers on pics
 * Support [ueberzug](https://github.com/seebye/ueberzug)
 
@@ -108,6 +108,22 @@ For more details refer to the [manual](#manual).
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
 ### Version 0.7
+#### Features
+* Users can now configure lscat numbers, including:
+    * Image width
+    * Image height
+    * Image thumbnail size (For pixcat; the above two are more accurate)
+    * x and y spacing/padding between images
+    * Spacing between printed text
+    * Spacing between pages
+    * See README.md and example_config.ini for more details
+    * TODO: document the settings in terms of what they actually are
+* Boolean settings in the config now accepts ('1', 'yes', 'true', or 'on') for True, and anything else as False.
+
+#### Internal code
+* Added lots of tests
+* CI now tries to launch the application to make sure it doesn't crash on start and I didn't make any silly mistakes when building
+* Updated requirements.txt
 
 
 # FAQ
@@ -138,7 +154,7 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 * Fork it
 * Edit the files on your fork/branch
     * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
-* Run tests with `pytest testing/ -vvvv -l -s --icat`
+* Run tests with `pytest testing/ -vvvv -l -s`
 * Try it with `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
     * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
 * Submit a pull request
@@ -217,7 +233,7 @@ git clone -b master https://github.com/twenty5151/koneko.git
 git clone -b dev https://github.com/twenty5151/koneko.git
 
 # Run the tests (for those who want to edit)
-pytest testing/ -vvvv -l -s --icat
+pytest testing/ -vvvv -l -s 
 
 cd koneko
 # Manually install without PyPI; for general usage
@@ -237,12 +253,12 @@ koneko
 ```
 
 ## Unit tests
-Run `pytest testing/ -vvvv -l -s --icat`. If icat fails, skip the three offending tests by omitting the `--icat` argument
+Run `pytest testing/ -vvvv -l -s`
 
-## Upload to PyPI
+## Build and upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
 
-**Warning:** you *must* test installing with `pip install .`, `python setup.py install`, and `python setup.py develop`.
+**Warning:** ~~you~~ *must* test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` (but now it's automated).
 
 Bump version info in `__init__.py`, `setup.py`, and `README.md`
 

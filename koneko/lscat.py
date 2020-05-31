@@ -6,10 +6,12 @@ from abc import ABC
 from pixcat import Image
 from blessed import Terminal
 
-from koneko.pure import cd
 from koneko import utils
 
 TERM = Terminal()
+
+def ncols(term_width, img_width, padding):
+    return round(term_width / (img_width + padding))
 
 def xcoords(term_width, img_width=18, padding=2, offset=0):
     """Generates the x-coord for each column to pass into pixcat
@@ -17,7 +19,7 @@ def xcoords(term_width, img_width=18, padding=2, offset=0):
     with spaces of (2, 20, 38, 56, 74)
     Meaning the first col has x-coordinates 2 and second col of 20
     """
-    number_of_columns = round(term_width / (img_width + padding))
+    number_of_columns = ncols(term_width, img_width, padding)
     return [col % number_of_columns * img_width + padding + offset
             for col in range(number_of_columns)]
 
@@ -32,6 +34,49 @@ def ycoords(term_height, img_height=8, padding=1):
             for row in range(number_of_rows)]
 
 
+def _width_paddingx():
+    settings = utils.get_config_section('lscat')
+    if not settings:
+        return 18, 2
+    img_width = settings.getint('image_width', fallback=18)
+    paddingx = settings.getint('images_x_spacing', fallback=2)
+    return img_width, paddingx
+
+def ncols_config():
+    return ncols(TERM.width, *_width_paddingx())
+
+def xcoords_config(offset=0):
+    return xcoords(TERM.width, *_width_paddingx(), offset)
+
+def ycoords_config():
+    settings = utils.get_config_section('lscat')
+    if not settings:
+        return ycoords(TERM.height, 8, 1)
+    img_height = settings.getint('image_height', fallback=8)
+    paddingy = settings.getint('images_y_spacing', fallback=1)
+    return ycoords(TERM.height, img_height, paddingy)
+
+def page_spacing_config(fallback):
+    settings = utils.get_config_section('lscat')
+    if not settings:
+        return fallback
+    return settings.getint('gallery_page_spacing', fallback=fallback)
+
+def thumbnail_size_config():
+    settings = utils.get_config_section('lscat')
+    if not settings:
+        return 310
+    return settings.getint('image_thumbnail_size', fallback=310)
+
+def get_gen_users_settings():
+    settings = utils.get_config_section('lscat')
+    if not settings:
+        return 18, 2
+    message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
+    padding = settings.getint('images_x_spacing', fallback=2)
+    return message_xcoord, padding
+
+
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
@@ -44,7 +89,18 @@ def show_instant(cls, data, check_noprint=False):
          if not x.startswith('.')]
 
     if check_noprint and not utils.check_noprint():
-        print(' ' * 8, 1, ' ' * 15, 2, ' ' * 15, 3, ' ' * 15, 4, ' ' * 15, 5, '\n')
+        number_of_cols = ncols_config()
+
+        spacing = utils.get_settings('lscat', 'gallery_print_spacing')
+        if spacing:
+            spacing = spacing.split(',')
+        else:
+            spacing = (9, 17, 17, 17, 17)
+
+        for (idx, space) in enumerate(spacing[:number_of_cols]):
+            print(' ' * int(space), end='')
+            print(idx+1, end='')
+        print('\n')
 
 
 class AbstractTracker(ABC):
@@ -102,7 +158,7 @@ class TrackDownloadsUsers(AbstractTracker):
         try:
             splitpoint = data.splitpoint
         except AttributeError:
-            with cd(data.download_path):
+            with utils.cd(data.download_path):
                 with open('.koneko', 'r') as f:
                     splitpoint = int(f.read())
 
@@ -116,50 +172,60 @@ class TrackDownloadsUsers(AbstractTracker):
 
 def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
-    left_shifts = xcoords(TERM.width)
-    rowspaces = ycoords(TERM.height)
+    left_shifts = xcoords_config()
+    rowspaces = ycoords_config()
+    number_of_cols = ncols_config()
+
+    # Does not catch if config doesn't exist, because it must exist
+    page_spacing = page_spacing_config(23)
+    thumbnail_size = thumbnail_size_config()
+
     while True:
         # Release control. When _inspect() sends another image,
         # assign to the variables and display it again
         image = yield
 
         number = int(image.split('_')[0])
-        x = number % 5
-        y = number // 5
+        x = number % number_of_cols
+        y = number // number_of_cols
 
         if number % 10 == 0 and number != 0:
-            print('\n' * 23)
+            print('\n' * page_spacing)
 
-        with cd(path):
-            Image(image).thumbnail(310).show(
+        with utils.cd(path):
+            Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
 
 def generate_users(path, noprint=False):
-    preview_xcoords = xcoords(TERM.width, offset=1)[-3:]
+    preview_xcoords = xcoords_config(offset=1)[-3:]
     os.system('clear')
+
+    message_xcoord, padding = get_gen_users_settings()
+    page_spacing = page_spacing_config(20)
+    thumbnail_size = thumbnail_size_config()
 
     while True:
         # Wait for artist pic
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
-        message = ''.join([number, '\n', ' ' * 18, artist_name])
+        message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
         if not noprint:
             # Print the message (artist name)
-            print(' ' * 18, message)
-        print('\n' * 20)  # Scroll to new 'page'
+            print(' ' * message_xcoord, message)
+        print('\n' * page_spacing)  # Scroll to new 'page'
 
-        with cd(path):
+        with utils.cd(path):
             # Display artist profile pic
-            Image(a_img).thumbnail(310).show(align='left', x=2, y=0)
+            Image(a_img).thumbnail(thumbnail_size).show(align='left', x=padding, y=0)
 
             # Display the three previews
             i = 0                   # Always resets for every artist
             while i < 3:            # Every artist has only 3 previews
                 p_img = yield       # Wait for preview pic
-                Image(p_img).thumbnail(310).show(align='left', y=0,
+                Image(p_img).thumbnail(thumbnail_size).show(align='left', y=0,
                                                  x=preview_xcoords[i])
                 i += 1
 
@@ -189,10 +255,10 @@ def generate_orders(total_pics, artists_count):
 
 class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, data):
+        super().__init__(data)
         self.orders = list(range(1,30))
-        self.generator = generate_previews(path)
+        self.generator = generate_previews(data.download_path)
         self.generator.send(None)
 
     def _inspect(self):
@@ -214,9 +280,11 @@ class TrackDownloadsImage(AbstractTracker):
 
 def generate_previews(path):
     """Experimental"""
-    rowspaces = ycoords(TERM.height)
-    left_shifts = xcoords(TERM.width)
+    rowspaces = ycoords_config()
+    left_shifts = xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
+
+    thumbnail_size = thumbnail_size_config()
 
     i = 0
     while True:
@@ -232,8 +300,8 @@ def generate_previews(path):
         else:
             x = 1
 
-        with cd(path):
-            Image(image).thumbnail(310).show(
+        with utils.cd(path):
+            Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=_xcoords[x], y=rowspaces[y]
             )
 
@@ -250,4 +318,3 @@ if __name__ == '__main__':
     # For Users, make sure it has a .koneko file
     #show_instant(TrackDownloadsUsers, data)
     show_instant(TrackDownloads, data)
-

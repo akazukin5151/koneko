@@ -8,7 +8,7 @@ import cytoolz
 from koneko import api, pure, utils
 
 
-@pure.spinner('')
+@utils.spinner('')
 def async_download_spinner(download_path, urls, rename_images=False,
                            file_names=None, pbar=None):
     """Batch download and rename, with spinner. For mode 2; multi-image posts"""
@@ -39,7 +39,7 @@ def async_download_core(download_path, urls, rename_images=False,
     oldnames = itertools.filterfalse(os.path.isfile, oldnames)
     helper = downloadr(pbar=pbar, tracker=tracker)
 
-    with pure.cd(download_path):
+    with utils.cd(download_path):
         with ThreadPoolExecutor(max_workers=len(urls)) as executor:
             executor.map(helper, urls, oldnames, filtered)
 
@@ -101,21 +101,21 @@ def init_download(data, download_func, tracker):
     # Save the number of artists == splitpoint
     # So later accesses, which will not request, can display properly
     if download_func == user_download:
-        with pure.cd(data.download_path):
+        with utils.cd(data.download_path):
             with open('.koneko', 'w') as f:
                 f.write(str(data.splitpoint))
 
     return True
 
 # - Wrappers around the core functions for downloading one image
-@pure.spinner('')
+@utils.spinner('')
 def download_core(large_dir, url, filename, try_make_dir=True):
     """Downloads one url, intended for single images only"""
     if try_make_dir:
         os.makedirs(large_dir, exist_ok=True)
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
-        with pure.cd(large_dir):
+        with utils.cd(large_dir):
             downloadr(url, filename, None)
 
 
@@ -148,7 +148,7 @@ def download_image_verified(image_id=None, post_json=None, png=False, **kwargs):
     else:
         print(f'Image downloaded at {filepath}\n')
 
-@pure.spinner('Getting full image details... ')
+@utils.spinner('Getting full image details... ')
 def full_img_details(png=False, post_json=None, image_id=None):
     """
     All in one function that gets the full-resolution url, filename, and

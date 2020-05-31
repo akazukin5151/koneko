@@ -4,4 +4,3 @@ dist/
 *egg-info/
 .coverage
 testing/htmlcov/
-testing/files/test_config.ini

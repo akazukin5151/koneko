@@ -144,6 +144,8 @@ def test_TrackDownloadsUser2(monkeypatch):
 def test_generate_page(monkeypatch):
     mocked_pixcat = Mock()
     monkeypatch.setattr("koneko.lscat.Image", lambda *a, **k: mocked_pixcat)
+    monkeypatch.setattr("koneko.lscat.Terminal.width", 100)
+    monkeypatch.setattr("koneko.lscat.Terminal.height", 20)
 
     correct_order = list(range(30))
     test_pics = [f"{str(idx).rjust(3, '0')}_test"

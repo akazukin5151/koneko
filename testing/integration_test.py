@@ -1,9 +1,13 @@
+"""Kind of pointless; just to test the individual functions don't crash
+(And to bump up the coverage)
+"""
+
 import os
 import sys
 import pytest
 from pathlib import Path
 
-from koneko import main, utils
+from koneko import main, utils, ui
 
 
 @pytest.fixture
@@ -89,3 +93,21 @@ def test_mode5(monkeypatch, set_config):
 
     with pytest.raises(SystemExit):
         main.main()
+
+@pytest.mark.integration
+def test_open_link(monkeypatch):
+    monkeypatch.setattr('koneko.ui.ArtistGallery.start', lambda x: True)
+    monkeypatch.setattr('koneko.ui.os.system', lambda x: True)
+    mode = ui.ArtistGallery(1234)
+    mode.data.image_id = lambda x: 5678
+    mode.open_link_coords(1, 2)
+
+@pytest.mark.integration
+def test_download_image(monkeypatch):
+    monkeypatch.setattr('koneko.ui.ArtistGallery.start', lambda x: True)
+    monkeypatch.setattr('koneko.ui.download.download_image_verified', lambda **x: True)
+    mode = ui.ArtistGallery(1234)
+    mode.data.post_json = lambda x: 5678
+    mode.download_image_coords(1, 2)
+
+

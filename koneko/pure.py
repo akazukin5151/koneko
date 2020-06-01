@@ -122,11 +122,9 @@ def catch_ctrl_c(call):
     See http://hackflow.com/blog/2013/11/03/painless-decorators/
     """
     try:
-        result = call()
+        return call()
     except KeyboardInterrupt:
         os.system('clear')
-    else:
-        return result
 
 def process_user_url(url_or_id):
     if 'users' in url_or_id:

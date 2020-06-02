@@ -496,10 +496,8 @@ class Image:
         # But I think delaying the prompt is better than waiting for an image
         # to download when you load it
 
-        # First time from gallery; download next image
-        if self.data.page_num == 1:
-            download.async_download_spinner(self.data.download_path,
-                                            [self.data.current_url])
+        download.async_download_spinner(self.data.download_path,
+                                        [self.data.current_url])
 
         lscat.icat(self.data.filepath)
 
@@ -509,6 +507,7 @@ class Image:
         except IndexError: # Last page
             pass
         else:  # No error
+            # TODO: Don't really need downloaded_images
             self.data.downloaded_images.append(
                 pure.split_backslash_last(next_img_url)
             )
@@ -543,30 +542,13 @@ class Image:
         return True
 
     def jump_to_image(self, selected_image_num: int):
-        if selected_image_num > len(self.data.page_urls):
+        if 0 >= selected_image_num > len(self.data.page_urls):
             print("Invalid number!")
-            prompt.image_prompt(self)
             return False
 
-        self.data.page_num = selected_image_num
-        download.async_download_spinner(self.data.download_path,
-                                        [self.data.current_url])
-
-        lscat.icat(self.data.filepath)
-
-        # Downloads the next image (copied)
-        try:
-            next_img_url = self.data.next_img_url
-        except IndexError: # Last page
-            pass
-        else:  # No error
-            # TODO: Don't really need downloaded_images
-            self.data.downloaded_images.append(
-                pure.split_backslash_last(next_img_url)
-            )
-            download.async_download_spinner(self.data.download_path, [next_img_url])
-
-        print(f'Page {self.data.page_num}/{self.data.number_of_pages}')
+        # Internally 0-based, but externally 1-based
+        self.data.page_num = selected_image_num - 1
+        self._go_next_image()
 
     def leave(self, force=False):
         if self._firstmode or force:

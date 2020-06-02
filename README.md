@@ -97,7 +97,6 @@ For more details refer to the [manual](#manual).
 
 ## Features
 
-* For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
 
 ## Upcoming changelog (in dev branch)
@@ -117,6 +116,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * TODO: document the settings in terms of what they actually are
 * Boolean settings in the config now accepts ('1', 'yes', 'true', or 'on') for True, and anything else as False.
 * Warn user for invalid credentials
+* Image mode can now jump to specified page number, in a multi-image post
 
 #### Internal code
 * Added lots of tests

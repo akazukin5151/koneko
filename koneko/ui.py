@@ -462,8 +462,20 @@ class Image:
             print('This is the last image in the post!')
             return False
 
+        self.data.page_num += 1
         # jump_to_image corrects for 1-based
-        self.jump_to_image(self.data.page_num + 2)
+        self.jump_to_image(self.data.page_num + 1)
+
+    def previous_image(self):
+        if not self.data.page_urls:
+            print('This is the only page in the post!')
+            return False
+        elif self.data.page_num == 0:
+            print('This is the first image in the post!')
+            return False
+
+        self.data.page_num -= 1
+        self.jump_to_image(self.data.page_num + 1)
 
     def jump_to_image(self, selected_image_num: int):
         if 0 >= selected_image_num > len(self.data.page_urls):
@@ -479,15 +491,13 @@ class Image:
         Downloads next image if not downloaded, open it, download the next image
         in the background
         """
-        # IDEAL: image prompt should not be blocked while downloading
-        # But I think delaying the prompt is better than waiting for an image
-        # to download when you load it
-
-        download.async_download_spinner(self.data.download_path, [self.data.current_url])
+        if not (self.data.download_path / self.data.image_filename).is_dir():
+            download.async_download_spinner(self.data.download_path,
+                                            [self.data.current_url])
 
         lscat.icat(self.data.filepath)
 
-        # Prefetch
+        # Prefetch (TODO: run in another thread)
         try:
             next_img_url = self.data.next_img_url
         except IndexError: # Last page
@@ -496,33 +506,6 @@ class Image:
             download.async_download_spinner(self.data.download_path, [next_img_url])
 
         print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
-
-    def previous_image(self):
-        if not self.data.page_urls:
-            print('This is the only page in the post!')
-            return False
-        elif self.data.page_num == 0:
-            print('This is the first image in the post!')
-            return False
-
-        self.data.page_num -= 1
-        download.async_download_spinner(self.data.download_path,
-                                        [self.data.current_url])
-
-        # Never downloads to "large"; should remove it anyway
-        # Then call _jump()
-        testpath = self.data.download_path / Path(self.data.image_filename)
-        if testpath.is_file():
-            lscat.icat(testpath)
-        else:
-            lscat.icat(
-                KONEKODIR / str(self.data.artist_user_id) /
-                str(self.data.page_num) / "large" /
-                self.data.image_filename
-            )
-
-        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
-        return True
 
     def leave(self, force=False):
         if self._firstmode or force:

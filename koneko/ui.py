@@ -435,28 +435,6 @@ class Image:
         self.data = idata
         self._firstmode = firstmode
 
-    def preview(self):
-        """Experimental"""
-        if self.data.number_of_pages == 1:
-            return True
-
-        tracker = lscat.TrackDownloadsImage(self.data)
-        slicestart = self.data.page_num
-        while not self.event.is_set() and slicestart <= 4:
-            img = self.data.page_urls[slicestart:slicestart+1]
-
-            if os.path.isfile(self.data.download_path / pure.split_backslash_last(img[0])):
-                tracker.update(pure.split_backslash_last(img[0]))
-            else:
-                download.async_download_core(self.data.download_path, img, tracker=tracker)
-
-            slicestart += 1
-
-    def set_thread_event(self, thread, event):
-        """Experimental"""
-        self.thread = thread
-        self.event = event
-
     def open_image(self):
         link = f'https://www.pixiv.net/artworks/{self.data.image_id}'
         os.system(f'xdg-open {link}')
@@ -479,15 +457,24 @@ class Image:
     def next_image(self):
         if not self.data.page_urls:
             print('This is the only page in the post!')
+            return False
         elif self.data.page_num + 1 == self.data.number_of_pages:
             print('This is the last image in the post!')
+            return False
 
-        else:
-            #self.event.set()
-            self.data.page_num += 1  # Be careful of 0 index
-            self._go_next_image()
+        # jump_to_image corrects for 1-based
+        self.jump_to_image(self.data.page_num + 2)
 
-    def _go_next_image(self):
+    def jump_to_image(self, selected_image_num: int):
+        if 0 >= selected_image_num > len(self.data.page_urls):
+            print("Invalid number!")
+            return False
+
+        # Internally 0-based, but externally 1-based
+        self.data.page_num = selected_image_num - 1
+        self._jump()
+
+    def _jump(self):
         """
         Downloads next image if not downloaded, open it, download the next image
         in the background
@@ -496,12 +483,11 @@ class Image:
         # But I think delaying the prompt is better than waiting for an image
         # to download when you load it
 
-        download.async_download_spinner(self.data.download_path,
-                                        [self.data.current_url])
+        download.async_download_spinner(self.data.download_path, [self.data.current_url])
 
         lscat.icat(self.data.filepath)
 
-        # Downloads the next image
+        # Prefetch
         try:
             next_img_url = self.data.next_img_url
         except IndexError: # Last page
@@ -524,10 +510,11 @@ class Image:
             return False
 
         self.data.page_num -= 1
-        # Never downloads to "large"; should remove it anyway
         download.async_download_spinner(self.data.download_path,
                                         [self.data.current_url])
 
+        # Never downloads to "large"; should remove it anyway
+        # Then call _jump()
         testpath = self.data.download_path / Path(self.data.image_filename)
         if testpath.is_file():
             lscat.icat(testpath)
@@ -541,15 +528,6 @@ class Image:
         print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
         return True
 
-    def jump_to_image(self, selected_image_num: int):
-        if 0 >= selected_image_num > len(self.data.page_urls):
-            print("Invalid number!")
-            return False
-
-        # Internally 0-based, but externally 1-based
-        self.data.page_num = selected_image_num - 1
-        self._go_next_image()
-
     def leave(self, force=False):
         if self._firstmode or force:
             # Came from view post mode, don't know current page num
@@ -558,6 +536,27 @@ class Image:
             prompt.gallery_like_prompt(mode)
         # Else: image prompt and class ends, goes back to previous mode
 
+    def preview(self):
+        """Experimental"""
+        if self.data.number_of_pages == 1:
+            return True
+
+        tracker = lscat.TrackDownloadsImage(self.data)
+        slicestart = self.data.page_num
+        while not self.event.is_set() and slicestart <= 4:
+            img = self.data.page_urls[slicestart:slicestart+1]
+
+            if os.path.isfile(self.data.download_path / pure.split_backslash_last(img[0])):
+                tracker.update(pure.split_backslash_last(img[0]))
+            else:
+                download.async_download_core(self.data.download_path, img, tracker=tracker)
+
+            slicestart += 1
+
+    def set_thread_event(self, thread, event):
+        """Experimental"""
+        self.thread = thread
+        self.event = event
 
 class AbstractUsers(ABC):
     """

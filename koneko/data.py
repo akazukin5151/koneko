@@ -74,9 +74,6 @@ class ImageJson:
     """Stores data for image view (mode 2)"""
     def __init__(self, raw, image_id):
         self.image_id = image_id
-        self.url = pure.url_given_size(raw, 'large')
-        self.filename = pure.split_backslash_last(self.url)
-        # TODO: replace url and filename attributes with methods
         self.artist_user_id = raw['user']['id']
         self.page_num = 0
 

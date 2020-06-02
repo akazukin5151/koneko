@@ -58,8 +58,6 @@ def test_gallery():
 def test_image():
     idata = data.ImageJson(mode2["illust"], "76695217")
     assert idata
-    assert idata.url == "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg"
-    assert idata.filename == "76695217_p0_master1200.jpg"
     assert idata.artist_user_id == 2232374
     assert idata.page_num == 0
     assert idata.number_of_pages == 8

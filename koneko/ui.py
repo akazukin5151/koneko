@@ -401,8 +401,8 @@ def view_post_mode(image_id):
 
     idata = data.ImageJson(post_json, image_id)
 
-    download.download_core(idata.download_path, idata.url, idata.filename)
-    lscat.icat(idata.download_path / idata.filename)
+    download.download_core(idata.download_path, idata.current_url, idata.image_filename)
+    lscat.icat(idata.download_path / idata.image_filename)
     print(f'Page 1/{idata.number_of_pages}')
 
     image = Image(image_id, idata, True)

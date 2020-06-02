@@ -79,11 +79,8 @@ class ImageJson:
 
         self.number_of_pages, self.page_urls = pure.page_urls_in_post(raw, 'large')
         if self.number_of_pages == 1:
-            self.downloaded_images = None
             self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
         else:
-            self.downloaded_images = list(map(pure.split_backslash_last,
-                                              self.page_urls[:2]))
             # So it won't be duplicated later
             self.download_path = (KONEKODIR / str(self.artist_user_id) / 'individual' /
                               str(image_id))

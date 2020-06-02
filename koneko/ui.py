@@ -493,10 +493,6 @@ class Image:
         except IndexError: # Last page
             pass
         else:  # No error
-            # TODO: Don't really need downloaded_images
-            self.data.downloaded_images.append(
-                pure.split_backslash_last(next_img_url)
-            )
             download.async_download_spinner(self.data.download_path, [next_img_url])
 
         print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')

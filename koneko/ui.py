@@ -456,7 +456,11 @@ class Image:
         lscat.icat(self.data.download_path / filename)
 
     def next_image(self):
-        if not self._bounds_check():
+        if not self.data.page_urls:
+            print('This is the only page in the post!')
+            return False
+        elif self.data.page_num + 1 == self.data.number_of_pages:
+            print('This is the last image in the post!')
             return False
 
         # jump_to_image corrects for 1-based
@@ -464,23 +468,15 @@ class Image:
         self.jump_to_image(self.data.page_num + 1)
 
     def previous_image(self):
-        if not self._bounds_check():
-            return False
-
-        self.data.page_num -= 1
-        self.jump_to_image(self.data.page_num + 1)
-
-    def _bounds_check(self):
         if not self.data.page_urls:
             print('This is the only page in the post!')
-            return False
-        elif self.data.page_num + 1 == self.data.number_of_pages:
-            print('This is the last image in the post!')
             return False
         elif self.data.page_num == 0:
             print('This is the first image in the post!')
             return False
-        return True
+
+        self.data.page_num -= 1
+        self.jump_to_image(self.data.page_num + 1)
 
     def jump_to_image(self, selected_image_num: int):
         if 0 >= selected_image_num > len(self.data.page_urls):
@@ -499,13 +495,15 @@ class Image:
 
         lscat.icat(self.data.filepath)
 
-        # Prefetch (TODO: run in another thread)
+        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_image)
+        self.prefetch_thread.start()
+
+    def _prefetch_next_image(self):
         with funcy.suppress(IndexError):
             next_img_url = self.data.next_img_url
         if next_img_url:
             download.async_download_spinner(self.data.download_path, [next_img_url])
-
-        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
 
     def leave(self, force=False):
         if self._firstmode or force:

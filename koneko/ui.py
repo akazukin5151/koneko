@@ -6,6 +6,7 @@ import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
 
+import funcy
 from tqdm import tqdm
 
 from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
@@ -455,27 +456,31 @@ class Image:
         lscat.icat(self.data.download_path / filename)
 
     def next_image(self):
+        if not self._bounds_check():
+            return False
+
+        # jump_to_image corrects for 1-based
+        self.data.page_num += 1
+        self.jump_to_image(self.data.page_num + 1)
+
+    def previous_image(self):
+        if not self._bounds_check():
+            return False
+
+        self.data.page_num -= 1
+        self.jump_to_image(self.data.page_num + 1)
+
+    def _bounds_check(self):
         if not self.data.page_urls:
             print('This is the only page in the post!')
             return False
         elif self.data.page_num + 1 == self.data.number_of_pages:
             print('This is the last image in the post!')
             return False
-
-        self.data.page_num += 1
-        # jump_to_image corrects for 1-based
-        self.jump_to_image(self.data.page_num + 1)
-
-    def previous_image(self):
-        if not self.data.page_urls:
-            print('This is the only page in the post!')
-            return False
         elif self.data.page_num == 0:
             print('This is the first image in the post!')
             return False
-
-        self.data.page_num -= 1
-        self.jump_to_image(self.data.page_num + 1)
+        return True
 
     def jump_to_image(self, selected_image_num: int):
         if 0 >= selected_image_num > len(self.data.page_urls):
@@ -487,10 +492,7 @@ class Image:
         self._jump()
 
     def _jump(self):
-        """
-        Downloads next image if not downloaded, open it, download the next image
-        in the background
-        """
+        """Downloads next image if not downloaded, display it, prefetch next"""
         if not (self.data.download_path / self.data.image_filename).is_dir():
             download.async_download_spinner(self.data.download_path,
                                             [self.data.current_url])
@@ -498,11 +500,9 @@ class Image:
         lscat.icat(self.data.filepath)
 
         # Prefetch (TODO: run in another thread)
-        try:
+        with funcy.suppress(IndexError):
             next_img_url = self.data.next_img_url
-        except IndexError: # Last page
-            pass
-        else:  # No error
+        if next_img_url:
             download.async_download_spinner(self.data.download_path, [next_img_url])
 
         print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')

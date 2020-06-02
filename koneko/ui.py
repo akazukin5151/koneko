@@ -525,6 +525,9 @@ class Image:
             return False
 
         self.data.page_num -= 1
+        # Never downloads to "large"; should remove it anyway
+        download.async_download_spinner(self.data.download_path,
+                                        [self.data.current_url])
 
         testpath = self.data.download_path / Path(self.data.image_filename)
         if testpath.is_file():
@@ -538,6 +541,32 @@ class Image:
 
         print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
         return True
+
+    def jump_to_image(self, selected_image_num: int):
+        if selected_image_num > len(self.data.page_urls):
+            print("Invalid number!")
+            prompt.image_prompt(self)
+            return False
+
+        self.data.page_num = selected_image_num
+        download.async_download_spinner(self.data.download_path,
+                                        [self.data.current_url])
+
+        lscat.icat(self.data.filepath)
+
+        # Downloads the next image (copied)
+        try:
+            next_img_url = self.data.next_img_url
+        except IndexError: # Last page
+            pass
+        else:  # No error
+            # TODO: Don't really need downloaded_images
+            self.data.downloaded_images.append(
+                pure.split_backslash_last(next_img_url)
+            )
+            download.async_download_spinner(self.data.download_path, [next_img_url])
+
+        print(f'Page {self.data.page_num}/{self.data.number_of_pages}')
 
     def leave(self, force=False):
         if self._firstmode or force:

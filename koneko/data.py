@@ -76,6 +76,7 @@ class ImageJson:
         self.image_id = image_id
         self.url = pure.url_given_size(raw, 'large')
         self.filename = pure.split_backslash_last(self.url)
+        # TODO: replace url and filename attributes with methods
         self.artist_user_id = raw['user']['id']
         self.page_num = 0
 
@@ -92,7 +93,7 @@ class ImageJson:
 
     @property
     def image_filename(self):
-        return self.downloaded_images[self.page_num]
+        return pure.split_backslash_last(self.page_urls[self.page_num])
 
     @property
     def filepath(self):

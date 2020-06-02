@@ -150,6 +150,7 @@ def image_prompt(image):
         'f': image.show_full_res,
     }
 
+    keyseqs = []
     with TERM.cbreak():
         while True:
             print('Enter an image view command:')
@@ -159,6 +160,20 @@ def image_prompt(image):
             func = case.get(image_prompt_command, None)
             if func:
                 func()
+
+            elif image_prompt_command.isdigit():
+                keyseqs.append(image_prompt_command)
+                print(keyseqs)
+
+                # End of the sequence...
+                # Two digit sequence -- jump to post number
+                if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+
+                    first_num = keyseqs[0]
+                    second_num = keyseqs[1]
+                    selected_image_num = int(f'{first_num}{second_num}')
+
+                    image.jump_to_image(selected_image_num)
 
             elif image_prompt_command == 'm':
                 print(image.__doc__)
@@ -197,7 +212,6 @@ def image_prompt(image):
         # End while
     # End cbreak()
 
-    # image_prompt_command == "b"
     image.leave(force)
 
 def user_prompt(user_class):

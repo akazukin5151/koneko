@@ -78,12 +78,10 @@ class ImageJson:
         self.page_num = 0
 
         self.number_of_pages, self.page_urls = pure.page_urls_in_post(raw, 'large')
-        if self.number_of_pages == 1:
-            self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
-        else:
-            # So it won't be duplicated later
-            self.download_path = (KONEKODIR / str(self.artist_user_id) / 'individual' /
-                              str(image_id))
+        self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
+        if self.number_of_pages != 1:
+            # Store multi image posts within their own dir
+            self.download_path = self.download_path / str(image_id)
 
     @property
     def image_filename(self):

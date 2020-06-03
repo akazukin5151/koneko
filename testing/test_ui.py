@@ -17,7 +17,7 @@ def test_open_link_coords(monkeypatch):
 def test_download_image_coords(monkeypatch):
     monkeypatch.setattr('koneko.api.myapi.protected_download', lambda x: True)
     monkeypatch.setattr('koneko.utils.verify_full_download', lambda x: True)
-    monkeypatch.setattr('koneko.download.download_core', lambda *a: True)
+    monkeypatch.setattr('koneko.download.download_core', lambda *a, **k: True)
     ui.download_image_coords(data, 1, 2)
     # Try if not verified first, then true
     responses = iter([False, True])

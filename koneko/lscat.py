@@ -56,11 +56,17 @@ def ycoords_config():
     paddingy = settings.getint('images_y_spacing', fallback=1)
     return ycoords(TERM.height, img_height, paddingy)
 
-def page_spacing_config(fallback):
+def gallery_page_spacing_config():
     settings = utils.get_config_section('lscat')
     if not settings:
-        return fallback
-    return settings.getint('gallery_page_spacing', fallback=fallback)
+        return 23
+    return settings.getint('gallery_page_spacing', fallback=23)
+
+def users_page_spacing_config():
+    settings = utils.get_config_section('lscat')
+    if not settings:
+        return 20
+    return settings.getint('users_page_spacing', fallback=20)
 
 def thumbnail_size_config():
     settings = utils.get_config_section('lscat')
@@ -180,7 +186,7 @@ def generate_page(path):
     number_of_cols = ncols_config()
 
     # Does not catch if config doesn't exist, because it must exist
-    page_spacing = page_spacing_config(23)
+    page_spacing = gallery_page_spacing_config()
     thumbnail_size = thumbnail_size_config()
 
     while True:
@@ -205,7 +211,7 @@ def generate_users(path, noprint=False):
     os.system('clear')
 
     message_xcoord, padding = get_gen_users_settings()
-    page_spacing = page_spacing_config(20)
+    page_spacing = users_page_spacing_config()
     thumbnail_size = thumbnail_size_config()
 
     while True:

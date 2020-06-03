@@ -12,6 +12,10 @@ from tqdm import tqdm
 from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
                     download)
 
+def open_in_browser(image_id):
+    link = f'https://www.pixiv.net/artworks/{image_id}'
+    os.system(f'xdg-open {link}')
+    print(f'Opened {link} in browser!')
 
 class AbstractGallery(ABC):
     def __init__(self):
@@ -65,22 +69,19 @@ class AbstractGallery(ABC):
 
     def open_link_num(self, number):
         # Update current_page_illusts, in case if you're in another page
-        image_id = self.data.image_id(number)
-        link = f'https://www.pixiv.net/artworks/{image_id}'
-        os.system(f'xdg-open {link}')
-        print(f'Opened {link}!\n')
+        open_in_browser(self.data.image_id(number))
 
     def download_image_coords(self, first_num, second_num):
         selected_image_num = pure.find_number_map(int(first_num), int(second_num))
-        if not selected_image_num:
+        # 0 is acceptable, but is falsy; but 0 'is not' False
+        if selected_image_num is False:
             print('Invalid number!')
         else:
             self.download_image_num(selected_image_num)
 
     def download_image_num(self, number):
         # Update current_page_illusts, in case if you're in another page
-        post_json = self.data.post_json(number)
-        download.download_image_verified(post_json=post_json)
+        download.download_url_verified(self.data.url(number))
 
     def view_image(self, selected_image_num):
         post_json = self.data.post_json(selected_image_num)
@@ -437,19 +438,15 @@ class Image:
         self._firstmode = firstmode
 
     def open_image(self):
-        link = f'https://www.pixiv.net/artworks/{self.data.image_id}'
-        os.system(f'xdg-open {link}')
-        print(f'Opened {link} in browser')
+        open_in_browser(self.data.image_id)
 
     def download_image(self):
         # Doing the same job as full_img_details
-        large_url = pure.change_url_to_full(url=self.data.current_url)
-        filename = pure.split_backslash_last(large_url)
-        filepath = pure.generate_filepath(filename)
-        download.download_image_verified(url=large_url, filename=filename,
-                                         filepath=filepath)
+        download.download_url_verified(self.data.current_url)
 
     def show_full_res(self):
+        # FIXME: some images that need to be downloaded in png won't work
+        # Can use verified function above
         large_url = pure.change_url_to_full(url=self.data.current_url)
         filename = pure.split_backslash_last(large_url)
         download.download_core(self.data.download_path, large_url, filename)
@@ -606,7 +603,8 @@ class AbstractUsers(ABC):
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
         # Wait for initial request to finish, so the data object is instantiated
-        self.parse_thread.join()
+        if hasattr(self, 'parse_thread'):
+            self.parse_thread.join()
         oldnum = self.data.page_num
 
         if self.data.next_url:

@@ -91,13 +91,8 @@ def test_post_titles_in_page():
 
 def test_change_url_to_full():
     assert (
-        pure.change_url_to_full(page_illusts[0], png=False)
-        == "https://i.pximg.net/img-original/img/2020/03/10/04/07/08/80017594_p0.jpg"
-    )
-    # Isn't actually needed for this image, but just testing
-    assert (
-        pure.change_url_to_full(page_illusts[0], png=True)
-        == "https://i.pximg.net/img-original/img/2020/03/10/04/07/08/80017594_p0.png"
+        pure.change_url_to_full("https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg")
+        == "https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p0.jpg"
     )
 
 def test_process_user_url():

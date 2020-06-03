@@ -128,7 +128,7 @@ class AbstractLoop(ABC):
         self.mode: 'Any'  # noqa: F821
 
     def start(self):
-        """Ask for further info if not provided; wait for log in then proceed"""
+        """Ask for further info if not provided, then proceed to mode"""
         while True:
             if self._prompted and not self._user_input:
                 self._prompt_url_id()

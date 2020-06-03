@@ -41,6 +41,25 @@ def download_image_num(data, number):
     # Update current_page_illusts, in case if you're in another page
     download.download_url_verified(data.url(number))
 
+def view_image(self, selected_image_num):
+    post_json = self.data.post_json(selected_image_num)
+    image_id = post_json.id
+    idata = data.ImageJson(post_json, image_id)
+
+    display_image(
+        post_json,
+        idata.artist_user_id,
+        selected_image_num,
+        self.data
+    )
+
+    # blocking: no way to unblock prompt
+    image = Image(image_id, idata, False)
+    prompt.image_prompt(image)
+
+    # Image prompt ends, user presses back
+    _back(self)
+
 def _back(self):
     """After user 'back's from image prompt or artist gallery, start mode again"""
     lscat.show_instant(lscat.TrackDownloads, self.data, True)
@@ -49,10 +68,8 @@ def _back(self):
     prompt.gallery_like_prompt(self)
 
 def next_page(self):
-    #self.prefetch_thread.join()
     self.data.current_page_num += 1
     if utils.dir_not_empty(self.data):
-        self._show = False
         lscat.show_instant(lscat.TrackDownloads, self.data, True)
     else:
         print('This is the last page!')
@@ -110,7 +127,6 @@ def reload(self):
 class AbstractGallery(ABC):
     def __init__(self):
         self.data = data.GalleryJson(1, self._main_path)
-        self._show = True
         self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
         self._main_path: 'Path'
@@ -124,12 +140,10 @@ class AbstractGallery(ABC):
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
         if utils.dir_not_empty(self.data):
-            self._show = False
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
             if self.data.download_path.is_dir():
                 self.data.download_path.rmdir()
-            self._show = True
 
         api.myapi.await_login()
         current_page = self._pixivrequest()
@@ -164,23 +178,7 @@ class AbstractGallery(ABC):
         download_image_num(self.data, number)
 
     def view_image(self, selected_image_num):
-        post_json = self.data.post_json(selected_image_num)
-        image_id = post_json.id
-        idata = data.ImageJson(post_json, image_id)
-
-        display_image(
-            post_json,
-            idata.artist_user_id,
-            selected_image_num,
-            self.data
-        )
-
-        # blocking: no way to unblock prompt
-        image = Image(image_id, idata, False)
-        prompt.image_prompt(image)
-
-        # Image prompt ends, user presses back
-        self._back()
+        view_image(self, selected_image_num)
 
     def _back(self):
         _back(self)
@@ -577,7 +575,6 @@ class AbstractUsers(ABC):
     def __init__(self, user_or_id):
         self.data: 'data.UserJson'
         self._input = user_or_id
-        self._show = True
         self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
         self._main_path: 'Path'

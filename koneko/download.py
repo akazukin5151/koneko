@@ -39,6 +39,10 @@ def async_download_core(download_path, urls, rename_images=False,
     oldnames = itertools.filterfalse(os.path.isfile, oldnames)
     helper = downloadr(pbar=pbar, tracker=tracker)
 
+    # Nothing needs to be downloaded
+    if not urls:
+        return True
+
     with utils.cd(download_path):
         with ThreadPoolExecutor(max_workers=len(urls)) as executor:
             executor.map(helper, urls, oldnames, filtered)

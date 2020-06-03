@@ -12,6 +12,10 @@ from tqdm import tqdm
 from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
                     download)
 
+def open_in_browser(image_id):
+    link = f'https://www.pixiv.net/artworks/{image_id}'
+    os.system(f'xdg-open {link}')
+    print(f'Opened {link} in browser!')
 
 class AbstractGallery(ABC):
     def __init__(self):
@@ -65,10 +69,7 @@ class AbstractGallery(ABC):
 
     def open_link_num(self, number):
         # Update current_page_illusts, in case if you're in another page
-        image_id = self.data.image_id(number)
-        link = f'https://www.pixiv.net/artworks/{image_id}'
-        os.system(f'xdg-open {link}')
-        print(f'Opened {link}!\n')
+        open_in_browser(self.data.image_id(number))
 
     def download_image_coords(self, first_num, second_num):
         selected_image_num = pure.find_number_map(int(first_num), int(second_num))
@@ -437,9 +438,7 @@ class Image:
         self._firstmode = firstmode
 
     def open_image(self):
-        link = f'https://www.pixiv.net/artworks/{self.data.image_id}'
-        os.system(f'xdg-open {link}')
-        print(f'Opened {link} in browser')
+        open_in_browser(self.data.image_id)
 
     def download_image(self):
         # Doing the same job as full_img_details

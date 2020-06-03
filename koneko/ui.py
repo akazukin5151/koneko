@@ -164,20 +164,6 @@ class AbstractGallery(ABC):
             self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
             self.prefetch_thread.start()
 
-
-    def open_link_coords(self, first_num, second_num):
-        open_link_coords(self.data, first_num, second_num)
-
-    def open_link_num(self, number):
-        # Update current_page_illusts, in case if you're in another page
-        open_link_num(self.data, number)
-
-    def download_image_coords(self, first_num, second_num):
-        download_image_coords(self.data, first_num, second_num)
-
-    def download_image_num(self, number):
-        download_image_num(self.data, number)
-
     def view_image(self, selected_image_num):
         view_image(self, selected_image_num)
 
@@ -187,9 +173,6 @@ class AbstractGallery(ABC):
     def next_page(self):
         self.prefetch_thread.join()
         next_page(self)
-
-    def previous_page(self):
-        previous_page(self.data)
 
     @abstractmethod
     def _pixivrequest(self, **kwargs):

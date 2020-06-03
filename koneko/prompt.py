@@ -71,10 +71,13 @@ def gallery_like_prompt(gallery_like_class):
 
                     # Open or download given coords
                     if keyseqs[0] == 'o':
-                        gallery_like_class.open_link_coords(first_num, second_num)
+                        ui.open_link_coords(gallery_like_class.data,
+                                            first_num, second_num)
 
                     elif keyseqs[0] == 'd':
-                        gallery_like_class.download_image_coords(first_num, second_num)
+                        ui.download_image_coords(gallery_like_class.data,
+                                                 first_num, second_num)
+
                     elif keyseqs[0] == 'a':
                         break
 
@@ -82,7 +85,7 @@ def gallery_like_prompt(gallery_like_class):
                     selected_image_num = int(f'{first_num}{second_num}')
 
                     if keyseqs[0] == 'O':
-                        gallery_like_class.open_link_num(selected_image_num)
+                        ui.open_link_num(gallery_like_class.data, selected_image_num)
                     elif keyseqs[0] == 'D':
                         gallery_like_class.download_image_num(selected_image_num)
                     elif keyseqs[0] == 'A':
@@ -103,7 +106,7 @@ def gallery_like_prompt(gallery_like_class):
                 gallery_like_class.next_page()
 
             elif gallery_command == 'p':
-                gallery_like_class.previous_page()
+                ui.previous_page(gallery_like_class.data)
 
             elif gallery_command == 'q':
                 print('Are you sure you want to exit?')

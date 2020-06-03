@@ -84,14 +84,14 @@ def next_page(self):
     if str(self.data.current_page_num + 1) not in self.data.cached_pages:
         _prefetch_next_page(self)
 
-def previous_page(self):
-    if self.data.current_page_num > 1:
-        self.data.current_page_num -= 1
+def previous_page(data):
+    if data.current_page_num > 1:
+        data.current_page_num -= 1
 
-        lscat.show_instant(lscat.TrackDownloads, self.data, True)
+        lscat.show_instant(lscat.TrackDownloads, data, True)
 
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
+        pure.print_multiple_imgs(data.current_illusts)
+        print(f'Page {data.current_page_num}')
         print('Enter a gallery command:\n')
 
     else:
@@ -123,6 +123,7 @@ def reload(self):
         self.start()
     prompt.gallery_like_prompt(self)
     # Regardless of confirmation, need to catch itself with a prompt
+
 
 class AbstractGallery(ABC):
     def __init__(self):
@@ -188,7 +189,7 @@ class AbstractGallery(ABC):
         next_page(self)
 
     def previous_page(self):
-        previous_page(self)
+        previous_page(self.data)
 
     @abstractmethod
     def _pixivrequest(self, **kwargs):

@@ -445,6 +445,8 @@ class Image:
         download.download_url_verified(self.data.current_url)
 
     def show_full_res(self):
+        # FIXME: some images that need to be downloaded in png won't work
+        # Can use verified function above
         large_url = pure.change_url_to_full(url=self.data.current_url)
         filename = pure.split_backslash_last(large_url)
         download.download_core(self.data.download_path, large_url, filename)

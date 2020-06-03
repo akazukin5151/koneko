@@ -606,7 +606,8 @@ class AbstractUsers(ABC):
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
         # Wait for initial request to finish, so the data object is instantiated
-        self.parse_thread.join()
+        if hasattr(self, 'parse_thread'):
+            self.parse_thread.join()
         oldnum = self.data.page_num
 
         if self.data.next_url:

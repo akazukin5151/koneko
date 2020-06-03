@@ -90,17 +90,13 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
-* I wonder what happens if you enter invalid credentials
-* Complete unit tests
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Terminal reliability
 * Option to use pillow or wand to edit numbers on pics
-* Support [ueberzug](https://github.com/seebye/ueberzug)
 
 ## Features
 
-* For multi-image posts in image view, enter a number to jump to the post's page
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
 
 ## Upcoming changelog (in dev branch)
@@ -119,6 +115,9 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * See README.md and example_config.ini for more details
     * TODO: document the settings in terms of what they actually are
 * Boolean settings in the config now accepts ('1', 'yes', 'true', or 'on') for True, and anything else as False.
+* Warn user for invalid credentials
+* Image mode can now jump to specified page number, in a multi-image post
+* Image mode now prefetches the next image in another thread
 
 #### Internal code
 * Added lots of tests

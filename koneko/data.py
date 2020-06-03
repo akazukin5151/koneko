@@ -74,25 +74,18 @@ class ImageJson:
     """Stores data for image view (mode 2)"""
     def __init__(self, raw, image_id):
         self.image_id = image_id
-        self.url = pure.url_given_size(raw, 'large')
-        self.filename = pure.split_backslash_last(self.url)
         self.artist_user_id = raw['user']['id']
         self.page_num = 0
 
         self.number_of_pages, self.page_urls = pure.page_urls_in_post(raw, 'large')
-        if self.number_of_pages == 1:
-            self.downloaded_images = None
-            self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
-        else:
-            self.downloaded_images = list(map(pure.split_backslash_last,
-                                              self.page_urls[:2]))
-            # So it won't be duplicated later
-            self.download_path = (KONEKODIR / str(self.artist_user_id) / 'individual' /
-                              str(image_id))
+        self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
+        if self.number_of_pages != 1:
+            # Store multi image posts within their own dir
+            self.download_path = self.download_path / str(image_id)
 
     @property
     def image_filename(self):
-        return self.downloaded_images[self.page_num]
+        return pure.split_backslash_last(self.page_urls[self.page_num])
 
     @property
     def filepath(self):

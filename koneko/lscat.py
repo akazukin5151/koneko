@@ -149,6 +149,11 @@ class TrackDownloads(AbstractTracker):
         self.generator = generate_page(data.download_path)
         self.generator.send(None)
 
+def read_invis(data):
+    with utils.cd(data.download_path):
+        with open('.koneko', 'r') as f:
+            return int(f.read())
+
 class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
@@ -158,9 +163,7 @@ class TrackDownloadsUsers(AbstractTracker):
         try:
             splitpoint = data.splitpoint
         except AttributeError:
-            with utils.cd(data.download_path):
-                with open('.koneko', 'r') as f:
-                    splitpoint = int(f.read())
+            splitpoint = read_invis(data)
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is

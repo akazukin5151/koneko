@@ -123,48 +123,22 @@ def download_core(large_dir, url, filename, try_make_dir=True):
             downloadr(url, filename, None)
 
 
-def download_image_verified(image_id=None, post_json=None, png=False, **kwargs):
-    """
-    This downloads an image, checks if it's valid. If not, retry with png.
-    Used for downloading full-res, single only; on-user-demand
-    """
-    if png and 'url' in kwargs: # Called from recursion
-        # IMPROVEMENT This is copied from full_img_details()...
-        url = pure.change_url_to_full(url=kwargs['url'], png=True)
-        filename = pure.split_backslash_last(url)
-        filepath = pure.generate_filepath(filename)
-
-    elif not kwargs:
-        url, filename, filepath = full_img_details(
-            image_id=image_id, post_json=post_json, png=png
-        )
-    else:
-        url = kwargs['url']
-        filename = kwargs['filename']
-        filepath = kwargs['filepath']
-
-    download_path = Path('~/Downloads').expanduser()
-    download_core(download_path, url, filename, try_make_dir=False)
-
-    verified = utils.verify_full_download(filepath)
-    if not verified:
-        download_image_verified(url=url, png=True)
-    else:
-        print(f'Image downloaded at {filepath}\n')
-
-@utils.spinner('Getting full image details... ')
-def full_img_details(png=False, post_json=None, image_id=None):
-    """
-    All in one function that gets the full-resolution url, filename, and
-    filepath of given image id. Or it can get the id given the post json
-    """
-    if image_id and not post_json:
-        current_image = api.myapi.protected_illust_detail(image_id)
-
-        post_json = current_image.illust
-
-    url = pure.change_url_to_full(post_json=post_json, png=png)
+def full_img_details(url, png=False):
+    # Example of an image that needs to be downloaded in png: 77803142
+    url = pure.change_url_to_full(url, png=png)
     filename = pure.split_backslash_last(url)
     filepath = pure.generate_filepath(filename)
     return url, filename, filepath
 
+def download_url_verified(url, png=False):
+    # Returned url might be different if png is True
+    url, filename, filepath = full_img_details(url, png=png)
+    download_path = Path('~/Downloads').expanduser()
+
+    download_core(download_path, url, filename, try_make_dir=False)
+
+    verified = utils.verify_full_download(filepath)
+    if not verified:
+        download_url_verified(url, png=True)
+    else:
+        print(f'Image downloaded at {filepath}\n')

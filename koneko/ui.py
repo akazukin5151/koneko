@@ -73,15 +73,15 @@ class AbstractGallery(ABC):
 
     def download_image_coords(self, first_num, second_num):
         selected_image_num = pure.find_number_map(int(first_num), int(second_num))
-        if not selected_image_num:
+        # 0 is acceptable, but is falsy; but 0 'is not' False
+        if selected_image_num is False:
             print('Invalid number!')
         else:
             self.download_image_num(selected_image_num)
 
     def download_image_num(self, number):
         # Update current_page_illusts, in case if you're in another page
-        post_json = self.data.post_json(number)
-        download.download_image_verified(post_json=post_json)
+        download.download_url_verified(self.data.url(number))
 
     def view_image(self, selected_image_num):
         post_json = self.data.post_json(selected_image_num)
@@ -442,11 +442,7 @@ class Image:
 
     def download_image(self):
         # Doing the same job as full_img_details
-        large_url = pure.change_url_to_full(url=self.data.current_url)
-        filename = pure.split_backslash_last(large_url)
-        filepath = pure.generate_filepath(filename)
-        download.download_image_verified(url=large_url, filename=filename,
-                                         filepath=filepath)
+        download.download_url_verified(self.data.current_url)
 
     def show_full_res(self):
         large_url = pure.change_url_to_full(url=self.data.current_url)

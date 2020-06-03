@@ -69,6 +69,9 @@ class GalleryJson:
         """Just a wrapper, for init_download"""
         return self.current_page_num
 
+    def url(self, number):
+        return pure.url_given_size(self.post_json(number), 'large')
+
 
 class ImageJson:
     """Stores data for image view (mode 2)"""

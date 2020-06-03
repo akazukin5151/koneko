@@ -101,13 +101,11 @@ def page_urls_in_post(post_json, size='medium'):
     return number_of_pages, page_urls
 
 
-def change_url_to_full(post_json=None, png=False, url=None):
+def change_url_to_full(url, png=False):
     """
     The 'large' resolution url isn't the largest. This uses changes the url to
     the highest resolution available
     """
-    if post_json:
-        url = url_given_size(post_json, 'large')
     url = re.sub(r'_master\d+', '', url)
     url = re.sub(r'c\/\d+x\d+_\d+_\w+\/img-master', 'img-original', url)
 

@@ -117,6 +117,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Boolean settings in the config now accepts ('1', 'yes', 'true', or 'on') for True, and anything else as False.
 * Warn user for invalid credentials
 * Image mode can now jump to specified page number, in a multi-image post
+* Image mode now prefetches the next image in another thread
 
 #### Internal code
 * Added lots of tests

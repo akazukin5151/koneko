@@ -17,28 +17,29 @@ def open_in_browser(image_id):
     os.system(f'xdg-open {link}')
     print(f'Opened {link} in browser!')
 
-def open_link_coords(self, first_num, second_num):
+def open_link_coords(data, first_num, second_num):
     selected_image_num = pure.find_number_map(int(first_num), int(second_num))
-    if not selected_image_num:
+    if selected_image_num is False:
         print('Invalid number!')
     else:
-        open_link_num(self, selected_image_num)
+        open_link_num(data, selected_image_num)
 
-def open_link_num(self, number):
+def open_link_num(data, number):
     # Update current_page_illusts, in case if you're in another page
-    open_in_browser(self.data.image_id(number))
+    open_in_browser(data.image_id(number))
 
-def download_image_coords(self, first_num, second_num):
+
+def download_image_coords(data, first_num, second_num):
     selected_image_num = pure.find_number_map(int(first_num), int(second_num))
     # 0 is acceptable, but is falsy; but 0 'is not' False
     if selected_image_num is False:
         print('Invalid number!')
     else:
-        download_image_num(self, selected_image_num)
+        download_image_num(data, selected_image_num)
 
-def download_image_num(self, number):
+def download_image_num(data, number):
     # Update current_page_illusts, in case if you're in another page
-    download.download_url_verified(self.data.url(number))
+    download.download_url_verified(data.url(number))
 
 def _back(self):
     """After user 'back's from image prompt or artist gallery, start mode again"""
@@ -150,17 +151,17 @@ class AbstractGallery(ABC):
 
 
     def open_link_coords(self, first_num, second_num):
-        open_link_coords(self, first_num, second_num)
+        open_link_coords(self.data, first_num, second_num)
 
     def open_link_num(self, number):
         # Update current_page_illusts, in case if you're in another page
-        open_link_num(self, number)
+        open_link_num(self.data, number)
 
     def download_image_coords(self, first_num, second_num):
-        download_image_coords(self, first_num, second_num)
+        download_image_coords(self.data, first_num, second_num)
 
     def download_image_num(self, number):
-        download_image_num(self, number)
+        download_image_num(self.data, number)
 
     def view_image(self, selected_image_num):
         post_json = self.data.post_json(selected_image_num)
@@ -270,7 +271,7 @@ class ArtistGallery(AbstractGallery):
             prompt.gallery_like_prompt(self) # Go back to while loop
         elif len(keyseqs) == 2:
             selected_image_num = pure.find_number_map(first_num, second_num)
-            if not selected_image_num:
+            if selected_image_num is False:
                 print('Invalid number!')
                 prompt.gallery_like_prompt(self) # Go back to while loop
             else:
@@ -361,7 +362,7 @@ class IllustFollowGallery(AbstractGallery):
             self.go_artist_gallery_num(selected_image_num)
         elif len(keyseqs) == 2:
             selected_image_num = pure.find_number_map(first_num, second_num)
-            if not selected_image_num:
+            if selected_image_num is False:
                 print('Invalid number!')
                 prompt.gallery_like_prompt(self) # Go back to while loop
             else:

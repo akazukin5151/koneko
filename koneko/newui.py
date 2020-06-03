@@ -19,8 +19,7 @@ def open_in_browser(image_id):
 
 def open_link_coords(self, first_num, second_num):
     selected_image_num = pure.find_number_map(int(first_num), int(second_num))
-    # 0 is acceptable, but is falsy; but 0 'is not' False
-    if selected_image_num is False:
+    if not selected_image_num:
         print('Invalid number!')
     else:
         open_link_num(self, selected_image_num)
@@ -28,7 +27,6 @@ def open_link_coords(self, first_num, second_num):
 def open_link_num(self, number):
     # Update current_page_illusts, in case if you're in another page
     open_in_browser(self.data.image_id(number))
-
 
 class AbstractGallery(ABC):
     def __init__(self):
@@ -77,6 +75,7 @@ class AbstractGallery(ABC):
         open_link_coords(self, first_num, second_num)
 
     def open_link_num(self, number):
+        # Update current_page_illusts, in case if you're in another page
         open_link_num(self, number)
 
     def download_image_coords(self, first_num, second_num):
@@ -251,8 +250,7 @@ class ArtistGallery(AbstractGallery):
             prompt.gallery_like_prompt(self) # Go back to while loop
         elif len(keyseqs) == 2:
             selected_image_num = pure.find_number_map(first_num, second_num)
-            # 0 is acceptable, but is falsy; but 0 'is not' False
-            if selected_image_num is False:
+            if not selected_image_num:
                 print('Invalid number!')
                 prompt.gallery_like_prompt(self) # Go back to while loop
             else:

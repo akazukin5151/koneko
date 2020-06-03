@@ -19,7 +19,7 @@ def ask_quit():
             elif ans:
                 break
 
-def gallery_like_prompt(gallery_like_class):
+def gallery_like_prompt(gallery_instance):
     """
     Only contains logic for interpreting key presses, and do the correct action
     Sequence means a combination of more than one key.
@@ -71,11 +71,11 @@ def gallery_like_prompt(gallery_like_class):
 
                     # Open or download given coords
                     if keyseqs[0] == 'o':
-                        ui.open_link_coords(gallery_like_class.data,
+                        ui.open_link_coords(gallery_instance.data,
                                             first_num, second_num)
 
                     elif keyseqs[0] == 'd':
-                        ui.download_image_coords(gallery_like_class.data,
+                        ui.download_image_coords(gallery_instance.data,
                                                  first_num, second_num)
 
                     elif keyseqs[0] == 'a':
@@ -85,9 +85,9 @@ def gallery_like_prompt(gallery_like_class):
                     selected_image_num = int(f'{first_num}{second_num}')
 
                     if keyseqs[0] == 'O':
-                        ui.open_link_num(gallery_like_class.data, selected_image_num)
+                        ui.open_link_num(gallery_instance.data, selected_image_num)
                     elif keyseqs[0] == 'D':
-                        gallery_like_class.download_image_num(selected_image_num)
+                        gallery_instance.download_image_num(selected_image_num)
                     elif keyseqs[0] == 'A':
                         break
                     elif keyseqs[0] == 'i':
@@ -103,10 +103,10 @@ def gallery_like_prompt(gallery_like_class):
 
             # No sequence, execute their functions immediately
             elif gallery_command == 'n':
-                gallery_like_class.next_page()
+                gallery_instance.next_page()
 
             elif gallery_command == 'p':
-                ui.previous_page(gallery_like_class.data)
+                ui.previous_page(gallery_instance.data)
 
             elif gallery_command == 'q':
                 print('Are you sure you want to exit?')
@@ -121,10 +121,10 @@ def gallery_like_prompt(gallery_like_class):
                 break
 
             elif gallery_command == 'm':
-                print(gallery_like_class.__doc__)
+                print(gallery_instance.__doc__)
 
             elif gallery_command == 'h':
-                gallery_like_class.help()
+                gallery_instance.help()
 
             elif gallery_command.code == 343:  # Enter
                 pass
@@ -135,7 +135,7 @@ def gallery_like_prompt(gallery_like_class):
             # End if
         # End while
     # End cbreak()
-    gallery_like_class.handle_prompt(keyseqs, gallery_command, selected_image_num,
+    gallery_instance.handle_prompt(keyseqs, gallery_command, selected_image_num,
                                      first_num, second_num)
 
 def image_prompt(image):
@@ -218,7 +218,7 @@ def image_prompt(image):
 
     image.leave(force)
 
-def user_prompt(user_class):
+def user_prompt(user_instance):
     """
     Handles key presses for user views (following users and user search)
     """
@@ -230,12 +230,12 @@ def user_prompt(user_class):
             user_prompt_command = TERM.inkey()
 
             if user_prompt_command == 'n':
-                user_class.next_page()
+                user_instance.next_page()
                 # Prevents catching "n" and messing up the cache
                 time.sleep(0.5)
 
             elif user_prompt_command == 'p':
-                user_class.previous_page()
+                user_instance.previous_page()
 
             elif user_prompt_command == 'r':
                 break
@@ -286,6 +286,6 @@ def user_prompt(user_class):
     # End cbreak()
 
     if user_prompt_command == 'r':
-        user_class.reload()
+        user_instance.reload()
     else:
-        user_class.go_artist_mode(selected_user_num)
+        user_instance.go_artist_mode(selected_user_num)

@@ -87,7 +87,7 @@ def gallery_like_prompt(gallery_instance):
                     if keyseqs[0] == 'O':
                         ui.open_link_num(gallery_instance.data, selected_image_num)
                     elif keyseqs[0] == 'D':
-                        gallery_instance.download_image_num(selected_image_num)
+                        ui.download_image_num(gallery_instance.data, selected_image_num)
                     elif keyseqs[0] == 'A':
                         break
                     elif keyseqs[0] == 'i':
@@ -235,7 +235,7 @@ def user_prompt(user_instance):
                 time.sleep(0.5)
 
             elif user_prompt_command == 'p':
-                user_instance.previous_page()
+                ui.previous_page_users(user_instance.data)
 
             elif user_prompt_command == 'r':
                 break

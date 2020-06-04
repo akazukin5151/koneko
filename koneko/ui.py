@@ -542,6 +542,23 @@ class Image:
         self.thread = thread
         self.event = event
 
+
+def previous_page_users(data):
+    if data.page_num > 1:
+        data.page_num -= 1
+        data.offset = int(data.offset) - 30
+        _show_page(data)
+    else:
+        print('This is the first page!')
+
+def _show_page(data):
+    if not utils.dir_not_empty(data):
+        print('This is the last page!')
+        data.page_num -= 1
+        return False
+
+    lscat.show_instant(lscat.TrackDownloadsUsers, data)
+
 class AbstractUsers(ABC):
     """
     User view commands (No need to press enter):
@@ -602,12 +619,7 @@ class AbstractUsers(ABC):
             self.data.update(result)
 
     def _show_page(self):
-        if not utils.dir_not_empty(self.data):
-            print('This is the last page!')
-            self.data.page_num -= 1
-            return False
-
-        lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
+        _show_page(self.data)
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
@@ -637,12 +649,7 @@ class AbstractUsers(ABC):
         self._prefetch_next_page()
 
     def previous_page(self):
-        if self.data.page_num > 1:
-            self.data.page_num -= 1
-            self.data.offset = int(self.data.offset) - 30
-            self._show_page()
-        else:
-            print('This is the first page!')
+        previous_page_users(self.data)
 
     def go_artist_mode(self, selected_user_num):
         try:

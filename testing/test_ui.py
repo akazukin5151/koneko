@@ -56,21 +56,44 @@ def test_show_full_res(monkeypatch):
 def test_next_image(monkeypatch):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
+    data.page_urls = False
+
+    # Only image
+    data.number_of_pages = 1
+    assert not ui.next_image(data)
+
+    # Last image
     data.page_urls = 'fake'
     data.number_of_pages = 2
+    assert not ui.next_image(data)
+
     data.image_filename = 'fake'
+    data.filepath = 'fake'
+    data.number_of_pages = 10
     ui.next_image(data)
 
 def test_previous_image(monkeypatch):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
+    data.page_urls = False
+
+    # Only image
+    data.number_of_pages = 1
+    assert not ui.previous_image(data)
+
+    # First image
     data.page_urls = 'fake'
-    data.number_of_pages = 2
+    data.page_num = 0
+    assert not ui.previous_image(data)
+
     data.image_filename = 'fake'
-    ui.next_image(data)
+    data.filepath = 'fake'
+    data.number_of_pages = 10
+    data.page_num = 2
+    ui.previous_image(data)
 
 def test_prefetch_next_image(monkeypatch):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
     data.next_img_url = 'fake'
-    ui.next_image(data)
+    ui._prefetch_next_image(data)
 

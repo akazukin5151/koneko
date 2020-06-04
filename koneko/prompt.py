@@ -179,6 +179,10 @@ def image_prompt(image):
                     keyseqs = []
                     ui.jump_to_image(image.data, selected_image_num)
 
+            elif image_prompt_command.code == 361:  # Escape
+                keyseqs = []
+                print(keyseqs)
+
             elif image_prompt_command == 'm':
                 print(image.__doc__)
 

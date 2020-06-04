@@ -522,7 +522,7 @@ def previous_image(data):
     jump_to_image(data, data.page_num + 1)
 
 def jump_to_image(data, selected_image_num: int):
-    if 0 >= selected_image_num > len(data.page_urls):
+    if selected_image_num <= 0 or selected_image_num > len(data.page_urls):
         print("Invalid number!")
         return False
 

@@ -111,7 +111,7 @@ class AbstractGallery(ABC):
         prompt.image_prompt(image)
 
         # Image prompt ends, user presses back
-        _back(self)
+        self._back(self)
 
     def _back(self):
         """After user 'back's from image prompt or artist gallery, start mode again"""
@@ -136,7 +136,7 @@ class AbstractGallery(ABC):
 
         # Skip prefetching again for cases like next -> prev -> next
         if str(self.data.current_page_num + 1) not in self.data.cached_pages:
-            _prefetch_next_page(self)
+            self._prefetch_next_page(self)
 
     @abstractmethod
     def _pixivrequest(self, **kwargs):

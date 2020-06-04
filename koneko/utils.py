@@ -45,10 +45,12 @@ def spinner(call, message=''):
     done = threading.Event()
     spinner_thread = threading.Thread(target=_spin, args=(done, message))
     spinner_thread.start()
-    result = call()  # Run the wrapped function
-    done.set()
-    spinner_thread.join()
-    return result
+    try:
+        return call()  # Run the wrapped function
+    finally:
+        # On exception, stop the spinner
+        done.set()
+        spinner_thread.join()
 
 def verify_full_download(filepath):
     verified = imghdr.what(filepath)

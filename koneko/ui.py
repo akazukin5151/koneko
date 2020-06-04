@@ -436,66 +436,27 @@ class Image:
         open_in_browser(self.data.image_id)
 
     def download_image(self):
-        # Doing the same job as full_img_details
         download.download_url_verified(self.data.current_url)
 
     def show_full_res(self):
-        # FIXME: some images that need to be downloaded in png won't work
-        # Can use verified function above
-        large_url = pure.change_url_to_full(url=self.data.current_url)
-        filename = pure.split_backslash_last(large_url)
-        download.download_core(self.data.download_path, large_url, filename)
-        lscat.icat(self.data.download_path / filename)
+        show_full_res(self.data)
 
     def next_image(self):
-        if not self.data.page_urls:
-            print('This is the only page in the post!')
-            return False
-        elif self.data.page_num + 1 == self.data.number_of_pages:
-            print('This is the last image in the post!')
-            return False
-
-        # jump_to_image corrects for 1-based
-        self.data.page_num += 1
-        self.jump_to_image(self.data.page_num + 1)
+        next_image(self.data)
 
     def previous_image(self):
-        if not self.data.page_urls:
-            print('This is the only page in the post!')
-            return False
-        elif self.data.page_num == 0:
-            print('This is the first image in the post!')
-            return False
-
-        self.data.page_num -= 1
-        self.jump_to_image(self.data.page_num + 1)
+        previous_image(self.data)
 
     def jump_to_image(self, selected_image_num: int):
-        if 0 >= selected_image_num > len(self.data.page_urls):
-            print("Invalid number!")
-            return False
-
-        # Internally 0-based, but externally 1-based
-        self.data.page_num = selected_image_num - 1
-        self._jump()
+        jump_to_image(self.data, selected_image_num)
 
     def _jump(self):
-        """Downloads next image if not downloaded, display it, prefetch next"""
-        if not (self.data.download_path / self.data.image_filename).is_dir():
-            download.async_download_spinner(self.data.download_path,
-                                            [self.data.current_url])
-
-        lscat.icat(self.data.filepath)
-
-        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
+        _jump(self.data)
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_image)
         self.prefetch_thread.start()
 
     def _prefetch_next_image(self):
-        with funcy.suppress(IndexError):
-            next_img_url = self.data.next_img_url
-        if next_img_url:
-            download.async_download_spinner(self.data.download_path, [next_img_url])
+        _prefetch_next_image(self.data)
 
     def leave(self, force=False):
         if self._firstmode or force:
@@ -526,6 +487,65 @@ class Image:
         """Experimental"""
         self.thread = thread
         self.event = event
+
+
+
+def show_full_res(data):
+    # FIXME: some images that need to be downloaded in png won't work
+    # Can use verified function above
+    large_url = pure.change_url_to_full(url=data.current_url)
+    filename = pure.split_backslash_last(large_url)
+    download.download_core(data.download_path, large_url, filename)
+    lscat.icat(data.download_path / filename)
+
+def next_image(data):
+    if not data.page_urls:
+        print('This is the only page in the post!')
+        return False
+    elif data.page_num + 1 == data.number_of_pages:
+        print('This is the last image in the post!')
+        return False
+
+    # jump_to_image corrects for 1-based
+    data.page_num += 1
+    jump_to_image(data, data.page_num + 1)
+
+def previous_image(data):
+    if not data.page_urls:
+        print('This is the only page in the post!')
+        return False
+    elif data.page_num == 0:
+        print('This is the first image in the post!')
+        return False
+
+    data.page_num -= 1
+    jump_to_image(data, data.page_num + 1)
+
+def jump_to_image(data, selected_image_num: int):
+    if 0 >= selected_image_num > len(data.page_urls):
+        print("Invalid number!")
+        return False
+
+    # Internally 0-based, but externally 1-based
+    data.page_num = selected_image_num - 1
+    _jump(data)
+
+def _jump(data):
+    """Downloads next image if not downloaded, display it, prefetch next"""
+    if not (data.download_path / data.image_filename).is_dir():
+        download.async_download_spinner(data.download_path,
+                                        [data.current_url])
+
+    lscat.icat(data.filepath)
+
+    print(f'Page {data.page_num+1}/{data.number_of_pages}')
+
+def _prefetch_next_image(data):
+    with funcy.suppress(IndexError):
+        next_img_url = data.next_img_url
+    if next_img_url:
+        download.async_download_spinner(data.download_path, [next_img_url])
+
 
 
 def previous_page_users(data):

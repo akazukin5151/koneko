@@ -177,7 +177,7 @@ def image_prompt(image):
                     selected_image_num = int(f'{first_num}{second_num}')
 
                     keyseqs = []
-                    image.jump_to_image(selected_image_num)
+                    jump_to_image(image.data, selected_image_num)
 
             elif image_prompt_command == 'm':
                 print(image.__doc__)

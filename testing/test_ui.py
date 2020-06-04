@@ -1,4 +1,6 @@
 import pytest
+from pathlib import Path
+
 from koneko import ui
 
 class FakeData:
@@ -43,3 +45,32 @@ def test_previous_page_users(monkeypatch):
     monkeypatch.setattr('koneko.utils.dir_not_empty', lambda *a: False)
     assert not ui.previous_page_users(data)
     assert data.offset == 60
+
+def test_show_full_res(monkeypatch):
+    monkeypatch.setattr('koneko.download.download_core', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
+    data.current_url = 'fake'
+    data.download_path = Path('fake')
+    ui.show_full_res(data)
+
+def test_next_image(monkeypatch):
+    monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
+    data.page_urls = 'fake'
+    data.number_of_pages = 2
+    data.image_filename = 'fake'
+    ui.next_image(data)
+
+def test_previous_image(monkeypatch):
+    monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
+    data.page_urls = 'fake'
+    data.number_of_pages = 2
+    data.image_filename = 'fake'
+    ui.next_image(data)
+
+def test_prefetch_next_image(monkeypatch):
+    monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
+    data.next_img_url = 'fake'
+    ui.next_image(data)
+

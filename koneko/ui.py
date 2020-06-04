@@ -41,49 +41,6 @@ def download_image_num(data, number):
     # Update current_page_illusts, in case if you're in another page
     download.download_url_verified(data.url(number))
 
-def view_image(self, selected_image_num):
-    post_json = self.data.post_json(selected_image_num)
-    image_id = post_json.id
-    idata = data.ImageJson(post_json, image_id)
-
-    display_image(
-        post_json,
-        idata.artist_user_id,
-        selected_image_num,
-        self.data
-    )
-
-    # blocking: no way to unblock prompt
-    image = Image(image_id, idata, False)
-    prompt.image_prompt(image)
-
-    # Image prompt ends, user presses back
-    _back(self)
-
-def _back(self):
-    """After user 'back's from image prompt or artist gallery, start mode again"""
-    lscat.show_instant(lscat.TrackDownloads, self.data, True)
-    pure.print_multiple_imgs(self.data.current_illusts)
-    print(f'Page {self.data.current_page_num}')
-    prompt.gallery_like_prompt(self)
-
-def next_page(self):
-    self.data.current_page_num += 1
-    if utils.dir_not_empty(self.data):
-        lscat.show_instant(lscat.TrackDownloads, self.data, True)
-    else:
-        print('This is the last page!')
-        self.data.current_page_num -= 1
-        return False
-
-    pure.print_multiple_imgs(self.data.current_illusts)
-    print(f'Page {self.data.current_page_num}')
-    print('Enter a gallery command:\n')
-
-    # Skip prefetching again for cases like next -> prev -> next
-    if str(self.data.current_page_num + 1) not in self.data.cached_pages:
-        _prefetch_next_page(self)
-
 def previous_page(data):
     if data.current_page_num > 1:
         data.current_page_num -= 1
@@ -96,33 +53,6 @@ def previous_page(data):
 
     else:
         print('This is the first page!')
-
-def _prefetch_next_page(self):
-    next_url = self.data.next_url
-    if not next_url:  # this is the last page
-        return
-
-    parse_page = api.myapi.parse_next(next_url)
-    next_page = self._pixivrequest(**parse_page)
-    self.data.all_pages_cache[str(self.data.current_page_num + 1)] = next_page
-
-    current_page_illusts = next_page['illusts']
-    download_path = self._main_path / str(self.data.current_page_num + 1)
-
-    if not download_path.is_dir():
-        oldnum = self.data.current_page_num
-        self.data.current_page_num += 1
-        download.download_page(self.data)
-        self.data.current_page_num = oldnum
-
-def reload(self):
-    ans = input('This will delete cached images and redownload them. Proceed?\n')
-    if ans == 'y' or not ans:
-        os.system(f'rm -r {self._main_path}') # shutil.rmtree is better
-        self.data.all_pages_cache = {} # Ensures prefetch after reloading
-        self.start()
-    prompt.gallery_like_prompt(self)
-    # Regardless of confirmation, need to catch itself with a prompt
 
 
 class AbstractGallery(ABC):
@@ -165,24 +95,79 @@ class AbstractGallery(ABC):
             self.prefetch_thread.start()
 
     def view_image(self, selected_image_num):
-        view_image(self, selected_image_num)
+        post_json = self.data.post_json(selected_image_num)
+        image_id = post_json.id
+        idata = data.ImageJson(post_json, image_id)
+
+        display_image(
+            post_json,
+            idata.artist_user_id,
+            selected_image_num,
+            self.data
+        )
+
+        # blocking: no way to unblock prompt
+        image = Image(image_id, idata, False)
+        prompt.image_prompt(image)
+
+        # Image prompt ends, user presses back
+        _back(self)
 
     def _back(self):
-        _back(self)
+        """After user 'back's from image prompt or artist gallery, start mode again"""
+        lscat.show_instant(lscat.TrackDownloads, self.data, True)
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+        prompt.gallery_like_prompt(self)
 
     def next_page(self):
         self.prefetch_thread.join()
-        next_page(self)
+        self.data.current_page_num += 1
+        if utils.dir_not_empty(self.data):
+            lscat.show_instant(lscat.TrackDownloads, self.data, True)
+        else:
+            print('This is the last page!')
+            self.data.current_page_num -= 1
+            return False
+
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+        print('Enter a gallery command:\n')
+
+        # Skip prefetching again for cases like next -> prev -> next
+        if str(self.data.current_page_num + 1) not in self.data.cached_pages:
+            _prefetch_next_page(self)
 
     @abstractmethod
     def _pixivrequest(self, **kwargs):
         raise NotImplementedError
 
     def _prefetch_next_page(self):
-        _prefetch_next_page(self)
+        next_url = self.data.next_url
+        if not next_url:  # this is the last page
+            return
+
+        parse_page = api.myapi.parse_next(next_url)
+        next_page = self._pixivrequest(**parse_page)
+        self.data.all_pages_cache[str(self.data.current_page_num + 1)] = next_page
+
+        current_page_illusts = next_page['illusts']
+        download_path = self._main_path / str(self.data.current_page_num + 1)
+
+        if not download_path.is_dir():
+            oldnum = self.data.current_page_num
+            self.data.current_page_num += 1
+            download.download_page(self.data)
+            self.data.current_page_num = oldnum
 
     def reload(self):
-        reload(self)
+        ans = input('This will delete cached images and redownload them. Proceed?\n')
+        if ans == 'y' or not ans:
+            os.system(f'rm -r {self._main_path}') # shutil.rmtree is better
+            self.data.all_pages_cache = {} # Ensures prefetch after reloading
+            self.start()
+        prompt.gallery_like_prompt(self)
+        # Regardless of confirmation, need to catch itself with a prompt
 
     @abstractmethod
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,

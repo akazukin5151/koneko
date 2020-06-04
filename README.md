@@ -90,7 +90,6 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
-* Convert ui class methods into free functions, so they can be tested easier
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Terminal reliability

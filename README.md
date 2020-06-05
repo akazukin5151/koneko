@@ -92,9 +92,6 @@ For more details refer to the [manual](#manual).
 
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
-## Terminal reliability
-* Option to use pillow or wand to edit numbers on pics
-
 ## Features
 
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)

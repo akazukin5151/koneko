@@ -139,3 +139,25 @@ def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak):
 #    fakegallery = FakeGallery()
 #    with pytest.raises(SystemExit):
 #        assert prompt.gallery_like_prompt(fakegallery)
+
+
+class FakeImage:
+    def open_image(self):     sys.exit(0)
+    def download_image(self): sys.exit(0)
+    def next_image(self):     sys.exit(0)
+    def previous_image(self): sys.exit(0)
+    def show_full_res(self):  sys.exit(0)
+    def leave(self, *a):      sys.exit(0)
+
+def test_image_prompt(monkeypatch, patch_cbreak):
+    monkeypatch.setattr('koneko.prompt.ask_quit', lambda: sys.exit(0))
+    for letter in (u'a', u'b', u'q', u'o', u'd', u'n', u'p', u'f'):
+        class FakeInKeyNew(FakeInKey):
+            def __call__(self):
+                return Keystroke(ucs=letter, code=1, name=letter)
+
+        fake_inkey = FakeInKeyNew()
+        monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
+        fakeimage = FakeImage()
+        with pytest.raises(SystemExit):
+            assert prompt.image_prompt(fakeimage)

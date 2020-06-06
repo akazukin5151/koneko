@@ -12,6 +12,20 @@ from koneko import utils
 sys.path.append('testing')
 
 
+def test_find_number_map(monkeypatch):
+    monkeypatch.setattr('koneko.lscat.ncols_config', lambda: 5)
+    assert ([utils.find_number_map(x, y)
+             for y in range(1,7)
+             for x in range(1,6)] == list(range(30)))
+    assert not utils.find_number_map(0, 100)
+
+    monkeypatch.setattr('koneko.lscat.ncols_config', lambda: 6)
+    assert list(filter(
+            lambda x: x is not None,
+            [utils.find_number_map(x, y)
+                for y in range(1,7)
+                for x in range(1,7)])) == list(range(30))
+
 def test_cd():
     current_dir = os.getcwd()
     with utils.cd(current_dir):

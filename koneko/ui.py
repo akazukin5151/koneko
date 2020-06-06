@@ -18,7 +18,8 @@ def open_in_browser(image_id):
     print(f'Opened {link} in browser!')
 
 def open_link_coords(data, first_num, second_num):
-    selected_image_num = pure.find_number_map(int(first_num), int(second_num))
+    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
+    # 0 is acceptable; 0 is falsy but not False
     if selected_image_num is False:
         print('Invalid number!')
     else:
@@ -30,7 +31,7 @@ def open_link_num(data, number):
 
 
 def download_image_coords(data, first_num, second_num):
-    selected_image_num = pure.find_number_map(int(first_num), int(second_num))
+    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
     # 0 is acceptable, but is falsy; but 0 'is not' False
     if selected_image_num is False:
         print('Invalid number!')
@@ -237,7 +238,8 @@ class ArtistGallery(AbstractGallery):
             print('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self) # Go back to while loop
         elif len(keyseqs) == 2:
-            selected_image_num = pure.find_number_map(first_num, second_num)
+            selected_image_num = utils.find_number_map(first_num, second_num)
+            # 0 is acceptable; 0 is falsy but not False
             if selected_image_num is False:
                 print('Invalid number!')
                 prompt.gallery_like_prompt(self) # Go back to while loop
@@ -299,7 +301,7 @@ class IllustFollowGallery(AbstractGallery):
             return api.myapi.illust_follow_request(restrict='private') # Publicity
 
     def go_artist_gallery_coords(self, first_num, second_num):
-        selected_image_num = pure.find_number_map(int(first_num), int(second_num))
+        selected_image_num = utils.find_number_map(int(first_num), int(second_num))
         if selected_image_num is False: # 0 is valid!
             print('Invalid number!')
         else:
@@ -328,7 +330,8 @@ class IllustFollowGallery(AbstractGallery):
         elif keyseqs[0] == 'A':
             self.go_artist_gallery_num(selected_image_num)
         elif len(keyseqs) == 2:
-            selected_image_num = pure.find_number_map(first_num, second_num)
+            selected_image_num = utils.find_number_map(first_num, second_num)
+            # 0 is acceptable; 0 is falsy but not False
             if selected_image_num is False:
                 print('Invalid number!')
                 prompt.gallery_like_prompt(self) # Go back to while loop

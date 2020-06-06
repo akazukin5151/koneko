@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko import ui, pure, colors
+from koneko import ui, pure, colors, utils
 
 TERM = Terminal()
 
@@ -59,7 +59,7 @@ def gallery_like_prompt(gallery_instance):
 
                     first_num = int(keyseqs[0])
                     second_num = int(keyseqs[1])
-                    selected_image_num = pure.find_number_map(first_num, second_num)
+                    selected_image_num = utils.find_number_map(first_num, second_num)
 
                     break  # leave cbreak(), go to image prompt
 

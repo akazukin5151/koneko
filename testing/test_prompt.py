@@ -49,9 +49,6 @@ class FakeInKey:
     def __init__(self):
         self.code = True
 
-    def isdigit(self):
-        return False
-
     def __call__(self):
         return Keystroke(ucs=u'n', code=1, name=u'next')
 
@@ -104,3 +101,41 @@ def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak):
     fakegallery = FakeGallery()
     with pytest.raises(SystemExit):
         assert prompt.gallery_like_prompt(fakegallery)
+
+
+def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak):
+    class FakeInKey1(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=u'1', code=1, name=u'1')
+
+    class FakeInKey2(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=u'2', code=1, name=u'2')
+
+    fake_inkey = iter([FakeInKey1(), FakeInKey2()])
+    monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
+    monkeypatch.setattr('koneko.utils.find_number_map', lambda *a: 0)
+    fakegallery = FakeGallery()
+    with pytest.raises(SystemExit):
+        assert prompt.gallery_like_prompt(fakegallery)
+
+# Doesn't work for some reason, but sequencable_keys did trigger
+#def test_gallery_like_prompt_3_seq(monkeypatch, patch_cbreak):
+#    class FakeInKey0(FakeInKey):
+#        def __call__(self):
+#            return Keystroke(ucs=u'o', code=1, name=u'o')
+#
+#    class FakeInKey1(FakeInKey):
+#        def __call__(self):
+#            return Keystroke(ucs=u'1', code=1, name=u'1')
+#
+#    class FakeInKey2(FakeInKey):
+#        def __call__(self):
+#            return Keystroke(ucs=u'2', code=1, name=u'2')
+#
+#    fake_inkey = iter([FakeInKey0(), FakeInKey1(), FakeInKey2()])
+#    monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
+#    monkeypatch.setattr('koneko.ui.open_link_coords', lambda *a: sys.exit(0))
+#    fakegallery = FakeGallery()
+#    with pytest.raises(SystemExit):
+#        assert prompt.gallery_like_prompt(fakegallery)

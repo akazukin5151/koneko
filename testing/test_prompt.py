@@ -67,6 +67,7 @@ class FakeGallery:
         sys.exit(0)
 
 def test_gallery_like_prompt(monkeypatch, patch_cbreak):
+    fakegallery = FakeGallery()
     for letter in (u'n', u'h', u'b', u'r'):
         class FakeInKeyNew(FakeInKey):
             def __call__(self):
@@ -74,7 +75,6 @@ def test_gallery_like_prompt(monkeypatch, patch_cbreak):
 
         fake_inkey = FakeInKeyNew()
         monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-        fakegallery = FakeGallery()
         with pytest.raises(SystemExit):
             assert prompt.gallery_like_prompt(fakegallery)
 
@@ -142,6 +142,7 @@ def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak):
 
 
 class FakeImage:
+    def __init__(self):       self.data = None
     def open_image(self):     sys.exit(0)
     def download_image(self): sys.exit(0)
     def next_image(self):     sys.exit(0)
@@ -151,6 +152,7 @@ class FakeImage:
 
 def test_image_prompt(monkeypatch, patch_cbreak):
     monkeypatch.setattr('koneko.prompt.ask_quit', lambda: sys.exit(0))
+    fakeimage = FakeImage()
     for letter in (u'a', u'b', u'q', u'o', u'd', u'n', u'p', u'f'):
         class FakeInKeyNew(FakeInKey):
             def __call__(self):
@@ -158,6 +160,21 @@ def test_image_prompt(monkeypatch, patch_cbreak):
 
         fake_inkey = FakeInKeyNew()
         monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-        fakeimage = FakeImage()
         with pytest.raises(SystemExit):
             assert prompt.image_prompt(fakeimage)
+
+def test_image_prompt_seq(monkeypatch, patch_cbreak):
+    class FakeInKey1(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=u'1', code=1, name=u'1')
+
+    class FakeInKey2(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=u'2', code=1, name=u'2')
+
+    fake_inkey = iter([FakeInKey1(), FakeInKey2()])
+    monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
+    monkeypatch.setattr('koneko.ui.jump_to_image', lambda *a: sys.exit(0))
+    fakeimage = FakeImage()
+    with pytest.raises(SystemExit):
+        assert prompt.image_prompt(fakeimage)

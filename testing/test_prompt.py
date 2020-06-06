@@ -178,3 +178,41 @@ def test_image_prompt_seq(monkeypatch, patch_cbreak):
     fakeimage = FakeImage()
     with pytest.raises(SystemExit):
         assert prompt.image_prompt(fakeimage)
+
+
+
+class FakeUser:
+    def __init__(self):           self.data = None
+    def next_page(self):          sys.exit(0)
+    def reload(self):             sys.exit(0)
+    def go_artist_mode(self, *a): sys.exit(0)
+
+def test_user_prompt(monkeypatch, patch_cbreak):
+    monkeypatch.setattr('koneko.prompt.ask_quit', lambda: sys.exit(0))
+    monkeypatch.setattr('koneko.ui.previous_page_users', lambda *a: sys.exit(0))
+    fakeuser = FakeUser()
+    for letter in (u'n', u'r', u'p', u'q'):
+        class FakeInKeyNew(FakeInKey):
+            def __call__(self):
+                return Keystroke(ucs=letter, code=1, name=letter)
+
+        fake_inkey = FakeInKeyNew()
+        monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
+        with pytest.raises(SystemExit):
+            assert prompt.user_prompt(fakeuser)
+
+def test_user_prompt_seq(monkeypatch, patch_cbreak):
+    class FakeInKey1(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=u'1', code=1, name=u'1')
+
+    class FakeInKey2(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=u'2', code=1, name=u'2')
+
+    fake_inkey = iter([FakeInKey1(), FakeInKey2()])
+    monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
+    fakeuser= FakeUser()
+    with pytest.raises(SystemExit):
+        assert prompt.user_prompt(fakeuser)
+

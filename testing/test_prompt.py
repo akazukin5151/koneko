@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import Mock
 from contextlib import contextmanager
 
 from koneko import prompt
@@ -35,6 +36,7 @@ def test_ask_quit2(monkeypatch):
     responses = ['y', 'q', '', 'h']
     for letter in responses:
         fake_inkey.__call__ = lambda x: letter
+        monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
         with pytest.raises(SystemExit):
             assert prompt.ask_quit()
 

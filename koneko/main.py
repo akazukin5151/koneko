@@ -155,7 +155,7 @@ class AbstractLoop(ABC):
         raise NotImplementedError
 
     def _process_url_or_input(self):
-        self._user_input, _ = pure.process_user_url(self._url_or_id)
+        self._user_input = pure.process_user_url(self._url_or_id)
 
     def _validate_input(self):
         try:
@@ -196,7 +196,7 @@ class ViewPostModeLoop(AbstractLoop):
 
     def _process_url_or_input(self):
         """Overriding base class to account for 'illust_id' cases"""
-        self._user_input, _ = pure.process_artwork_url(self._url_or_id)
+        self._user_input = pure.process_artwork_url(self._url_or_id)
 
     def _go_to_mode(self):
         ui.view_post_mode(self._user_input)

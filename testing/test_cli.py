@@ -52,3 +52,16 @@ def test_mode5_no_link(monkeypatch):
     assert cli.process_cli_args() == ('5', None)
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'n']))
     assert cli.process_cli_args() == ('5', None)
+
+@pytest.mark.parametrize("arg", ('-v', '--version'))
+def test_version(monkeypatch, arg):
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
+    assert cli.process_cli_args() == ('vh', None)
+
+@pytest.mark.parametrize("arg", ('-h', '--help'))
+def test_help(monkeypatch, arg):
+    monkeypatch.setattr('koneko.cli.docopt',
+        lambda x: {'-h': True, '--help': True, '-v': False, '--version': False})
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
+    assert cli.process_cli_args() == ('vh', None)
+

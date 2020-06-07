@@ -116,6 +116,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Image mode can now jump to specified page number, in a multi-image post
 * Image mode now prefetches the next image in another thread
 * Fixed spinner not propagating exceptions
+* On reloading and clearing cache, the directory to be deleted will be shown
+* Fixed clearing the cache not working
 
 #### Internal code
 * Added lots of tests

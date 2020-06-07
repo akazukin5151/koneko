@@ -8,7 +8,8 @@ Usage:
   koneko (3|f) <link_or_id>
   koneko [4|s] <searchstr>
   koneko [5|n]
-  koneko -h
+  koneko (-h | --help)
+  koneko (-v | --version)
 
 Notes:
 *  If you supply a link and want to go to mode 3, you must give the (3|f) argument,
@@ -29,14 +30,15 @@ Required arguments if a mode is specified:
   <searchstr>   String to search for artists
 
 Options:
-  -h  Show this help
+  (-h | --help)     Show this help
+  (-v | --version)  Show version number
 """
 
 import sys
 
 from docopt import docopt
 
-from koneko import pure
+from koneko import pure, __version__
 
 
 def process_cli_args():
@@ -50,10 +52,21 @@ def process_cli_args():
         eg, modes 1/5 requires artist user id; mode 2, requires image id
     """
     args = docopt(__doc__)
+
+    # Handle version or help
+    if args['--version'] or args['-v']:
+        print(__version__)
+        return None, 'vh', None
+    elif args['--help'] or args['-h']:
+        print(__doc__)
+        return None, 'vh', None
+
+    # cli arguments
     if len(sys.argv) > 1:
         print('Logging in...')
         prompted = False
-    else:  # No cli arguments
+    # No cli arguments
+    else:
         return True, None, None
 
     # Argument given, no mode specified

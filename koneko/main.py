@@ -23,9 +23,14 @@ from koneko import ui, api, cli, pure, utils, prompt, screens
 
 def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
+    prompted, main_command, user_input = cli.process_cli_args()
+    if main_command == 'vh':
+        sys.exit(0)
+
     os.system('clear')
     credentials, your_id = utils.config()
 
+    # Handle startup picture missing
     if not Path('~/.local/share/koneko').expanduser().exists():
         print('Please wait, downloading welcome image (this will only occur once)...')
         baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
@@ -39,9 +44,7 @@ def main():
 
     api.myapi.add_credentials(credentials)
     api.myapi.start()
-
     # After this part, the API is logging in in the background and we can proceed
-    prompted, main_command, user_input = cli.process_cli_args()
 
     try:
         main_loop(prompted, main_command, user_input, your_id)

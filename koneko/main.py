@@ -23,9 +23,16 @@ from koneko import ui, api, cli, pure, utils, prompt, screens
 
 def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
-    prompted, main_command, user_input = cli.process_cli_args()
-    if main_command == 'vh':
-        sys.exit(0)
+
+    if len(sys.argv) <= 1:
+        # no cli arguments, prompt user for mode selection
+        prompted = True
+        main_command, user_input = None, None
+    else:
+        prompted = False
+        main_command, user_input = cli.process_cli_args()
+        if main_command == 'vh':
+            sys.exit(0)
 
     os.system('clear')
     credentials, your_id = utils.config()

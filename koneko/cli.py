@@ -56,14 +56,10 @@ def process_cli_args():
     # Handle version or help
     if args['--version'] or args['-v']:
         print(__version__)
-        return None, 'vh', None
+        return 'vh', None
     elif args['--help'] or args['-h']:
         print(__doc__)
-        return None, 'vh', None
-
-    # no cli arguments
-    if len(sys.argv) <= 1:
-        return True, None, None
+        return 'vh', None
 
     # Yes it's a lie
     print('Logging in...')
@@ -71,34 +67,34 @@ def process_cli_args():
     # Argument given, no mode specified
     if url_or_str := args['<link>']:
         if 'users' in url_or_str:
-            return False, '1', pure.process_user_url(url_or_str)
+            return '1', pure.process_user_url(url_or_str)
 
         elif 'artworks' in url_or_str or 'illust_id' in url_or_str:
-            return False, '2', pure.process_artwork_url(url_or_str)
+            return '2', pure.process_artwork_url(url_or_str)
 
         # Assume you won't search for '3' or 'f'
         elif url_or_str == '3' or url_or_str == 'f':
-            return False, '3', None
+            return '3', None
 
         # Assume you won't search for '5' or 'n'
         elif url_or_str == '5' or url_or_str == 'n':
-            return False, '5', None
+            return '5', None
 
         else:  # Mode 4, string to search for artists
-            return False, '4', url_or_str
+            return '4', url_or_str
 
     # Mode specified, argument can be link or id
     elif url_or_id := args['<link_or_id>']:
         if args['1'] or args['a']:
-            return False, '1', pure.process_user_url(url_or_id)
+            return '1', pure.process_user_url(url_or_id)
 
         elif args['2'] or args['i']:
-            return False, '2', pure.process_artwork_url(url_or_id)
+            return '2', pure.process_artwork_url(url_or_id)
 
         elif args['3'] or args['f']:
-            return False, '3', pure.process_user_url(url_or_id)
+            return '3', pure.process_user_url(url_or_id)
 
     elif user_input := args['<searchstr>']:
-        return False, '4', user_input
+        return '4', user_input
 
     raise Exception("Unknown command line argument!")

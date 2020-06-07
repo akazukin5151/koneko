@@ -73,9 +73,8 @@ class AbstractGallery(ABC):
         """
         if utils.dir_not_empty(self.data):
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
-        else:
-            if self.data.download_path.is_dir():
-                self.data.download_path.rmdir()
+        elif self.data.download_path.is_dir():
+            self.data.download_path.rmdir()
 
         api.myapi.await_login()
         current_page = self._pixivrequest()
@@ -162,7 +161,8 @@ class AbstractGallery(ABC):
             self.data.current_page_num = oldnum
 
     def reload(self):
-        ans = input('This will delete cached images and redownload them. Proceed?\n')
+        print('This will delete cached images and redownload them. Proceed?')
+        ans = input(f'Directory to be deleted: {self._main_path}\n')
         if ans == 'y' or not ans:
             os.system(f'rm -r {self._main_path}') # shutil.rmtree is better
             self.data.all_pages_cache = {} # Ensures prefetch after reloading
@@ -672,7 +672,8 @@ class AbstractUsers(ABC):
             prompt.user_prompt(self)
 
     def reload(self):
-        ans = input('This will delete cached images and redownload them. Proceed?\n')
+        print('This will delete cached images and redownload them. Proceed?')
+        ans = input(f'Directory to be deleted: {self._main_path}\n')
         if ans == 'y' or not ans:
             os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
             self.__init__(self.data._input)

@@ -62,11 +62,12 @@ def show_man_loop():
 @pure.catch_ctrl_c
 def clear_cache_loop():
     print('Do you want to remove all cached images?')
-    print('This will not remove images you explicitly downloaded.')
+    print('This will not remove images you explicitly downloaded to ~/Downloads.')
+    print(f'Directory to be deleted: {KONEKODIR}')
     while True:
         help_command = input('\nEnter y to confirm: ')
         if help_command == 'y':
-            shutil.rmtree('/tmp/koneko/')
+            shutil.rmtree(KONEKODIR)
             os.system('clear')
             break
         else:

@@ -76,7 +76,6 @@ def main_loop(prompted, main_command, user_input, your_id=None):
     while True:
         if prompted and not user_input:
             main_command = screens.begin_prompt(printmessage)
-            printmessage = False
 
         if main_command == '1':
             ArtistModeLoop(prompted, user_input).start()

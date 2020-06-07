@@ -118,12 +118,15 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed spinner not propagating exceptions
 * On reloading and clearing cache, the directory to be deleted will be shown
 * Fixed clearing the cache not working
+* Added -v/--version option
+* Added --help option
 
 #### Internal code
 * Added lots of tests
 * CI now tries to launch the application to make sure it doesn't crash on start and I didn't make any silly mistakes when building
 * Updated requirements.txt
 * Moved stuff like begin prompt and show man loop from `utils.py` to `screens.py`
+* Refactored cli.py
 
 
 # FAQ

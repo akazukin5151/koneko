@@ -177,8 +177,13 @@ def test_open_link(monkeypatch):
     monkeypatch.setattr('koneko.ui.ArtistGallery.start', lambda x: True)
     monkeypatch.setattr('koneko.ui.os.system', lambda x: True)
     mode = ui.ArtistGallery(1234)
-    mode.data.image_id = lambda x: 5678
-    mode.open_link_coords(1, 2)
+
+    class FakeData:
+        def image_id(self):
+            return 1
+    data = FakeData
+
+    ui.open_link_coords(data, 1, 2)
 
 #@pytest.mark.integration
 #def test_download_image(monkeypatch):

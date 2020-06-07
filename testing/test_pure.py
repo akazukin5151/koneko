@@ -38,13 +38,6 @@ def test_prefix_artist_name():
     assert pure.prefix_artist_name("name1", 2) == f"02\n{' ' * 19}name1"
     assert pure.prefix_artist_name("name2", 10) == f"10\n{' ' * 19}name2"
 
-def test_find_number_map():
-    assert ([pure.find_number_map(x, y)
-             for y in range(1,7)
-             for x in range(1,6)] == list(range(30)))
-    assert pure.find_number_map(0, 100) == False
-
-
 def test_print_multiple_imgs(capsys):
     assert pure.print_multiple_imgs(page_illusts) == None
     captured = capsys.readouterr()

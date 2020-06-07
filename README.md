@@ -90,11 +90,7 @@ For more details refer to the [manual](#manual).
 
 # Roadmap
 
-* Convert ui class methods into free functions, so they can be tested easier
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
-
-## Terminal reliability
-* Option to use pillow or wand to edit numbers on pics
 
 ## Features
 
@@ -119,6 +115,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Warn user for invalid credentials
 * Image mode can now jump to specified page number, in a multi-image post
 * Image mode now prefetches the next image in another thread
+* Fixed spinner not propagating exceptions
 
 #### Internal code
 * Added lots of tests

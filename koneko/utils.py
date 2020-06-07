@@ -2,12 +2,32 @@ import os
 import imghdr
 import itertools
 import threading
+from math import ceil
 from getpass import getpass
 from pathlib import Path
 from contextlib import contextmanager
 from configparser import ConfigParser
 
 import funcy
+
+from koneko import lscat
+
+
+def find_number_map(x, y):
+    """Translates 1-based-index coordinates into (0-) indexable number
+    For 5 cols and 6 rows:
+        5 columns and 6 rows == 30 images
+        -1 accounts for the input being 1-based-index but python being 0-based
+        mod 5: x is cyclic for every 5
+        +5y: adding a 5 for every row 'moves one square down' on the 5x6 grid
+
+    >>> a = [find_number_map(x,y) for y in range(1,7) for x in range(1,6)]
+    >>> assert a == list(range(30))
+    """
+    ncols = lscat.ncols_config()
+    nrows = ceil(30 / ncols)
+    if 1 <= x <= ncols and 1 <= y <= nrows:
+        return ((x - 1) % ncols) + (ncols * (y - 1))
 
 
 @contextmanager
@@ -45,10 +65,12 @@ def spinner(call, message=''):
     done = threading.Event()
     spinner_thread = threading.Thread(target=_spin, args=(done, message))
     spinner_thread.start()
-    result = call()  # Run the wrapped function
-    done.set()
-    spinner_thread.join()
-    return result
+    try:
+        return call()  # Run the wrapped function
+    finally:
+        # On exception, stop the spinner
+        done.set()
+        spinner_thread.join()
 
 def verify_full_download(filepath):
     verified = imghdr.what(filepath)

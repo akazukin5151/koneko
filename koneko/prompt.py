@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko import ui, pure, colors
+from koneko import ui, pure, colors, utils
 
 TERM = Terminal()
 
@@ -19,7 +19,7 @@ def ask_quit():
             elif ans:
                 break
 
-def gallery_like_prompt(gallery_like_class):
+def gallery_like_prompt(gallery_instance):
     """
     Only contains logic for interpreting key presses, and do the correct action
     Sequence means a combination of more than one key.
@@ -59,7 +59,7 @@ def gallery_like_prompt(gallery_like_class):
 
                     first_num = int(keyseqs[0])
                     second_num = int(keyseqs[1])
-                    selected_image_num = pure.find_number_map(first_num, second_num)
+                    selected_image_num = utils.find_number_map(first_num, second_num)
 
                     break  # leave cbreak(), go to image prompt
 
@@ -71,10 +71,13 @@ def gallery_like_prompt(gallery_like_class):
 
                     # Open or download given coords
                     if keyseqs[0] == 'o':
-                        gallery_like_class.open_link_coords(first_num, second_num)
+                        ui.open_link_coords(gallery_instance.data,
+                                            first_num, second_num)
 
                     elif keyseqs[0] == 'd':
-                        gallery_like_class.download_image_coords(first_num, second_num)
+                        ui.download_image_coords(gallery_instance.data,
+                                                 first_num, second_num)
+
                     elif keyseqs[0] == 'a':
                         break
 
@@ -82,9 +85,9 @@ def gallery_like_prompt(gallery_like_class):
                     selected_image_num = int(f'{first_num}{second_num}')
 
                     if keyseqs[0] == 'O':
-                        gallery_like_class.open_link_num(selected_image_num)
+                        ui.open_link_num(gallery_instance.data, selected_image_num)
                     elif keyseqs[0] == 'D':
-                        gallery_like_class.download_image_num(selected_image_num)
+                        ui.download_image_num(gallery_instance.data, selected_image_num)
                     elif keyseqs[0] == 'A':
                         break
                     elif keyseqs[0] == 'i':
@@ -100,10 +103,10 @@ def gallery_like_prompt(gallery_like_class):
 
             # No sequence, execute their functions immediately
             elif gallery_command == 'n':
-                gallery_like_class.next_page()
+                gallery_instance.next_page()
 
             elif gallery_command == 'p':
-                gallery_like_class.previous_page()
+                ui.previous_page(gallery_instance.data)
 
             elif gallery_command == 'q':
                 print('Are you sure you want to exit?')
@@ -118,10 +121,10 @@ def gallery_like_prompt(gallery_like_class):
                 break
 
             elif gallery_command == 'm':
-                print(gallery_like_class.__doc__)
+                print(gallery_instance.__doc__)
 
             elif gallery_command == 'h':
-                gallery_like_class.help()
+                gallery_instance.help()
 
             elif gallery_command.code == 343:  # Enter
                 pass
@@ -132,7 +135,7 @@ def gallery_like_prompt(gallery_like_class):
             # End if
         # End while
     # End cbreak()
-    gallery_like_class.handle_prompt(keyseqs, gallery_command, selected_image_num,
+    gallery_instance.handle_prompt(keyseqs, gallery_command, selected_image_num,
                                      first_num, second_num)
 
 def image_prompt(image):
@@ -174,7 +177,11 @@ def image_prompt(image):
                     selected_image_num = int(f'{first_num}{second_num}')
 
                     keyseqs = []
-                    image.jump_to_image(selected_image_num)
+                    ui.jump_to_image(image.data, selected_image_num)
+
+            elif image_prompt_command.code == 361:  # Escape
+                keyseqs = []
+                print(keyseqs)
 
             elif image_prompt_command == 'm':
                 print(image.__doc__)
@@ -215,7 +222,7 @@ def image_prompt(image):
 
     image.leave(force)
 
-def user_prompt(user_class):
+def user_prompt(user_instance):
     """
     Handles key presses for user views (following users and user search)
     """
@@ -227,12 +234,12 @@ def user_prompt(user_class):
             user_prompt_command = TERM.inkey()
 
             if user_prompt_command == 'n':
-                user_class.next_page()
+                user_instance.next_page()
                 # Prevents catching "n" and messing up the cache
                 time.sleep(0.5)
 
             elif user_prompt_command == 'p':
-                user_class.previous_page()
+                ui.previous_page_users(user_instance.data)
 
             elif user_prompt_command == 'r':
                 break
@@ -283,6 +290,6 @@ def user_prompt(user_class):
     # End cbreak()
 
     if user_prompt_command == 'r':
-        user_class.reload()
+        user_instance.reload()
     else:
-        user_class.go_artist_mode(selected_user_num)
+        user_instance.go_artist_mode(selected_user_num)

@@ -35,23 +35,6 @@ def prefix_artist_name(name, number):
     new_file_name = f"{number_prefix}\n{' ' * 19}{name}"
     return new_file_name
 
-def find_number_map(x, y):
-    """Translates 1-based-index coordinates into (0-) indexable number
-    5 columns and 6 rows == 30 images
-    -1 accounts for the input being 1-based-index but python being 0-based
-    mod 5: x is cyclic for every 5
-    +5y: adding a 5 for every row 'moves one square down' on the 5x6 grid
-
-    >>> a = [find_number_map(x,y) for y in range(1,7) for x in range(1,6)]
-    >>> assert a == list(range(30))
-    """
-    # In brackets: the accepted ranges for 5x6 grid
-    if not (1 <= x <= 5 and 1 <= y <= 6):
-        print('Invalid number!')
-        return False
-    return ((x - 1) % 5) + (5 * (y - 1))
-
-
 def print_multiple_imgs(illusts_json):
     _red = Fore.RED
     _r = Fore.RESET

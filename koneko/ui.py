@@ -17,10 +17,48 @@ def open_in_browser(image_id):
     os.system(f'xdg-open {link}')
     print(f'Opened {link} in browser!')
 
+def open_link_coords(data, first_num, second_num):
+    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
+    # 0 is acceptable; 0 is falsy but not False
+    if selected_image_num is False:
+        print('Invalid number!')
+    else:
+        open_link_num(data, selected_image_num)
+
+def open_link_num(data, number):
+    # Update current_page_illusts, in case if you're in another page
+    open_in_browser(data.image_id(number))
+
+
+def download_image_coords(data, first_num, second_num):
+    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
+    # 0 is acceptable, but is falsy; but 0 'is not' False
+    if selected_image_num is False:
+        print('Invalid number!')
+    else:
+        download_image_num(data, selected_image_num)
+
+def download_image_num(data, number):
+    # Update current_page_illusts, in case if you're in another page
+    download.download_url_verified(data.url(number))
+
+def previous_page(data):
+    if data.current_page_num > 1:
+        data.current_page_num -= 1
+
+        lscat.show_instant(lscat.TrackDownloads, data, True)
+
+        pure.print_multiple_imgs(data.current_illusts)
+        print(f'Page {data.current_page_num}')
+        print('Enter a gallery command:\n')
+
+    else:
+        print('This is the first page!')
+
+
 class AbstractGallery(ABC):
     def __init__(self):
         self.data = data.GalleryJson(1, self._main_path)
-        self._show = True
         self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
         self._main_path: 'Path'
@@ -34,12 +72,10 @@ class AbstractGallery(ABC):
         Else, fetch current_page json and proceed download -> show -> prefetch
         """
         if utils.dir_not_empty(self.data):
-            self._show = False
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
             if self.data.download_path.is_dir():
                 self.data.download_path.rmdir()
-            self._show = True
 
         api.myapi.await_login()
         current_page = self._pixivrequest()
@@ -59,30 +95,6 @@ class AbstractGallery(ABC):
             self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
             self.prefetch_thread.start()
 
-
-    def open_link_coords(self, first_num, second_num):
-        selected_image_num = pure.find_number_map(int(first_num), int(second_num))
-        if not selected_image_num:
-            print('Invalid number!')
-        else:
-            self.open_link_num(selected_image_num)
-
-    def open_link_num(self, number):
-        # Update current_page_illusts, in case if you're in another page
-        open_in_browser(self.data.image_id(number))
-
-    def download_image_coords(self, first_num, second_num):
-        selected_image_num = pure.find_number_map(int(first_num), int(second_num))
-        # 0 is acceptable, but is falsy; but 0 'is not' False
-        if selected_image_num is False:
-            print('Invalid number!')
-        else:
-            self.download_image_num(selected_image_num)
-
-    def download_image_num(self, number):
-        # Update current_page_illusts, in case if you're in another page
-        download.download_url_verified(self.data.url(number))
-
     def view_image(self, selected_image_num):
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
@@ -100,7 +112,7 @@ class AbstractGallery(ABC):
         prompt.image_prompt(image)
 
         # Image prompt ends, user presses back
-        self._back()
+        self._back(self)
 
     def _back(self):
         """After user 'back's from image prompt or artist gallery, start mode again"""
@@ -113,7 +125,6 @@ class AbstractGallery(ABC):
         self.prefetch_thread.join()
         self.data.current_page_num += 1
         if utils.dir_not_empty(self.data):
-            self._show = False
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
         else:
             print('This is the last page!')
@@ -126,28 +137,13 @@ class AbstractGallery(ABC):
 
         # Skip prefetching again for cases like next -> prev -> next
         if str(self.data.current_page_num + 1) not in self.data.cached_pages:
-            self._prefetch_next_page()
-
-    def previous_page(self):
-        if self.data.current_page_num > 1:
-            self.data.current_page_num -= 1
-
-            lscat.show_instant(lscat.TrackDownloads, self.data, True)
-
-            pure.print_multiple_imgs(self.data.current_illusts)
-            print(f'Page {self.data.current_page_num}')
-            print('Enter a gallery command:\n')
-
-        else:
-            print('This is the first page!')
+            self._prefetch_next_page(self)
 
     @abstractmethod
     def _pixivrequest(self, **kwargs):
         raise NotImplementedError
 
     def _prefetch_next_page(self):
-        # TODO: move this somewhere else
-        # print("   Prefetching next page...", flush=True, end="\r")
         next_url = self.data.next_url
         if not next_url:  # this is the last page
             return
@@ -242,8 +238,9 @@ class ArtistGallery(AbstractGallery):
             print('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self) # Go back to while loop
         elif len(keyseqs) == 2:
-            selected_image_num = pure.find_number_map(first_num, second_num)
-            if not selected_image_num:
+            selected_image_num = utils.find_number_map(first_num, second_num)
+            # 0 is acceptable; 0 is falsy but not False
+            if selected_image_num is False:
                 print('Invalid number!')
                 prompt.gallery_like_prompt(self) # Go back to while loop
             else:
@@ -304,7 +301,7 @@ class IllustFollowGallery(AbstractGallery):
             return api.myapi.illust_follow_request(restrict='private') # Publicity
 
     def go_artist_gallery_coords(self, first_num, second_num):
-        selected_image_num = pure.find_number_map(int(first_num), int(second_num))
+        selected_image_num = utils.find_number_map(int(first_num), int(second_num))
         if selected_image_num is False: # 0 is valid!
             print('Invalid number!')
         else:
@@ -333,8 +330,9 @@ class IllustFollowGallery(AbstractGallery):
         elif keyseqs[0] == 'A':
             self.go_artist_gallery_num(selected_image_num)
         elif len(keyseqs) == 2:
-            selected_image_num = pure.find_number_map(first_num, second_num)
-            if not selected_image_num:
+            selected_image_num = utils.find_number_map(first_num, second_num)
+            # 0 is acceptable; 0 is falsy but not False
+            if selected_image_num is False:
                 print('Invalid number!')
                 prompt.gallery_like_prompt(self) # Go back to while loop
             else:
@@ -441,66 +439,27 @@ class Image:
         open_in_browser(self.data.image_id)
 
     def download_image(self):
-        # Doing the same job as full_img_details
         download.download_url_verified(self.data.current_url)
 
     def show_full_res(self):
-        # FIXME: some images that need to be downloaded in png won't work
-        # Can use verified function above
-        large_url = pure.change_url_to_full(url=self.data.current_url)
-        filename = pure.split_backslash_last(large_url)
-        download.download_core(self.data.download_path, large_url, filename)
-        lscat.icat(self.data.download_path / filename)
+        show_full_res(self.data)
 
     def next_image(self):
-        if not self.data.page_urls:
-            print('This is the only page in the post!')
-            return False
-        elif self.data.page_num + 1 == self.data.number_of_pages:
-            print('This is the last image in the post!')
-            return False
-
-        # jump_to_image corrects for 1-based
-        self.data.page_num += 1
-        self.jump_to_image(self.data.page_num + 1)
+        next_image(self.data)
 
     def previous_image(self):
-        if not self.data.page_urls:
-            print('This is the only page in the post!')
-            return False
-        elif self.data.page_num == 0:
-            print('This is the first image in the post!')
-            return False
-
-        self.data.page_num -= 1
-        self.jump_to_image(self.data.page_num + 1)
+        previous_image(self.data)
 
     def jump_to_image(self, selected_image_num: int):
-        if 0 >= selected_image_num > len(self.data.page_urls):
-            print("Invalid number!")
-            return False
-
-        # Internally 0-based, but externally 1-based
-        self.data.page_num = selected_image_num - 1
-        self._jump()
+        jump_to_image(self.data, selected_image_num)
 
     def _jump(self):
-        """Downloads next image if not downloaded, display it, prefetch next"""
-        if not (self.data.download_path / self.data.image_filename).is_dir():
-            download.async_download_spinner(self.data.download_path,
-                                            [self.data.current_url])
-
-        lscat.icat(self.data.filepath)
-
-        print(f'Page {self.data.page_num+1}/{self.data.number_of_pages}')
+        _jump(self.data)
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_image)
         self.prefetch_thread.start()
 
     def _prefetch_next_image(self):
-        with funcy.suppress(IndexError):
-            next_img_url = self.data.next_img_url
-        if next_img_url:
-            download.async_download_spinner(self.data.download_path, [next_img_url])
+        _prefetch_next_image(self.data)
 
     def leave(self, force=False):
         if self._firstmode or force:
@@ -532,6 +491,82 @@ class Image:
         self.thread = thread
         self.event = event
 
+
+
+def show_full_res(data):
+    # FIXME: some images that need to be downloaded in png won't work
+    # Can use verified function above
+    large_url = pure.change_url_to_full(url=data.current_url)
+    filename = pure.split_backslash_last(large_url)
+    download.download_core(data.download_path, large_url, filename)
+    lscat.icat(data.download_path / filename)
+
+def next_image(data):
+    if not data.page_urls:
+        print('This is the only page in the post!')
+        return False
+    elif data.page_num + 1 == data.number_of_pages:
+        print('This is the last image in the post!')
+        return False
+
+    # jump_to_image corrects for 1-based
+    data.page_num += 1
+    jump_to_image(data, data.page_num + 1)
+
+def previous_image(data):
+    if not data.page_urls:
+        print('This is the only page in the post!')
+        return False
+    elif data.page_num == 0:
+        print('This is the first image in the post!')
+        return False
+
+    data.page_num -= 1
+    jump_to_image(data, data.page_num + 1)
+
+def jump_to_image(data, selected_image_num: int):
+    if selected_image_num <= 0 or selected_image_num > len(data.page_urls):
+        print("Invalid number!")
+        return False
+
+    # Internally 0-based, but externally 1-based
+    data.page_num = selected_image_num - 1
+    _jump(data)
+
+def _jump(data):
+    """Downloads next image if not downloaded, display it, prefetch next"""
+    if not (data.download_path / data.image_filename).is_dir():
+        download.async_download_spinner(data.download_path,
+                                        [data.current_url])
+
+    lscat.icat(data.filepath)
+
+    print(f'Page {data.page_num+1}/{data.number_of_pages}')
+
+def _prefetch_next_image(data):
+    with funcy.suppress(IndexError):
+        next_img_url = data.next_img_url
+    if next_img_url:
+        download.async_download_spinner(data.download_path, [next_img_url])
+
+
+
+def previous_page_users(data):
+    if data.page_num > 1:
+        data.page_num -= 1
+        data.offset = int(data.offset) - 30
+        _show_page(data)
+    else:
+        print('This is the first page!')
+
+def _show_page(data):
+    if not utils.dir_not_empty(data):
+        print('This is the last page!')
+        data.page_num -= 1
+        return False
+
+    lscat.show_instant(lscat.TrackDownloadsUsers, data)
+
 class AbstractUsers(ABC):
     """
     User view commands (No need to press enter):
@@ -549,7 +584,6 @@ class AbstractUsers(ABC):
     def __init__(self, user_or_id):
         self.data: 'data.UserJson'
         self._input = user_or_id
-        self._show = True
         self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
         self._main_path: 'Path'
@@ -593,12 +627,7 @@ class AbstractUsers(ABC):
             self.data.update(result)
 
     def _show_page(self):
-        if not utils.dir_not_empty(self.data):
-            print('This is the last page!')
-            self.data.page_num -= 1
-            return False
-
-        lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
+        _show_page(self.data)
 
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
@@ -628,12 +657,7 @@ class AbstractUsers(ABC):
         self._prefetch_next_page()
 
     def previous_page(self):
-        if self.data.page_num > 1:
-            self.data.page_num -= 1
-            self.data.offset = int(self.data.offset) - 30
-            self._show_page()
-        else:
-            print('This is the first page!')
+        previous_page_users(self.data)
 
     def go_artist_mode(self, selected_user_num):
         try:

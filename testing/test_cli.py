@@ -4,8 +4,7 @@ from koneko import cli
 
 def test_cli(monkeypatch):
     # No cli args
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko']))
-    assert cli.process_cli_args() == (None, None)
+    # (No longer tested here, as main.py does not call cli if no args)
 
     # No mode specified
     ## Mode 1, link only

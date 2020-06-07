@@ -115,7 +115,7 @@ def process_user_url(url_or_id):
             user_input = split_backslash_last(url_or_id)
     else:
         user_input = url_or_id
-    return user_input, '1'
+    return user_input
 
 def process_artwork_url(url_or_id):
     if 'artworks' in url_or_id:
@@ -124,4 +124,4 @@ def process_artwork_url(url_or_id):
         user_input = re.findall(r'&illust_id.*', url_or_id)[0].split('=')[-1]
     else:
         user_input = url_or_id
-    return user_input, '2'
+    return user_input

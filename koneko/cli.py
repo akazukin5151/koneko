@@ -61,49 +61,44 @@ def process_cli_args():
         print(__doc__)
         return None, 'vh', None
 
-    # cli arguments
-    if len(sys.argv) > 1:
-        print('Logging in...')
-        prompted = False
-    # No cli arguments
-    else:
+    # no cli arguments
+    if len(sys.argv) <= 1:
         return True, None, None
+
+    # Yes it's a lie
+    print('Logging in...')
 
     # Argument given, no mode specified
     if url_or_str := args['<link>']:
         if 'users' in url_or_str:
-            user_input, main_command = pure.process_user_url(url_or_str)
+            return False, '1', pure.process_user_url(url_or_str)
 
         elif 'artworks' in url_or_str or 'illust_id' in url_or_str:
-            user_input, main_command = pure.process_artwork_url(url_or_str)
+            return False, '2', pure.process_artwork_url(url_or_str)
 
         # Assume you won't search for '3' or 'f'
         elif url_or_str == '3' or url_or_str == 'f':
-            main_command = '3'
-            user_input = None
+            return False, '3', None
 
         # Assume you won't search for '5' or 'n'
         elif url_or_str == '5' or url_or_str == 'n':
-            main_command = '5'
-            user_input = None
+            return False, '5', None
 
         else:  # Mode 4, string to search for artists
-            user_input = url_or_str
-            main_command = '4'
+            return False, '4', url_or_str
 
     # Mode specified, argument can be link or id
     elif url_or_id := args['<link_or_id>']:
         if args['1'] or args['a']:
-            user_input, main_command = pure.process_user_url(url_or_id)
+            return False, '1', pure.process_user_url(url_or_id)
 
         elif args['2'] or args['i']:
-            user_input, main_command = pure.process_artwork_url(url_or_id)
+            return False, '2', pure.process_artwork_url(url_or_id)
 
         elif args['3'] or args['f']:
-            user_input, main_command = pure.process_user_url(url_or_id)
-            main_command = '3'
+            return False, '3', pure.process_user_url(url_or_id)
 
     elif user_input := args['<searchstr>']:
-        main_command = '4'
+        return False, '4', user_input
 
-    return prompted, main_command, user_input
+    raise Exception("Unknown command line argument!")

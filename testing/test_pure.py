@@ -89,12 +89,11 @@ def test_change_url_to_full():
     )
 
 def test_process_user_url():
-    assert (pure.process_user_url("https://www.pixiv.net/en/users/2232374") ==
-            ("2232374", "1"))
-    assert pure.process_user_url("2232374") == ("2232374", "1")
+    assert pure.process_user_url("https://www.pixiv.net/en/users/2232374") == "2232374"
+    assert pure.process_user_url("2232374") == "2232374"
 
 def test_process_artwork_url():
     assert (pure.process_artwork_url("https://www.pixiv.net/en/artworks/76695217") ==
-            ("76695217", "2"))
-    assert pure.process_artwork_url("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=76695217") == ("76695217", "2")
-    assert pure.process_artwork_url("76695217") == ("76695217", "2")
+            "76695217")
+    assert pure.process_artwork_url("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=76695217") == "76695217"
+    assert pure.process_artwork_url("76695217") == "76695217"

@@ -284,7 +284,8 @@ Usage:
   koneko (3|f) <link_or_id>
   koneko [4|s] <searchstr>
   koneko [5|n]
-  koneko -h
+  koneko (-h | --help)
+  koneko (-v | --version)
 
 Notes:
 *  If you supply a link and want to go to mode 3, you must give the (3|f) argument,
@@ -305,7 +306,8 @@ Required arguments if a mode is specified:
   <searchstr>   String to search for artists
 
 Options:
-  -h  Show this help
+  (-h | --help)     Show this help
+  (-v | --version)  Show version number
 ```
 
 ```

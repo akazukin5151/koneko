@@ -64,8 +64,16 @@ def process_cli_args():
     # Yes it's a lie
     print('Logging in...')
 
-    # Argument given, no mode specified
-    if url_or_str := args['<link>']:
+    # Mode given or not will decide the branches
+    if (url_or_str := args['<link>']) or (url_or_str := args['<searchstr>']):
+        number_of_args = 1
+    elif url_or_id := args['<link_or_id>']:
+        number_of_args = 2
+    else:
+        # Docopt should raise an error anyway
+        raise Exception("Invalid command line arguments!")
+
+    if number_of_args == 1:
         if 'users' in url_or_str:
             return '1', pure.process_user_url(url_or_str)
 
@@ -80,11 +88,10 @@ def process_cli_args():
         elif url_or_str == '5' or url_or_str == 'n':
             return '5', None
 
-        else:  # Mode 4, string to search for artists
+        else:
             return '4', url_or_str
 
-    # Mode specified, argument can be link or id
-    elif url_or_id := args['<link_or_id>']:
+    elif number_of_args == 2:
         if args['1'] or args['a']:
             return '1', pure.process_user_url(url_or_id)
 
@@ -94,7 +101,4 @@ def process_cli_args():
         elif args['3'] or args['f']:
             return '3', pure.process_user_url(url_or_id)
 
-    elif user_input := args['<searchstr>']:
-        return '4', user_input
-
-    raise Exception("Unknown command line argument!")
+        # Mode 4 isn't needed here, because docopt catches <searchstr>

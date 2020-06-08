@@ -24,18 +24,19 @@ def generate_filepath(filename: str) -> Path:
     return Path('~').expanduser() / 'Downloads' / filename
 
 @cytoolz.curry
-def prefix_filename(old_name, new_name, number):
-    img_ext = old_name.split('.')[-1]
+def prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
+    """old_name_with_ext can be `test.png`, but new_name is `abcd`"""
+    img_ext = old_name_with_ext.split('.')[-1]
     number_prefix = str(number).rjust(3, '0')
     new_file_name = f'{number_prefix}_{new_name}.{img_ext}'
     return new_file_name
 
-def prefix_artist_name(name, number):
+def prefix_artist_name(name: str, number: int) -> str:
     number_prefix = str(number).rjust(2, '0')
     new_file_name = f"{number_prefix}\n{' ' * 19}{name}"
     return new_file_name
 
-def print_multiple_imgs(illusts_json):
+def print_multiple_imgs(illusts_json) -> None:
     _red = Fore.RED
     _r = Fore.RESET
     _blue = Fore.BLUE
@@ -46,7 +47,7 @@ def print_multiple_imgs(illusts_json):
 
 
 @cytoolz.curry
-def url_given_size(post_json, size):
+def url_given_size(post_json, size: str) -> str:
     """
     size : str
         One of: ("square-medium", "medium", "large")
@@ -55,11 +56,11 @@ def url_given_size(post_json, size):
 
 
 @cytoolz.curry
-def post_title(current_page_illusts, post_number):
+def post_title(current_page_illusts, post_number: int) -> str:
     return current_page_illusts[post_number]['title']
 
 
-def medium_urls(current_page_illusts):
+def medium_urls(current_page_illusts) -> List[str]:
     get_medium_url = url_given_size(size='square_medium')
     urls = list(map(get_medium_url, current_page_illusts))
     return urls

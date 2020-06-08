@@ -20,7 +20,7 @@ Requires [kitty](https://github.com/kovidgoyal/kitty). It uses the magical `kitt
 
 
 # Features
-See the [manual](#manual) for more details
+See the [manual](MANUAL.md) for more details
 
 1. Artist illustrations gallery ([ex](https://www.pixiv.net/bookmark.php?type=user))
     * Enter the post's coordinates to open it in image view. Coordinates are in the form `xy` where x is column and y is row.
@@ -60,6 +60,12 @@ See also: [manual installation](#manual-installation)
 0. Install [kitty](https://github.com/kovidgoyal/kitty)
 1. `pip install koneko` (or if you use [conda](MANUAL.md#conda-environment)...):
 2. Run `koneko`
+
+## Requirements
+
+* Python 3.8+
+* It has been tested on kitty v0.17.2 onwards, but should work on older versions
+* Operating system: all OSes that kitty supports, which means Linux and macOS.
 
 <details>
   <summary>If it crashes (it shouldn't), it might be because pip didn't 'install' the welcome pictures, *and* the script failed to download them for some reason. Try:</summary>
@@ -141,18 +147,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 That's because cookies aren't stored so you log in everytime with a new session. Looking at [PixivUtil's cookie implementation](https://github.com/Nandaka/PixivUtil2/blob/master/PixivBrowserFactory.py), it would be easier to base this app on PixivUtil for downloads, than to write it myself (currently, it's based on the [pixivpy](https://github.com/upbit/pixivpy/) api). The problems with this, other than being a huge time and effort investment, is that koneko uses info from the requests, such as number of pages.
 I'd like to fix this but I'd rather not use mechanize but I don't know how to do it either way.
 
-* What operating systems does it support?
-
-It supports all OSes that kitty supports, which means Linux and macOS. It should work on macOS, but I don't have a test device. If you do, please contribute!
-
-* What versions of kitty does it support?
-
-It has been successfuly tested on version 0.17.2 onwards
-
-* Why use threading and not asyncio? There's a async version of pixivpy.
-
-If only I can understand how to use asyncio. See [I don't understand Python's Asyncio](https://lucumr.pocoo.org/2016/10/30/i-dont-understand-asyncio/). I only need to do two simple things. Start this function in the background, wait for its result somewhere later, in another function. Then keep the result so I can use it later. Asyncio is impossible to use.
-
 * I'm having problems with lscat
 
 First, koneko is intended to work for full screen terminals, so don't tile it around unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine.
@@ -162,11 +156,10 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 # Contributing
 * Fork it
 * Edit the files on your fork/branch
-    * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
-* Run tests with `pytest testing/ -vvvv -l -s`
-* Try it with `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
-    * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
+* Run tests with `pytest testing/ -vvvv -l -s` (`--inte` for integration tests)
 * Submit a pull request
+
+* If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
 * If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.
 

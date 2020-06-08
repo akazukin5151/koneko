@@ -13,14 +13,14 @@ import cytoolz
 from colorama import Fore
 
 
-def split_backslash_last(string):
+def split_backslash_last(string: str) -> str:
     """
     Intended for splitting url to get filename, but it has lots of applications...
     """
     return string.split('/')[-1]
 
 
-def generate_filepath(filename):
+def generate_filepath(filename: str) -> Path:
     return Path('~').expanduser() / 'Downloads' / filename
 
 @cytoolz.curry

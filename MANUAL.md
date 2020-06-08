@@ -32,7 +32,7 @@ In general:
 ### number of blank spaces to print before printing numbers/words
 
 * `gallery_print_spacing`: the spacing between column numbers (number of blank spaces between each number)
-* `cards_print_name_xcoord`: location of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
+* `users_print_name_xcoord`: location of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
 * The number(s) are the number of blank spaces (' ') to print
 * Both of them act on the x-axis
 * These settings are ignored if the `noprint` option is on

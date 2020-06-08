@@ -184,10 +184,10 @@ class AbstractGallery(ABC):
 class ArtistGallery(AbstractGallery):
     """
     Artist Gallery commands: (No need to press enter)
-        Using coordinates, where {digit1} is the row and {digit2} is the column
-        {digit1}{digit2}   -- display the image on row {digit1} and column {digit2}
-        o{digit1}{digit2}  -- open pixiv image/post in browser
-        d{digit1}{digit2}  -- download image in large resolution
+    Using coordinates, where {x} is the row and {y} is the column
+        {x}{y}             -- display the image on row {x} and column {y}
+        o{x}{y}            -- open pixiv image/post in browser
+        d{x}{y}            -- download image in large resolution
 
     Using image number, where {number} is the nth image in order (see examples)
         i{number}          -- display the image
@@ -198,7 +198,8 @@ class ArtistGallery(AbstractGallery):
         p                  -- view the previous page
         r                  -- delete all cached images, re-download and reload view
         b                  -- go back to previous mode (either 3, 4, 5, or main screen)
-        h                  -- show this help
+        h                  -- show keybindings
+        m                  -- show this manual
         q                  -- quit (with confirmation)
 
     Examples:
@@ -255,11 +256,11 @@ class ArtistGallery(AbstractGallery):
 class IllustFollowGallery(AbstractGallery):
     """
     Illust Follow Gallery commands: (No need to press enter)
-        Using coordinates, where {digit1} is the row and {digit2} is the column
-        {digit1}{digit2}   -- display the image on column digit1 and row digit2
-        o{digit1}{digit2}  -- open pixiv image/post in browser
-        d{digit1}{digit2}  -- download image in large resolution
-        a{digit1}{digit2}  -- view illusts by the artist of the selected image
+    Using coordinates, where {x} is the row and {y} is the column
+        {x}{y}             -- display the image on row {x} and column {y}
+        o{x}{y}            -- open pixiv image/post in browser
+        d{x}{y}            -- download image in large resolution
+        a{x}{y}            -- view illusts by the artist of the selected image
 
     Using image number, where {number} is the nth image in order (see examples)
         i{number}          -- display the image
@@ -278,13 +279,12 @@ class IllustFollowGallery(AbstractGallery):
     Examples:
         i09   --->  Display the ninth image in image view (must have leading 0)
         i10   --->  Display the tenth image in image view
-        O9    --->  Open the ninth image's post in browser
-        D9    --->  Download the ninth image, in large resolution
+        O29   --->  Open the last image's post in browser
+        D00   --->  Download the first image, in large resolution
 
         25    --->  Display the image on column 2, row 5 (index starts at 1)
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
-
     """
     def __init__(self, data=None):
         self._main_path = KONEKODIR / 'illustfollow'
@@ -419,15 +419,14 @@ class Image:
     Image view commands (No need to press enter):
         b -- go back to the gallery
         n -- view next image in post (only for posts with multiple pages)
-        p -- view previous image in post (same as above)
-        d -- download this image
-        o -- open pixiv post in browser
+        p -- view previous image in post (only for posts with multiple pages)
+        d -- download this image in full resolution
+        o -- open this post in browser
         f -- show this image in full resolution
 
         h -- show keybindings
         m -- show this manual
         q -- quit (with confirmation)
-
     """
     def __init__(self, image_id, idata, firstmode=False):
         self.data = idata
@@ -568,7 +567,7 @@ def _show_page(data):
 class AbstractUsers(ABC):
     """
     User view commands (No need to press enter):
-        {digit1}{digit2}   -- display artist illusts on column digit1 and row digit2
+        {x}{y}             -- display artist illusts on column {x} and row {y}
         n                  -- view next page
         p                  -- view previous page
         r                  -- delete all cached images, re-download and reload view

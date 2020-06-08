@@ -36,7 +36,7 @@ def prefix_artist_name(name: str, number: int) -> str:
     new_file_name = f"{number_prefix}\n{' ' * 19}{name}"
     return new_file_name
 
-def print_multiple_imgs(illusts_json) -> None:
+def print_multiple_imgs(illusts_json: 'Json') -> None:
     _red = Fore.RED
     _r = Fore.RESET
     _blue = Fore.BLUE
@@ -47,7 +47,7 @@ def print_multiple_imgs(illusts_json) -> None:
 
 
 @cytoolz.curry
-def url_given_size(post_json, size: str) -> str:
+def url_given_size(post_json: 'Json', size: str) -> str:
     """
     size : str
         One of: ("square-medium", "medium", "large")
@@ -56,23 +56,23 @@ def url_given_size(post_json, size: str) -> str:
 
 
 @cytoolz.curry
-def post_title(current_page_illusts, post_number: int) -> str:
+def post_title(current_page_illusts: 'Json', post_number: int) -> str:
     return current_page_illusts[post_number]['title']
 
 
-def medium_urls(current_page_illusts) -> 'List[str]':
+def medium_urls(current_page_illusts: 'Json') -> 'list[str]':
     get_medium_url = url_given_size(size='square_medium')
     urls = list(map(get_medium_url, current_page_illusts))
     return urls
 
 
-def post_titles_in_page(current_page_illusts) -> 'List[str]':
+def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
     post_titles = post_title(current_page_illusts)
     titles = list(map(post_titles, range(len(current_page_illusts))))
     return titles
 
 
-def page_urls_in_post(post_json, size='medium'):
+def page_urls_in_post(post_json: 'Json', size='medium') -> (int, 'list[str]'):
     """Get the number of pages and each of their urls in a multi-image post."""
     number_of_pages = post_json['page_count']
     if number_of_pages > 1:

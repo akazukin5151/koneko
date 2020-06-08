@@ -60,6 +60,7 @@ See [example config](example_config.ini) for reference.
 
 # Usage
 
+Command line usage
 ```
 Browse pixiv in the terminal using kitty's icat to display images (in the
 terminal!)
@@ -97,6 +98,7 @@ Options:
   (-v | --version)  Show version number
 ```
 
+Mode 1
 ```
 Artist Gallery commands: (No need to press enter)
 Using coordinates, where {x} is the row and {y} is the column
@@ -128,6 +130,7 @@ Examples:
     o25   --->  Download the image on column 2, row 5 (index starts at 1)
 ```
 
+Mode 2
 ```
 Image view commands (No need to press enter):
     b -- go back to the gallery
@@ -142,6 +145,7 @@ Image view commands (No need to press enter):
     q -- quit (with confirmation)
 ```
 
+Mode 3 and 4
 ```
 User view commands (No need to press enter):
     {x}{y}   -- display artist illusts on column {x} and row {y}
@@ -153,6 +157,7 @@ User view commands (No need to press enter):
     q                  -- quit (with confirmation)
 ```
 
+Mode 5
 ```
 Illust Follow Gallery commands: (No need to press enter)
 Using coordinates, where {x} is the row and {y} is the column

@@ -44,7 +44,7 @@ I get 32 trackers on Pixiv. Plus, you have to disable ublock if you ever get log
 
 <a href="url"><img src="pics/pixiv_ublock.png" height="350"></a>
 
-The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See [prompt 1](https://raw.githubusercontent.com/twenty5151/koneko/master/pics/ads1.png), [prompt 2](https://raw.githubusercontent.com/twenty5151/koneko/master/pics/ads2.png) (Github can't render the images correctly for some reason) and this [list](#trackers)
+The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See [prompt 1](https://raw.githubusercontent.com/twenty5151/koneko/master/pics/ads1.png), [prompt 2](https://raw.githubusercontent.com/twenty5151/koneko/master/pics/ads2.png) (Github can't render the images correctly for some reason) and this [list](#trackers-avoided)
 
 * TUIs make you cool
 * TUIs *with embedded pictures* make you even cooler
@@ -230,7 +230,10 @@ pip install koneko --upgrade
 
 For usage, see [Usage](MANUAL.md#Usage). For configuration, see [Configuration](MANUAL.md#Configuration)
 
-## Trackers
+# Trackers avoided
+<details>
+<summary>This is a list of trackers present when you use the official pixiv website or app. koneko frees you from them.</summary>
+
 Nine trackers in the Android app, according to [exodus](https://reports.exodus-privacy.eu.org/en/reports/jp.pxv.android/latest/):
 
 * Amazon Advertisement
@@ -281,3 +284,4 @@ Advertisers from pixiv's [privacy policy](https://policies.pixiv.net/en.html#boo
 * Smaato, Inc.
 * SMN株式会社
 * 株式会社アドインテ
+</details>

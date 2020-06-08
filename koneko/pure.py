@@ -60,13 +60,13 @@ def post_title(current_page_illusts, post_number: int) -> str:
     return current_page_illusts[post_number]['title']
 
 
-def medium_urls(current_page_illusts) -> List[str]:
+def medium_urls(current_page_illusts) -> 'List[str]':
     get_medium_url = url_given_size(size='square_medium')
     urls = list(map(get_medium_url, current_page_illusts))
     return urls
 
 
-def post_titles_in_page(current_page_illusts):
+def post_titles_in_page(current_page_illusts) -> 'List[str]':
     post_titles = post_title(current_page_illusts)
     titles = list(map(post_titles, range(len(current_page_illusts))))
     return titles

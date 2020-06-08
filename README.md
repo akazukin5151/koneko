@@ -98,7 +98,7 @@ koneko f https://www.pixiv.net/en/users/2232374 # Mode 3
 koneko "raika9" # Mode 4
 koneko 5 # Mode 5
 ```
-For more details refer to the [manual](MANUAL.md#Usage).
+For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
 # Roadmap
 

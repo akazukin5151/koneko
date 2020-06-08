@@ -22,13 +22,13 @@ conda remove --name koneko --all
 
 See [example config](example_config.ini) for reference.
 
+In general: 
 * Your config must be saved as `~/.config/koneko/config.ini` (exact path and name)
 * The credentials section will be automatically generated on first launch
-
 * Gallery means grid: artist illust mode (1) and illust follow mode (5)
 * Users (mode) means: following users mode (3) and search users mode (4)
 
-* Print spacing: x-spacing/location of words being printed
+Print spacing: x-spacing/location of words being printed
     * gallery_print_spacing: the spacing between column numbers (number of blank spaces between each number)
     * cards_print_name_xcoord: location of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
 * The number(s) are the number of blank spaces (' ') to print
@@ -37,22 +37,21 @@ See [example config](example_config.ini) for reference.
 * Comma delimited, no spaces.
 * Number of values correponds to the number of columns
 
-* Page spacing: number of `\n` to print after every page, until previous rows are out of view
+Page spacing: number of `\n` to print after every page, until previous rows are out of view
     * gallery_page_spacing: for gallery modes (default: 23)
     * users_page_spacing: for user modes (default: 20)
 * For gallery modes, by default one page has two rows of images. The next row cannot be displayed without covering another, so printing newlines will shift the terminal screen down, until the last row is out of view.
 * For user modes, each page has one row (each with four pics: the artist profile picture and three previews). The same principle applies: find a value such that the completed four-picture row is completely out of view.
 * Both of them act on the y-axis
 
-
-* Image configuration
+Image configuration
     * image_width: width of the image (default: 18)
     * image_height: height of the image (default: 8)
     * image_thumbnail_size: just a value for pixcat (default: 310)
     * images_x_spacing: horizontal spacing between images (default: 2)
     * images_y_spacing: vertical spacing between images in one page (default: 1)
 
-* Misc
+Misc
     * noprint: Turns off printing the column numbers for the gallery, and number+artist name for user modes.
     * Anything not exactly ('1', 'yes', 'true', or 'on') will be considered off
 

@@ -4,14 +4,14 @@ from colorama import Fore
 
 
 # Private
-def _letter(letter):
+def _letter(letter: str) -> str:
     """[] are red and a is magenta
     >>> _letter("a")
     ... [a]
     """
     return ''.join([Fore.RED, '[', Fore.MAGENTA, letter, Fore.RED, ']', Fore.RESET])
 
-def _letter_with_coords(letter):
+def _letter_with_coords(letter: str) -> str:
     """ letter is magenta, n is blue, [] is red
     >>> _letter_with_coords("i")
     ... [i][n]
@@ -19,7 +19,7 @@ def _letter_with_coords(letter):
     return ''.join([Fore.RED, '[', Fore.MAGENTA, letter, Fore.RED, ']',
                     BLUE_N, Fore.RESET])
 
-def _two_letter_with_coords(letter):
+def _two_letter_with_coords(letter: str) -> str:
     """ [] and {} is red, | is black, o and O is magenta, y and x is blue
     >>> _two_letter_with_coords("o")
     ... [o{y}{x}|O[n]]

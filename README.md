@@ -121,8 +121,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * x and y spacing/padding between images
     * Spacing between printed text
     * Spacing between pages
-    * See README.md and example_config.ini for more details
-    * TODO: document the settings in terms of what they actually are
+    * See MANUAL.md and example_config.ini for more details
 * Boolean settings in the config now accepts ('1', 'yes', 'true', or 'on') for True, and anything else as False.
 * Warn user for invalid credentials
 * Image mode can now jump to specified page number, in a multi-image post

@@ -28,7 +28,8 @@ In general:
 * Gallery means grid: artist illust mode (1) and illust follow mode (5)
 * Users (mode) means: following users mode (3) and search users mode (4)
 
-## Print spacing: x-spacing/location of words being printed
+## Print spacing:
+### number of blank spaces to print before printing numbers/words
 
 * `gallery_print_spacing`: the spacing between column numbers (number of blank spaces between each number)
 * `cards_print_name_xcoord`: location of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
@@ -38,7 +39,8 @@ In general:
 * Comma delimited, no spaces.
 * Number of values correponds to the number of columns
 
-## Page spacing: number of `\n` to print after every page, until previous rows are out of view
+## Page spacing
+### number of `\n` to print after every page, until previous rows are out of view
 * `gallery_page_spacing`: for gallery modes (default: 23)
 * `users_page_spacing`: for user modes (default: 20)
 * For gallery modes, by default one page has two rows of images. The next row cannot be displayed without covering another, so printing newlines will shift the terminal screen down, until the last row is out of view.

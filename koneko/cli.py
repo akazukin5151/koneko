@@ -41,10 +41,8 @@ from docopt import docopt
 from koneko import pure, __version__
 
 
-def process_cli_args():
+def process_cli_args() -> (str, str):
     """Use docopt to process cli args, returning:
-    prompted: bool
-        if user needs to be asked for the mode
     main_command: string, 1-5
         if user has specified a mode number
     user_input: string

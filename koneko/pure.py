@@ -85,7 +85,7 @@ def page_urls_in_post(post_json: 'Json', size='medium') -> (int, 'list[str]'):
     return number_of_pages, page_urls
 
 
-def change_url_to_full(url, png=False):
+def change_url_to_full(url: str, png=False) -> str:
     """
     The 'large' resolution url isn't the largest. This uses changes the url to
     the highest resolution available
@@ -99,7 +99,7 @@ def change_url_to_full(url, png=False):
     return url
 
 @funcy.decorator
-def catch_ctrl_c(call):
+def catch_ctrl_c(call: 'func[T]') -> 'T':
     """
     See http://hackflow.com/blog/2013/11/03/painless-decorators/
     """
@@ -108,7 +108,7 @@ def catch_ctrl_c(call):
     except KeyboardInterrupt:
         os.system('clear')
 
-def process_user_url(url_or_id):
+def process_user_url(url_or_id: str) -> str:
     if 'users' in url_or_id:
         if '\\' in url_or_id:
             user_input = split_backslash_last(url_or_id).split('\\')[-1][1:]
@@ -118,7 +118,7 @@ def process_user_url(url_or_id):
         user_input = url_or_id
     return user_input
 
-def process_artwork_url(url_or_id):
+def process_artwork_url(url_or_id: str) -> str:
     if 'artworks' in url_or_id:
         user_input = split_backslash_last(url_or_id).split('\\')[0]
     elif 'illust_id' in url_or_id:

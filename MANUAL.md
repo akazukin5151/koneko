@@ -100,7 +100,7 @@ Options:
 ```
 Artist Gallery commands: (No need to press enter)
     Using coordinates, where {digit1} is the row and {digit2} is the column
-    {digit1}{digit2}   -- display the image on row digit1 and column digit2
+    {digit1}{digit2}   -- display the image on row {digit1} and column {digit2}
     o{digit1}{digit2}  -- open pixiv image/post in browser
     d{digit1}{digit2}  -- download image in large resolution
 
@@ -119,8 +119,8 @@ Using image number, where {number} is the nth image in order (see examples)
 Examples:
     i09   --->  Display the ninth image in image view (must have leading 0)
     i10   --->  Display the tenth image in image view
-    O9    --->  Open the ninth image's post in browser
-    D9    --->  Download the ninth image, in large resolution
+    O29   --->  Open the last image's post in browser
+    D00   --->  Download the first image, in large resolution
 
     25    --->  Display the image on column 2, row 5 (index starts at 1)
     d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser

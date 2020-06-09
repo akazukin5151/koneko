@@ -61,7 +61,7 @@ def main():
         api.myapi.await_login()
         main()
 
-def main_loop(prompted, main_command, user_input, your_id=None):
+def main_loop(prompted: bool, main_command: str, user_input: str, your_id=None):
     """
     Ask for mode selection, if no command line arguments supplied
     call the right function depending on the mode
@@ -129,12 +129,12 @@ class AbstractLoop(ABC):
     wait for api thread to finish logging in
     activates the selected mode (needs to be overridden)
     """
-    def __init__(self, prompted, user_input):
+    def __init__(self, prompted: bool, user_input: str):
         self._prompted = prompted
         self._user_input = user_input
         # Defined by classes that inherit this in _prompt_url_id()
         self._url_or_id: str
-        self.mode: 'Any'  # noqa: F821
+        self.mode: 'ui'
 
     def start(self):
         """Ask for further info if not provided, then proceed to mode"""
@@ -149,14 +149,14 @@ class AbstractLoop(ABC):
             self._go_to_mode()
 
     @abstractmethod
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         """define self._url_or_id here"""
         raise NotImplementedError
 
-    def _process_url_or_input(self):
+    def _process_url_or_input(self) -> str:
         self._user_input = pure.process_user_url(self._url_or_id)
 
-    def _validate_input(self):
+    def _validate_input(self) -> bool:
         try:
             int(self._user_input)
         except ValueError:
@@ -175,7 +175,7 @@ class ArtistModeLoop(AbstractLoop):
     Ask for artist ID and process it, wait for API to finish logging in
     before proceeding
     """
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         self._url_or_id = input('Enter artist ID or url:\n')
 
     def _go_to_mode(self):
@@ -190,10 +190,10 @@ class ViewPostModeLoop(AbstractLoop):
     Ask for post ID and process it, wait for API to finish logging in
     before proceeding
     """
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         self._url_or_id = input('Enter pixiv post url or ID:\n')
 
-    def _process_url_or_input(self):
+    def _process_url_or_input(self) -> str:
         """Overriding base class to account for 'illust_id' cases"""
         self._user_input = pure.process_artwork_url(self._url_or_id)
 
@@ -208,14 +208,14 @@ class SearchUsersModeLoop(AbstractLoop):
     Ask for search string and process it, wait for API to finish logging in
     before proceeding
     """
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         self._url_or_id = input('Enter search string:\n')
 
-    def _process_url_or_input(self):
+    def _process_url_or_input(self) -> str:
         """the 'url or id' name doesn't really apply; accepts all strings"""
         self._user_input = self._url_or_id
 
-    def _validate_input(self):
+    def _validate_input(self) -> bool:
         """Overriding base class: all inputs are valid"""
         return True
 
@@ -233,7 +233,7 @@ class FollowingUserModeLoop(AbstractLoop):
     If user agrees to use the your_id saved in config, prompt_url_id() will be
     skipped
     """
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         self._url_or_id = input('Enter your pixiv ID or url: ')
 
     def _go_to_mode(self):

@@ -104,36 +104,36 @@ def config():
         credentials = config_object['Credentials']
         # If your_id is stored in the config
         your_id = credentials.get('ID', None)
+        return credentials, your_id
 
+    username = input('Please enter your username:\n')
+    print('\nPlease enter your password:')
+    password = getpass()
+    config_object['Credentials'] = {'Username': username, 'Password': password}
+
+    print('\nDo you want to save your pixiv ID? It will be more convenient')
+    print('to view artists you are following')
+    ans = input()
+    if ans == 'y' or not ans:
+        your_id = input('Please enter your pixiv ID:\n')
+        config_object['Credentials'].update({'ID': your_id})
     else:
-        username = input('Please enter your username:\n')
-        print('\nPlease enter your password:')
-        password = getpass()
-        config_object['Credentials'] = {'Username': username, 'Password': password}
+        your_id = None
 
-        print('\nDo you want to save your pixiv ID? It will be more convenient')
-        print('to view artists you are following')
-        ans = input()
-        if ans == 'y' or not ans:
-            your_id = input('Please enter your pixiv ID:\n')
-            config_object['Credentials'].update({'ID': your_id})
-        else:
-            your_id = None
+    os.system('clear')
 
-        os.system('clear')
+    config_path.parent.mkdir(exist_ok=True)
+    config_path.touch()
+    with open(config_path, 'w') as c:
+        config_object.write(c)
 
-        config_path.parent.mkdir(exist_ok=True)
-        config_path.touch()
-        with open(config_path, 'w') as c:
-            config_object.write(c)
+    # Append the default settings to the config file
+    # Why not use python? Because it's functional, readable, and
+    # this one liner defeats any potential speed benefits
+    example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
+    os.system(f'tail {example_cfg} -n +9 >> {config_path}')
 
-        # Append the default settings to the config file
-        # Why not use python? Because it's functional, readable, and
-        # this one liner defeats any potential speed benefits
-        example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
-        os.system(f'tail {example_cfg} -n +9 >> {config_path}')
-
-        credentials = config_object['Credentials']
+    credentials = config_object['Credentials']
 
     return credentials, your_id
 

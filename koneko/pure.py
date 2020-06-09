@@ -10,7 +10,6 @@ from pathlib import Path
 
 import funcy
 import cytoolz
-from colorama import Fore
 
 from koneko import colors as c
 

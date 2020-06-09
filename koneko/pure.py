@@ -12,6 +12,8 @@ import funcy
 import cytoolz
 from colorama import Fore
 
+from koneko import colors as c
+
 
 def split_backslash_last(string: str) -> str:
     """
@@ -37,10 +39,7 @@ def prefix_artist_name(name: str, number: int) -> str:
     return new_file_name
 
 def print_multiple_imgs(illusts_json: 'Json') -> None:
-    _red = Fore.RED
-    _r = Fore.RESET
-    _blue = Fore.BLUE
-    _ = [print(f'{_red}#{index}{_r} has {_blue}{pages}{_r} pages', end=', ')
+    _ = [print(f'{c.RED}#{index}{c.RESET} has {c.BLUE}{pages}{c.RESET} pages',end=', ')
          for (index, json) in enumerate(illusts_json)
          if (pages := json['page_count']) > 1]
     print('')

@@ -1,7 +1,10 @@
 """Export the colors for [h]elp screen keys"""
 
-from colorama import Fore
-
+RED = "\x1b[31m"
+MAGENTA = "\x1b[35m"
+BLUE = "\x1b[34m"
+RESET = "\x1b[39m"
+BLUE_N = ''.join([RED, '[', BLUE, 'n', RED, ']', RESET])
 
 # Private
 def _letter(letter: str) -> str:
@@ -9,34 +12,32 @@ def _letter(letter: str) -> str:
     >>> _letter("a")
     ... [a]
     """
-    return ''.join([Fore.RED, '[', Fore.MAGENTA, letter, Fore.RED, ']', Fore.RESET])
+    return ''.join([RED, '[', MAGENTA, letter, RED, ']', RESET])
 
 def _letter_with_coords(letter: str) -> str:
     """ letter is magenta, n is blue, [] is red
     >>> _letter_with_coords("i")
     ... [i][n]
     """
-    return ''.join([Fore.RED, '[', Fore.MAGENTA, letter, Fore.RED, ']',
-                    BLUE_N, Fore.RESET])
+    return ''.join([RED, '[', MAGENTA, letter, RED, ']',
+                    BLUE_N, RESET])
 
 def _two_letter_with_coords(letter: str) -> str:
     """ [] and {} is red, | is black, o and O is magenta, y and x is blue
     >>> _two_letter_with_coords("o")
     ... [o{y}{x}|O[n]]
     """
-    return ''.join([Fore.RED, '[', Fore.MAGENTA, letter.lower(), Fore.RESET, _COORDS, '|',
-                    Fore.MAGENTA, letter.upper(), BLUE_N, Fore.RED, ']', Fore.RESET])
+    return ''.join([RED, '[', MAGENTA, letter.lower(), RESET, _COORDS, '|',
+                    MAGENTA, letter.upper(), BLUE_N, RED, ']', RESET])
 
 
 _letters = ['n', 'p', 'r', 'q', 'm', 'b', 'o', 'd', 'f']
 _tlc = ['a', 'o', 'd']
 # {y}{x}
-_COORDS = ''.join([Fore.RED, '{', Fore.BLUE, 'x', Fore.RED, '}{', Fore.BLUE,
-                  'y', Fore.RED, '}', Fore.RESET])
+_COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
+                  'y', RED, '}', RESET])
 
 # Public
-BLUE_N = ''.join([Fore.RED, '[', Fore.BLUE, 'n', Fore.RED, ']', Fore.RESET])
-
 n, p, r, q, m, b, o_, d_, f = list(map(_letter, _letters))
 
 i = _letter_with_coords('i')

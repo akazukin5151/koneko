@@ -13,7 +13,7 @@ import funcy
 from koneko import lscat
 
 
-def process_digits(keyseqs: 'list[str]') -> int:
+def seq_to_num(keyseqs: 'list[str]') -> int:
     first_num, second_num = keyseqs[-2:]
     return find_number_map(int(first_num), int(second_num))
 

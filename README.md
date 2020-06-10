@@ -138,7 +138,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * CI now tries to launch the application to make sure it doesn't crash on start and I didn't make any silly mistakes when building
 * Updated requirements.txt
 * Moved stuff like begin prompt and show man loop from `utils.py` to `screens.py`
-* Refactored cli.py
+* Refactored cli.py and prompt.py
 
 
 # FAQ

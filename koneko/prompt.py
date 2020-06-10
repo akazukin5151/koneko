@@ -144,12 +144,6 @@ def image_prompt(image):
                 keyseqs.append(image_prompt_command)
                 print(keyseqs)
 
-                # End of the sequence...
-                # Two digit sequence -- jump to post number
-                if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
-                    ui.jump_to_image(image.data, utils.seq_to_num(keyseqs))
-                    keyseqs = []
-
             elif image_prompt_command.code == 361:  # Escape
                 keyseqs = []
                 print(keyseqs)
@@ -181,6 +175,16 @@ def image_prompt(image):
             elif image_prompt_command:
                 print('Invalid command! Press h to show help')
 
+            # End of the sequence...
+            # Two digit sequence -- jump to post number
+            if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+
+                first_num = keyseqs[0]
+                second_num = keyseqs[1]
+                selected_image_num = int(f'{first_num}{second_num}')
+
+                keyseqs = []
+                ui.jump_to_image(image.data, selected_image_num)
 
 def user_prompt(user_instance):
     """

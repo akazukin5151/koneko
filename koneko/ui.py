@@ -81,7 +81,7 @@ class AbstractGallery(ABC):
         prompt.image_prompt(image)
 
         # Image prompt ends, user presses back
-        self._back(self)
+        self._back()
 
     def _back(self):
         """After user 'back's from image prompt or artist gallery, start mode again"""

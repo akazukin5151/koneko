@@ -35,9 +35,9 @@ def test_mode3_mode_and_link(monkeypatch):
 
 def test_mode3_no_link(monkeypatch):
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', '3']))
-    assert cli.process_cli_args() == ('3', None)
+    assert cli.process_cli_args() == ('3', '')
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'f']))
-    assert cli.process_cli_args() == ('3', None)
+    assert cli.process_cli_args() == ('3', '')
 
 def test_mode4_string_only(monkeypatch):
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'searchstring']))
@@ -49,19 +49,19 @@ def test_mode4_mode_and_string(monkeypatch):
 
 def test_mode5_no_link(monkeypatch):
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', '5']))
-    assert cli.process_cli_args() == ('5', None)
+    assert cli.process_cli_args() == ('5', '')
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'n']))
-    assert cli.process_cli_args() == ('5', None)
+    assert cli.process_cli_args() == ('5', '')
 
 @pytest.mark.parametrize("arg", ('-v', '--version'))
 def test_version(monkeypatch, arg):
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
-    assert cli.process_cli_args() == ('vh', None)
+    assert cli.process_cli_args() == ('vh', '')
 
 @pytest.mark.parametrize("arg", ('-h', '--help'))
 def test_help(monkeypatch, arg):
     monkeypatch.setattr('koneko.cli.docopt',
         lambda x: {'-h': True, '--help': True, '-v': False, '--version': False})
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
-    assert cli.process_cli_args() == ('vh', None)
+    assert cli.process_cli_args() == ('vh', '')
 

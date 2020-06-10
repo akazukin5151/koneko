@@ -27,7 +27,7 @@ def main():
     if len(sys.argv) <= 1:
         # no cli arguments, prompt user for mode selection
         prompted = True
-        main_command, user_input = None, None
+        main_command, user_input =  '', ''
     else:
         prompted = False
         main_command, user_input = cli.process_cli_args()
@@ -61,7 +61,7 @@ def main():
         api.myapi.await_login()
         main()
 
-def main_loop(prompted: bool, main_command: str, user_input: str, your_id=None):
+def main_loop(prompted: bool, main_command, user_input, your_id: str):
     """
     Ask for mode selection, if no command line arguments supplied
     call the right function depending on the mode
@@ -150,13 +150,12 @@ class AbstractLoop(ABC):
     def _process_url_or_input(self) -> str:
         self._user_input = pure.process_user_url(self._url_or_id)
 
-    def _validate_input(self) -> bool:
+    def _validate_input(self) -> 'Maybe[int]':
         try:
-            int(self._user_input)
+            return int(self._user_input)
         except ValueError:
             print('Invalid image ID!')
             return False
-        return True
 
     @abstractmethod
     def _go_to_mode(self):

@@ -20,11 +20,9 @@ def test_find_number_map(monkeypatch):
     assert not utils.find_number_map(0, 100)
 
     monkeypatch.setattr('koneko.lscat.ncols_config', lambda: 6)
-    assert list(filter(
-            lambda x: x is not None,
-            [utils.find_number_map(x, y)
-                for y in range(1,7)
-                for x in range(1,7)])) == list(range(30))
+    assert [utils.find_number_map(x, y)
+            for y in range(1,7)
+            for x in range(1,7)][:30] == list(range(30))
 
 def test_cd():
     current_dir = os.getcwd()
@@ -104,7 +102,7 @@ def test_config(monkeypatch):
 
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'y', 'myid'])
-    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
+    monkeypatch.setattr('builtins.input', lambda x='': next(responses))
     monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
     # fix for macOS
     monkeypatch.setattr('koneko.utils.os.system',
@@ -126,14 +124,14 @@ def test_config2(monkeypatch):
 
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'n'])
-    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
+    monkeypatch.setattr('builtins.input', lambda x='': next(responses))
     monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
     # fix for macOS
     monkeypatch.setattr('koneko.utils.os.system',
                         lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
 
     creds, your_id = utils.config()
-    assert your_id is None
+    assert your_id == ''
     assert type(creds) is configparser.SectionProxy
 
     assert utils.get_settings('Credentials', 'username') == 'myusername'

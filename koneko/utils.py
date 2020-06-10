@@ -114,14 +114,14 @@ def open_link_num(data, number):
 
 
 # If config functions get longer/more, consider moving them to a seperate module
-def config() -> ('config', 'Optional[str]'):
+def config() -> ('config', str):
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
     if config_path.exists():
         config_object.read(Path('~/.config/koneko/config.ini').expanduser())
         credentials = config_object['Credentials']
         # If your_id is stored in the config
-        your_id = credentials.get('ID', None)
+        your_id = credentials.get('ID', '')
         return credentials, your_id
 
     username = input('Please enter your username:\n')
@@ -136,7 +136,7 @@ def config() -> ('config', 'Optional[str]'):
         your_id = input('Please enter your pixiv ID:\n')
         config_object['Credentials'].update({'ID': your_id})
     else:
-        your_id = None
+        your_id = ''
 
     os.system('clear')
 
@@ -165,11 +165,11 @@ def get_config_section(section: str) -> 'config':
     section = config_object[section]
     return section
 
-def get_settings(section: str, setting: str) -> 'Optional[str]':
+def get_settings(section: str, setting: str) -> str:
     cfgsection = get_config_section(section)
     if not cfgsection:
         return False
-    return cfgsection.get(setting, None)
+    return cfgsection.get(setting, '')
 
 def check_noprint() -> bool:
     section = get_config_section('misc')

@@ -54,10 +54,10 @@ def process_cli_args() -> (str, str):
     # Handle version or help
     if args['--version'] or args['-v']:
         print(__version__)
-        return 'vh', None
+        return 'vh', ''
     elif args['--help'] or args['-h']:
         print(__doc__)
-        return 'vh', None
+        return 'vh', ''
 
     # Yes it's a lie
     print('Logging in...')
@@ -80,11 +80,11 @@ def process_cli_args() -> (str, str):
 
         # Assume you won't search for '3' or 'f'
         elif url_or_str == '3' or url_or_str == 'f':
-            return '3', None
+            return '3', ''
 
         # Assume you won't search for '5' or 'n'
         elif url_or_str == '5' or url_or_str == 'n':
-            return '5', None
+            return '5', ''
 
         else:
             return '4', url_or_str

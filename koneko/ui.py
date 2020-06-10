@@ -257,10 +257,8 @@ class IllustFollowGallery(AbstractGallery):
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
-    def __init__(self, data=None):
+    def __init__(self, data):
         self._main_path = KONEKODIR / 'illustfollow'
-        if data:
-            self.data = data
         super().__init__()
 
     def _pixivrequest(self, **kwargs):

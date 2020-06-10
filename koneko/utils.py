@@ -13,7 +13,7 @@ import funcy
 from koneko import lscat
 
 
-def find_number_map(x, y):
+def find_number_map(x: int, y: int) -> 'Optional[int]':
     """Translates 1-based-index coordinates into (0-) indexable number
     For 5 cols and 6 rows:
         5 columns and 6 rows == 30 images
@@ -31,7 +31,7 @@ def find_number_map(x, y):
 
 
 @contextmanager
-def cd(newdir):
+def cd(newdir: Path) -> None:
     """
     Change current script directory, do something, change back to old directory
     See https://stackoverflow.com/questions/431684/how-do-i-change-the-working-directory-in-python/24176022#24176022
@@ -49,7 +49,7 @@ def cd(newdir):
         os.chdir(prevdir)
 
 
-def _spin(done, message):
+def _spin(done: 'Event', message: str) -> None:
     for char in itertools.cycle('|/-\\'):  # Infinite loop
         print(message, char, flush=True, end='\r')
         if done.wait(0.1):
@@ -58,7 +58,7 @@ def _spin(done, message):
 
 
 @funcy.decorator
-def spinner(call, message=''):
+def spinner(call: 'func[T]', message='') -> 'T':
     """
     See http://hackflow.com/blog/2013/11/03/painless-decorators/
     """
@@ -72,14 +72,14 @@ def spinner(call, message=''):
         done.set()
         spinner_thread.join()
 
-def verify_full_download(filepath):
+def verify_full_download(filepath: Path) -> bool:
     verified = imghdr.what(filepath)
     if not verified:
         os.remove(filepath)
         return False
     return True
 
-def dir_not_empty(data):
+def dir_not_empty(data: 'Data') -> bool:
     # If it breaks, try len([x for x in os.listdir(path) if os.is_file(x)])
     if data.download_path.is_dir() and (_dir := os.listdir(data.download_path)):
         try:
@@ -94,50 +94,68 @@ def dir_not_empty(data):
 
     return False
 
+# From ui
+def open_in_browser(image_id):
+    link = f'https://www.pixiv.net/artworks/{image_id}'
+    os.system(f'xdg-open {link}')
+    print(f'Opened {link} in browser!')
+
+def open_link_coords(data, first_num, second_num):
+    selected_image_num = find_number_map(int(first_num), int(second_num))
+    # 0 is acceptable; 0 is falsy but not False
+    if selected_image_num is False:
+        print('Invalid number!')
+    else:
+        open_link_num(data, selected_image_num)
+
+def open_link_num(data, number):
+    # Update current_page_illusts, in case if you're in another page
+    open_in_browser(data.image_id(number))
+
 
 # If config functions get longer/more, consider moving them to a seperate module
-def config():
+def config() -> ('config', str):
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
     if config_path.exists():
         config_object.read(Path('~/.config/koneko/config.ini').expanduser())
         credentials = config_object['Credentials']
         # If your_id is stored in the config
-        your_id = credentials.get('ID', None)
+        your_id = credentials.get('ID', '')
+        return credentials, your_id
 
+    username = input('Please enter your username:\n')
+    print('\nPlease enter your password:')
+    password = getpass()
+    config_object['Credentials'] = {'Username': username, 'Password': password}
+
+    print('\nDo you want to save your pixiv ID? It will be more convenient')
+    print('to view artists you are following')
+    ans = input()
+    if ans == 'y' or not ans:
+        your_id = input('Please enter your pixiv ID:\n')
+        config_object['Credentials'].update({'ID': your_id})
     else:
-        username = input('Please enter your username:\n')
-        print('\nPlease enter your password:')
-        password = getpass()
-        config_object['Credentials'] = {'Username': username, 'Password': password}
+        your_id = ''
 
-        print('\nDo you want to save your pixiv ID? It will be more convenient')
-        print('to view artists you are following')
-        ans = input()
-        if ans == 'y' or not ans:
-            your_id = input('Please enter your pixiv ID:\n')
-            config_object['Credentials'].update({'ID': your_id})
-        else:
-            your_id = None
+    os.system('clear')
 
-        os.system('clear')
+    config_path.parent.mkdir(exist_ok=True)
+    config_path.touch()
+    with open(config_path, 'w') as c:
+        config_object.write(c)
 
-        config_path.parent.mkdir(exist_ok=True)
-        config_path.touch()
-        with open(config_path, 'w') as c:
-            config_object.write(c)
+    # Append the default settings to the config file
+    # Why not use python? Because it's functional, readable, and
+    # this one liner defeats any potential speed benefits
+    example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
+    os.system(f'tail {example_cfg} -n +9 >> {config_path}')
 
-        # Append the default settings to the config file
-        # Why not use python? Because it's functional, readable, and
-        # this one liner defeats any potential speed benefits
-        example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
-        os.system(f'tail {example_cfg} -n +9 >> {config_path}')
-
-        credentials = config_object['Credentials']
+    credentials = config_object['Credentials']
 
     return credentials, your_id
 
-def get_config_section(section: str):
+def get_config_section(section: str) -> 'config':
     config_object = ConfigParser()
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     if not config_path.exists():
@@ -147,13 +165,13 @@ def get_config_section(section: str):
     section = config_object[section]
     return section
 
-def get_settings(section: str, setting: str):
+def get_settings(section: str, setting: str) -> str:
     cfgsection = get_config_section(section)
     if not cfgsection:
         return False
-    return cfgsection.get(setting, None)
+    return cfgsection.get(setting, '')
 
-def check_noprint():
+def check_noprint() -> bool:
     section = get_config_section('misc')
     if not section:
         return False
@@ -162,7 +180,7 @@ def check_noprint():
     except ValueError:
         return False
 
-def noprint(func, *args, **kwargs):
+def noprint(func: 'func[T]', *args, **kwargs) -> 'T':
     import contextlib
     with open(os.devnull, "w") as null:
         with contextlib.redirect_stdout(null):

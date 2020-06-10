@@ -7,42 +7,13 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 import funcy
-from tqdm import tqdm
 
 from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
                     download)
 
-def open_in_browser(image_id):
-    link = f'https://www.pixiv.net/artworks/{image_id}'
-    os.system(f'xdg-open {link}')
-    print(f'Opened {link} in browser!')
-
-def open_link_coords(data, first_num, second_num):
-    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
-    # 0 is acceptable; 0 is falsy but not False
-    if selected_image_num is False:
-        print('Invalid number!')
-    else:
-        open_link_num(data, selected_image_num)
-
-def open_link_num(data, number):
-    # Update current_page_illusts, in case if you're in another page
-    open_in_browser(data.image_id(number))
-
-
-def download_image_coords(data, first_num, second_num):
-    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
-    # 0 is acceptable, but is falsy; but 0 'is not' False
-    if selected_image_num is False:
-        print('Invalid number!')
-    else:
-        download_image_num(data, selected_image_num)
-
-def download_image_num(data, number):
-    # Update current_page_illusts, in case if you're in another page
-    download.download_url_verified(data.url(number))
 
 def previous_page(data):
+    """Previous page for galleries"""
     if data.current_page_num > 1:
         data.current_page_num -= 1
 
@@ -54,7 +25,6 @@ def previous_page(data):
 
     else:
         print('This is the first page!')
-
 
 class AbstractGallery(ABC):
     def __init__(self):
@@ -73,9 +43,8 @@ class AbstractGallery(ABC):
         """
         if utils.dir_not_empty(self.data):
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
-        else:
-            if self.data.download_path.is_dir():
-                self.data.download_path.rmdir()
+        elif self.data.download_path.is_dir():
+            self.data.download_path.rmdir()
 
         api.myapi.await_login()
         current_page = self._pixivrequest()
@@ -112,7 +81,7 @@ class AbstractGallery(ABC):
         prompt.image_prompt(image)
 
         # Image prompt ends, user presses back
-        self._back(self)
+        self._back()
 
     def _back(self):
         """After user 'back's from image prompt or artist gallery, start mode again"""
@@ -137,7 +106,7 @@ class AbstractGallery(ABC):
 
         # Skip prefetching again for cases like next -> prev -> next
         if str(self.data.current_page_num + 1) not in self.data.cached_pages:
-            self._prefetch_next_page(self)
+            self._prefetch_next_page()
 
     @abstractmethod
     def _pixivrequest(self, **kwargs):
@@ -162,7 +131,8 @@ class AbstractGallery(ABC):
             self.data.current_page_num = oldnum
 
     def reload(self):
-        ans = input('This will delete cached images and redownload them. Proceed?\n')
+        print('This will delete cached images and redownload them. Proceed?')
+        ans = input(f'Directory to be deleted: {self._main_path}\n')
         if ans == 'y' or not ans:
             os.system(f'rm -r {self._main_path}') # shutil.rmtree is better
             self.data.all_pages_cache = {} # Ensures prefetch after reloading
@@ -184,10 +154,10 @@ class AbstractGallery(ABC):
 class ArtistGallery(AbstractGallery):
     """
     Artist Gallery commands: (No need to press enter)
-        Using coordinates, where {digit1} is the row and {digit2} is the column
-        {digit1}{digit2}   -- display the image on column digit1 and row digit2
-        o{digit1}{digit2}  -- open pixiv image/post in browser
-        d{digit1}{digit2}  -- download image in large resolution
+    Using coordinates, where {x} is the row and {y} is the column
+        {x}{y}             -- display the image on row {x} and column {y}
+        o{x}{y}            -- open pixiv image/post in browser
+        d{x}{y}            -- download image in large resolution
 
     Using image number, where {number} is the nth image in order (see examples)
         i{number}          -- display the image
@@ -205,13 +175,12 @@ class ArtistGallery(AbstractGallery):
     Examples:
         i09   --->  Display the ninth image in image view (must have leading 0)
         i10   --->  Display the tenth image in image view
-        O9    --->  Open the ninth image's post in browser
-        D9    --->  Download the ninth image, in large resolution
+        O29   --->  Open the last image's post in browser
+        D00   --->  Download the first image, in large resolution
 
         25    --->  Display the image on column 2, row 5 (index starts at 1)
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
-
     """
     def __init__(self, artist_user_id, **kwargs):
         self._main_path = KONEKODIR / str(artist_user_id)
@@ -257,11 +226,11 @@ class ArtistGallery(AbstractGallery):
 class IllustFollowGallery(AbstractGallery):
     """
     Illust Follow Gallery commands: (No need to press enter)
-        Using coordinates, where {digit1} is the row and {digit2} is the column
-        {digit1}{digit2}   -- display the image on column digit1 and row digit2
-        o{digit1}{digit2}  -- open pixiv image/post in browser
-        d{digit1}{digit2}  -- download image in large resolution
-        a{digit1}{digit2}  -- view illusts by the artist of the selected image
+    Using coordinates, where {x} is the row and {y} is the column
+        {x}{y}             -- display the image on row {x} and column {y}
+        o{x}{y}            -- open pixiv image/post in browser
+        d{x}{y}            -- download image in large resolution
+        a{x}{y}            -- view illusts by the artist of the selected image
 
     Using image number, where {number} is the nth image in order (see examples)
         i{number}          -- display the image
@@ -280,18 +249,15 @@ class IllustFollowGallery(AbstractGallery):
     Examples:
         i09   --->  Display the ninth image in image view (must have leading 0)
         i10   --->  Display the tenth image in image view
-        O9    --->  Open the ninth image's post in browser
-        D9    --->  Download the ninth image, in large resolution
+        O29   --->  Open the last image's post in browser
+        D00   --->  Download the first image, in large resolution
 
         25    --->  Display the image on column 2, row 5 (index starts at 1)
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
-
     """
-    def __init__(self, data=None):
+    def __init__(self):
         self._main_path = KONEKODIR / 'illustfollow'
-        if data:
-            self.data = data
         super().__init__()
 
     def _pixivrequest(self, **kwargs):
@@ -421,22 +387,21 @@ class Image:
     Image view commands (No need to press enter):
         b -- go back to the gallery
         n -- view next image in post (only for posts with multiple pages)
-        p -- view previous image in post (same as above)
-        d -- download this image
-        o -- open pixiv post in browser
+        p -- view previous image in post (only for posts with multiple pages)
+        d -- download this image in full resolution
+        o -- open this post in browser
         f -- show this image in full resolution
 
         h -- show keybindings
         m -- show this manual
         q -- quit (with confirmation)
-
     """
     def __init__(self, image_id, idata, firstmode=False):
         self.data = idata
         self._firstmode = firstmode
 
     def open_image(self):
-        open_in_browser(self.data.image_id)
+        utils.open_in_browser(self.data.image_id)
 
     def download_image(self):
         download.download_url_verified(self.data.current_url)
@@ -552,6 +517,7 @@ def _prefetch_next_image(data):
 
 
 def previous_page_users(data):
+    """Previous page for users"""
     if data.page_num > 1:
         data.page_num -= 1
         data.offset = int(data.offset) - 30
@@ -570,7 +536,7 @@ def _show_page(data):
 class AbstractUsers(ABC):
     """
     User view commands (No need to press enter):
-        {digit1}{digit2}   -- display artist illusts on column digit1 and row digit2
+        {x}{y}             -- display artist illusts on column {x} and row {y}
         n                  -- view next page
         p                  -- view previous page
         r                  -- delete all cached images, re-download and reload view
@@ -672,7 +638,8 @@ class AbstractUsers(ABC):
             prompt.user_prompt(self)
 
     def reload(self):
-        ans = input('This will delete cached images and redownload them. Proceed?\n')
+        print('This will delete cached images and redownload them. Proceed?')
+        ans = input(f'Directory to be deleted: {self._main_path}\n')
         if ans == 'y' or not ans:
             os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
             self.__init__(self.data._input)

@@ -23,9 +23,21 @@ from koneko import ui, api, cli, pure, utils, prompt, screens
 
 def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
+
+    if len(sys.argv) <= 1:
+        # no cli arguments, prompt user for mode selection
+        prompted = True
+        main_command, user_input =  '', ''
+    else:
+        prompted = False
+        main_command, user_input = cli.process_cli_args()
+        if main_command == 'vh':
+            sys.exit(0)
+
     os.system('clear')
     credentials, your_id = utils.config()
 
+    # Handle startup picture missing
     if not Path('~/.local/share/koneko').expanduser().exists():
         print('Please wait, downloading welcome image (this will only occur once)...')
         baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
@@ -39,9 +51,7 @@ def main():
 
     api.myapi.add_credentials(credentials)
     api.myapi.start()
-
     # After this part, the API is logging in in the background and we can proceed
-    prompted, main_command, user_input = cli.process_cli_args()
 
     try:
         main_loop(prompted, main_command, user_input, your_id)
@@ -51,7 +61,7 @@ def main():
         api.myapi.await_login()
         main()
 
-def main_loop(prompted, main_command, user_input, your_id=None):
+def main_loop(prompted: bool, main_command, user_input, your_id: str):
     """
     Ask for mode selection, if no command line arguments supplied
     call the right function depending on the mode
@@ -63,16 +73,24 @@ def main_loop(prompted, main_command, user_input, your_id=None):
         For illust following mode, it's not required
     """
     printmessage = True
+    case = {
+        '1': ArtistModeLoop(prompted, user_input).start,
+        '2': ViewPostModeLoop(prompted, user_input).start,
+        '4': SearchUsersModeLoop(prompted, user_input).start,
+        '5': illust_follow_mode_loop,
+        '?': screens.info_screen_loop,
+        'm': screens.show_man_loop,
+        'c': screens.clear_cache_loop,
+    }
+
     while True:
         if prompted and not user_input:
             main_command = screens.begin_prompt(printmessage)
-            printmessage = False
 
-        if main_command == '1':
-            ArtistModeLoop(prompted, user_input).start()
-
-        elif main_command == '2':
-            ViewPostModeLoop(prompted, user_input).start()
+        # Simplify if-else chain with case-switch
+        func = case.get(main_command, None)
+        if func:
+            func()
 
         elif main_command == '3':
             if your_id and not user_input: # your_id stored in config file
@@ -82,21 +100,6 @@ def main_loop(prompted, main_command, user_input, your_id=None):
 
             # If your_id not stored, or if ans is no, or if id provided, via cli
             FollowingUserModeLoop(prompted, user_input).start()
-
-        elif main_command == '4':
-            SearchUsersModeLoop(prompted, user_input).start()
-
-        elif main_command == '5':
-            illust_follow_mode_loop()
-
-        elif main_command == '?':
-            screens.info_screen_loop()
-
-        elif main_command == 'm':
-            screens.show_man_loop()
-
-        elif main_command == 'c':
-            screens.clear_cache_loop()
 
         elif main_command == 'q':
             answer = input('Are you sure you want to exit? [Y/n]:\n')
@@ -120,12 +123,12 @@ class AbstractLoop(ABC):
     wait for api thread to finish logging in
     activates the selected mode (needs to be overridden)
     """
-    def __init__(self, prompted, user_input):
+    def __init__(self, prompted: bool, user_input: str):
         self._prompted = prompted
         self._user_input = user_input
         # Defined by classes that inherit this in _prompt_url_id()
         self._url_or_id: str
-        self.mode: 'Any'  # noqa: F821
+        self.mode: 'ui'
 
     def start(self):
         """Ask for further info if not provided, then proceed to mode"""
@@ -140,20 +143,19 @@ class AbstractLoop(ABC):
             self._go_to_mode()
 
     @abstractmethod
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         """define self._url_or_id here"""
         raise NotImplementedError
 
-    def _process_url_or_input(self):
-        self._user_input, _ = pure.process_user_url(self._url_or_id)
+    def _process_url_or_input(self) -> str:
+        self._user_input = pure.process_user_url(self._url_or_id)
 
-    def _validate_input(self):
+    def _validate_input(self) -> 'Maybe[int]':
         try:
-            int(self._user_input)
+            return int(self._user_input)
         except ValueError:
             print('Invalid image ID!')
             return False
-        return True
 
     @abstractmethod
     def _go_to_mode(self):
@@ -166,7 +168,7 @@ class ArtistModeLoop(AbstractLoop):
     Ask for artist ID and process it, wait for API to finish logging in
     before proceeding
     """
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         self._url_or_id = input('Enter artist ID or url:\n')
 
     def _go_to_mode(self):
@@ -181,12 +183,12 @@ class ViewPostModeLoop(AbstractLoop):
     Ask for post ID and process it, wait for API to finish logging in
     before proceeding
     """
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         self._url_or_id = input('Enter pixiv post url or ID:\n')
 
-    def _process_url_or_input(self):
+    def _process_url_or_input(self) -> str:
         """Overriding base class to account for 'illust_id' cases"""
-        self._user_input, _ = pure.process_artwork_url(self._url_or_id)
+        self._user_input = pure.process_artwork_url(self._url_or_id)
 
     def _go_to_mode(self):
         ui.view_post_mode(self._user_input)
@@ -199,14 +201,14 @@ class SearchUsersModeLoop(AbstractLoop):
     Ask for search string and process it, wait for API to finish logging in
     before proceeding
     """
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         self._url_or_id = input('Enter search string:\n')
 
-    def _process_url_or_input(self):
+    def _process_url_or_input(self) -> str:
         """the 'url or id' name doesn't really apply; accepts all strings"""
         self._user_input = self._url_or_id
 
-    def _validate_input(self):
+    def _validate_input(self) -> bool:
         """Overriding base class: all inputs are valid"""
         return True
 
@@ -224,7 +226,7 @@ class FollowingUserModeLoop(AbstractLoop):
     If user agrees to use the your_id saved in config, prompt_url_id() will be
     skipped
     """
-    def _prompt_url_id(self):
+    def _prompt_url_id(self) -> str:
         self._url_or_id = input('Enter your pixiv ID or url: ')
 
     def _go_to_mode(self):

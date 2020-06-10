@@ -78,7 +78,7 @@ def get_gen_users_settings():
     settings = utils.get_config_section('lscat')
     if not settings:
         return 18, 2
-    message_xcoord = settings.getint('cards_print_name_xcoord', fallback=18)
+    message_xcoord = settings.getint('users_print_name_xcoord', fallback=18)
     padding = settings.getint('images_x_spacing', fallback=2)
     return message_xcoord, padding
 

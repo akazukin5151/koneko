@@ -8,7 +8,8 @@ Usage:
   koneko (3|f) <link_or_id>
   koneko [4|s] <searchstr>
   koneko [5|n]
-  koneko -h
+  koneko (-h | --help)
+  koneko (-v | --version)
 
 Notes:
 *  If you supply a link and want to go to mode 3, you must give the (3|f) argument,
@@ -29,20 +30,19 @@ Required arguments if a mode is specified:
   <searchstr>   String to search for artists
 
 Options:
-  -h  Show this help
+  (-h | --help)     Show this help
+  (-v | --version)  Show version number
 """
 
 import sys
 
 from docopt import docopt
 
-from koneko import pure
+from koneko import pure, __version__
 
 
-def process_cli_args():
+def process_cli_args() -> (str, str):
     """Use docopt to process cli args, returning:
-    prompted: bool
-        if user needs to be asked for the mode
     main_command: string, 1-5
         if user has specified a mode number
     user_input: string
@@ -50,47 +50,53 @@ def process_cli_args():
         eg, modes 1/5 requires artist user id; mode 2, requires image id
     """
     args = docopt(__doc__)
-    if len(sys.argv) > 1:
-        print('Logging in...')
-        prompted = False
-    else:  # No cli arguments
-        return True, None, None
 
-    # Argument given, no mode specified
-    if url_or_str := args['<link>']:
+    # Handle version or help
+    if args['--version'] or args['-v']:
+        print(__version__)
+        return 'vh', ''
+    elif args['--help'] or args['-h']:
+        print(__doc__)
+        return 'vh', ''
+
+    # Yes it's a lie
+    print('Logging in...')
+
+    # Mode given or not will decide the branches
+    if (url_or_str := args['<link>']) or (url_or_str := args['<searchstr>']):
+        number_of_args = 1
+    elif url_or_id := args['<link_or_id>']:
+        number_of_args = 2
+    else:
+        # Docopt should raise an error anyway
+        raise Exception("Invalid command line arguments!")
+
+    if number_of_args == 1:
         if 'users' in url_or_str:
-            user_input, main_command = pure.process_user_url(url_or_str)
+            return '1', pure.process_user_url(url_or_str)
 
         elif 'artworks' in url_or_str or 'illust_id' in url_or_str:
-            user_input, main_command = pure.process_artwork_url(url_or_str)
+            return '2', pure.process_artwork_url(url_or_str)
 
         # Assume you won't search for '3' or 'f'
         elif url_or_str == '3' or url_or_str == 'f':
-            main_command = '3'
-            user_input = None
+            return '3', ''
 
         # Assume you won't search for '5' or 'n'
         elif url_or_str == '5' or url_or_str == 'n':
-            main_command = '5'
-            user_input = None
+            return '5', ''
 
-        else:  # Mode 4, string to search for artists
-            user_input = url_or_str
-            main_command = '4'
+        else:
+            return '4', url_or_str
 
-    # Mode specified, argument can be link or id
-    elif url_or_id := args['<link_or_id>']:
+    elif number_of_args == 2:
         if args['1'] or args['a']:
-            user_input, main_command = pure.process_user_url(url_or_id)
+            return '1', pure.process_user_url(url_or_id)
 
         elif args['2'] or args['i']:
-            user_input, main_command = pure.process_artwork_url(url_or_id)
+            return '2', pure.process_artwork_url(url_or_id)
 
         elif args['3'] or args['f']:
-            user_input, main_command = pure.process_user_url(url_or_id)
-            main_command = '3'
+            return '3', pure.process_user_url(url_or_id)
 
-    elif user_input := args['<searchstr>']:
-        main_command = '4'
-
-    return prompted, main_command, user_input
+        # Mode 4 isn't needed here, because docopt catches <searchstr>

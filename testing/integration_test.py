@@ -23,7 +23,7 @@ def test_mode1(monkeypatch, set_config):
     And internet connection
     """
     monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: (False, '1', 2232374))
+                        lambda: ('1', 2232374))
 
     # Make the prompt exit (return True will cause main() to loop forever)
     monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
@@ -38,7 +38,8 @@ def test_mode1_input(monkeypatch):
     in ~/.config/koneko/config.ini
     And internet connection
     """
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (True, None, None))
+    monkeypatch.setattr('koneko.main.sys.argv', [1])
+    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
     responses = iter(['1', 'https://www.pixiv.net/en/users/2232374'])
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
@@ -55,7 +56,7 @@ def test_mode2(monkeypatch, set_config):
     And internet connection
     """
     monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: (False, '2', 78823485))
+                        lambda: ('2', 78823485))
 
     monkeypatch.setattr('koneko.main.ui.prompt.image_prompt',
                         lambda x: sys.exit(0))
@@ -69,7 +70,8 @@ def test_mode2_input(monkeypatch, set_config):
     in ~/.config/koneko/config.ini
     And internet connection
     """
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (True, None, None))
+    monkeypatch.setattr('koneko.main.sys.argv', [1])
+    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
     responses = iter(['2', 'https://www.pixiv.net/en/artworks/78823485'])
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
@@ -86,7 +88,7 @@ def test_mode3(monkeypatch, set_config):
     And internet connection
     """
     monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: (False, '3', None))
+                        lambda: ('3', None))
 
     monkeypatch.setattr('koneko.main.prompt.user_prompt',
                         lambda x: sys.exit(0))
@@ -102,7 +104,8 @@ def test_mode3_input(monkeypatch, set_config):
     in ~/.config/koneko/config.ini
     And internet connection
     """
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (True, None, None))
+    monkeypatch.setattr('koneko.main.sys.argv', [1])
+    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
     monkeypatch.setattr('builtins.input', lambda x=None: '3')
 
     monkeypatch.setattr('koneko.main.prompt.user_prompt',
@@ -118,7 +121,7 @@ def test_mode4(monkeypatch, set_config):
     And internet connection
     """
     monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: (False, '4', 'gomzi'))
+                        lambda: ('4', 'gomzi'))
 
     monkeypatch.setattr('koneko.main.prompt.user_prompt',
                         lambda x: sys.exit(0))
@@ -132,7 +135,8 @@ def test_mode4_input(monkeypatch, set_config):
     in ~/.config/koneko/config.ini
     And internet connection
     """
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (True, None, None))
+    monkeypatch.setattr('koneko.main.sys.argv', [1])
+    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
     responses = iter(['4', 'gomzi'])
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
@@ -149,7 +153,7 @@ def test_mode5(monkeypatch, set_config):
     And internet connection
     """
     monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: (False, '5', None))
+                        lambda: ('5', None))
 
     monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
                         lambda x: sys.exit(0))
@@ -163,7 +167,8 @@ def test_mode5_input(monkeypatch, set_config):
     in ~/.config/koneko/config.ini
     And internet connection
     """
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (True, None, None))
+    monkeypatch.setattr('koneko.main.sys.argv', [1])
+    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
     monkeypatch.setattr('builtins.input', lambda x=None: '5')
 
     monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
@@ -183,7 +188,7 @@ def test_open_link(monkeypatch):
             return 1
     data = FakeData
 
-    ui.open_link_coords(data, 1, 2)
+    utils.open_link_coords(data, 1, 2)
 
 #@pytest.mark.integration
 #def test_download_image(monkeypatch):

@@ -10,18 +10,17 @@ from koneko import api, pure, utils
 
 @utils.spinner('')
 def async_download_spinner(download_path, urls, rename_images=False,
-                           file_names=None, pbar=None):
+                           file_names=None):
     """Batch download and rename, with spinner. For mode 2; multi-image posts"""
     async_download_core(
         download_path,
         urls,
         rename_images=rename_images,
         file_names=file_names,
-        pbar=pbar,
     )
 
 def async_download_core(download_path, urls, rename_images=False,
-                        file_names=None, pbar=None, tracker=None):
+                        file_names=None, tracker=None):
     """
     Rename files with given new name if needed.
     Submit each url to the ThreadPoolExecutor, so download and rename are concurrent
@@ -37,7 +36,7 @@ def async_download_core(download_path, urls, rename_images=False,
 
     filtered = itertools.filterfalse(os.path.isfile, newnames)
     oldnames = itertools.filterfalse(os.path.isfile, oldnames)
-    helper = downloadr(pbar=pbar, tracker=tracker)
+    helper = downloadr(tracker=tracker)
 
     # Nothing needs to be downloaded
     if not urls:
@@ -49,13 +48,10 @@ def async_download_core(download_path, urls, rename_images=False,
 
 
 @cytoolz.curry
-def downloadr(url, img_name, new_file_name=None, pbar=None, tracker=None):
+def downloadr(url, img_name, new_file_name=None, tracker=None):
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)
 
-    if pbar:
-        pbar.update(1)
-    # print(f"{img_name} done!")
     if new_file_name:
         # This character break renames
         if '/' in new_file_name:
@@ -67,7 +63,7 @@ def downloadr(url, img_name, new_file_name=None, pbar=None, tracker=None):
         tracker.update(img_name)
 
 
-def download_page(data, pbar=None, tracker=None):
+def download_page(data, tracker=None):
     """
     Download the illustrations on one page of given artist id (using threads),
     rename them based on the *post title*. Used for gallery modes (1 and 5)
@@ -76,7 +72,7 @@ def download_page(data, pbar=None, tracker=None):
     titles = pure.post_titles_in_page(data.current_illusts)
 
     async_download_core(
-        data.download_path, urls, rename_images=True, file_names=titles, pbar=pbar,
+        data.download_path, urls, rename_images=True, file_names=titles,
         tracker=tracker
     )
 
@@ -87,7 +83,6 @@ def user_download(data, tracker=None):
         data.all_urls,
         rename_images=True,
         file_names=data.all_names,
-        pbar=None,
         tracker=tracker
     )
 
@@ -142,3 +137,16 @@ def download_url_verified(url, png=False):
         download_url_verified(url, png=True)
     else:
         print(f'Image downloaded at {filepath}\n')
+
+# From ui
+def download_image_coords(data, first_num, second_num):
+    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
+    # 0 is acceptable, but is falsy; but 0 'is not' False
+    if selected_image_num is False:
+        print('Invalid number!')
+    else:
+        download_image_num(data, selected_image_num)
+
+def download_image_num(data, number):
+    # Update current_page_illusts, in case if you're in another page
+    download_url_verified(data.url(number))

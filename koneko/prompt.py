@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko import ui, pure, colors, utils
+from koneko import ui, pure, colors, utils, download
 
 TERM = Terminal()
 
@@ -30,7 +30,6 @@ def gallery_like_prompt(gallery_instance):
     sequenceable_keys = ('o', 'd', 'i', 'O', 'D', 'a', 'A')
     with TERM.cbreak():
         keyseqs = []
-        seq_num = 0
         selected_image_num, first_num, second_num = None, None, None
 
         print('Enter a gallery command:')
@@ -41,11 +40,9 @@ def gallery_like_prompt(gallery_instance):
             if gallery_command in sequenceable_keys:
                 keyseqs.append(gallery_command)
                 print(keyseqs)
-                seq_num += 1
 
             elif gallery_command.code == 361:  # Escape
                 keyseqs = []
-                seq_num = 0
                 print(keyseqs)
 
             # Digits continue the sequence
@@ -55,7 +52,7 @@ def gallery_like_prompt(gallery_instance):
 
                 # End of the sequence...
                 # Two digit sequence -- view image given coords
-                if seq_num == 1 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+                if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
 
                     first_num = int(keyseqs[0])
                     second_num = int(keyseqs[1])
@@ -64,18 +61,18 @@ def gallery_like_prompt(gallery_instance):
                     break  # leave cbreak(), go to image prompt
 
                 # One letter two digit sequence
-                elif seq_num == 2 and keyseqs[1].isdigit() and keyseqs[2].isdigit():
+                elif len(keyseqs) == 3 and keyseqs[1].isdigit() and keyseqs[2].isdigit():
 
                     first_num = keyseqs[1]
                     second_num = keyseqs[2]
 
                     # Open or download given coords
                     if keyseqs[0] == 'o':
-                        ui.open_link_coords(gallery_instance.data,
+                        utils.open_link_coords(gallery_instance.data,
                                             first_num, second_num)
 
                     elif keyseqs[0] == 'd':
-                        ui.download_image_coords(gallery_instance.data,
+                        download.download_image_coords(gallery_instance.data,
                                                  first_num, second_num)
 
                     elif keyseqs[0] == 'a':
@@ -85,9 +82,10 @@ def gallery_like_prompt(gallery_instance):
                     selected_image_num = int(f'{first_num}{second_num}')
 
                     if keyseqs[0] == 'O':
-                        ui.open_link_num(gallery_instance.data, selected_image_num)
+                        utils.open_link_num(gallery_instance.data, selected_image_num)
                     elif keyseqs[0] == 'D':
-                        ui.download_image_num(gallery_instance.data, selected_image_num)
+                        download.download_image_num(gallery_instance.data,
+                                                    selected_image_num)
                     elif keyseqs[0] == 'A':
                         break
                     elif keyseqs[0] == 'i':
@@ -95,11 +93,8 @@ def gallery_like_prompt(gallery_instance):
 
                     # Reset sequence info after running everything
                     keyseqs = []
-                    seq_num = 0
 
                 # Not the end of the sequence yet, continue while block
-                else:
-                    seq_num += 1
 
             # No sequence, execute their functions immediately
             elif gallery_command == 'n':
@@ -131,7 +126,6 @@ def gallery_like_prompt(gallery_instance):
             elif gallery_command:
                 print('Invalid command! Press h to show help')
                 keyseqs = []
-                seq_num = 0
             # End if
         # End while
     # End cbreak()
@@ -227,7 +221,6 @@ def user_prompt(user_instance):
     Handles key presses for user views (following users and user search)
     """
     keyseqs = []
-    seq_num = 0
     with TERM.cbreak():
         while True:
             print('Enter a user view command:')
@@ -251,7 +244,7 @@ def user_prompt(user_instance):
 
                 # End of the sequence...
                 # Two digit sequence -- view artist given number
-                if seq_num == 1 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+                if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
 
                     first_num = keyseqs[0]
                     second_num = keyseqs[1]
@@ -259,8 +252,6 @@ def user_prompt(user_instance):
                     break  # leave cbreak(), go to gallery
 
                 # Not the end of the sequence yet, continue while block
-                else:
-                    seq_num += 1
 
             elif user_prompt_command == 'q':
                 print('Are you sure you want to exit?')

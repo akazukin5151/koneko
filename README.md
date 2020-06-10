@@ -102,8 +102,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 # Roadmap
 
-* Use a Maybe monad to represent optional args in download functions
-* Prompt should immediately pass keyseqs to a helper function
+* Improve prompt code
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features

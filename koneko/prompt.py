@@ -178,24 +178,14 @@ def image_prompt(image):
                 ask_quit()
 
             elif image_prompt_command == 'b':
-                force = False
-                break  # Leave cbreak()
+                return image.leave(False)
 
             elif image_prompt_command == 'a':
-                force = True
-                break  # Leave cbreak()
-
-            elif image_prompt_command == '':
-                pass
+                return image.leave(True)
 
             elif image_prompt_command:
                 print('Invalid command! Press h to show help')
 
-            # End if
-        # End while
-    # End cbreak()
-
-    image.leave(force)
 
 def user_prompt(user_instance):
     """
@@ -216,7 +206,7 @@ def user_prompt(user_instance):
                 ui.previous_page_users(user_instance.data)
 
             elif user_prompt_command == 'r':
-                break
+                return user_instance.reload()
 
             # Wait for the rest of the sequence
             elif user_prompt_command.isdigit():
@@ -230,9 +220,7 @@ def user_prompt(user_instance):
                     first_num = keyseqs[0]
                     second_num = keyseqs[1]
                     selected_user_num = int(f'{first_num}{second_num}')
-                    break  # leave cbreak(), go to gallery
-
-                # Not the end of the sequence yet, continue while block
+                    return user_instance.go_artist_mode(selected_user_num)
 
             elif user_prompt_command == 'q':
                 ask_quit()
@@ -250,17 +238,7 @@ def user_prompt(user_instance):
                     'view ', colors.m, 'anual\n'
                 ]))
 
-            elif user_prompt_command == '':
-                pass
             elif user_prompt_command:
                 print('Invalid command! Press h to show help')
                 keyseqs = []
-                seq_num = 0
-            # End if
-        # End while
-    # End cbreak()
 
-    if user_prompt_command == 'r':
-        user_instance.reload()
-    else:
-        user_instance.go_artist_mode(selected_user_num)

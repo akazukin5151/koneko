@@ -94,6 +94,24 @@ def dir_not_empty(data: 'Data') -> bool:
 
     return False
 
+# From ui
+def open_in_browser(image_id):
+    link = f'https://www.pixiv.net/artworks/{image_id}'
+    os.system(f'xdg-open {link}')
+    print(f'Opened {link} in browser!')
+
+def open_link_coords(data, first_num, second_num):
+    selected_image_num = find_number_map(int(first_num), int(second_num))
+    # 0 is acceptable; 0 is falsy but not False
+    if selected_image_num is False:
+        print('Invalid number!')
+    else:
+        open_link_num(data, selected_image_num)
+
+def open_link_num(data, number):
+    # Update current_page_illusts, in case if you're in another page
+    open_in_browser(data.image_id(number))
+
 
 # If config functions get longer/more, consider moving them to a seperate module
 def config() -> ('config', 'Optional[str]'):

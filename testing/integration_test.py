@@ -188,7 +188,7 @@ def test_open_link(monkeypatch):
             return 1
     data = FakeData
 
-    ui.open_link_coords(data, 1, 2)
+    utils.open_link_coords(data, 1, 2)
 
 #@pytest.mark.integration
 #def test_download_image(monkeypatch):

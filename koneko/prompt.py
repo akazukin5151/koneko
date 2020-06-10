@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko import ui, pure, colors, utils
+from koneko import ui, pure, colors, utils, download
 
 TERM = Terminal()
 
@@ -71,11 +71,11 @@ def gallery_like_prompt(gallery_instance):
 
                     # Open or download given coords
                     if keyseqs[0] == 'o':
-                        ui.open_link_coords(gallery_instance.data,
+                        utils.open_link_coords(gallery_instance.data,
                                             first_num, second_num)
 
                     elif keyseqs[0] == 'd':
-                        ui.download_image_coords(gallery_instance.data,
+                        download.download_image_coords(gallery_instance.data,
                                                  first_num, second_num)
 
                     elif keyseqs[0] == 'a':
@@ -85,9 +85,10 @@ def gallery_like_prompt(gallery_instance):
                     selected_image_num = int(f'{first_num}{second_num}')
 
                     if keyseqs[0] == 'O':
-                        ui.open_link_num(gallery_instance.data, selected_image_num)
+                        utils.open_link_num(gallery_instance.data, selected_image_num)
                     elif keyseqs[0] == 'D':
-                        ui.download_image_num(gallery_instance.data, selected_image_num)
+                        download.download_image_num(gallery_instance.data,
+                                                    selected_image_num)
                     elif keyseqs[0] == 'A':
                         break
                     elif keyseqs[0] == 'i':

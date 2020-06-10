@@ -12,37 +12,9 @@ from tqdm import tqdm
 from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
                     download)
 
-def open_in_browser(image_id):
-    link = f'https://www.pixiv.net/artworks/{image_id}'
-    os.system(f'xdg-open {link}')
-    print(f'Opened {link} in browser!')
-
-def open_link_coords(data, first_num, second_num):
-    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
-    # 0 is acceptable; 0 is falsy but not False
-    if selected_image_num is False:
-        print('Invalid number!')
-    else:
-        open_link_num(data, selected_image_num)
-
-def open_link_num(data, number):
-    # Update current_page_illusts, in case if you're in another page
-    open_in_browser(data.image_id(number))
-
-
-def download_image_coords(data, first_num, second_num):
-    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
-    # 0 is acceptable, but is falsy; but 0 'is not' False
-    if selected_image_num is False:
-        print('Invalid number!')
-    else:
-        download_image_num(data, selected_image_num)
-
-def download_image_num(data, number):
-    # Update current_page_illusts, in case if you're in another page
-    download.download_url_verified(data.url(number))
 
 def previous_page(data):
+    """Previous page for galleries"""
     if data.current_page_num > 1:
         data.current_page_num -= 1
 
@@ -54,7 +26,6 @@ def previous_page(data):
 
     else:
         print('This is the first page!')
-
 
 class AbstractGallery(ABC):
     def __init__(self):
@@ -433,7 +404,7 @@ class Image:
         self._firstmode = firstmode
 
     def open_image(self):
-        open_in_browser(self.data.image_id)
+        utils.open_in_browser(self.data.image_id)
 
     def download_image(self):
         download.download_url_verified(self.data.current_url)
@@ -549,6 +520,7 @@ def _prefetch_next_image(data):
 
 
 def previous_page_users(data):
+    """Previous page for users"""
     if data.page_num > 1:
         data.page_num -= 1
         data.offset = int(data.offset) - 30

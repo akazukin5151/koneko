@@ -142,3 +142,16 @@ def download_url_verified(url, png=False):
         download_url_verified(url, png=True)
     else:
         print(f'Image downloaded at {filepath}\n')
+
+# From ui
+def download_image_coords(data, first_num, second_num):
+    selected_image_num = utils.find_number_map(int(first_num), int(second_num))
+    # 0 is acceptable, but is falsy; but 0 'is not' False
+    if selected_image_num is False:
+        print('Invalid number!')
+    else:
+        download_image_num(data, selected_image_num)
+
+def download_image_num(data, number):
+    # Update current_page_illusts, in case if you're in another page
+    download_url_verified(data.url(number))

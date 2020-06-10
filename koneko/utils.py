@@ -13,7 +13,14 @@ import funcy
 from koneko import lscat
 
 
+def seq_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
+    """Takes prompt input key seqs, combine two digits literally as int"""
+    first = keyseqs[start]
+    second = keyseqs[start+1]
+    return int(f'{first}{second}')
+
 def seq_to_num(keyseqs: 'list[str]') -> int:
+    """Takes prompt input key seqs, find the selected image number"""
     first_num, second_num = keyseqs[-2:]
     return find_number_map(int(first_num), int(second_num))
 

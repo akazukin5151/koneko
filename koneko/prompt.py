@@ -103,7 +103,7 @@ def gallery_like_prompt(gallery):
                 open_or_download(gallery, keyseqs)
 
                 if keyseqs[0] == 'i':
-                    return goto_image(gallery, int(f'{keyseqs[1]}{keyseqs[2]}'))
+                    return goto_image(gallery, utils.seq_to_int(keyseqs, 1))
                 elif keyseqs[0].lower() == 'a':
                     return gallery.handle_prompt(keyseqs)
                 else:
@@ -177,7 +177,7 @@ def image_prompt(image):
 
             # Two digit sequence -- jump to post number
             if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
-                ui.jump_to_image(image.data, int('{k[0]}{k[1]}'.format(k=keyseqs)))
+                ui.jump_to_image(image.data, utils.seq_to_int(keyseqs))
                 keyseqs = []
 
 def user_prompt(user):
@@ -229,5 +229,5 @@ def user_prompt(user):
             # End of the sequence...
             # Two digit sequence -- view artist given number
             if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
-                return user.go_artist_mode(int('{k[0]}{k[1]}'.format(k=keyseqs)))
+                return user.go_artist_mode(utils.seq_to_int(keyseqs))
 

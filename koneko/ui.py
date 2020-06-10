@@ -106,7 +106,7 @@ class AbstractGallery(ABC):
 
         # Skip prefetching again for cases like next -> prev -> next
         if str(self.data.current_page_num + 1) not in self.data.cached_pages:
-            self._prefetch_next_page(self)
+            self._prefetch_next_page()
 
     @abstractmethod
     def _pixivrequest(self, **kwargs):
@@ -256,7 +256,7 @@ class IllustFollowGallery(AbstractGallery):
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
-    def __init__(self, data):
+    def __init__(self):
         self._main_path = KONEKODIR / 'illustfollow'
         super().__init__()
 

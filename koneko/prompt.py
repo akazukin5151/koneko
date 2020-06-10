@@ -21,7 +21,7 @@ def ask_quit():
                 break
 
 
-def process_letter_digits(gallery, keyseqs: 'list[str]'):
+def open_or_download(gallery, keyseqs: 'list[str]'):
     first_num, second_num = keyseqs[-2:]
     if keyseqs[0] == 'o':
         utils.open_link_coords(gallery.data, int(first_num), int(second_num))
@@ -100,7 +100,7 @@ def gallery_like_prompt(gallery):
             elif (len(keyseqs) == 3 and keyseqs[1].isdigit() and keyseqs[2].isdigit()
                   and keyseqs[0] in sequenceable_keys):
 
-                process_letter_digits(gallery, keyseqs)
+                open_or_download(gallery, keyseqs)
 
                 if keyseqs[0] == 'i':
                     return goto_image(gallery, int(f'{keyseqs[1]}{keyseqs[2]}'))

@@ -180,7 +180,7 @@ def image_prompt(image):
                 ui.jump_to_image(image.data, int('{k[0]}{k[1]}'.format(k=keyseqs)))
                 keyseqs = []
 
-def user_prompt(user_instance):
+def user_prompt(user):
     """
     Handles key presses for user views (following users and user search)
     """
@@ -191,25 +191,20 @@ def user_prompt(user_instance):
             user_prompt_command = TERM.inkey()
 
             if user_prompt_command == 'n':
-                user_instance.next_page()
+                user.next_page()
                 # Prevents catching "n" and messing up the cache
                 time.sleep(0.5)
 
             elif user_prompt_command == 'p':
-                ui.previous_page_users(user_instance.data)
+                ui.previous_page_users(user.data)
 
             elif user_prompt_command == 'r':
-                return user_instance.reload()
+                return user.reload()
 
             # Wait for the rest of the sequence
             elif user_prompt_command.isdigit():
                 keyseqs.append(user_prompt_command)
                 print(keyseqs)
-
-                # End of the sequence...
-                # Two digit sequence -- view artist given number
-                if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
-                    return user_instance.go_artist_mode(utils.seq_to_num(keyseqs))
 
             elif user_prompt_command == 'q':
                 ask_quit()
@@ -230,4 +225,9 @@ def user_prompt(user_instance):
             elif user_prompt_command:
                 print('Invalid command! Press h to show help')
                 keyseqs = []
+
+            # End of the sequence...
+            # Two digit sequence -- view artist given number
+            if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+                return user.go_artist_mode(int('{k[0]}{k[1]}'.format(k=keyseqs)))
 

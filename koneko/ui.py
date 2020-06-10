@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 import funcy
-from tqdm import tqdm
 
 from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
                     download)

@@ -80,7 +80,7 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
 </details>
 
 # Usage
-There are five modes of operation:
+Launch with `koneko`. There are five modes of operation:
 1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
 2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
 3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))

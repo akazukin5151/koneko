@@ -11,7 +11,7 @@ TERM = Terminal()
 
 def ask_quit():
     """Ask for quit confirmation, no need to press enter"""
-    print('Are you sure you want to exit?')
+    print('\nAre you sure you want to exit?')
     with TERM.cbreak():
         while True:
             ans = TERM.inkey()
@@ -57,7 +57,6 @@ def gallery_like_prompt(gallery):
 
     with TERM.cbreak():
         while True:
-            print("Enter a gallery command:")
             gallery_command = TERM.inkey()
             print(gallery_command, end='', flush=True)
 
@@ -92,6 +91,7 @@ def gallery_like_prompt(gallery):
 
             elif gallery_command == 'q':
                 ask_quit()
+                print("Enter a gallery command:")
 
             # Multi char sequence
             if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():

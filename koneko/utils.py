@@ -13,6 +13,10 @@ import funcy
 from koneko import lscat
 
 
+def process_digits(keyseqs: 'list[str]') -> int:
+    first_num, second_num = keyseqs[-2:]
+    return find_number_map(int(first_num), int(second_num))
+
 def find_number_map(x: int, y: int) -> 'Optional[int]':
     """Translates 1-based-index coordinates into (0-) indexable number
     For 5 cols and 6 rows:

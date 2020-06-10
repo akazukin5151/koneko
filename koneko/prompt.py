@@ -19,7 +19,31 @@ def ask_quit():
             elif ans:
                 break
 
-def gallery_like_prompt(gallery_instance):
+
+def process_letter_digits(gallery, keyseqs: 'list[str]'):
+    first_num, second_num = keyseqs[-2:]
+    if keyseqs[0] == 'o':
+        utils.open_link_coords(gallery.data, int(first_num), int(second_num))
+
+    elif keyseqs[0] == 'd':
+        download.download_image_coords(gallery.data, int(first_num), int(second_num))
+
+    selected_image_num = int(f'{first_num}{second_num}')
+
+    if keyseqs[0] == 'O':
+        utils.open_link_num(gallery.data, selected_image_num)
+
+    elif keyseqs[0] == 'D':
+        download.download_image_num(gallery.data, selected_image_num)
+
+def goto_image(gallery, image_num: int):
+    if image_num is False:
+        print('Invalid number!')
+        gallery_like_prompt(gallery)  # Go back to while loop
+    else:
+        gallery.view_image(image_num)
+
+def gallery_like_prompt(gallery):
     """
     Only contains logic for interpreting key presses, and do the correct action
     Sequence means a combination of more than one key.
@@ -27,81 +51,42 @@ def gallery_like_prompt(gallery_instance):
         If the sequence is valid, execute their corresponding actions
     Otherwise for keys that do not need a sequence, execute their actions normally
     """
+    keyseqs = []
     sequenceable_keys = ('o', 'd', 'i', 'O', 'D', 'a', 'A')
-    with TERM.cbreak():
-        keyseqs = []
-        selected_image_num, first_num, second_num = None, None, None
 
-        print('Enter a gallery command:')
+    with TERM.cbreak():
         while True:
             gallery_command = TERM.inkey()
+            print(gallery_command, end='', flush=True)
 
-            # Wait for the rest of the sequence
-            if gallery_command in sequenceable_keys:
+            if gallery_command.isdigit() or gallery_command in sequenceable_keys:
                 keyseqs.append(gallery_command)
-                print(keyseqs)
+
+            # Single char input
+            if gallery_command == 'n':
+                gallery.next_page()
+
+            elif gallery_command == 'p':
+                ui.previous_page(gallery.data)
+
+            elif gallery_command == 'm':
+                print('')
+                print(gallery.__doc__)
+
+            elif gallery_command == 'h':
+                print('')
+                gallery.help()
 
             elif gallery_command.code == 361:  # Escape
                 keyseqs = []
-                print(keyseqs)
+                # Remove entire line
+                print("\r", "\b \b" * 4, end='', flush=True)
 
-            # Digits continue the sequence
-            elif gallery_command.isdigit():
-                keyseqs.append(gallery_command)
-                print(keyseqs)
+            elif gallery_command == 'b':
+                return gallery.handle_prompt(['b'])
 
-                # End of the sequence...
-                # Two digit sequence -- view image given coords
-                if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
-
-                    first_num = int(keyseqs[0])
-                    second_num = int(keyseqs[1])
-                    selected_image_num = utils.find_number_map(first_num, second_num)
-
-                    break  # leave cbreak(), go to image prompt
-
-                # One letter two digit sequence
-                elif len(keyseqs) == 3 and keyseqs[1].isdigit() and keyseqs[2].isdigit():
-
-                    first_num = keyseqs[1]
-                    second_num = keyseqs[2]
-
-                    # Open or download given coords
-                    if keyseqs[0] == 'o':
-                        utils.open_link_coords(gallery_instance.data,
-                                            first_num, second_num)
-
-                    elif keyseqs[0] == 'd':
-                        download.download_image_coords(gallery_instance.data,
-                                                 first_num, second_num)
-
-                    elif keyseqs[0] == 'a':
-                        break
-
-                    # Open, download, or view image, given image number
-                    selected_image_num = int(f'{first_num}{second_num}')
-
-                    if keyseqs[0] == 'O':
-                        utils.open_link_num(gallery_instance.data, selected_image_num)
-                    elif keyseqs[0] == 'D':
-                        download.download_image_num(gallery_instance.data,
-                                                    selected_image_num)
-                    elif keyseqs[0] == 'A':
-                        break
-                    elif keyseqs[0] == 'i':
-                        break  # leave cbreak(), go to image prompt
-
-                    # Reset sequence info after running everything
-                    keyseqs = []
-
-                # Not the end of the sequence yet, continue while block
-
-            # No sequence, execute their functions immediately
-            elif gallery_command == 'n':
-                gallery_instance.next_page()
-
-            elif gallery_command == 'p':
-                ui.previous_page(gallery_instance.data)
+            elif gallery_command == 'r':
+                return gallery.handle_prompt(['r'])
 
             elif gallery_command == 'q':
                 print('Are you sure you want to exit?')
@@ -109,28 +94,26 @@ def gallery_like_prompt(gallery_instance):
                 # If exit cancelled
                 print('Enter a gallery command:')
 
-            elif gallery_command == 'b':
-                break
+            # Multi char sequence
+            if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+                return goto_image(gallery, utils.process_digits(keyseqs))
 
-            elif gallery_command == 'r':
-                break
+            elif (len(keyseqs) == 3 and keyseqs[1].isdigit() and keyseqs[2].isdigit()
+                  and keyseqs[0] in sequenceable_keys):
 
-            elif gallery_command == 'm':
-                print(gallery_instance.__doc__)
+                process_letter_digits(gallery, keyseqs)
 
-            elif gallery_command == 'h':
-                gallery_instance.help()
+                if keyseqs[0] == 'i':
+                    return goto_image(gallery, int(f'{keyseqs[1]}{keyseqs[2]}'))
+                elif keyseqs[0].lower() == 'a':
+                    return gallery.handle_prompt(keyseqs)
+                else:
+                    keyseqs = []
 
-            elif gallery_command.code == 343:  # Enter
-                pass
-            elif gallery_command:
-                print('Invalid command! Press h to show help')
+            if len(keyseqs) > 3:
+                print('\nInvalid command! Press h to show help')
                 keyseqs = []
-            # End if
-        # End while
-    # End cbreak()
-    gallery_instance.handle_prompt(keyseqs, gallery_command, selected_image_num,
-                                     first_num, second_num)
+
 
 def image_prompt(image):
     """

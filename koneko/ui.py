@@ -194,26 +194,15 @@ class ArtistGallery(AbstractGallery):
         else:
             return api.myapi.artist_gallery_request(self._artist_user_id)
 
-    def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
-                      first_num, second_num):
+    def handle_prompt(self, keyseqs):
         # Display image (using either coords or image number), the show this prompt
-        if gallery_command == 'b':
+        if keyseqs[0] == 'b':
             pass # Stop gallery instance, return to previous state
-        elif gallery_command == 'r':
+        elif keyseqs[0] == 'r':
             self.reload()
-        elif keyseqs[0] == 'i':
-            self.view_image(selected_image_num)
         elif keyseqs[0].lower() == 'a':
             print('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self) # Go back to while loop
-        elif len(keyseqs) == 2:
-            selected_image_num = utils.find_number_map(first_num, second_num)
-            # 0 is acceptable; 0 is falsy but not False
-            if selected_image_num is False:
-                print('Invalid number!')
-                prompt.gallery_like_prompt(self) # Go back to while loop
-            else:
-                self.view_image(selected_image_num)
 
     @staticmethod
     def help():
@@ -281,28 +270,17 @@ class IllustFollowGallery(AbstractGallery):
         # Gallery prompt ends, user presses back
         self._back()
 
-    def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
-                      first_num, second_num):
+    def handle_prompt(self, keyseqs):
         # "b" must be handled first, because keyseqs might be empty
-        if gallery_command == 'b':
+        if keyseqs[0] == 'b':
             print('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self) # Go back to while loop
-        elif gallery_command == 'r':
+        elif keyseqs[0] == 'r':
             self.reload()
-        elif keyseqs[0] == 'i':
-            self.view_image(selected_image_num)
         elif keyseqs[0] == 'a':
-            self.go_artist_gallery_coords(first_num, second_num)
+            self.go_artist_gallery_coords(*keyseqs[-2:])
         elif keyseqs[0] == 'A':
-            self.go_artist_gallery_num(selected_image_num)
-        elif len(keyseqs) == 2:
-            selected_image_num = utils.find_number_map(first_num, second_num)
-            # 0 is acceptable; 0 is falsy but not False
-            if selected_image_num is False:
-                print('Invalid number!')
-                prompt.gallery_like_prompt(self) # Go back to while loop
-            else:
-                self.view_image(selected_image_num)
+            self.go_artist_gallery_num(utils.process_digits(keyseqs))
 
     @staticmethod
     def help():

@@ -56,15 +56,12 @@ class FakeGallery:
     def __init__(self):
         self.data = None
 
-    def next_page(self):
-        sys.exit(0)
-
-    def handle_prompt(self, *a):
-        sys.exit(0)
-
     @staticmethod
-    def help():
-        sys.exit(0)
+    def help():                  sys.exit(0)
+    def next_page(self):         sys.exit(0)
+    def handle_prompt(self, *a): sys.exit(0)
+    def view_image(self, *a):    sys.exit(0)
+
 
 def test_gallery_like_prompt(monkeypatch, patch_cbreak):
     fakegallery = FakeGallery()

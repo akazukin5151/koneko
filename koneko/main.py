@@ -73,15 +73,24 @@ def main_loop(prompted: bool, main_command: str, user_input: str, your_id=None):
         For illust following mode, it's not required
     """
     printmessage = True
+    case = {
+        '1': ArtistModeLoop(prompted, user_input).start,
+        '2': ViewPostModeLoop(prompted, user_input).start,
+        '4': SearchUsersModeLoop(prompted, user_input).start,
+        '5': illust_follow_mode_loop,
+        '?': screens.info_screen_loop,
+        'm': screens.show_man_loop,
+        'c': screens.clear_cache_loop,
+    }
+
     while True:
         if prompted and not user_input:
             main_command = screens.begin_prompt(printmessage)
 
-        if main_command == '1':
-            ArtistModeLoop(prompted, user_input).start()
-
-        elif main_command == '2':
-            ViewPostModeLoop(prompted, user_input).start()
+        # Simplify if-else chain with case-switch
+        func = case.get(main_command, None)
+        if func:
+            func()
 
         elif main_command == '3':
             if your_id and not user_input: # your_id stored in config file
@@ -91,21 +100,6 @@ def main_loop(prompted: bool, main_command: str, user_input: str, your_id=None):
 
             # If your_id not stored, or if ans is no, or if id provided, via cli
             FollowingUserModeLoop(prompted, user_input).start()
-
-        elif main_command == '4':
-            SearchUsersModeLoop(prompted, user_input).start()
-
-        elif main_command == '5':
-            illust_follow_mode_loop()
-
-        elif main_command == '?':
-            screens.info_screen_loop()
-
-        elif main_command == 'm':
-            screens.show_man_loop()
-
-        elif main_command == 'c':
-            screens.clear_cache_loop()
 
         elif main_command == 'q':
             answer = input('Are you sure you want to exit? [Y/n]:\n')

@@ -33,6 +33,9 @@ Options:
   (-h | --help)     Show this help
   (-v | --version)  Show version number
 """
+# This is needed for testing
+import sys
+
 from docopt import docopt
 
 from koneko import pure, __version__

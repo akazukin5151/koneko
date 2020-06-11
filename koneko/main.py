@@ -17,7 +17,7 @@ import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, prompt, screens, config
+from koneko import ui, api, cli, pure, config, prompt, screens
 
 
 def main():

@@ -1,7 +1,9 @@
-import pytest
 from pathlib import Path
 
+import pytest
+
 from koneko import ui, utils, download
+
 
 class FakeData:
     def image_id(self):
@@ -97,4 +99,3 @@ def test_prefetch_next_image(monkeypatch):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
     data.next_img_url = 'fake'
     ui._prefetch_next_image(data)
-

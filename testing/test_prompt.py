@@ -1,10 +1,11 @@
 import sys
-import pytest
 from contextlib import contextmanager
 
+import pytest
 from blessed.keyboard import Keystroke
 
 from koneko import prompt
+
 
 class CustomExit(Exception):
     pass
@@ -217,4 +218,3 @@ def test_user_prompt_seq(monkeypatch, patch_cbreak):
     fakeuser= FakeUser()
     with pytest.raises(CustomExit):
         assert prompt.user_prompt(fakeuser)
-

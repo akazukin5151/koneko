@@ -3,9 +3,10 @@
 """
 
 import sys
+
 import pytest
 
-from koneko import main, utils, ui, config
+from koneko import ui, main, utils, config
 
 
 @pytest.fixture
@@ -194,5 +195,3 @@ def test_open_link(monkeypatch):
 #    mode = ui.ArtistGallery(1234)
 #    mode.data.post_json = lambda x: 5678
 #    mode.download_image_coords(1, 2)
-
-

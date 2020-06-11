@@ -2,11 +2,11 @@ import sys
 import json
 from pathlib import Path
 
+from koneko import KONEKODIR, data
 
 # Lmao python
 sys.path.append('testing')
 
-from koneko import data, KONEKODIR
 from page_json import *  # Imports the current_page (dict) stored in disk
 
 page_illusts = page_json["illusts"]
@@ -98,4 +98,3 @@ def test_user():
     assert udata.splitpoint == 30
 
     assert udata.first_img == "畳と桧"
-

@@ -8,8 +8,8 @@ from pathlib import Path
 
 import funcy
 
-from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
-                    download, config)
+from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
+                    prompt, download)
 
 
 def previous_page(data):

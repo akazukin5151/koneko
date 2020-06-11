@@ -1,6 +1,6 @@
 import os
-from pathlib import Path
 from getpass import getpass
+from pathlib import Path
 from configparser import ConfigParser
 
 from blessed import Terminal

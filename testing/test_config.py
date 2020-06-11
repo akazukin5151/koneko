@@ -2,11 +2,11 @@ import os
 import configparser
 from pathlib import Path
 
+import pytest
 from returns.result import Success
 
 from koneko import config
 
-import pytest
 
 @pytest.fixture
 def use_test_cfg(monkeypatch):

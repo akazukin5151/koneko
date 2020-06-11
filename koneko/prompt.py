@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko import ui, pure, colors, utils, download
+from koneko import ui, pure, utils, colors, download
 
 TERM = Terminal()
 
@@ -230,4 +230,3 @@ def user_prompt(user):
             # Two digit sequence -- view artist given number
             if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
                 return user.go_artist_mode(utils.seq_to_int(keyseqs))
-

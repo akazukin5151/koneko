@@ -96,7 +96,7 @@ def show_instant(cls, data, check_print=True):
          for x in os.listdir(data.download_path)
          if not x.startswith('.')]
 
-    if check_print and utils.check_print_cols().value_or(True):
+    if check_print and utils.check_print_cols():
         number_of_cols = ncols_config()
 
         spacing = utils.get_settings('lscat', 'gallery_print_spacing').map(
@@ -164,7 +164,7 @@ class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
         super().__init__(data)
-        print_cols = utils.check_print_cols().value_or(True)
+        print_cols = utils.check_print_cols()
 
         try:
             splitpoint = data.splitpoint

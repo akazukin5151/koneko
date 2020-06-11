@@ -47,7 +47,7 @@ def test_verify_full_download():
 
 def test_check_print_cols(monkeypatch, use_test_cfg):
     # print_cols is on in example config
-    assert utils.check_print_cols() == Success(True)
+    assert utils.check_print_cols() == True
 
     cfg = configparser.ConfigParser()
     cfg.read('testing/test_config.ini')
@@ -56,20 +56,19 @@ def test_check_print_cols(monkeypatch, use_test_cfg):
         cfg.set('misc', 'print_cols', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
-        assert utils.check_print_cols() == Success(True)
+        assert utils.check_print_cols() == True
 
     for setting in ('off', 'no', 'off'):
         cfg.set('misc', 'print_cols', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
-        assert utils.check_print_cols() == Success(False)
+        assert utils.check_print_cols() == False
 
     # Invalid boolean should default to True
     cfg.set('misc', 'print_cols',  'asdf')
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
-    assert isinstance(utils.check_print_cols().failure(), ValueError)
-    assert utils.check_print_cols().fix(lambda x: True) == Success(True)
+    assert utils.check_print_cols() == True
 
     # Restore default value
     cfg.set('misc', 'print_cols',  'on')

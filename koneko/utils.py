@@ -184,13 +184,3 @@ def check_noprint() -> 'Result[bool]':
     section = get_config_section('misc')
     return section.map(lambda s: s.getboolean('noprint', fallback=False)).value_or(True)
 
-def noprint(func: 'func[T]', *args, **kwargs) -> 'T':
-    import contextlib
-    with open(os.devnull, "w") as null:
-        with contextlib.redirect_stdout(null):
-            func(*args, **kwargs)
-
-
-if __name__ == "__main__":
-    noprint(print, "hello")
-    print('world')

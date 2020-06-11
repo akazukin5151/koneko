@@ -73,11 +73,6 @@ def test_check_noprint(monkeypatch, use_example_cfg):
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
 
-def test_noprint(capsys):
-    utils.noprint(print, "hello")
-    captured = capsys.readouterr()
-    assert captured.out == ""
-
 def test_get_settings(monkeypatch, use_example_cfg):
     assert utils.get_settings('Credentials', 'username') == Success('koneko')
     assert utils.get_settings('Credentials', 'password') == Success('mypassword')

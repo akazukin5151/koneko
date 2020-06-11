@@ -110,6 +110,12 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
 
+## Upcoming changelog (in dev branch)
+
+For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+
+### Version 0.8
+
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!

@@ -5,6 +5,8 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+from returns.maybe import Maybe, Some, Nothing
+from returns.result import Result, Success, Failure
 
 from koneko import utils
 
@@ -45,7 +47,7 @@ def test_verify_full_download():
 
 def test_check_noprint(monkeypatch, use_example_cfg):
     # noprint is off in example config
-    assert utils.check_noprint() == False
+    assert utils.check_noprint() == Success(False)
 
     cfg = configparser.ConfigParser()
     cfg.read('testing/test_config.ini')
@@ -54,13 +56,22 @@ def test_check_noprint(monkeypatch, use_example_cfg):
         cfg.set('misc', 'noprint', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
-        assert utils.check_noprint() == True
+        assert utils.check_noprint() == Success(True)
 
-    for setting in ('off', 'no', 'asdf', 'off'):
+    for setting in ('off', 'no', 'off'):
         cfg.set('misc', 'noprint', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
-        assert utils.check_noprint() == False
+        assert utils.check_noprint() == Success(False)
+
+    cfg.set('misc', 'noprint',  'asdf')
+    with open('testing/test_config.ini', 'w') as f:
+        cfg.write(f)
+    assert isinstance(utils.check_noprint().failure(), ValueError)
+
+    cfg.set('misc', 'noprint',  'off')
+    with open('testing/test_config.ini', 'w') as f:
+        cfg.write(f)
 
 def test_noprint(capsys):
     utils.noprint(print, "hello")
@@ -68,11 +79,11 @@ def test_noprint(capsys):
     assert captured.out == ""
 
 def test_get_settings(monkeypatch, use_example_cfg):
-    assert utils.get_settings('Credentials', 'username') == 'koneko'
-    assert utils.get_settings('Credentials', 'password') == 'mypassword'
-    assert utils.get_settings('Credentials', 'ID') == '1234'
-    assert utils.get_settings('experimental', 'image_mode_previews') == 'off'
-    assert utils.get_settings('misc', 'noprint') == 'off'
+    assert utils.get_settings('Credentials', 'username') == Success('koneko')
+    assert utils.get_settings('Credentials', 'password') == Success('mypassword')
+    assert utils.get_settings('Credentials', 'ID') == Success('1234')
+    assert utils.get_settings('experimental', 'image_mode_previews') == Success('off')
+    assert utils.get_settings('misc', 'noprint') == Success('off')
 
     # If config doesn't exist
     test_cfg_path = Path('testing/files/test_config.ini')
@@ -81,7 +92,7 @@ def test_get_settings(monkeypatch, use_example_cfg):
 
     monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
 
-    assert utils.get_settings('wewr', 'asda') is False
+    assert isinstance(utils.get_settings('wewr', 'asda').failure(), KeyError)
 
 def test_config(monkeypatch):
     # If config exists
@@ -112,8 +123,8 @@ def test_config(monkeypatch):
     assert your_id == 'myid'
     assert type(creds) is configparser.SectionProxy
 
-    assert utils.get_settings('Credentials', 'username') == 'myusername'
-    assert utils.get_settings('Credentials', 'password') == 'mypassword'
+    assert utils.get_settings('Credentials', 'username') == Success('myusername')
+    assert utils.get_settings('Credentials', 'password') == Success('mypassword')
 
 def test_config2(monkeypatch):
     """Config path does not exist, user does not save their ID"""
@@ -134,8 +145,8 @@ def test_config2(monkeypatch):
     assert your_id == ''
     assert type(creds) is configparser.SectionProxy
 
-    assert utils.get_settings('Credentials', 'username') == 'myusername'
-    assert utils.get_settings('Credentials', 'password') == 'mypassword'
+    assert utils.get_settings('Credentials', 'username') == Success('myusername')
+    assert utils.get_settings('Credentials', 'password') == Success('mypassword')
 
 
 def test_dir_not_empty():

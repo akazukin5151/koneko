@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from configparser import ConfigParser
 
 import funcy
+from returns.result import safe, Success
 
 from koneko import lscat
 
@@ -166,30 +167,22 @@ def config() -> ('config', str):
 
     return credentials, your_id
 
-def get_config_section(section: str) -> 'config':
+@safe
+def get_config_section(section: str) -> 'Result[config]':
     config_object = ConfigParser()
     config_path = Path('~/.config/koneko/config.ini').expanduser()
-    if not config_path.exists():
-        return False
-
     config_object.read(config_path)
     section = config_object[section]
     return section
 
-def get_settings(section: str, setting: str) -> str:
-    cfgsection = get_config_section(section)
-    if not cfgsection:
-        return False
-    return cfgsection.get(setting, '')
+def get_settings(section: str, setting: str) -> 'Result[str]':
+    cfgsection: 'Result[config]' = get_config_section(section)
+    return cfgsection.map(lambda c: c.get(setting, ''))
 
-def check_noprint() -> bool:
+@safe
+def check_noprint() -> 'Result[bool]':
     section = get_config_section('misc')
-    if not section:
-        return False
-    try:
-        return section.getboolean('noprint', fallback=False)
-    except ValueError:
-        return False
+    return section.map(lambda s: s.getboolean('noprint', fallback=False)).value_or(True)
 
 def noprint(func: 'func[T]', *args, **kwargs) -> 'T':
     import contextlib

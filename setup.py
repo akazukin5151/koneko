@@ -38,6 +38,7 @@ setup(
         "cytoolz~=0.10",
         "PixivPy~=3.5",
         "blessed~=1.17",
+        "returns~=0.14"
     ],
     extras_requires = ["pytest~=5.4"],
     entry_points={

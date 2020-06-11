@@ -102,7 +102,6 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 # Roadmap
 
-* noprint option should be renamed to print_columns (in the affirmative), and True by default (if no key found)
 * Move config functions in lscat and utils to config.py
 * Indepth usage documentation?
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
@@ -134,6 +133,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed clearing the cache not working
 * Added -v/--version option
 * Added --help option
+* noprint option renamed to print_info (in the affirmative), and True by default (if no key or setting found)
 
 #### Internal code
 * Added lots of tests

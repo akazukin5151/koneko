@@ -4,11 +4,9 @@ import threading
 from abc import ABC
 
 from pixcat import Image
-from blessed import Terminal
 
-from koneko import utils
+from koneko import utils, config
 
-TERM = Terminal()
 
 def ncols(term_width, img_width, padding):
     return round(term_width / (img_width + padding))
@@ -34,57 +32,6 @@ def ycoords(term_height, img_height=8, padding=1):
             for row in range(number_of_rows)]
 
 
-def _width_paddingx() -> int:
-    settings = utils.get_config_section('lscat')
-    return (
-        settings.map(lambda s: s.getint('image_width', fallback=18)).value_or(18),
-        settings.map(lambda s: s.getint('images_x_spacing', fallback=2)).value_or(2)
-    )
-
-def ncols_config():
-    return ncols(TERM.width, *_width_paddingx())
-
-def xcoords_config(offset=0):
-    return xcoords(TERM.width, *_width_paddingx(), offset)
-
-def ycoords_config():
-    settings = utils.get_config_section('lscat')
-    img_height = settings.map(
-        lambda s: s.getint('image_height', fallback=8)
-    ).value_or(8)
-    paddingy = settings.map(
-        lambda s: s.getint('images_y_spacing', fallback=1)
-    ).value_or(1)
-    return ycoords(TERM.height, img_height, paddingy)
-
-def gallery_page_spacing_config():
-    settings = utils.get_config_section('lscat')
-    return settings.map(
-        lambda s: s.getint('gallery_page_spacing', fallback=23)
-    ).value_or(23)
-
-def users_page_spacing_config():
-    settings = utils.get_config_section('lscat')
-    return settings.map(
-        lambda s: s.getint('users_page_spacing', fallback=22)
-    ).value_or(22)
-
-def thumbnail_size_config():
-    settings = utils.get_config_section('lscat')
-    return settings.map(
-        lambda s: s.getint('image_thumbnail_size', fallback=310)
-    ).value_or(310)
-
-def get_gen_users_settings():
-    settings = utils.get_config_section('lscat')
-    return (
-        settings.map(
-            lambda s: s.getint('users_print_name_xcoord', fallback=18)
-        ).value_or(18),
-        settings.map(lambda s: s.getint('images_x_spacing', fallback=2)).value_or(2)
-    )
-
-
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
@@ -97,7 +44,7 @@ def show_instant(cls, data, gallerymode=False):
          if not x.startswith('.')]
 
     if gallerymode and utils.check_print_info():
-        number_of_cols = ncols_config()
+        number_of_cols = config.ncols_config()
 
         spacing = utils.get_settings('lscat', 'gallery_print_spacing').map(
                     lambda s: s.split(',')
@@ -181,13 +128,13 @@ class TrackDownloadsUsers(AbstractTracker):
 
 def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
-    left_shifts = xcoords_config()
-    rowspaces = ycoords_config()
-    number_of_cols = ncols_config()
+    left_shifts = config.xcoords_config()
+    rowspaces = config.ycoords_config()
+    number_of_cols = config.ncols_config()
 
     # Does not catch if config doesn't exist, because it must exist
-    page_spacing = gallery_page_spacing_config()
-    thumbnail_size = thumbnail_size_config()
+    page_spacing = config.gallery_page_spacing_config()
+    thumbnail_size = config.thumbnail_size_config()
 
     while True:
         # Release control. When _inspect() sends another image,
@@ -207,12 +154,12 @@ def generate_page(path):
             )
 
 def generate_users(path, print_info=False):
-    preview_xcoords = xcoords_config(offset=1)[-3:]
+    preview_xcoords = config.xcoords_config(offset=1)[-3:]
     os.system('clear')
 
-    message_xcoord, padding = get_gen_users_settings()
-    page_spacing = users_page_spacing_config()
-    thumbnail_size = thumbnail_size_config()
+    message_xcoord, padding = config.get_gen_users_settings()
+    page_spacing = config.users_page_spacing_config()
+    thumbnail_size = config.thumbnail_size_config()
 
     while True:
         # Wait for artist pic
@@ -289,11 +236,11 @@ class TrackDownloadsImage(AbstractTracker):
 
 def generate_previews(path):
     """Experimental"""
-    rowspaces = ycoords_config()
-    left_shifts = xcoords_config()
+    rowspaces = config.ycoords_config()
+    left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
 
-    thumbnail_size = thumbnail_size_config()
+    thumbnail_size = config.thumbnail_size_config()
 
     i = 0
     while True:

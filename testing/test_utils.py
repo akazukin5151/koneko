@@ -5,8 +5,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
-from returns.maybe import Maybe, Some, Nothing
-from returns.result import Result, Success, Failure
+from returns.result import Success
 
 from koneko import utils
 
@@ -15,13 +14,13 @@ sys.path.append('testing')
 
 
 def test_find_number_map(monkeypatch):
-    monkeypatch.setattr('koneko.lscat.ncols_config', lambda: 5)
+    monkeypatch.setattr('koneko.config.ncols_config', lambda: 5)
     assert ([utils.find_number_map(x, y)
              for y in range(1,7)
              for x in range(1,6)] == list(range(30)))
     assert not utils.find_number_map(0, 100)
 
-    monkeypatch.setattr('koneko.lscat.ncols_config', lambda: 6)
+    monkeypatch.setattr('koneko.utils.ncols_config', lambda: 6)
     assert [utils.find_number_map(x, y)
             for y in range(1,7)
             for x in range(1,7)][:30] == list(range(30))

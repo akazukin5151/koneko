@@ -9,9 +9,9 @@ from contextlib import contextmanager
 from configparser import ConfigParser
 
 import funcy
-from returns.result import safe, Success
+from returns.result import safe
 
-from koneko import lscat
+from koneko.config import ncols_config
 
 
 def seq_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
@@ -36,7 +36,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
     >>> a = [find_number_map(x,y) for y in range(1,7) for x in range(1,6)]
     >>> assert a == list(range(30))
     """
-    ncols = lscat.ncols_config()
+    ncols = ncols_config()
     nrows = ceil(30 / ncols)
     if 1 <= x <= ncols and 1 <= y <= nrows:
         return ((x - 1) % ncols) + (ncols * (y - 1))

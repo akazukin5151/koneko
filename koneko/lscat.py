@@ -96,7 +96,7 @@ def show_instant(cls, data, gallerymode=False):
          for x in os.listdir(data.download_path)
          if not x.startswith('.')]
 
-    if gallerymode and utils.check_print_cols():
+    if gallerymode and utils.check_print_info():
         number_of_cols = ncols_config()
 
         spacing = utils.get_settings('lscat', 'gallery_print_spacing').map(
@@ -164,7 +164,7 @@ class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
         super().__init__(data)
-        print_cols = utils.check_print_cols()
+        print_info = utils.check_print_info()
 
         try:
             splitpoint = data.splitpoint
@@ -176,7 +176,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # splitpoint * 3 + splitpoint == splitpoint * 4
         self.orders = generate_orders(splitpoint * 4, splitpoint)
 
-        self.generator = generate_users(data.download_path, print_cols)
+        self.generator = generate_users(data.download_path, print_info)
         self.generator.send(None)
 
 def generate_page(path):
@@ -206,7 +206,7 @@ def generate_page(path):
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
 
-def generate_users(path, print_cols=False):
+def generate_users(path, print_info=False):
     preview_xcoords = xcoords_config(offset=1)[-3:]
     os.system('clear')
 
@@ -221,7 +221,7 @@ def generate_users(path, print_cols=False):
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
-        if not print_cols:
+        if not print_info:
             # Print the message (artist name)
             print(' ' * message_xcoord, message)
         print('\n' * page_spacing)  # Scroll to new 'page'

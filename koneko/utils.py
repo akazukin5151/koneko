@@ -180,17 +180,17 @@ def get_settings(section: str, setting: str) -> 'Result[str]':
     return cfgsection.map(lambda c: c.get(setting, ''))
 
 @safe
-def _check_print_cols() -> 'Result[bool]':
+def _check_print_info() -> 'Result[bool]':
     """Returns either Success(True), Success(False) or Failure.
     Inner boolean represents whether to print columns or not
     Failure represents no key/setting/config found
     """
     section = get_config_section('misc')
     return section.map(
-        lambda s: s.getboolean('print_cols', fallback=True)
+        lambda s: s.getboolean('print_info', fallback=True)
     ).value_or(True)
 
-def check_print_cols() -> 'bool':
+def check_print_info() -> 'bool':
     """For a Failure (setting not found), return True by default"""
-    return _check_print_cols().value_or(True)
+    return _check_print_info().value_or(True)
 

@@ -45,33 +45,33 @@ def test_verify_full_download():
     # The above code will remove the file
     os.system("touch testing/files/not_an_image.txt")
 
-def test_check_print_cols(monkeypatch, use_test_cfg):
-    # print_cols is on in example config
-    assert utils.check_print_cols() == True
+def test_check_print_info(monkeypatch, use_test_cfg):
+    # print_info is on in example config
+    assert utils.check_print_info() == True
 
     cfg = configparser.ConfigParser()
     cfg.read('testing/test_config.ini')
 
     for setting in ('1', 'yes', 'true', 'on'):
-        cfg.set('misc', 'print_cols', setting)
+        cfg.set('misc', 'print_info', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
-        assert utils.check_print_cols() == True
+        assert utils.check_print_info() == True
 
     for setting in ('off', 'no', 'off'):
-        cfg.set('misc', 'print_cols', setting)
+        cfg.set('misc', 'print_info', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
-        assert utils.check_print_cols() == False
+        assert utils.check_print_info() == False
 
     # Invalid boolean should default to True
-    cfg.set('misc', 'print_cols',  'asdf')
+    cfg.set('misc', 'print_info',  'asdf')
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
-    assert utils.check_print_cols() == True
+    assert utils.check_print_info() == True
 
     # Restore default value
-    cfg.set('misc', 'print_cols',  'on')
+    cfg.set('misc', 'print_info',  'on')
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
 
@@ -80,7 +80,7 @@ def test_get_settings(monkeypatch, use_test_cfg):
     assert utils.get_settings('Credentials', 'password') == Success('mypassword')
     assert utils.get_settings('Credentials', 'ID') == Success('1234')
     assert utils.get_settings('experimental', 'image_mode_previews') == Success('off')
-    assert utils.get_settings('misc', 'print_cols') == Success('on')
+    assert utils.get_settings('misc', 'print_info') == Success('on')
 
     # If config doesn't exist
     test_cfg_path = Path('testing/files/test_config.ini')

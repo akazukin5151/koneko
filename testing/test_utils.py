@@ -64,10 +64,12 @@ def test_check_print_cols(monkeypatch, use_test_cfg):
             cfg.write(f)
         assert utils.check_print_cols() == Success(False)
 
+    # Invalid boolean should default to True
     cfg.set('misc', 'print_cols',  'asdf')
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
     assert isinstance(utils.check_print_cols().failure(), ValueError)
+    assert utils.check_print_cols().fix(lambda x: True) == Success(True)
 
     # Restore default value
     cfg.set('misc', 'print_cols',  'on')

@@ -34,13 +34,12 @@ def ycoords(term_height, img_height=8, padding=1):
             for row in range(number_of_rows)]
 
 
-def _width_paddingx():
+def _width_paddingx() -> int:
     settings = utils.get_config_section('lscat')
-    if not settings:
-        return 18, 2
-    img_width = settings.getint('image_width', fallback=18)
-    paddingx = settings.getint('images_x_spacing', fallback=2)
-    return img_width, paddingx
+    return (
+        settings.map(lambda s: s.getint('image_width', fallback=18)).value_or(18),
+        settings.map(lambda s: s.getint('images_x_spacing', fallback=2)).value_or(2)
+    )
 
 def ncols_config():
     return ncols(TERM.width, *_width_paddingx())
@@ -50,37 +49,40 @@ def xcoords_config(offset=0):
 
 def ycoords_config():
     settings = utils.get_config_section('lscat')
-    if not settings:
-        return ycoords(TERM.height, 8, 1)
-    img_height = settings.getint('image_height', fallback=8)
-    paddingy = settings.getint('images_y_spacing', fallback=1)
+    img_height = settings.map(
+        lambda s: s.getint('image_height', fallback=8)
+    ).value_or(8)
+    paddingy = settings.map(
+        lambda s: s.getint('images_y_spacing', fallback=1)
+    ).value_or(1)
     return ycoords(TERM.height, img_height, paddingy)
 
 def gallery_page_spacing_config():
     settings = utils.get_config_section('lscat')
-    if not settings:
-        return 23
-    return settings.getint('gallery_page_spacing', fallback=23)
+    return settings.map(
+        lambda s: s.getint('gallery_page_spacing', fallback=23)
+    ).value_or(23)
 
 def users_page_spacing_config():
     settings = utils.get_config_section('lscat')
-    if not settings:
-        return 20
-    return settings.getint('users_page_spacing', fallback=20)
+    return settings.map(
+        lambda s: s.getint('users_page_spacing', fallback=20)
+    ).value_or(20)
 
 def thumbnail_size_config():
     settings = utils.get_config_section('lscat')
-    if not settings:
-        return 310
-    return settings.getint('image_thumbnail_size', fallback=310)
+    return settings.map(
+        lambda s: s.getint('image_thumbnail_size', fallback=310)
+    ).value_or(310)
 
 def get_gen_users_settings():
     settings = utils.get_config_section('lscat')
-    if not settings:
-        return 18, 2
-    message_xcoord = settings.getint('users_print_name_xcoord', fallback=18)
-    padding = settings.getint('images_x_spacing', fallback=2)
-    return message_xcoord, padding
+    return (
+        settings.map(
+            lambda s: s.getint('users_print_name_xcoord', fallback=18)
+        ).value_or(18),
+        settings.map(lambda s: s.getint('images_x_spacing', fallback=2)).value_or(2)
+    )
 
 
 def icat(args):
@@ -97,11 +99,9 @@ def show_instant(cls, data, check_noprint=False):
     if check_noprint and not utils.check_noprint():
         number_of_cols = ncols_config()
 
-        spacing = utils.get_settings('lscat', 'gallery_print_spacing')
-        if spacing:
-            spacing = spacing.split(',')
-        else:
-            spacing = (9, 17, 17, 17, 17)
+        spacing = utils.get_settings('lscat', 'gallery_print_spacing').map(
+                    lambda s: s.split(',')
+                  ).value_or((9, 17, 17, 17, 17))
 
         for (idx, space) in enumerate(spacing[:number_of_cols]):
             print(' ' * int(space), end='')

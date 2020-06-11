@@ -1,15 +1,12 @@
-import os
 import sys
 import json
 from pathlib import Path
-import configparser
 
-import pytest
 
 # Lmao python
 sys.path.append('testing')
 
-from koneko import pure, lscat, utils, data, KONEKODIR
+from koneko import data, KONEKODIR
 from page_json import *  # Imports the current_page (dict) stored in disk
 
 page_illusts = page_json["illusts"]

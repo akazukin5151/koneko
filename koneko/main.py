@@ -12,13 +12,12 @@ Capitalized tag definitions:
 """
 
 import os
-import re
 import sys
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, utils, prompt, screens, config
+from koneko import ui, api, cli, pure, prompt, screens, config
 
 
 def main():

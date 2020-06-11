@@ -33,7 +33,7 @@ def test_check_print_info(monkeypatch, use_test_cfg):
         assert config.check_print_info() == False
 
     # Invalid boolean should default to True
-    cfg.set('misc', 'print_info',  'asdf')
+    cfg.set('misc', 'print_info', 'asdf')
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
     assert config.check_print_info() == True

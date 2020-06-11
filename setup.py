@@ -40,7 +40,7 @@ setup(
         "blessed~=1.17",
         "returns~=0.14"
     ],
-    extras_requires = ["pytest~=5.4"],
+    extras_requires=["pytest~=5.4"],
     entry_points={
         "console_scripts": [
             "koneko=koneko.main:main",

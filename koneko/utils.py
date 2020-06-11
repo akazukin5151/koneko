@@ -3,13 +3,10 @@ import imghdr
 import itertools
 import threading
 from math import ceil
-from getpass import getpass
 from pathlib import Path
 from contextlib import contextmanager
-from configparser import ConfigParser
 
 import funcy
-from returns.result import safe
 
 from koneko.config import ncols_config
 
@@ -17,7 +14,7 @@ from koneko.config import ncols_config
 def seq_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
     """Takes prompt input key seqs, combine two digits literally as int"""
     first = keyseqs[start]
-    second = keyseqs[start+1]
+    second = keyseqs[start + 1]
     return int(f'{first}{second}')
 
 def seq_to_num(keyseqs: 'list[str]') -> int:

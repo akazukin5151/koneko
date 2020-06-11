@@ -47,7 +47,7 @@ def show_instant(cls, data, gallerymode=False):
         number_of_cols = config.ncols_config()
 
         spacing = config.get_settings('lscat', 'gallery_print_spacing').map(
-                    lambda s: s.split(',')
+                      lambda s: s.split(',')
                   ).value_or((9, 17, 17, 17, 17))
 
         for (idx, space) in enumerate(spacing[:number_of_cols]):
@@ -196,7 +196,7 @@ def generate_orders(total_pics, artists_count):
     artist = list(range(artists_count))
     prev = list(range(artists_count, total_pics))
     order = []
-    a,p = 0,0
+    a, p = 0, 0
 
     for i in range(total_pics):
         if i % 4 == 0:
@@ -213,7 +213,7 @@ class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
     def __init__(self, data):
         super().__init__(data)
-        self.orders = list(range(1,30))
+        self.orders = list(range(1, 30))
         self.generator = generate_previews(data.download_path)
         self.generator.send(None)
 

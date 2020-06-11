@@ -121,7 +121,6 @@ class AbstractGallery(ABC):
         next_page = self._pixivrequest(**parse_page)
         self.data.all_pages_cache[str(self.data.current_page_num + 1)] = next_page
 
-        current_page_illusts = next_page['illusts']
         download_path = self._main_path / str(self.data.current_page_num + 1)
 
         if not download_path.is_dir():
@@ -207,9 +206,9 @@ class ArtistGallery(AbstractGallery):
     @staticmethod
     def help():
         print(''.join(
-            colors.base1 + ['view '] + colors.base2
-            + ['view ', colors.m, 'anual; ',
-               colors.b, 'ack\n']))
+            colors.base1 + ['view '] + colors.base2 +
+            ['view ', colors.m, 'anual; ',
+              colors.b, 'ack\n']))
 
 
 class IllustFollowGallery(AbstractGallery):
@@ -314,7 +313,7 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     url = pure.url_given_size(post_json, 'large')
     filename = pure.split_backslash_last(url)
     download_path = (KONEKODIR / str(artist_user_id) / "individual" /
-                 str(data.image_id(number_prefix)))
+                     str(data.image_id(number_prefix)))
     download.download_core(download_path, url, filename)
 
     # BLOCKING: imput is blocking, will not display large image until input
@@ -420,7 +419,7 @@ class Image:
         tracker = lscat.TrackDownloadsImage(self.data)
         slicestart = self.data.page_num
         while not self.event.is_set() and slicestart <= 4:
-            img = self.data.page_urls[slicestart:slicestart+1]
+            img = self.data.page_urls[slicestart:slicestart + 1]
 
             if os.path.isfile(self.data.download_path / pure.split_backslash_last(img[0])):
                 tracker.update(pure.split_backslash_last(img[0]))

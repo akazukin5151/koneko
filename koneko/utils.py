@@ -182,7 +182,7 @@ def get_settings(section: str, setting: str) -> 'Result[str]':
 @safe
 def check_noprint() -> 'Result[bool]':
     section = get_config_section('misc')
-    return section.map(lambda s: s.getboolean('noprint', fallback=False)).value_or(False)
+    return section.map(lambda s: s.getboolean('noprint', fallback=False)).value_or(True)
 
 def noprint(func: 'func[T]', *args, **kwargs) -> 'T':
     import contextlib

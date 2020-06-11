@@ -3,15 +3,24 @@ import imghdr
 import itertools
 import threading
 from math import ceil
-from getpass import getpass
 from pathlib import Path
 from contextlib import contextmanager
-from configparser import ConfigParser
 
 import funcy
 
-from koneko import lscat
+from koneko.config import ncols_config
 
+
+def seq_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
+    """Takes prompt input key seqs, combine two digits literally as int"""
+    first = keyseqs[start]
+    second = keyseqs[start + 1]
+    return int(f'{first}{second}')
+
+def seq_to_num(keyseqs: 'list[str]') -> int:
+    """Takes prompt input key seqs, find the selected image number"""
+    first_num, second_num = keyseqs[-2:]
+    return find_number_map(int(first_num), int(second_num))
 
 def find_number_map(x: int, y: int) -> 'Optional[int]':
     """Translates 1-based-index coordinates into (0-) indexable number
@@ -24,7 +33,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
     >>> a = [find_number_map(x,y) for y in range(1,7) for x in range(1,6)]
     >>> assert a == list(range(30))
     """
-    ncols = lscat.ncols_config()
+    ncols = ncols_config()
     nrows = ceil(30 / ncols)
     if 1 <= x <= ncols and 1 <= y <= nrows:
         return ((x - 1) % ncols) + (ncols * (y - 1))
@@ -113,80 +122,3 @@ def open_link_num(data, number):
     open_in_browser(data.image_id(number))
 
 
-# If config functions get longer/more, consider moving them to a seperate module
-def config() -> ('config', str):
-    config_path = Path('~/.config/koneko/config.ini').expanduser()
-    config_object = ConfigParser()
-    if config_path.exists():
-        config_object.read(Path('~/.config/koneko/config.ini').expanduser())
-        credentials = config_object['Credentials']
-        # If your_id is stored in the config
-        your_id = credentials.get('ID', '')
-        return credentials, your_id
-
-    username = input('Please enter your username:\n')
-    print('\nPlease enter your password:')
-    password = getpass()
-    config_object['Credentials'] = {'Username': username, 'Password': password}
-
-    print('\nDo you want to save your pixiv ID? It will be more convenient')
-    print('to view artists you are following')
-    ans = input()
-    if ans == 'y' or not ans:
-        your_id = input('Please enter your pixiv ID:\n')
-        config_object['Credentials'].update({'ID': your_id})
-    else:
-        your_id = ''
-
-    os.system('clear')
-
-    config_path.parent.mkdir(exist_ok=True)
-    config_path.touch()
-    with open(config_path, 'w') as c:
-        config_object.write(c)
-
-    # Append the default settings to the config file
-    # Why not use python? Because it's functional, readable, and
-    # this one liner defeats any potential speed benefits
-    example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
-    os.system(f'tail {example_cfg} -n +9 >> {config_path}')
-
-    credentials = config_object['Credentials']
-
-    return credentials, your_id
-
-def get_config_section(section: str) -> 'config':
-    config_object = ConfigParser()
-    config_path = Path('~/.config/koneko/config.ini').expanduser()
-    if not config_path.exists():
-        return False
-
-    config_object.read(config_path)
-    section = config_object[section]
-    return section
-
-def get_settings(section: str, setting: str) -> str:
-    cfgsection = get_config_section(section)
-    if not cfgsection:
-        return False
-    return cfgsection.get(setting, '')
-
-def check_noprint() -> bool:
-    section = get_config_section('misc')
-    if not section:
-        return False
-    try:
-        return section.getboolean('noprint', fallback=False)
-    except ValueError:
-        return False
-
-def noprint(func: 'func[T]', *args, **kwargs) -> 'T':
-    import contextlib
-    with open(os.devnull, "w") as null:
-        with contextlib.redirect_stdout(null):
-            func(*args, **kwargs)
-
-
-if __name__ == "__main__":
-    noprint(print, "hello")
-    print('world')

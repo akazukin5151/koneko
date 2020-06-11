@@ -2,18 +2,17 @@
 (And to bump up the coverage)
 """
 
-import os
 import sys
-import pytest
-from pathlib import Path
 
-from koneko import main, utils, ui
+import pytest
+
+from koneko import ui, main, utils, config
 
 
 @pytest.fixture
 def set_config(monkeypatch):
-    credentials, your_id = utils.config()
-    monkeypatch.setattr('koneko.main.utils.config',
+    credentials, your_id = config.begin_config()
+    monkeypatch.setattr('koneko.main.config.begin_config',
                         lambda: (credentials, your_id))
 
 @pytest.mark.integration
@@ -181,7 +180,6 @@ def test_mode5_input(monkeypatch, set_config):
 def test_open_link(monkeypatch):
     monkeypatch.setattr('koneko.ui.ArtistGallery.start', lambda x: True)
     monkeypatch.setattr('koneko.ui.os.system', lambda x: True)
-    mode = ui.ArtistGallery(1234)
 
     class FakeData:
         def image_id(self):
@@ -197,5 +195,3 @@ def test_open_link(monkeypatch):
 #    mode = ui.ArtistGallery(1234)
 #    mode.data.post_json = lambda x: 5678
 #    mode.download_image_coords(1, 2)
-
-

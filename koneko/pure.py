@@ -5,7 +5,6 @@ Collection of functions that are pure and side effect free
 
 import os
 import re
-import threading
 from pathlib import Path
 
 import funcy
@@ -38,7 +37,7 @@ def prefix_artist_name(name: str, number: int) -> str:
     return new_file_name
 
 def print_multiple_imgs(illusts_json: 'Json') -> None:
-    _ = [print(f'{c.RED}#{index}{c.RESET} has {c.BLUE}{pages}{c.RESET} pages',end=', ')
+    _ = [print(f'{c.RED}#{index}{c.RESET} has {c.BLUE}{pages}{c.RESET} pages', end=', ')
          for (index, json) in enumerate(illusts_json)
          if (pages := json['page_count']) > 1]
     print('')

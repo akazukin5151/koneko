@@ -15,7 +15,7 @@ os.system("cp example_config.ini ~/.local/share/koneko/")
 
 setup(
     name="koneko",
-    version="0.6.2",
+    version="0.7",
     description="Browse pixiv in the terminal",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -38,8 +38,9 @@ setup(
         "cytoolz~=0.10",
         "PixivPy~=3.5",
         "blessed~=1.17",
+        "returns~=0.14"
     ],
-    extras_requires = ["pytest~=5.4"],
+    extras_requires=["pytest~=5.4"],
     entry_points={
         "console_scripts": [
             "koneko=koneko.main:main",

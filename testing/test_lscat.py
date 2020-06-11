@@ -2,7 +2,7 @@ import os
 import sys
 import random
 from pathlib import Path
-from unittest.mock import Mock, call
+from unittest.mock import Mock
 
 import pytest
 
@@ -35,7 +35,7 @@ def test_show_instant(monkeypatch):
         def __init__(self):
             self.download_path = Path('testing/files/')
 
-    # This config has noprint = False
+    # This config has print_info = True
     # Can't use shared fixture because pathlib is used in FakeData
     monkeypatch.setattr('koneko.utils.Path.expanduser',
                         lambda x: Path('testing/test_config.ini'))
@@ -144,8 +144,8 @@ def test_TrackDownloadsUser2(monkeypatch):
 def test_generate_page(monkeypatch):
     mocked_pixcat = Mock()
     monkeypatch.setattr("koneko.lscat.Image", lambda *a, **k: mocked_pixcat)
-    monkeypatch.setattr("koneko.lscat.Terminal.width", 100)
-    monkeypatch.setattr("koneko.lscat.Terminal.height", 20)
+    monkeypatch.setattr("koneko.config.Terminal.width", 100)
+    monkeypatch.setattr("koneko.config.Terminal.height", 20)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(30))]
@@ -177,8 +177,8 @@ def test_generate_page(monkeypatch):
 def test_generate_users(monkeypatch):
     mocked_pixcat = Mock()
     monkeypatch.setattr("koneko.lscat.Image", lambda *a, **k: mocked_pixcat)
-    monkeypatch.setattr("koneko.lscat.Terminal.width", 100)
-    monkeypatch.setattr("koneko.lscat.Terminal.height", 20)
+    monkeypatch.setattr("koneko.config.Terminal.width", 100)
+    monkeypatch.setattr("koneko.config.Terminal.height", 20)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]

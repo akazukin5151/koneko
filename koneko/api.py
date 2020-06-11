@@ -1,6 +1,5 @@
 """Handles (almost) all Pixiv API interactions, eg async login, requests"""
 
-import sys
 import queue
 import threading
 

@@ -1,10 +1,7 @@
-import os
 import sys
 from pathlib import Path
 
-import pytest
-
-from koneko import KONEKODIR, data, pure, lscat, utils
+from koneko import pure
 from page_json import *  # Imports the current_page (dict) stored in disk
 
 # Lmao python

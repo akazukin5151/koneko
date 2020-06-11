@@ -1,16 +1,14 @@
-import os
 import sys
 import json
 from pathlib import Path
-import configparser
 
-import pytest
+from koneko import KONEKODIR, data
 
 # Lmao python
 sys.path.append('testing')
 
-from koneko import pure, lscat, utils, data, KONEKODIR
-from page_json import *  # Imports the current_page (dict) stored in disk
+# Imports the current_page (dict) stored in disk
+from page_json import *  # isort:skip
 
 page_illusts = page_json["illusts"]
 
@@ -101,4 +99,3 @@ def test_user():
     assert udata.splitpoint == 30
 
     assert udata.first_img == "畳と桧"
-

@@ -80,7 +80,7 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
 </details>
 
 # Usage
-There are five modes of operation:
+Launch with `koneko`. There are five modes of operation:
 1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
 2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
 3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))
@@ -102,7 +102,8 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 # Roadmap
 
-* Improve prompt code
+* In-depth usage documentation?
+* Refactor ui.py
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features
@@ -132,13 +133,15 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed clearing the cache not working
 * Added -v/--version option
 * Added --help option
+* noprint option renamed to print_info (in the affirmative), and True by default (if no key or setting found)
 
 #### Internal code
 * Added lots of tests
 * CI now tries to launch the application to make sure it doesn't crash on start and I didn't make any silly mistakes when building
 * Updated requirements.txt
 * Moved stuff like begin prompt and show man loop from `utils.py` to `screens.py`
-* Refactored cli.py
+* Refactored cli.py and prompt.py
+* Move config functions in lscat and utils to config.py
 
 
 # FAQ
@@ -151,7 +154,7 @@ I'd like to fix this but I'd rather not use mechanize but I don't know how to do
 
 First, koneko is intended to work for full screen terminals, so don't tile it around unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine.
 
-You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6.2 onwards.
+You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.7 onwards.
 
 # Contributing
 * Fork it
@@ -176,7 +179,7 @@ Note: if you want to make some edits, you should install it in a conda environme
 ```sh
 # Use the latest stable version (recommended for usage)
 # Make sure the version number is the latest
-git clone -b 'v0.6.2' --depth 1 https://github.com/twenty5151/koneko.git
+git clone -b 'v0.7' --depth 1 https://github.com/twenty5151/koneko.git
 # Use the master branch for upcoming features:
 git clone -b master https://github.com/twenty5151/koneko.git
 # Use the dev branch for latest features, fixes, and instability (recommended for contributers):

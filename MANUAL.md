@@ -37,7 +37,7 @@ See [example config](example_config.ini) for reference.
 * `users_print_name_xcoord`: location of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
 * The number(s) are the number of blank spaces (' ') to print
 * Both of them act on the x-axis
-* These settings are ignored if the `noprint` option is on
+* These settings are ignored if the `print_info` option is on
 
 ## Page spacing
 ### number of `\n` to print after every page, until all rows are out of view
@@ -55,7 +55,7 @@ See [example config](example_config.ini) for reference.
 * `images_y_spacing`: vertical spacing between images in one page (default: 1)
 
 ## Misc
-* `noprint`: Turns off printing the column numbers for the gallery, and number+artist name for user modes.
+* `print_info`: Turns off printing the column numbers for the gallery, and number+artist name for user modes.
 * Anything not exactly ('1', 'yes', 'true', or 'on') will be considered off
 
 # Usage

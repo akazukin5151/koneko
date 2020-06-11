@@ -18,6 +18,7 @@ def test_launch():
         pass
     os.chdir(curdir)
 
+
 cmds = (
     "pip install .",
     "python setup.py install",

@@ -8,8 +8,8 @@ from pathlib import Path
 
 import funcy
 
-from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
-                    download)
+from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
+                    prompt, download)
 
 
 def previous_page(data):
@@ -121,7 +121,6 @@ class AbstractGallery(ABC):
         next_page = self._pixivrequest(**parse_page)
         self.data.all_pages_cache[str(self.data.current_page_num + 1)] = next_page
 
-        current_page_illusts = next_page['illusts']
         download_path = self._main_path / str(self.data.current_page_num + 1)
 
         if not download_path.is_dir():
@@ -194,33 +193,22 @@ class ArtistGallery(AbstractGallery):
         else:
             return api.myapi.artist_gallery_request(self._artist_user_id)
 
-    def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
-                      first_num, second_num):
+    def handle_prompt(self, keyseqs):
         # Display image (using either coords or image number), the show this prompt
-        if gallery_command == 'b':
+        if keyseqs[0] == 'b':
             pass # Stop gallery instance, return to previous state
-        elif gallery_command == 'r':
+        elif keyseqs[0] == 'r':
             self.reload()
-        elif keyseqs[0] == 'i':
-            self.view_image(selected_image_num)
         elif keyseqs[0].lower() == 'a':
             print('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self) # Go back to while loop
-        elif len(keyseqs) == 2:
-            selected_image_num = utils.find_number_map(first_num, second_num)
-            # 0 is acceptable; 0 is falsy but not False
-            if selected_image_num is False:
-                print('Invalid number!')
-                prompt.gallery_like_prompt(self) # Go back to while loop
-            else:
-                self.view_image(selected_image_num)
 
     @staticmethod
     def help():
         print(''.join(
-            colors.base1 + ['view '] + colors.base2
-            + ['view ', colors.m, 'anual; ',
-               colors.b, 'ack\n']))
+            colors.base1 + ['view '] + colors.base2 +
+            ['view ', colors.m, 'anual; ',
+              colors.b, 'ack\n']))
 
 
 class IllustFollowGallery(AbstractGallery):
@@ -281,28 +269,17 @@ class IllustFollowGallery(AbstractGallery):
         # Gallery prompt ends, user presses back
         self._back()
 
-    def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
-                      first_num, second_num):
+    def handle_prompt(self, keyseqs):
         # "b" must be handled first, because keyseqs might be empty
-        if gallery_command == 'b':
+        if keyseqs[0] == 'b':
             print('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self) # Go back to while loop
-        elif gallery_command == 'r':
+        elif keyseqs[0] == 'r':
             self.reload()
-        elif keyseqs[0] == 'i':
-            self.view_image(selected_image_num)
         elif keyseqs[0] == 'a':
-            self.go_artist_gallery_coords(first_num, second_num)
+            self.go_artist_gallery_coords(*keyseqs[-2:])
         elif keyseqs[0] == 'A':
-            self.go_artist_gallery_num(selected_image_num)
-        elif len(keyseqs) == 2:
-            selected_image_num = utils.find_number_map(first_num, second_num)
-            # 0 is acceptable; 0 is falsy but not False
-            if selected_image_num is False:
-                print('Invalid number!')
-                prompt.gallery_like_prompt(self) # Go back to while loop
-            else:
-                self.view_image(selected_image_num)
+            self.go_artist_gallery_num(utils.process_digits(keyseqs))
 
     @staticmethod
     def help():
@@ -336,7 +313,7 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     url = pure.url_given_size(post_json, 'large')
     filename = pure.split_backslash_last(url)
     download_path = (KONEKODIR / str(artist_user_id) / "individual" /
-                 str(data.image_id(number_prefix)))
+                     str(data.image_id(number_prefix)))
     download.download_core(download_path, url, filename)
 
     # BLOCKING: imput is blocking, will not display large image until input
@@ -373,7 +350,7 @@ def view_post_mode(image_id):
 
     image = Image(image_id, idata, True)
 
-    experimental = utils.get_settings('experimental', 'image_mode_previews')
+    experimental = config.get_settings('experimental', 'image_mode_previews')
     if experimental == 'on':
         event = threading.Event()
         thread = threading.Thread(target=image.preview)
@@ -442,7 +419,7 @@ class Image:
         tracker = lscat.TrackDownloadsImage(self.data)
         slicestart = self.data.page_num
         while not self.event.is_set() and slicestart <= 4:
-            img = self.data.page_urls[slicestart:slicestart+1]
+            img = self.data.page_urls[slicestart:slicestart + 1]
 
             if os.path.isfile(self.data.download_path / pure.split_backslash_last(img[0])):
                 tracker.update(pure.split_backslash_last(img[0]))

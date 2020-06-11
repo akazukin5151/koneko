@@ -1,8 +1,6 @@
 import os
 import sys
-import configparser
 from pathlib import Path
-from unittest.mock import Mock
 
 import pytest
 
@@ -13,16 +11,16 @@ sys.path.append('testing')
 
 
 def test_find_number_map(monkeypatch):
-    monkeypatch.setattr('koneko.lscat.ncols_config', lambda: 5)
+    monkeypatch.setattr('koneko.utils.ncols_config', lambda: 5)
     assert ([utils.find_number_map(x, y)
-             for y in range(1,7)
-             for x in range(1,6)] == list(range(30)))
+             for y in range(1, 7)
+             for x in range(1, 6)] == list(range(30)))
     assert not utils.find_number_map(0, 100)
 
-    monkeypatch.setattr('koneko.lscat.ncols_config', lambda: 6)
+    monkeypatch.setattr('koneko.utils.ncols_config', lambda: 6)
     assert [utils.find_number_map(x, y)
-            for y in range(1,7)
-            for x in range(1,7)][:30] == list(range(30))
+            for y in range(1, 7)
+            for x in range(1, 7)][:30] == list(range(30))
 
 def test_cd():
     current_dir = os.getcwd()
@@ -32,111 +30,12 @@ def test_cd():
     assert testdir == os.getcwd()
     assert os.getcwd() == current_dir
 
-@pytest.fixture
-def use_example_cfg(monkeypatch):
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
 
 def test_verify_full_download():
     assert utils.verify_full_download("testing/files/008_77803142_p0.png") == True
     assert utils.verify_full_download("testing/files/not_an_image.txt") == False
     # The above code will remove the file
     os.system("touch testing/files/not_an_image.txt")
-
-def test_check_noprint(monkeypatch, use_example_cfg):
-    # noprint is off in example config
-    assert utils.check_noprint() == False
-
-    cfg = configparser.ConfigParser()
-    cfg.read('testing/test_config.ini')
-
-    for setting in ('1', 'yes', 'true', 'on'):
-        cfg.set('misc', 'noprint', setting)
-        with open('testing/test_config.ini', 'w') as f:
-            cfg.write(f)
-        assert utils.check_noprint() == True
-
-    for setting in ('off', 'no', 'asdf', 'off'):
-        cfg.set('misc', 'noprint', setting)
-        with open('testing/test_config.ini', 'w') as f:
-            cfg.write(f)
-        assert utils.check_noprint() == False
-
-def test_noprint(capsys):
-    utils.noprint(print, "hello")
-    captured = capsys.readouterr()
-    assert captured.out == ""
-
-def test_get_settings(monkeypatch, use_example_cfg):
-    assert utils.get_settings('Credentials', 'username') == 'koneko'
-    assert utils.get_settings('Credentials', 'password') == 'mypassword'
-    assert utils.get_settings('Credentials', 'ID') == '1234'
-    assert utils.get_settings('experimental', 'image_mode_previews') == 'off'
-    assert utils.get_settings('misc', 'noprint') == 'off'
-
-    # If config doesn't exist
-    test_cfg_path = Path('testing/files/test_config.ini')
-    if test_cfg_path.exists():
-        os.system(f'rm {test_cfg_path}')
-
-    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
-
-    assert utils.get_settings('wewr', 'asda') is False
-
-def test_config(monkeypatch):
-    # If config exists
-    example_path = Path('testing/test_config.ini')
-    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: example_path)
-
-    creds, your_id = utils.config()
-    assert your_id == '1234'
-    assert type(creds) is configparser.SectionProxy
-
-
-    # If config doesn't exist
-    test_cfg_path = Path('testing/files/test_config.ini')
-    if test_cfg_path.exists():
-        os.system(f'rm {test_cfg_path}')
-
-    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
-
-    # It asks for multiple inputs: username, whether to save user id, user id
-    responses = iter(['myusername', 'y', 'myid'])
-    monkeypatch.setattr('builtins.input', lambda x='': next(responses))
-    monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
-    # fix for macOS
-    monkeypatch.setattr('koneko.utils.os.system',
-                        lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
-
-    creds, your_id = utils.config()
-    assert your_id == 'myid'
-    assert type(creds) is configparser.SectionProxy
-
-    assert utils.get_settings('Credentials', 'username') == 'myusername'
-    assert utils.get_settings('Credentials', 'password') == 'mypassword'
-
-def test_config2(monkeypatch):
-    """Config path does not exist, user does not save their ID"""
-    test_cfg_path = Path('testing/files/test_config.ini')
-    os.system(f'rm {test_cfg_path}')
-
-    monkeypatch.setattr('koneko.utils.Path.expanduser', lambda x: test_cfg_path)
-
-    # It asks for multiple inputs: username, whether to save user id, user id
-    responses = iter(['myusername', 'n'])
-    monkeypatch.setattr('builtins.input', lambda x='': next(responses))
-    monkeypatch.setattr('koneko.utils.getpass', lambda: 'mypassword')
-    # fix for macOS
-    monkeypatch.setattr('koneko.utils.os.system',
-                        lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
-
-    creds, your_id = utils.config()
-    assert your_id == ''
-    assert type(creds) is configparser.SectionProxy
-
-    assert utils.get_settings('Credentials', 'username') == 'myusername'
-    assert utils.get_settings('Credentials', 'password') == 'mypassword'
-
 
 def test_dir_not_empty():
     class FakeData:

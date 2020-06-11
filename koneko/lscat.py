@@ -4,11 +4,9 @@ import threading
 from abc import ABC
 
 from pixcat import Image
-from blessed import Terminal
 
-from koneko import utils
+from koneko import utils, config
 
-TERM = Terminal()
 
 def ncols(term_width, img_width, padding):
     return round(term_width / (img_width + padding))
@@ -34,59 +32,10 @@ def ycoords(term_height, img_height=8, padding=1):
             for row in range(number_of_rows)]
 
 
-def _width_paddingx():
-    settings = utils.get_config_section('lscat')
-    if not settings:
-        return 18, 2
-    img_width = settings.getint('image_width', fallback=18)
-    paddingx = settings.getint('images_x_spacing', fallback=2)
-    return img_width, paddingx
-
-def ncols_config():
-    return ncols(TERM.width, *_width_paddingx())
-
-def xcoords_config(offset=0):
-    return xcoords(TERM.width, *_width_paddingx(), offset)
-
-def ycoords_config():
-    settings = utils.get_config_section('lscat')
-    if not settings:
-        return ycoords(TERM.height, 8, 1)
-    img_height = settings.getint('image_height', fallback=8)
-    paddingy = settings.getint('images_y_spacing', fallback=1)
-    return ycoords(TERM.height, img_height, paddingy)
-
-def gallery_page_spacing_config():
-    settings = utils.get_config_section('lscat')
-    if not settings:
-        return 23
-    return settings.getint('gallery_page_spacing', fallback=23)
-
-def users_page_spacing_config():
-    settings = utils.get_config_section('lscat')
-    if not settings:
-        return 20
-    return settings.getint('users_page_spacing', fallback=20)
-
-def thumbnail_size_config():
-    settings = utils.get_config_section('lscat')
-    if not settings:
-        return 310
-    return settings.getint('image_thumbnail_size', fallback=310)
-
-def get_gen_users_settings():
-    settings = utils.get_config_section('lscat')
-    if not settings:
-        return 18, 2
-    message_xcoord = settings.getint('users_print_name_xcoord', fallback=18)
-    padding = settings.getint('images_x_spacing', fallback=2)
-    return message_xcoord, padding
-
-
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
-def show_instant(cls, data, check_noprint=False):
+def show_instant(cls, data, gallerymode=False):
     tracker = cls(data)
     # Filter out invisible files
     # (used to save splitpoint and total_imgs without requesting)
@@ -94,14 +43,12 @@ def show_instant(cls, data, check_noprint=False):
          for x in os.listdir(data.download_path)
          if not x.startswith('.')]
 
-    if check_noprint and not utils.check_noprint():
-        number_of_cols = ncols_config()
+    if gallerymode and config.check_print_info():
+        number_of_cols = config.ncols_config()
 
-        spacing = utils.get_settings('lscat', 'gallery_print_spacing')
-        if spacing:
-            spacing = spacing.split(',')
-        else:
-            spacing = (9, 17, 17, 17, 17)
+        spacing = config.get_settings('lscat', 'gallery_print_spacing').map(
+                      lambda s: s.split(',')
+                  ).value_or((9, 17, 17, 17, 17))
 
         for (idx, space) in enumerate(spacing[:number_of_cols]):
             print(' ' * int(space), end='')
@@ -164,7 +111,7 @@ class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
         super().__init__(data)
-        noprint = utils.check_noprint()
+        print_info = config.check_print_info()
 
         try:
             splitpoint = data.splitpoint
@@ -176,18 +123,18 @@ class TrackDownloadsUsers(AbstractTracker):
         # splitpoint * 3 + splitpoint == splitpoint * 4
         self.orders = generate_orders(splitpoint * 4, splitpoint)
 
-        self.generator = generate_users(data.download_path, noprint)
+        self.generator = generate_users(data.download_path, print_info)
         self.generator.send(None)
 
 def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
-    left_shifts = xcoords_config()
-    rowspaces = ycoords_config()
-    number_of_cols = ncols_config()
+    left_shifts = config.xcoords_config()
+    rowspaces = config.ycoords_config()
+    number_of_cols = config.ncols_config()
 
     # Does not catch if config doesn't exist, because it must exist
-    page_spacing = gallery_page_spacing_config()
-    thumbnail_size = thumbnail_size_config()
+    page_spacing = config.gallery_page_spacing_config()
+    thumbnail_size = config.thumbnail_size_config()
 
     while True:
         # Release control. When _inspect() sends another image,
@@ -205,14 +152,14 @@ def generate_page(path):
             Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
-
-def generate_users(path, noprint=False):
-    preview_xcoords = xcoords_config(offset=1)[-3:]
+import time
+def generate_users(path, print_info=True):
+    preview_xcoords = config.xcoords_config(offset=1)[-3:]
     os.system('clear')
 
-    message_xcoord, padding = get_gen_users_settings()
-    page_spacing = users_page_spacing_config()
-    thumbnail_size = thumbnail_size_config()
+    message_xcoord, padding = config.get_gen_users_settings()
+    page_spacing = config.users_page_spacing_config()
+    thumbnail_size = config.thumbnail_size_config()
 
     while True:
         # Wait for artist pic
@@ -221,7 +168,7 @@ def generate_users(path, noprint=False):
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
-        if not noprint:
+        if print_info:
             # Print the message (artist name)
             print(' ' * message_xcoord, message)
         print('\n' * page_spacing)  # Scroll to new 'page'
@@ -249,7 +196,7 @@ def generate_orders(total_pics, artists_count):
     artist = list(range(artists_count))
     prev = list(range(artists_count, total_pics))
     order = []
-    a,p = 0,0
+    a, p = 0, 0
 
     for i in range(total_pics):
         if i % 4 == 0:
@@ -266,7 +213,7 @@ class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
     def __init__(self, data):
         super().__init__(data)
-        self.orders = list(range(1,30))
+        self.orders = list(range(1, 30))
         self.generator = generate_previews(data.download_path)
         self.generator.send(None)
 
@@ -289,11 +236,11 @@ class TrackDownloadsImage(AbstractTracker):
 
 def generate_previews(path):
     """Experimental"""
-    rowspaces = ycoords_config()
-    left_shifts = xcoords_config()
+    rowspaces = config.ycoords_config()
+    left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
 
-    thumbnail_size = thumbnail_size_config()
+    thumbnail_size = config.thumbnail_size_config()
 
     i = 0
     while True:

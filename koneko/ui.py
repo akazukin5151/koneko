@@ -9,7 +9,7 @@ from pathlib import Path
 import funcy
 
 from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, prompt,
-                    download)
+                    download, config)
 
 
 def previous_page(data):
@@ -351,7 +351,7 @@ def view_post_mode(image_id):
 
     image = Image(image_id, idata, True)
 
-    experimental = utils.get_settings('experimental', 'image_mode_previews')
+    experimental = config.get_settings('experimental', 'image_mode_previews')
     if experimental == 'on':
         event = threading.Event()
         thread = threading.Thread(target=image.preview)

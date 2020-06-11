@@ -7,13 +7,13 @@ import sys
 import pytest
 from pathlib import Path
 
-from koneko import main, utils, ui
+from koneko import main, utils, ui, config
 
 
 @pytest.fixture
 def set_config(monkeypatch):
-    credentials, your_id = utils.config()
-    monkeypatch.setattr('koneko.main.utils.config',
+    credentials, your_id = config.config()
+    monkeypatch.setattr('koneko.main.config.config',
                         lambda: (credentials, your_id))
 
 @pytest.mark.integration

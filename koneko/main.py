@@ -18,7 +18,7 @@ import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, utils, prompt, screens
+from koneko import ui, api, cli, pure, utils, prompt, screens, config
 
 
 def main():
@@ -35,7 +35,7 @@ def main():
             sys.exit(0)
 
     os.system('clear')
-    credentials, your_id = utils.config()
+    credentials, your_id = config.config()
 
     # Handle startup picture missing
     if not Path('~/.local/share/koneko').expanduser().exists():

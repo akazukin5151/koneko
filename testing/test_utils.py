@@ -14,7 +14,7 @@ sys.path.append('testing')
 
 
 def test_find_number_map(monkeypatch):
-    monkeypatch.setattr('koneko.config.ncols_config', lambda: 5)
+    monkeypatch.setattr('koneko.utils.ncols_config', lambda: 5)
     assert ([utils.find_number_map(x, y)
              for y in range(1,7)
              for x in range(1,6)] == list(range(30)))

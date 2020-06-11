@@ -7,7 +7,8 @@ from koneko import KONEKODIR, data
 # Lmao python
 sys.path.append('testing')
 
-from page_json import *  # Imports the current_page (dict) stored in disk
+# Imports the current_page (dict) stored in disk
+from page_json import *  # isort:skip
 
 page_illusts = page_json["illusts"]
 

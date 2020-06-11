@@ -102,7 +102,8 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 # Roadmap
 
-* Indepth usage documentation?
+* In-depth usage documentation?
+* Refactor ui.py
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features

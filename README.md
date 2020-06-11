@@ -102,7 +102,6 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 # Roadmap
 
-* Move config functions in lscat and utils to config.py
 * Indepth usage documentation?
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
@@ -141,6 +140,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Updated requirements.txt
 * Moved stuff like begin prompt and show man loop from `utils.py` to `screens.py`
 * Refactored cli.py and prompt.py
+* Move config functions in lscat and utils to config.py
 
 
 # FAQ

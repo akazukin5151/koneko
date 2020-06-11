@@ -88,7 +88,7 @@ def get_gen_users_settings():
 def icat(args):
     os.system(f'kitty +kitten icat --silent {args}')
 
-def show_instant(cls, data, check_print=True):
+def show_instant(cls, data, gallerymode=False):
     tracker = cls(data)
     # Filter out invisible files
     # (used to save splitpoint and total_imgs without requesting)
@@ -96,7 +96,7 @@ def show_instant(cls, data, check_print=True):
          for x in os.listdir(data.download_path)
          if not x.startswith('.')]
 
-    if check_print and utils.check_print_cols():
+    if gallerymode and utils.check_print_cols():
         number_of_cols = ncols_config()
 
         spacing = utils.get_settings('lscat', 'gallery_print_spacing').map(

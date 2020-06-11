@@ -183,6 +183,7 @@ def get_settings(section: str, setting: str) -> 'Result[str]':
 def _check_print_cols() -> 'Result[bool]':
     """Returns either Success(True), Success(False) or Failure.
     Inner boolean represents whether to print columns or not
+    Failure represents no key/setting/config found
     """
     section = get_config_section('misc')
     return section.map(

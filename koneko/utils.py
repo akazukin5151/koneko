@@ -180,7 +180,7 @@ def get_settings(section: str, setting: str) -> 'Result[str]':
     return cfgsection.map(lambda c: c.get(setting, ''))
 
 @safe
-def check_noprint() -> 'Result[bool]':
+def check_print_cols() -> 'Result[bool]':
     section = get_config_section('misc')
-    return section.map(lambda s: s.getboolean('noprint', fallback=False)).value_or(True)
+    return section.map(lambda s: s.getboolean('print_cols', fallback=False)).value_or(True)
 

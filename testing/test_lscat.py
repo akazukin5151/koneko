@@ -35,7 +35,7 @@ def test_show_instant(monkeypatch):
         def __init__(self):
             self.download_path = Path('testing/files/')
 
-    # This config has noprint = False
+    # This config has print_cols = True
     # Can't use shared fixture because pathlib is used in FakeData
     monkeypatch.setattr('koneko.utils.Path.expanduser',
                         lambda x: Path('testing/test_config.ini'))

@@ -35,7 +35,7 @@ def test_cd():
     assert os.getcwd() == current_dir
 
 @pytest.fixture
-def use_example_cfg(monkeypatch):
+def use_test_cfg(monkeypatch):
     monkeypatch.setattr('koneko.utils.Path.expanduser',
                         lambda x: Path('testing/test_config.ini'))
 
@@ -45,9 +45,9 @@ def test_verify_full_download():
     # The above code will remove the file
     os.system("touch testing/files/not_an_image.txt")
 
-def test_check_print_cols(monkeypatch, use_example_cfg):
-    # print_cols is off in example config
-    assert utils.check_print_cols() == Success(False)
+def test_check_print_cols(monkeypatch, use_test_cfg):
+    # print_cols is on in example config
+    assert utils.check_print_cols() == Success(True)
 
     cfg = configparser.ConfigParser()
     cfg.read('testing/test_config.ini')
@@ -69,11 +69,12 @@ def test_check_print_cols(monkeypatch, use_example_cfg):
         cfg.write(f)
     assert isinstance(utils.check_print_cols().failure(), ValueError)
 
-    cfg.set('misc', 'print_cols',  'off')
+    # Restore default value
+    cfg.set('misc', 'print_cols',  'on')
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
 
-def test_get_settings(monkeypatch, use_example_cfg):
+def test_get_settings(monkeypatch, use_test_cfg):
     assert utils.get_settings('Credentials', 'username') == Success('koneko')
     assert utils.get_settings('Credentials', 'password') == Success('mypassword')
     assert utils.get_settings('Credentials', 'ID') == Success('1234')

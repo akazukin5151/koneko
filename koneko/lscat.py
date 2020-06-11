@@ -96,7 +96,7 @@ def show_instant(cls, data, check_print_cols=False):
          for x in os.listdir(data.download_path)
          if not x.startswith('.')]
 
-    if check_print_cols and not utils.check_print_cols().value_or(False):
+    if check_print_cols and utils.check_print_cols().value_or(True):
         number_of_cols = ncols_config()
 
         spacing = utils.get_settings('lscat', 'gallery_print_spacing').map(

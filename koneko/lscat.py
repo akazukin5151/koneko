@@ -152,8 +152,8 @@ def generate_page(path):
             Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
-
-def generate_users(path, print_info=False):
+import time
+def generate_users(path, print_info=True):
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     os.system('clear')
 
@@ -168,7 +168,7 @@ def generate_users(path, print_info=False):
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
-        if not print_info:
+        if print_info:
             # Print the message (artist name)
             print(' ' * message_xcoord, message)
         print('\n' * page_spacing)  # Scroll to new 'page'

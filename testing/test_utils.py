@@ -78,7 +78,7 @@ def test_get_settings(monkeypatch, use_example_cfg):
     assert utils.get_settings('Credentials', 'password') == Success('mypassword')
     assert utils.get_settings('Credentials', 'ID') == Success('1234')
     assert utils.get_settings('experimental', 'image_mode_previews') == Success('off')
-    assert utils.get_settings('misc', 'print_cols') == Success('off')
+    assert utils.get_settings('misc', 'print_cols') == Success('on')
 
     # If config doesn't exist
     test_cfg_path = Path('testing/files/test_config.ini')

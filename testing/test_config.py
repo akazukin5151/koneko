@@ -64,7 +64,7 @@ def test_config(monkeypatch):
     example_path = Path('testing/test_config.ini')
     monkeypatch.setattr('koneko.config.Path.expanduser', lambda x: example_path)
 
-    creds, your_id = config.config()
+    creds, your_id = config.begin_config()
     assert your_id == '1234'
     assert type(creds) is configparser.SectionProxy
 
@@ -84,7 +84,7 @@ def test_config(monkeypatch):
     monkeypatch.setattr('koneko.config.os.system',
                         lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
 
-    creds, your_id = config.config()
+    creds, your_id = config.begin_config()
     assert your_id == 'myid'
     assert type(creds) is configparser.SectionProxy
 
@@ -106,7 +106,7 @@ def test_config2(monkeypatch):
     monkeypatch.setattr('koneko.config.os.system',
                         lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
 
-    creds, your_id = config.config()
+    creds, your_id = config.begin_config()
     assert your_id == ''
     assert type(creds) is configparser.SectionProxy
 

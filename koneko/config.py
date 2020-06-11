@@ -62,7 +62,7 @@ def get_gen_users_settings():
     )
 
 
-def config() -> ('config', str):
+def begin_config() -> ('config', str):
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
     if config_path.exists():

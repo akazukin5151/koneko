@@ -35,7 +35,7 @@ def main():
             sys.exit(0)
 
     os.system('clear')
-    credentials, your_id = config.config()
+    credentials, your_id = config.begin_config()
 
     # Handle startup picture missing
     if not Path('~/.local/share/koneko').expanduser().exists():

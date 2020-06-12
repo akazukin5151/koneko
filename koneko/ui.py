@@ -48,7 +48,6 @@ class AbstractGallery(ABC):
         self.data.update(current_page)
 
         tracker = lscat.TrackDownloads(self.data)
-        # Tracker will cause gallery to show each img as they finish downloading
         download.init_download(self.data, download.download_page, tracker)
 
         pure.print_multiple_imgs(self.data.current_illusts)
@@ -56,9 +55,7 @@ class AbstractGallery(ABC):
 
         # Make sure the following work:
         # Gallery -> next page -> image prompt -> back -> prev page
-        if len(self.data.all_pages_cache) == 1:
-            # Prefetch the next page on first gallery load
-            self.prefetch_thread.start()
+        self.prefetch_thread.start()
 
     def view_image(self, selected_image_num):
         post_json = self.data.post_json(selected_image_num)
@@ -89,24 +86,27 @@ class AbstractGallery(ABC):
     def next_page(self):
         self.prefetch_thread.join()
         self.data.current_page_num += 1
-        if utils.dir_not_empty(self.data):
-            lscat.show_instant(lscat.TrackDownloads, self.data, True)
-        else:
+        if not utils.dir_not_empty(self.data):
             print('This is the last page!')
             self.data.current_page_num -= 1
             return False
 
+        lscat.show_instant(lscat.TrackDownloads, self.data, True)
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
         print('Enter a gallery command:\n')
 
         # Skip prefetching again for cases like next -> prev -> next
         if str(self.data.current_page_num + 1) not in self.data.cached_pages:
-            self._prefetch_next_page()
+            self._prefetch_thread()
 
     @abstractmethod
     def _pixivrequest(self, **kwargs):
         raise NotImplementedError
+
+    def _prefetch_thread(self):
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self.prefetch_thread.start()
 
     def _prefetch_next_page(self):
         next_url = self.data.next_url

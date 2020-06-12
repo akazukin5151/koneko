@@ -23,7 +23,6 @@ def split_backslash_last(string: str) -> str:
 def generate_filepath(filename: str) -> Path:
     return Path('~').expanduser() / 'Downloads' / filename
 
-@cytoolz.curry
 def prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
     """old_name_with_ext can be `test.png`, but new_name is `abcd`"""
     img_ext = old_name_with_ext.split('.')[-1]

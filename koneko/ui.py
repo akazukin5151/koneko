@@ -519,15 +519,14 @@ class AbstractUsers(ABC):
     """
 
     @abstractmethod
-    def __init__(self, user_or_id):
+    def __init__(self, user_or_id, main_path):
         self.data: 'data.UserJson'
         self._input = user_or_id
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
-        # Defined in child classes
-        self._main_path: 'Path'
+        self.start(main_path, user_or_id)
 
-    def start(self):
-        self.data = data.UserJson(1, self._main_path, self._input)
+    def start(self, main_path, user_or_id):
+        self.data = data.UserJson(1, main_path, user_or_id)
         self._parse_and_download()
         self.prefetch_thread.start()
 
@@ -610,11 +609,12 @@ class AbstractUsers(ABC):
 
     def reload(self):
         print('This will delete cached images and redownload them. Proceed?')
-        ans = input(f'Directory to be deleted: {self._main_path}\n')
+        ans = input(f'Directory to be deleted: {self.data.main_path}\n')
         if ans == 'y' or not ans:
             os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
             self.__init__(self.data._input)
-            self.start()
+            # Will remove all data, but keep main path and user input
+            self.start(self.data.main_path, self.data._input)
         prompt.user_prompt(self)
 
 
@@ -624,8 +624,7 @@ class SearchUsers(AbstractUsers):
     Parent directory for downloads should go to search/
     """
     def __init__(self, user):
-        self._main_path = KONEKODIR / 'search'
-        super().__init__(user)
+        super().__init__(user, KONEKODIR / 'search')
 
     def _pixivrequest(self):
         return api.myapi.search_user_request(self._input, self.data.offset)
@@ -638,8 +637,7 @@ class FollowingUsers(AbstractUsers):
     """
     def __init__(self, your_id, publicity='private'):
         self._publicity = publicity
-        self._main_path = KONEKODIR / 'following'
-        super().__init__(your_id)
+        super().__init__(your_id, KONEKODIR / 'following')
 
     def _pixivrequest(self):
         return api.myapi.following_user_request(self._input, self._publicity,

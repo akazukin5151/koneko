@@ -213,7 +213,6 @@ class SearchUsersModeLoop(AbstractLoop):
 
     def _go_to_mode(self):
         self.mode = ui.SearchUsers(self._user_input)
-        self.mode.start()
         prompt.user_prompt(self.mode)
         main()
 
@@ -230,7 +229,6 @@ class FollowingUserModeLoop(AbstractLoop):
 
     def _go_to_mode(self):
         self.mode = ui.FollowingUsers(self._user_input)
-        self.mode.start()
         prompt.user_prompt(self.mode)
         main()
 

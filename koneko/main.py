@@ -236,7 +236,7 @@ class FollowingUserModeLoop(AbstractLoop):
 def illust_follow_mode_loop():
     """Immediately goes to IllustFollow()"""
     while True:
-        mode = ui.IllustFollowGallery()
+        mode = newui.IllustFollowGallery()
         prompt.gallery_like_prompt(mode)
         # After backing
         main()

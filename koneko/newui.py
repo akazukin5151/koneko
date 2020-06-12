@@ -27,7 +27,7 @@ def _show_page_gallery(data):
 
     lscat.show_instant(lscat.TrackDownloads, data)
     # New
-    pure.print_multiple_imgs(self.data.current_illusts)
+    pure.print_multiple_imgs(data.current_illusts)
     print(f'Page {self.data.current_page_num}')
 
 class AbstractGalleryNew(ABC):
@@ -257,7 +257,7 @@ class IllustFollowGallery(AbstractGalleryNew):
         elif keyseqs[0] == 'a':
             self.go_artist_gallery_coords(*keyseqs[-2:])
         elif keyseqs[0] == 'A':
-            self.go_artist_gallery_num(utils.process_digits(keyseqs))
+            self.go_artist_gallery_num(utils.seq_to_int(keyseqs, 1))
 
     @staticmethod
     def help():

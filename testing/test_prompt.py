@@ -188,12 +188,13 @@ def test_image_prompt_seq(monkeypatch, patch_cbreak):
 class FakeUser:
     def __init__(self):           self.data = None
     def next_page(self):          raise CustomExit()
+    def previous_page(self):      raise CustomExit()
     def reload(self):             raise CustomExit()
     def go_artist_mode(self, *a): raise CustomExit()
 
 def test_user_prompt(monkeypatch, patch_cbreak):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
-    monkeypatch.setattr('koneko.ui.previous_page_users', raises_customexit)
+    monkeypatch.setattr('koneko.ui.AbstractUsers.previous_page', raises_customexit)
     fakeuser = FakeUser()
     for letter in (u'n', u'r', u'p', u'q'):
         class FakeInKeyNew(FakeInKey):

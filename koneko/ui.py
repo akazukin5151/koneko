@@ -46,10 +46,6 @@ class AbstractUI(ABC):
     def _show_page(self):
         raise NotImplementedError
 
-    @abstractmethod
-    def previous_page(self):
-        raise NotImplementedError
-
     def start(self, main_path):
         self.data = self.data_class(main_path)
         self._parse_and_download()
@@ -117,6 +113,14 @@ class AbstractUI(ABC):
         self._show_page()
         self._prefetch_next_page()
 
+    def previous_page(self):
+        if self.data.page_num > 1:
+            self.data.page_num -= 1
+            self.data.offset = int(self.data.offset) - 30
+            self._show_page()
+        else:
+            print('This is the first page!')
+
     def reload(self):
         print('This will delete cached images and redownload them. Proceed?')
         ans = input(f'Directory to be deleted: {self.data.main_path}\n')
@@ -155,14 +159,6 @@ class AbstractGallery(AbstractUI, ABC):
             return False
         self.show_instant()
         self.print_page_info()
-
-    def previous_page(self):
-        if self.data.page_num > 1:
-            self.data.page_num -= 1
-            self.data.offset = int(self.data.offset) - 30
-            self._show_page()
-        else:
-            print('This is the first page!')
 
     def print_page_info(self):
         pure.print_multiple_imgs(self.data.current_illusts)
@@ -372,10 +368,12 @@ class AbstractUsers(AbstractUI, ABC):
             self.parse_thread.join()
 
     def _show_page(self):
-        _show_page_users(self.data)
+        if not utils.dir_not_empty(self.data):
+            print('This is the last page!')
+            self.data.page_num -= 1
+            return False
 
-    def previous_page(self):
-        previous_page_users(self.data)
+        lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
 
     # Unique to Users
     def go_artist_mode(self, selected_user_num):
@@ -391,22 +389,6 @@ class AbstractUsers(AbstractUI, ABC):
         self._show_page()
         prompt.user_prompt(self)
 
-def previous_page_users(data):
-    """Previous page for users"""
-    if data.page_num > 1:
-        data.page_num -= 1
-        data.offset = int(data.offset) - 30
-        _show_page_users(data)
-    else:
-        print('This is the first page!')
-
-def _show_page_users(data):
-    if not utils.dir_not_empty(data):
-        print('This is the last page!')
-        data.page_num -= 1
-        return False
-
-    lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
 class SearchUsers(AbstractUsers):
     """

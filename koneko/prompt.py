@@ -196,7 +196,7 @@ def user_prompt(user):
                 time.sleep(0.5)
 
             elif user_prompt_command == 'p':
-                ui.previous_page_users(user.data)
+                user.previous_page()
 
             elif user_prompt_command == 'r':
                 return user.reload()

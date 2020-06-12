@@ -32,7 +32,7 @@ class AbstractGallery(ABC):
         self.main_path: 'Path'
 
         self.data = data.GalleryJson(1, self.main_path)
-        self.prefetch_thread: 'threading.Thread'
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.start()
 
     def start(self):
@@ -61,7 +61,6 @@ class AbstractGallery(ABC):
         # Gallery -> next page -> image prompt -> back -> prev page
         if len(self.data.all_pages_cache) == 1:
             # Prefetch the next page on first gallery load
-            self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
             self.prefetch_thread.start()
 
     def view_image(self, selected_image_num):
@@ -527,14 +526,13 @@ class AbstractUsers(ABC):
     def __init__(self, user_or_id):
         self.data: 'data.UserJson'
         self._input = user_or_id
-        self.prefetch_thread: 'threading.Thread'
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         # Defined in child classes
         self._main_path: 'Path'
 
     def start(self):
         self.data = data.UserJson(1, self._main_path, self._input)
         self._parse_and_download()
-        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.prefetch_thread.start()
 
     def _parse_and_download(self):

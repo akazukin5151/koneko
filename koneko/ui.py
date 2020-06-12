@@ -137,8 +137,7 @@ class AbstractGallery(ABC):
         prompt.gallery_like_prompt(self)
 
     @abstractmethod
-    def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
-                      first_num, second_num):
+    def handle_prompt(self, keyseqs):
         raise NotImplementedError
 
     @staticmethod
@@ -274,7 +273,7 @@ class IllustFollowGallery(AbstractGallery):
         elif keyseqs[0] == 'a':
             self.go_artist_gallery_coords(*keyseqs[-2:])
         elif keyseqs[0] == 'A':
-            self.go_artist_gallery_num(utils.process_digits(keyseqs))
+            self.go_artist_gallery_num(utils.seq_to_int(keyseqs, 1))
 
     @staticmethod
     def help():

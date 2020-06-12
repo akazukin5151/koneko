@@ -564,25 +564,28 @@ class AbstractUsers(ABC):
         _show_page(self.data)
 
     def _prefetch_next_page(self):
-        # TODO: split into download and data parts
         # Wait for initial request to finish, so the data object is instantiated
+        # Else next_url won't be set yet
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
 
         if not self.data.next_url:  # Last page
             return True
 
-        oldnum = self.data.page_num
-
-        next_offset = api.myapi.parse_next(self.data.next_url)['offset']
+        next_offset = self.data.next_url.split('&')[-1].split('=')[-1]
         # Won't download if not immediately next page, eg
-        # p1 (p2 downloaded) -> p2 (p3) -> p1 -> p2 (p4 won't download)
-        if int(next_offset) - int(self.data.offset) <= 30:
-            self.data.offset = next_offset
-            self.data.page_num = int(self.data.offset) // 30 + 1
+        # p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
+        offset_diffs = int(next_offset) - int(self.data.offset)
+        immediate_next: bool = offset_diffs <= 30
+        if not immediate_next:
+            return
 
-            self._parse_user_infos()
-            download.init_download(self.data, download.user_download, None)
+        oldnum = self.data.page_num
+        self.data.offset = next_offset
+        self.data.page_num = int(self.data.offset) // 30 + 1
+
+        self._parse_user_infos()
+        download.init_download(self.data, download.user_download, None)
 
         self.data.page_num = oldnum
 

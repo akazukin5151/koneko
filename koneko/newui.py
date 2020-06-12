@@ -47,11 +47,6 @@ class AbstractUI(ABC):
     def previous_page(self):
         raise NotImplementedError
 
-    def _prefetch_thread(self):
-        """Reassign the thread again and start; as threads can only be started once"""
-        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
-        self.prefetch_thread.start()
-
     def start(self, main_path):
         self.data = self.data_class(main_path)
         self._parse_and_download()
@@ -74,6 +69,11 @@ class AbstractUI(ABC):
         self._parse_user_infos()
         download.init_download(self.data, self.download_function(), self.tracker())
         self.print_page_info()
+
+    def _prefetch_thread(self):
+        """Reassign the thread again and start; as threads can only be started once"""
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self.prefetch_thread.start()
 
     @abstractmethod
     def _pixivrequest(self):
@@ -181,7 +181,7 @@ class AbstractGalleryNew(AbstractUI, ABC):
     def help():
         raise NotImplementedError
 
-    # New; same
+    # Unique for Galleries
     def view_image(self, selected_image_num):
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
@@ -339,6 +339,7 @@ class AbstractUsersNew(AbstractUI, ABC):
     def previous_page(self):
         previous_page_users(self.data)
 
+    # Unique to Users
     def go_artist_mode(self, selected_user_num):
         try:
             artist_user_id = self.data.artist_user_id(selected_user_num)

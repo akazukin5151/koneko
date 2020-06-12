@@ -213,7 +213,7 @@ class SearchUsersModeLoop(AbstractLoop):
         return True
 
     def _go_to_mode(self):
-        self.mode = ui.SearchUsers(self._user_input)
+        self.mode = newui.SearchUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
 
@@ -229,7 +229,7 @@ class FollowingUserModeLoop(AbstractLoop):
         self._url_or_id = input('Enter your pixiv ID or url: ')
 
     def _go_to_mode(self):
-        self.mode = ui.FollowingUsers(self._user_input)
+        self.mode = newui.FollowingUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
 

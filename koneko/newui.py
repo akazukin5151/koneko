@@ -32,7 +32,7 @@ class AbstractUI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def action_after_instant(self):
+    def action_after_parse(self):
         raise NotImplementedError
 
     @abstractmethod
@@ -62,7 +62,8 @@ class AbstractUI(ABC):
         if utils.dir_not_empty(self.data):
             self.show_instant()
             api.myapi.await_login()
-            self.action_after_instant()
+            self._parse_user_infos()
+            self.action_after_parse()
             return True
 
         # No valid cached images, download all from scratch
@@ -154,8 +155,7 @@ class AbstractGalleryNew(AbstractUI, ABC):
         """Passing a function, not calling anything"""
         return download.download_page
 
-    def action_after_instant(self):
-        self._parse_user_infos()
+    def action_after_parse(self):
         self.print_page_info()
 
     def action_before_prefetch(self):
@@ -310,3 +310,88 @@ class IllustFollowGallery(AbstractGalleryNew):
             colors.r, 'eload and re-download all; ',
             colors.q, 'uit (with confirmation); ',
             'view ', colors.m, 'anual\n']))
+
+
+class AbstractUsersNew(AbstractUI, ABC):
+    def data_class(self, main_path):
+        return data.UserJson(1, main_path)
+
+    def tracker(self):
+        return lscat.TrackDownloadsUsers(self.data)
+
+    def show_instant(self):
+        return lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
+
+    def download_function(self) -> 'func':
+        """Passing a function, not calling anything"""
+        return download.user_download
+
+    def action_after_parse(self):
+        return True
+
+    def action_before_prefetch(self):
+        with funcy.suppress(AttributeError):
+            self.parse_thread.join()
+
+    def _show_page(self):
+        _show_page_users(self.data)
+
+    def previous_page(self):
+        previous_page_users(self.data)
+
+    def go_artist_mode(self, selected_user_num):
+        try:
+            artist_user_id = self.data.artist_user_id(selected_user_num)
+        except IndexError:
+            print('Invalid number!')
+            return False
+
+        mode = ArtistGallery(artist_user_id)
+        prompt.gallery_like_prompt(mode)
+        # After backing from gallery
+        self._show_page()
+        prompt.user_prompt(self)
+
+def previous_page_users(data):
+    """Previous page for users"""
+    if data.page_num > 1:
+        data.page_num -= 1
+        data.offset = int(data.offset) - 30
+        _show_page_users(data)
+    else:
+        print('This is the first page!')
+
+def _show_page_users(data):
+    if not utils.dir_not_empty(data):
+        print('This is the last page!')
+        data.page_num -= 1
+        return False
+
+    lscat.show_instant(lscat.TrackDownloadsUsers, data)
+
+class SearchUsers(AbstractUsersNew):
+    """
+    Inherits from AbstractUsers class, define self._input as the search string (user)
+    Parent directory for downloads should go to search/
+    """
+    def __init__(self, user):
+        self.user = user # This is only used for pixivrequest
+        super().__init__(KONEKODIR / 'search' / user)
+
+    def _pixivrequest(self):
+        return api.myapi.search_user_request(self.user, self.data.offset)
+
+class FollowingUsers(AbstractUsersNew):
+    """
+    Inherits from AbstractUsers class, define self._input as the user's pixiv ID
+    (Or any other pixiv ID that the user wants to look at their following users)
+    Parent directory for downloads should go to following/
+    """
+    def __init__(self, your_id, publicity='private'):
+        self._publicity = publicity
+        self.your_id = your_id
+        super().__init__(KONEKODIR / 'following' / your_id)
+
+    def _pixivrequest(self):
+        return api.myapi.following_user_request(self.your_id, self._publicity,
+                                                self.data.offset)

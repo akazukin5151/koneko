@@ -128,24 +128,6 @@ class AbstractUI(ABC):
 
 
 
-def previous_page_gallery(data):
-    """Previous page for users"""
-    if data.page_num > 1:
-        data.page_num -= 1
-        data.offset = int(data.offset) - 30
-        _show_page_gallery(data)
-    else:
-        print('This is the first page!')
-
-def _show_page_gallery(data):
-    if not utils.dir_not_empty(data):
-        print('This is the last page!')
-        data.page_num -= 1
-        return False
-
-    lscat.show_instant(lscat.TrackDownloads, data)
-
-
 class AbstractGallery(AbstractUI, ABC):
     def data_class(self, main_path):
         return data.GalleryJson(1, main_path)
@@ -208,9 +190,26 @@ class AbstractGallery(AbstractUI, ABC):
 
     def _back(self):
         """After user 'back's from image prompt or artist gallery, start mode again"""
-        lscat.show_instant(lscat.TrackDownloads, self.data, True)
+        self.show_instant()
         self.print_page_info()
         prompt.gallery_like_prompt(self)
+
+
+def previous_page_gallery(data):
+    """Previous page for users"""
+    if data.page_num > 1:
+        data.page_num -= 1
+        data.offset = int(data.offset) - 30
+        _show_page_gallery(data)
+    else:
+        print('This is the first page!')
+
+def _show_page_gallery(data):
+    if not utils.dir_not_empty(data):
+        print('This is the last page!')
+        data.page_num -= 1
+        return False
+    lscat.show_instant(lscat.TrackDownloads, data)
 
 
 class ArtistGallery(AbstractGallery):

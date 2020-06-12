@@ -518,18 +518,17 @@ class AbstractUsers(ABC):
     """
 
     @abstractmethod
-    def __init__(self, user_or_id, main_path):
+    def __init__(self, main_path):
         self.data: 'data.UserJson'
-        self._input = user_or_id  # This is only used for pixivrequest
-        self.start(main_path, user_or_id)
+        self.start(main_path)
 
     def _prefetch_thread(self):
         """Reassign the thread again and start; as threads can only be started once"""
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.prefetch_thread.start()
 
-    def start(self, main_path, user_or_id):
-        self.data = data.UserJson(1, main_path, user_or_id)
+    def start(self, main_path):
+        self.data = data.UserJson(1, main_path)
         self._parse_and_download()
         self._prefetch_thread()
 
@@ -620,7 +619,7 @@ class AbstractUsers(ABC):
         if ans == 'y' or not ans:
             os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
             # Will remove all data, but keep main path and user input
-            self.start(self.data.main_path, self.data._input)
+            self.start(self.data.main_path)
         prompt.user_prompt(self)
 
 
@@ -630,10 +629,11 @@ class SearchUsers(AbstractUsers):
     Parent directory for downloads should go to search/
     """
     def __init__(self, user):
-        super().__init__(user, KONEKODIR / 'search')
+        self.user = user # This is only used for pixivrequest
+        super().__init__(KONEKODIR / 'search' / user)
 
     def _pixivrequest(self):
-        return api.myapi.search_user_request(self._input, self.data.offset)
+        return api.myapi.search_user_request(self.user, self.data.offset)
 
 class FollowingUsers(AbstractUsers):
     """
@@ -643,8 +643,9 @@ class FollowingUsers(AbstractUsers):
     """
     def __init__(self, your_id, publicity='private'):
         self._publicity = publicity
-        super().__init__(your_id, KONEKODIR / 'following')
+        self.your_id = your_id
+        super().__init__(KONEKODIR / 'following' / your_id)
 
     def _pixivrequest(self):
-        return api.myapi.following_user_request(self._input, self._publicity,
+        return api.myapi.following_user_request(self.your_id, self._publicity,
                                                 self.data.offset)

@@ -72,13 +72,12 @@ def test_image():
 
 
 def test_user():
-    udata = data.UserJson(1, Path(f"{KONEKODIR}/following/"), "2232374")
+    udata = data.UserJson(1, Path(f"{KONEKODIR}/following/2232374"))
     assert udata
 
     udata.update(mode3)
     assert udata.page_num == 1
-    assert udata.main_path == Path(f"{KONEKODIR}/following/")
-    assert udata._input == "2232374"
+    assert udata.main_path == Path(f"{KONEKODIR}/following/2232374")
 
     assert udata.next_url == "https://app-api.pixiv.net/v1/user/following?user_id=2232374&restrict=private&offset=30"
     assert udata.ids_cache == {1: [219621, 1510169, 12612404, 8660134, 15063, 28245700, 33137265, 2702224, 24218478, 625051, 95391, 9427, 1193008, 1554775, 11103, 7309825, 5301174, 4316556, 10573236, 29362997, 809099, 82688, 15608555, 30803054, 18836733, 644670, 2397243, 14211481, 8092144, 8175661]}

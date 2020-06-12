@@ -110,17 +110,16 @@ class ImageJson:
 
 class UserJson:
     """Stores data for user views (modes 3 and 4)"""
-    def __init__(self, page_num: int, main_path: str, user_or_id: str):
+    def __init__(self, page_num: int, main_path: str):
         self.page_num = page_num
         self.main_path = main_path
-        self._input = user_or_id
         self.offset = 0
 
         self.ids_cache, self.names_cache = {}, {}
 
     @property
     def download_path(self) -> str:
-        return self.main_path / self._input / str(self.page_num)
+        return self.main_path / str(self.page_num)
 
     def update(self, raw: 'Json'):
         self.next_url = raw['next_url']

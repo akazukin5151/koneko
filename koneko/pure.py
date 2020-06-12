@@ -5,10 +5,10 @@ Collection of functions that are pure and side effect free
 
 import os
 import re
+from functools import partial
 from pathlib import Path
 
 import funcy
-import cytoolz
 
 from koneko import colors as c
 
@@ -42,7 +42,6 @@ def print_multiple_imgs(illusts_json: 'Json') -> None:
     print('')
 
 
-@cytoolz.curry
 def url_given_size(post_json: 'Json', size: str) -> str:
     """
     size : str
@@ -51,19 +50,18 @@ def url_given_size(post_json: 'Json', size: str) -> str:
     return post_json['image_urls'][size]
 
 
-@cytoolz.curry
 def post_title(current_page_illusts: 'Json', post_number: int) -> str:
     return current_page_illusts[post_number]['title']
 
 
 def medium_urls(current_page_illusts: 'Json') -> 'list[str]':
-    get_medium_url = url_given_size(size='square_medium')
+    get_medium_url = partial(url_given_size, size='square_medium')
     urls = list(map(get_medium_url, current_page_illusts))
     return urls
 
 
 def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
-    post_titles = post_title(current_page_illusts)
+    post_titles = partial(post_title, current_page_illusts)
     titles = list(map(post_titles, range(len(current_page_illusts))))
     return titles
 

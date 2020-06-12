@@ -1,9 +1,8 @@
 import os
 import itertools
 from pathlib import Path
+from functools import partial
 from concurrent.futures import ThreadPoolExecutor
-
-import cytoolz
 
 from koneko import api, pure, utils
 
@@ -36,7 +35,7 @@ def async_download_core(download_path, urls, rename_images=False,
 
     filtered = itertools.filterfalse(os.path.isfile, newnames)
     oldnames = itertools.filterfalse(os.path.isfile, oldnames)
-    helper = downloadr(tracker=tracker)
+    helper = partial(downloadr, tracker=tracker)
 
     # Nothing needs to be downloaded
     if not urls:
@@ -47,7 +46,6 @@ def async_download_core(download_path, urls, rename_images=False,
             executor.map(helper, urls, oldnames, filtered)
 
 
-@cytoolz.curry
 def downloadr(url, img_name, new_file_name=None, tracker=None):
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)
@@ -115,7 +113,7 @@ def download_core(large_dir, url, filename, try_make_dir=True):
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
         with utils.cd(large_dir):
-            downloadr(url, filename, None)
+            downloadr(url, filename)
 
 
 def full_img_details(url, png=False):

@@ -35,7 +35,6 @@ setup(
         "funcy~=1.14",
         "docopt~=0.6",
         "pixcat~=0.1",
-        "cytoolz~=0.10",
         "PixivPy~=3.5",
         "blessed~=1.17",
         "returns~=0.14"

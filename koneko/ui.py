@@ -521,7 +521,7 @@ class AbstractUsers(ABC):
     @abstractmethod
     def __init__(self, user_or_id, main_path):
         self.data: 'data.UserJson'
-        self._input = user_or_id
+        self._input = user_or_id  # This is only used for pixivrequest
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.start(main_path, user_or_id)
 
@@ -557,10 +557,7 @@ class AbstractUsers(ABC):
     def _parse_user_infos(self):
         """Parse json and get list of artist names, profile pic urls, and id"""
         result = self._pixivrequest()
-        if not hasattr(self, 'data'):
-            self.data = data.UserJson(1, self._main_path, self._input)
-        else:
-            self.data.update(result)
+        self.data.update(result)
 
     def _show_page(self):
         _show_page(self.data)
@@ -612,7 +609,6 @@ class AbstractUsers(ABC):
         ans = input(f'Directory to be deleted: {self.data.main_path}\n')
         if ans == 'y' or not ans:
             os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
-            self.__init__(self.data._input)
             # Will remove all data, but keep main path and user input
             self.start(self.data.main_path, self.data._input)
         prompt.user_prompt(self)

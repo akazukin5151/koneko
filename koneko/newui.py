@@ -191,3 +191,80 @@ class ArtistGallery(AbstractGalleryNew):
             colors.base1 + ['view '] + colors.base2 +
             ['view ', colors.m, 'anual; ',
               colors.b, 'ack\n']))
+
+class IllustFollowGallery(AbstractGalleryNew):
+    """
+    Illust Follow Gallery commands: (No need to press enter)
+    Using coordinates, where {x} is the row and {y} is the column
+        {x}{y}             -- display the image on row {x} and column {y}
+        o{x}{y}            -- open pixiv image/post in browser
+        d{x}{y}            -- download image in large resolution
+        a{x}{y}            -- view illusts by the artist of the selected image
+
+    Using image number, where {number} is the nth image in order (see examples)
+        i{number}          -- display the image
+        O{number}          -- open pixiv image/post in browser.
+        D{number}          -- download image in large resolution.
+        A{number}          -- view illusts by the artist of the selected image
+
+        n                  -- view the next page
+        p                  -- view the previous page
+        r                  -- delete all cached images, re-download and reload view
+        b                  -- go back to main screen
+        h                  -- show keybindings
+        m                  -- show this manual
+        q                  -- quit (with confirmation)
+
+    Examples:
+        i09   --->  Display the ninth image in image view (must have leading 0)
+        i10   --->  Display the tenth image in image view
+        O29   --->  Open the last image's post in browser
+        D00   --->  Download the first image, in large resolution
+
+        25    --->  Display the image on column 2, row 5 (index starts at 1)
+        d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
+        o25   --->  Download the image on column 2, row 5 (index starts at 1)
+    """
+    def __init__(self):
+        super().__init__(KONEKODIR / 'illustfollow')
+
+    def _pixivrequest(self):
+        return api.myapi.illust_follow_request(restrict='private',
+                                               offset=self.data.offset)
+
+    def go_artist_gallery_coords(self, first_num, second_num):
+        selected_image_num = utils.find_number_map(int(first_num), int(second_num))
+        if selected_image_num is False: # 0 is valid!
+            print('Invalid number!')
+        else:
+            self.go_artist_gallery_num(selected_image_num)
+
+    def go_artist_gallery_num(self, selected_image_num):
+        """Like self.view_image(), but goes to artist mode instead of image"""
+        artist_user_id = self.data.artist_user_id(selected_image_num)
+        mode = ArtistGallery(artist_user_id)
+        prompt.gallery_like_prompt(mode)
+        # Gallery prompt ends, user presses back
+        self._back()
+
+    def handle_prompt(self, keyseqs):
+        # "b" must be handled first, because keyseqs might be empty
+        if keyseqs[0] == 'b':
+            print('Invalid command! Press h to show help')
+            prompt.gallery_like_prompt(self) # Go back to while loop
+        elif keyseqs[0] == 'r':
+            self.reload()
+        elif keyseqs[0] == 'a':
+            self.go_artist_gallery_coords(*keyseqs[-2:])
+        elif keyseqs[0] == 'A':
+            self.go_artist_gallery_num(utils.process_digits(keyseqs))
+
+    @staticmethod
+    def help():
+        print(''.join(colors.base1 + [
+            colors.a, "view artist's illusts; ",
+            colors.n, 'ext page;\n',
+            colors.p, 'revious page; ',
+            colors.r, 'eload and re-download all; ',
+            colors.q, 'uit (with confirmation); ',
+            'view ', colors.m, 'anual\n']))

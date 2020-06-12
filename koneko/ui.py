@@ -521,13 +521,17 @@ class AbstractUsers(ABC):
     def __init__(self, user_or_id, main_path):
         self.data: 'data.UserJson'
         self._input = user_or_id  # This is only used for pixivrequest
-        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.start(main_path, user_or_id)
+
+    def _prefetch_thread(self):
+        """Reassign the thread again and start; as threads can only be started once"""
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self.prefetch_thread.start()
 
     def start(self, main_path, user_or_id):
         self.data = data.UserJson(1, main_path, user_or_id)
         self._parse_and_download()
-        self.prefetch_thread.start()
+        self._prefetch_thread()
 
     def _parse_and_download(self):
         """If download path not empty, immediately show. Else parse & download"""

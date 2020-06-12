@@ -17,7 +17,7 @@ import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, config, prompt, screens
+from koneko import ui, api, cli, pure, config, prompt, screens, newui
 
 
 def main():
@@ -171,7 +171,8 @@ class ArtistModeLoop(AbstractLoop):
         self._url_or_id = input('Enter artist ID or url:\n')
 
     def _go_to_mode(self):
-        self.mode = ui.ArtistGallery(self._user_input)
+        #self.mode = ui.ArtistGallery(self._user_input)
+        self.mode = newui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
         main()

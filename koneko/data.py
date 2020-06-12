@@ -25,6 +25,7 @@ class GalleryJson:
         self.current_page_num = current_page_num
         self.main_path = main_path
         self.all_pages_cache = {}
+        self.offset = 0
 
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
@@ -68,6 +69,10 @@ class GalleryJson:
     def page_num(self) -> int:
         """Just a wrapper, for init_download"""
         return self.current_page_num
+
+    @page_num.setter
+    def page_num(self, page_num):
+        self.current_page_num = page_num
 
     def url(self, number: int) -> str:
         return pure.url_given_size(self.post_json(number), 'large')

@@ -72,6 +72,12 @@ class APIHandler:
         return self.api.user_illusts(artist_user_id)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
+    @utils.spinner('')
+    def artist_gallery_general(self, artist_user_id, offset):
+        """Mode 1, general"""
+        return self.api.user_illusts(artist_user_id, offset=offset)
+
+    @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     def protected_illust_detail(self, image_id):
         """Mode 2"""
         return self.api.illust_detail(image_id)

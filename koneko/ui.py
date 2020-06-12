@@ -568,18 +568,21 @@ class AbstractUsers(ABC):
         # Wait for initial request to finish, so the data object is instantiated
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
+
+        if not self.data.next_url:  # Last page
+            return True
+
         oldnum = self.data.page_num
 
-        if self.data.next_url:
-            next_offset = api.myapi.parse_next(self.data.next_url)['offset']
-            # Won't download if not immediately next page, eg
-            # p1 (p2 downloaded) -> p2 (p3) -> p1 -> p2 (p4 won't download)
-            if int(next_offset) - int(self.data.offset) <= 30:
-                self.data.offset = next_offset
-                self.data.page_num = int(self.data.offset) // 30 + 1
+        next_offset = api.myapi.parse_next(self.data.next_url)['offset']
+        # Won't download if not immediately next page, eg
+        # p1 (p2 downloaded) -> p2 (p3) -> p1 -> p2 (p4 won't download)
+        if int(next_offset) - int(self.data.offset) <= 30:
+            self.data.offset = next_offset
+            self.data.page_num = int(self.data.offset) // 30 + 1
 
-                self._parse_user_infos()
-                download.init_download(self.data, download.user_download, None)
+            self._parse_user_infos()
+            download.init_download(self.data, download.user_download, None)
 
         self.data.page_num = oldnum
 
@@ -587,7 +590,6 @@ class AbstractUsers(ABC):
         self.prefetch_thread.join()
         self.data.page_num += 1
         self._show_page()
-
         self._prefetch_next_page()
 
     def previous_page(self):
@@ -598,12 +600,13 @@ class AbstractUsers(ABC):
             artist_user_id = self.data.artist_user_id(selected_user_num)
         except IndexError:
             print('Invalid number!')
-        else:
-            mode = ArtistGallery(artist_user_id)
-            prompt.gallery_like_prompt(mode)
-            # After backing from gallery
-            self._show_page()
-            prompt.user_prompt(self)
+            return False
+
+        mode = ArtistGallery(artist_user_id)
+        prompt.gallery_like_prompt(mode)
+        # After backing from gallery
+        self._show_page()
+        prompt.user_prompt(self)
 
     def reload(self):
         print('This will delete cached images and redownload them. Proceed?')

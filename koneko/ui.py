@@ -27,11 +27,8 @@ def previous_page(data):
         print('This is the first page!')
 
 class AbstractGallery(ABC):
-    def __init__(self):
-        # Defined in child classes
-        self.main_path: 'Path'
-
-        self.data = data.GalleryJson(1, self.main_path)
+    def __init__(self, main_path):
+        self.data = data.GalleryJson(1, main_path)
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.start()
 
@@ -181,10 +178,9 @@ class ArtistGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
     def __init__(self, artist_user_id, **kwargs):
-        self.main_path = KONEKODIR / str(artist_user_id)
         self._artist_user_id = artist_user_id
         self._kwargs = kwargs
-        super().__init__()
+        super().__init__(KONEKODIR / str(artist_user_id))
 
     def _pixivrequest(self, **kwargs):
         if kwargs:
@@ -244,8 +240,7 @@ class IllustFollowGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
     def __init__(self):
-        self.main_path = KONEKODIR / 'illustfollow'
-        super().__init__()
+        super().__init__(KONEKODIR / 'illustfollow')
 
     def _pixivrequest(self, **kwargs):
         if kwargs:

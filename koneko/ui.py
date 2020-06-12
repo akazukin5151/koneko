@@ -556,7 +556,6 @@ class AbstractUsers(ABC):
         """Blank method, classes that inherit this ABC must override this"""
         raise NotImplementedError
 
-    @utils.spinner('Parsing info...')
     def _parse_user_infos(self):
         """Parse json and get list of artist names, profile pic urls, and id"""
         result = self._pixivrequest()

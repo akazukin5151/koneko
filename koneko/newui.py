@@ -9,55 +9,60 @@ import funcy
 from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
                     prompt, download, ui)
 
-
-def previous_page_gallery(data):
-    """Previous page for users"""
-    if data.page_num > 1:
-        data.page_num -= 1
-        data.offset = int(data.offset) - 30
-        _show_page_gallery(data)
-    else:
-        print('This is the first page!')
-
-def _show_page_gallery(data):
-    if not utils.dir_not_empty(data):
-        print('This is the last page!')
-        data.page_num -= 1
-        return False
-
-    lscat.show_instant(lscat.TrackDownloads, data)
-    # New
-    pure.print_multiple_imgs(data.current_illusts)
-    print(f'Page {self.data.current_page_num}')
-
-class AbstractGalleryNew(ABC):
+class AbstractUI(ABC):
     @abstractmethod
     def __init__(self, main_path):
-        self.data: 'data.GalleryJson'
+        self.data: 'data'
         self.start(main_path)
 
-    # New; should be implemented in Users
+    @abstractmethod
+    def data_class(self, main_path):
+        raise NotImplementedError
+
+    @abstractmethod
+    def tracker(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def show_instant(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def download_function(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def action_after_instant(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def action_before_prefetch(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def _show_page(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def previous_page(self):
+        raise NotImplementedError
+
     def _prefetch_thread(self):
         """Reassign the thread again and start; as threads can only be started once"""
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.prefetch_thread.start()
 
     def start(self, main_path):
-        self.data = data.GalleryJson(1, main_path)
+        self.data = self.data_class(main_path)
         self._parse_and_download()
         self._prefetch_thread()
-
-    def print_page_info(self):
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
 
     def _parse_and_download(self):
         """If download path not empty, immediately show. Else parse & download"""
         if utils.dir_not_empty(self.data):
-            lscat.show_instant(lscat.TrackDownloads, self.data, True)
+            self.show_instant()
             api.myapi.await_login()
-            self._parse_user_infos()
-            self.print_page_info()
+            self.action_after_instant()
             return True
 
         # No valid cached images, download all from scratch
@@ -66,8 +71,7 @@ class AbstractGalleryNew(ABC):
 
         api.myapi.await_login()
         self._parse_user_infos()
-        tracker = lscat.TrackDownloads(self.data)
-        download.init_download(self.data, download.download_page, tracker)
+        download.init_download(self.data, self.download_function(), self.tracker())
         self.print_page_info()
 
     @abstractmethod
@@ -79,9 +83,6 @@ class AbstractGalleryNew(ABC):
         """Parse json and get list of artist names, profile pic urls, and id"""
         result = self._pixivrequest()
         self.data.update(result)
-
-    def _show_page(self):
-        _show_page_gallery(self.data)
 
     def _prefetch_next_page(self):
         # Wait for initial request to finish, so the data object is instantiated
@@ -102,7 +103,7 @@ class AbstractGalleryNew(ABC):
         self.data.page_num = int(self.data.offset) // 30 + 1
 
         self._parse_user_infos()
-        download.init_download(self.data, download.download_page, None)
+        download.init_download(self.data, self.download_function(), None)
 
         self.data.page_num = oldnum
 
@@ -111,12 +112,6 @@ class AbstractGalleryNew(ABC):
         self.data.page_num += 1
         self._show_page()
         self._prefetch_next_page()
-
-    def previous_page(self):
-        previous_page_gallery(self.data)
-
-    # Entire block removed
-    #def go_artist_mode(self, selected_user_num):
 
     def reload(self):
         print('This will delete cached images and redownload them. Proceed?')
@@ -127,7 +122,56 @@ class AbstractGalleryNew(ABC):
             self.start(self.data.main_path)
         prompt.user_prompt(self)
 
-    # New; should be in abstract gallery
+
+def previous_page_gallery(data):
+    """Previous page for users"""
+    if data.page_num > 1:
+        data.page_num -= 1
+        data.offset = int(data.offset) - 30
+        _show_page_gallery(data)
+    else:
+        print('This is the first page!')
+
+def _show_page_gallery(data):
+    if not utils.dir_not_empty(data):
+        print('This is the last page!')
+        data.page_num -= 1
+        return False
+
+    lscat.show_instant(lscat.TrackDownloads, data)
+
+class AbstractGalleryNew(AbstractUI, ABC):
+    def data_class(self, main_path):
+        return data.GalleryJson(1, main_path)
+
+    def tracker(self):
+        return lscat.TrackDownloads(self.data)
+
+    def show_instant(self):
+        return lscat.show_instant(lscat.TrackDownloads, self.data, True)
+
+    def download_function(self) -> 'func':
+        """Passing a function, not calling anything"""
+        return download.download_page
+
+    def action_after_instant(self):
+        self._parse_user_infos()
+        self.print_page_info()
+
+    def action_before_prefetch(self):
+        return True
+
+    def _show_page(self):
+        _show_page_gallery(self.data)
+        self.print_page_info()
+
+    def previous_page(self):
+        previous_page_gallery(self.data)
+
+    def print_page_info(self):
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+
     @abstractmethod
     def handle_prompt(self, keyseqs):
         raise NotImplementedError

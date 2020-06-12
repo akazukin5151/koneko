@@ -23,7 +23,7 @@ class GalleryJson:
     """
     def __init__(self, current_page_num: int, main_path: str):
         self.current_page_num = current_page_num
-        self._main_path = main_path
+        self.main_path = main_path
         self.all_pages_cache = {}
 
     def update(self, raw: 'Json'):
@@ -46,7 +46,7 @@ class GalleryJson:
     @property
     def download_path(self) -> str:
         """Get the download path of the current page"""
-        return self._main_path / str(self.current_page_num)
+        return self.main_path / str(self.current_page_num)
 
     def post_json(self, post_number: int) -> 'Json':
         """Get the post json for a specified post number"""

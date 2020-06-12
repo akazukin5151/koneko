@@ -27,7 +27,7 @@ def test_gallery():
     assert gdata
     assert gdata.all_pages_cache == {}
     assert gdata.current_page_num == 1
-    assert gdata._main_path == Path(f"{KONEKODIR}/2232374/")
+    assert gdata.main_path == Path(f"{KONEKODIR}/2232374/")
 
     gdata.update(mode1)
     assert list(gdata.all_pages_cache.keys()) == ['1']

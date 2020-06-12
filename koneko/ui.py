@@ -28,11 +28,11 @@ def previous_page(data):
 
 class AbstractGallery(ABC):
     def __init__(self):
-        self.data = data.GalleryJson(1, self._main_path)
-        self.prefetch_thread: 'threading.Thread'
         # Defined in child classes
-        self._main_path: 'Path'
+        self.main_path: 'Path'
 
+        self.data = data.GalleryJson(1, self.main_path)
+        self.prefetch_thread: 'threading.Thread'
         self.start()
 
     def start(self):
@@ -121,7 +121,7 @@ class AbstractGallery(ABC):
         next_page = self._pixivrequest(**parse_page)
         self.data.all_pages_cache[str(self.data.current_page_num + 1)] = next_page
 
-        download_path = self._main_path / str(self.data.current_page_num + 1)
+        download_path = self.data.main_path / str(self.data.current_page_num + 1)
 
         if not download_path.is_dir():
             oldnum = self.data.current_page_num
@@ -131,9 +131,9 @@ class AbstractGallery(ABC):
 
     def reload(self):
         print('This will delete cached images and redownload them. Proceed?')
-        ans = input(f'Directory to be deleted: {self._main_path}\n')
+        ans = input(f'Directory to be deleted: {self.data.main_path}\n')
         if ans == 'y' or not ans:
-            os.system(f'rm -r {self._main_path}') # shutil.rmtree is better
+            os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
             self.data.all_pages_cache = {} # Ensures prefetch after reloading
             self.start()
         prompt.gallery_like_prompt(self)
@@ -182,7 +182,7 @@ class ArtistGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
     def __init__(self, artist_user_id, **kwargs):
-        self._main_path = KONEKODIR / str(artist_user_id)
+        self.main_path = KONEKODIR / str(artist_user_id)
         self._artist_user_id = artist_user_id
         self._kwargs = kwargs
         super().__init__()
@@ -245,7 +245,7 @@ class IllustFollowGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
     def __init__(self):
-        self._main_path = KONEKODIR / 'illustfollow'
+        self.main_path = KONEKODIR / 'illustfollow'
         super().__init__()
 
     def _pixivrequest(self, **kwargs):

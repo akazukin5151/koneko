@@ -29,8 +29,13 @@ def previous_page(data):
 class AbstractGallery(ABC):
     def __init__(self, main_path):
         self.data = data.GalleryJson(1, main_path)
-        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self.prefetch_thread: threading.Thread
         self.start()
+
+    def _prefetch_thread(self):
+        """Reassign the thread again and start; as threads can only be started once"""
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self.prefetch_thread.start()
 
     def start(self):
         """
@@ -55,33 +60,7 @@ class AbstractGallery(ABC):
 
         # Make sure the following work:
         # Gallery -> next page -> image prompt -> back -> prev page
-        self.prefetch_thread.start()
-
-    def view_image(self, selected_image_num):
-        post_json = self.data.post_json(selected_image_num)
-        image_id = post_json.id
-        idata = data.ImageJson(post_json, image_id)
-
-        display_image(
-            post_json,
-            idata.artist_user_id,
-            selected_image_num,
-            self.data
-        )
-
-        # blocking: no way to unblock prompt
-        image = Image(image_id, idata, False)
-        prompt.image_prompt(image)
-
-        # Image prompt ends, user presses back
-        self._back()
-
-    def _back(self):
-        """After user 'back's from image prompt or artist gallery, start mode again"""
-        lscat.show_instant(lscat.TrackDownloads, self.data, True)
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
-        prompt.gallery_like_prompt(self)
+        self._prefetch_thread()
 
     def next_page(self):
         self.prefetch_thread.join()
@@ -103,10 +82,6 @@ class AbstractGallery(ABC):
     @abstractmethod
     def _pixivrequest(self, **kwargs):
         raise NotImplementedError
-
-    def _prefetch_thread(self):
-        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
-        self.prefetch_thread.start()
 
     def _prefetch_next_page(self):
         next_url = self.data.next_url
@@ -134,6 +109,32 @@ class AbstractGallery(ABC):
             self.start()
         prompt.gallery_like_prompt(self)
         # Regardless of confirmation, need to catch itself with a prompt
+
+    def view_image(self, selected_image_num):
+        post_json = self.data.post_json(selected_image_num)
+        image_id = post_json.id
+        idata = data.ImageJson(post_json, image_id)
+
+        display_image(
+            post_json,
+            idata.artist_user_id,
+            selected_image_num,
+            self.data
+        )
+
+        # blocking: no way to unblock prompt
+        image = Image(image_id, idata, False)
+        prompt.image_prompt(image)
+
+        # Image prompt ends, user presses back
+        self._back()
+
+    def _back(self):
+        """After user 'back's from image prompt or artist gallery, start mode again"""
+        lscat.show_instant(lscat.TrackDownloads, self.data, True)
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+        prompt.gallery_like_prompt(self)
 
     @abstractmethod
     def handle_prompt(self, keyseqs, gallery_command, selected_image_num,

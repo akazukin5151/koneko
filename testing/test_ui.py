@@ -32,9 +32,12 @@ def test_download_image_coords(monkeypatch):
 def test_previous_page(monkeypatch):
     monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
     monkeypatch.setattr('koneko.pure.print_multiple_imgs', lambda x: True)
-    data.current_page_num = 2
+    monkeypatch.setattr('koneko.utils.dir_not_empty', lambda x: True)
+    data.page_num = 2
     data.current_illusts = None
-    ui.previous_page(data)
+    data.offset = 60
+    data.download_path = 'fake'
+    ui.previous_page_gallery(data)
 
 def test_previous_page_users(monkeypatch):
     monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)

@@ -17,7 +17,7 @@ import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, config, prompt, screens, newui
+from koneko import ui, api, cli, pure, config, prompt, screens
 
 
 def main():
@@ -172,7 +172,7 @@ class ArtistModeLoop(AbstractLoop):
 
     def _go_to_mode(self):
         #self.mode = ui.ArtistGallery(self._user_input)
-        self.mode = newui.ArtistGallery(self._user_input)
+        self.mode = ui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
         main()
@@ -213,7 +213,7 @@ class SearchUsersModeLoop(AbstractLoop):
         return True
 
     def _go_to_mode(self):
-        self.mode = newui.SearchUsers(self._user_input)
+        self.mode = ui.SearchUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
 
@@ -229,14 +229,14 @@ class FollowingUserModeLoop(AbstractLoop):
         self._url_or_id = input('Enter your pixiv ID or url: ')
 
     def _go_to_mode(self):
-        self.mode = newui.FollowingUsers(self._user_input)
+        self.mode = ui.FollowingUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
 
 def illust_follow_mode_loop():
     """Immediately goes to IllustFollow()"""
     while True:
-        mode = newui.IllustFollowGallery()
+        mode = ui.IllustFollowGallery()
         prompt.gallery_like_prompt(mode)
         # After backing
         main()

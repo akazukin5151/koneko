@@ -89,7 +89,7 @@ def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
 
     fake_inkey = FakeInKeyPrev()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-    monkeypatch.setattr('koneko.ui.previous_page', raises_customexit)
+    monkeypatch.setattr('koneko.ui.previous_page_gallery', raises_customexit)
     fakegallery = FakeGallery()
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)

@@ -103,7 +103,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 # Roadmap
 
 * In-depth usage documentation?
-* Refactor ui.py
+* Extract gallery and user data classes into an ABC?
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features

@@ -210,7 +210,7 @@ def user_prompt(user):
                 ask_quit()
 
             elif user_prompt_command == 'm':
-                print(ui.Users.__doc__)
+                print(ui.AbstractUsers.__doc__)
 
             elif user_prompt_command == 'h':
                 print(''.join([

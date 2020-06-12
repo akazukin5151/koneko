@@ -127,6 +127,7 @@ class AbstractUI(ABC):
         prompt.user_prompt(self)
 
 
+
 def previous_page_gallery(data):
     """Previous page for users"""
     if data.page_num > 1:
@@ -143,6 +144,7 @@ def _show_page_gallery(data):
         return False
 
     lscat.show_instant(lscat.TrackDownloads, data)
+
 
 class AbstractGallery(AbstractUI, ABC):
     def data_class(self, main_path):
@@ -345,6 +347,7 @@ class IllustFollowGallery(AbstractGallery):
             'view ', colors.m, 'anual\n']))
 
 
+
 class AbstractUsers(AbstractUI, ABC):
     """
     User view commands (No need to press enter):
@@ -440,6 +443,7 @@ class FollowingUsers(AbstractUsers):
     def _pixivrequest(self):
         return api.myapi.following_user_request(self.your_id, self._publicity,
                                                 self.data.offset)
+
 
 
 def display_image(post_json, artist_user_id, number_prefix, data):

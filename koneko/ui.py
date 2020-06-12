@@ -248,7 +248,7 @@ class ArtistGallery(AbstractGallery):
         super().__init__(KONEKODIR / str(artist_user_id))
 
     def _pixivrequest(self, **kwargs):
-        return api.myapi.artist_gallery_general(self._artist_user_id, self.data.offset)
+        return api.myapi.artist_gallery(self._artist_user_id, self.data.offset)
 
     def handle_prompt(self, keyseqs):
         # Display image (using either coords or image number), the show this prompt

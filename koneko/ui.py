@@ -535,6 +535,7 @@ class AbstractUsers(ABC):
         if utils.dir_not_empty(self.data):
             lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
             api.myapi.await_login()
+            # Parse in the background; the other branch doesn't need this
             self.parse_thread = threading.Thread(target=self._parse_user_infos)
             self.parse_thread.start()
             return True
@@ -565,7 +566,7 @@ class AbstractUsers(ABC):
     def _prefetch_next_page(self):
         # TODO: split into download and data parts
         # Wait for initial request to finish, so the data object is instantiated
-        if hasattr(self, 'parse_thread'):
+        with funcy.suppress(AttributeError):
             self.parse_thread.join()
         oldnum = self.data.page_num
 

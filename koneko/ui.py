@@ -149,11 +149,20 @@ class AbstractGallery(AbstractUI, ABC):
         return True
 
     def _show_page(self):
-        _show_page_gallery(self.data)
+        if not utils.dir_not_empty(data):
+            print('This is the last page!')
+            data.page_num -= 1
+            return False
+        self.show_instant()
         self.print_page_info()
 
     def previous_page(self):
-        previous_page_gallery(self.data)
+        if self.data.page_num > 1:
+            self.data.page_num -= 1
+            self.data.offset = int(self.data.offset) - 30
+            self._show_page()
+        else:
+            print('This is the first page!')
 
     def print_page_info(self):
         pure.print_multiple_imgs(self.data.current_illusts)
@@ -193,23 +202,6 @@ class AbstractGallery(AbstractUI, ABC):
         self.show_instant()
         self.print_page_info()
         prompt.gallery_like_prompt(self)
-
-
-def previous_page_gallery(data):
-    """Previous page for users"""
-    if data.page_num > 1:
-        data.page_num -= 1
-        data.offset = int(data.offset) - 30
-        _show_page_gallery(data)
-    else:
-        print('This is the first page!')
-
-def _show_page_gallery(data):
-    if not utils.dir_not_empty(data):
-        print('This is the last page!')
-        data.page_num -= 1
-        return False
-    lscat.show_instant(lscat.TrackDownloads, data)
 
 
 class ArtistGallery(AbstractGallery):

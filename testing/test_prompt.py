@@ -66,6 +66,7 @@ class FakeGallery:
     @staticmethod
     def help():                  raise CustomExit()
     def next_page(self):         raise CustomExit()
+    def previous_page(self):     raise CustomExit()
     def handle_prompt(self, *a): raise CustomExit()
     def view_image(self, *a):    raise CustomExit()
 
@@ -89,7 +90,7 @@ def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
 
     fake_inkey = FakeInKeyPrev()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-    monkeypatch.setattr('koneko.ui.previous_page_gallery', raises_customexit)
+    monkeypatch.setattr('koneko.ui.AbstractGallery.previous_page', raises_customexit)
     fakegallery = FakeGallery()
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)

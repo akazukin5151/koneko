@@ -68,7 +68,7 @@ def gallery_like_prompt(gallery):
                 gallery.next_page()
 
             elif gallery_command == 'p':
-                ui.previous_page_gallery(gallery.data)
+                gallery.previous_page()
 
             elif gallery_command == 'm':
                 print('')

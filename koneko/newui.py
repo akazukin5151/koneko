@@ -47,16 +47,17 @@ class AbstractGalleryNew(ABC):
         self._parse_and_download()
         self._prefetch_thread()
 
+    def print_page_info(self):
+        pure.print_multiple_imgs(self.data.current_illusts)
+        print(f'Page {self.data.current_page_num}')
+
     def _parse_and_download(self):
         """If download path not empty, immediately show. Else parse & download"""
         if utils.dir_not_empty(self.data):
             lscat.show_instant(lscat.TrackDownloads, self.data, True)
             api.myapi.await_login()
-            # Parse in the background; the other branch doesn't need this
             self._parse_user_infos()
-            # Might as well put this in a function
-            pure.print_multiple_imgs(self.data.current_illusts)
-            print(f'Page {self.data.current_page_num}')
+            self.print_page_info()
             return True
 
         # No valid cached images, download all from scratch
@@ -67,9 +68,7 @@ class AbstractGalleryNew(ABC):
         self._parse_user_infos()
         tracker = lscat.TrackDownloads(self.data)
         download.init_download(self.data, download.download_page, tracker)
-        # New
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
+        self.print_page_info()
 
     @abstractmethod
     def _pixivrequest(self):
@@ -161,8 +160,7 @@ class AbstractGalleryNew(ABC):
     def _back(self):
         """After user 'back's from image prompt or artist gallery, start mode again"""
         lscat.show_instant(lscat.TrackDownloads, self.data, True)
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
+        self.print_page_info()
         prompt.gallery_like_prompt(self)
 
 

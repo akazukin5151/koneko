@@ -19,7 +19,7 @@ class AbstractUI(ABC):
         declare the data and download_function attributes as appropriate.
         Main path includes any user input (eg, artist user id or search string)
         """
-        self.data: 'data'
+        self.data: 'data.<class>'
         self.download_function: 'download.<function>'
         self.start(main_path)
 

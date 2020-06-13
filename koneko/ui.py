@@ -16,6 +16,7 @@ class AbstractUI(ABC):
     @abstractmethod
     def __init__(self, main_path):
         self.data: 'data'
+        self.download_function: 'download.<function>'
         self.start(main_path)
 
     @abstractmethod
@@ -31,11 +32,6 @@ class AbstractUI(ABC):
     @abstractmethod
     def show_instant(self):
         """Action: define appropriate lscat.show_instant function here"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def download_function(self) -> 'func':
-        """Function: pass the appropriate download function object, no arguments"""
         raise NotImplementedError
 
     @abstractmethod
@@ -83,7 +79,7 @@ class AbstractUI(ABC):
 
         api.myapi.await_login()
         self._parse_user_infos()
-        download.init_download(self.data, self.download_function(), self.tracker())
+        download.init_download(self.data, self.download_function, self.tracker())
         self.print_page_info()
 
     def _prefetch_thread(self):
@@ -116,7 +112,7 @@ class AbstractUI(ABC):
         self.data.page_num = int(self.data.offset) // 30 + 1
 
         self._parse_user_infos()
-        download.init_download(self.data, self.download_function(), None)
+        download.init_download(self.data, self.download_function, None)
 
         self.data.page_num = oldnum
 
@@ -154,6 +150,11 @@ class AbstractUI(ABC):
 
 
 class AbstractGallery(AbstractUI, ABC):
+    @abstractmethod
+    def __init__(self, main_path):
+        self.download_function = download.download_page
+        super().__init__(main_path)
+
     def data_class(self, main_path):
         return data.GalleryJson(1, main_path)
 
@@ -162,10 +163,6 @@ class AbstractGallery(AbstractUI, ABC):
 
     def show_instant(self):
         return lscat.show_instant(lscat.TrackDownloads, self.data, True)
-
-    def download_function(self) -> 'func':
-        """Passing a function, not calling anything"""
-        return download.download_page
 
     def action_after_parse(self):
         self.print_page_info()
@@ -248,9 +245,8 @@ class ArtistGallery(AbstractGallery):
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
-    def __init__(self, artist_user_id, **kwargs):
+    def __init__(self, artist_user_id):
         self._artist_user_id = artist_user_id
-        self._kwargs = kwargs
         super().__init__(KONEKODIR / str(artist_user_id))
 
     def _pixivrequest(self, **kwargs):
@@ -364,6 +360,11 @@ class AbstractUsers(AbstractUI, ABC):
         q                  -- quit (with confirmation)
 
     """
+    @abstractmethod
+    def __init__(self, main_path):
+        self.download_function = download.user_download
+        super().__init__(main_path)
+
     def data_class(self, main_path):
         return data.UserJson(1, main_path)
 
@@ -372,10 +373,6 @@ class AbstractUsers(AbstractUI, ABC):
 
     def show_instant(self):
         return lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
-
-    def download_function(self) -> 'func':
-        """Passing a function, not calling anything"""
-        return download.user_download
 
     def action_after_parse(self):
         """No action needed"""

@@ -153,9 +153,9 @@ class AbstractGallery(AbstractUI, ABC):
         return True
 
     def _show_page(self):
-        if not utils.dir_not_empty(data):
+        if not utils.dir_not_empty(self.data):
             print('This is the last page!')
-            data.page_num -= 1
+            self.data.page_num -= 1
             return False
         self.show_instant()
         self.print_page_info()

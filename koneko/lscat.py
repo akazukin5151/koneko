@@ -152,7 +152,7 @@ def generate_page(path):
             Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
-import time
+
 def generate_users(path, print_info=True):
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     os.system('clear')

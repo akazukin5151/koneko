@@ -15,48 +15,42 @@ from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
 class AbstractUI(ABC):
     @abstractmethod
     def __init__(self, main_path):
+        """Child classes must pass in main_path, and
+        declare the data and download_function attributes as appropriate.
+        Main path includes any user input (eg, artist user id or search string)
+        """
         self.data: 'data'
         self.download_function: 'download.<function>'
         self.start(main_path)
 
     @abstractmethod
     def data_class(self, main_path):
-        """Action: Instantiate the appropriate data object here"""
+        """Instantiate the appropriate data object here (with args and bracket)"""
         raise NotImplementedError
 
     @abstractmethod
     def tracker(self):
-        """Action: Instantiate the appropriate tracker object here"""
+        """Instantiate the appropriate tracker object here (with args and bracket)"""
         raise NotImplementedError
 
     @abstractmethod
     def show_instant(self):
-        """Action: define appropriate lscat.show_instant function here"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def action_after_parse(self):
-        """Action: anything to do after parsing/fetching,
-        in the case of images already downloaded (show_instant() first then
-        fetch and parse)
-        """
+        """Run appropriate lscat.show_instant function here (will actually display)"""
         raise NotImplementedError
 
     @abstractmethod
     def action_before_prefetch(self):
-        """Action: anything to do before prefetching (either in background or not)"""
+        """Procedure: Anything to do before prefetching (either in background or not)"""
         raise NotImplementedError
 
     @abstractmethod
     def print_page_info(self):
-        """Action: statements to print the page info (for gallery only)"""
+        """Procedure: Anything to do to print the page info"""
         raise NotImplementedError
 
     @abstractmethod
     def _pixivrequest(self) -> 'Json':
-        """Action with return: call the appropriate api request function and
-        return the result
-        """
+        """Run: call the appropriate api request function and return the result"""
         raise NotImplementedError
 
     def start(self, main_path):
@@ -70,7 +64,7 @@ class AbstractUI(ABC):
             self.show_instant()
             api.myapi.await_login()
             self._parse_user_infos()
-            self.action_after_parse()
+            self.print_page_info()
             return True
 
         # No valid cached images, download all from scratch
@@ -164,9 +158,6 @@ class AbstractGallery(AbstractUI, ABC):
     def show_instant(self):
         return lscat.show_instant(lscat.TrackDownloads, self.data, True)
 
-    def action_after_parse(self):
-        self.print_page_info()
-
     def action_before_prefetch(self):
         """No action needed"""
         return True
@@ -177,13 +168,13 @@ class AbstractGallery(AbstractUI, ABC):
 
     @abstractmethod
     def handle_prompt(self, keyseqs: 'list[str]'):
-        """Action: Gallery prompt accepts more keys(eqs) than Users, handle them here"""
+        """Gallery prompt accepts more keys(eqs) than Users, handle them here"""
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
     def help():
-        """Action: each gallery mode has different keyseqs and help"""
+        """each gallery mode has different keyseqs and help"""
         raise NotImplementedError
 
     # Unique for Galleries
@@ -374,17 +365,12 @@ class AbstractUsers(AbstractUI, ABC):
     def show_instant(self):
         return lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
 
-    def action_after_parse(self):
-        """No action needed"""
-        return True
-
     def action_before_prefetch(self):
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
 
     def print_page_info(self):
-        """No action needed"""
-        return True
+        print(f'Page {self.data.page_num}')
 
     # Unique to Users
     def go_artist_mode(self, selected_user_num):

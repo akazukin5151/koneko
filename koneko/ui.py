@@ -43,8 +43,16 @@ class AbstractUI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _show_page(self):
+    def print_page_info(self):
         raise NotImplementedError
+
+    def _show_page(self):
+        if not utils.dir_not_empty(self.data):
+            print('This is the last page!')
+            self.data.page_num -= 1
+            return False
+        self.show_instant()
+        self.print_page_info()
 
     def start(self, main_path):
         self.data = self.data_class(main_path)
@@ -151,14 +159,6 @@ class AbstractGallery(AbstractUI, ABC):
 
     def action_before_prefetch(self):
         return True
-
-    def _show_page(self):
-        if not utils.dir_not_empty(self.data):
-            print('This is the last page!')
-            self.data.page_num -= 1
-            return False
-        self.show_instant()
-        self.print_page_info()
 
     def print_page_info(self):
         pure.print_multiple_imgs(self.data.current_illusts)
@@ -367,13 +367,8 @@ class AbstractUsers(AbstractUI, ABC):
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
 
-    def _show_page(self):
-        if not utils.dir_not_empty(self.data):
-            print('This is the last page!')
-            self.data.page_num -= 1
-            return False
-
-        lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
+    def print_page_info(self):
+        return True
 
     # Unique to Users
     def go_artist_mode(self, selected_user_num):

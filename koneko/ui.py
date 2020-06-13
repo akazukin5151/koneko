@@ -585,7 +585,7 @@ class Image:
             ):
                 tracker.update(pure.split_backslash_last(img[0]))
             else:
-                download.async_download_core(self.data.download_path, img
+                download.async_download_core(self.data.download_path, img,
                                              tracker=tracker)
 
             slicestart += 1

@@ -50,16 +50,21 @@ class AbstractUI(ABC):
 
     @abstractmethod
     def _pixivrequest(self) -> 'Json':
-        """Run: call the appropriate api request function and return the result"""
+        """Run: call the appropriate api request function and return the result
+        Must pass in `offset=self.data.offset` into API for pages to work
+        """
         raise NotImplementedError
 
     def start(self, main_path):
+        # self.data defined here not in __init__, so that reload() will wipe cache
         self.data = self.data_class(main_path)
         self._parse_and_download()
         self._prefetch_thread()
 
     def _parse_and_download(self):
-        """If download path not empty, immediately show. Else parse & download"""
+        """If download path not empty, immediately show.
+        Regardless, proceed to parse & download
+        """
         if utils.dir_not_empty(self.data):
             self.show_instant()
             api.myapi.await_login()
@@ -121,8 +126,8 @@ class AbstractUI(ABC):
             self.data.page_num -= 1
             self.data.offset = int(self.data.offset) - 30
             self._show_page()
-        else:
-            print('This is the first page!')
+            return True
+        print('This is the first page!')
 
     def _show_page(self):
         if not utils.dir_not_empty(self.data):
@@ -137,7 +142,7 @@ class AbstractUI(ABC):
         ans = input(f'Directory to be deleted: {self.data.main_path}\n')
         if ans == 'y' or not ans:
             os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
-            # Will remove all data, but keep main path and user input
+            # Will remove all data, but keep info on the main path
             self.start(self.data.main_path)
         prompt.user_prompt(self)
 
@@ -146,35 +151,44 @@ class AbstractUI(ABC):
 class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
+        """Complements abstractmethod: Define download function for galleries"""
         self.download_function = download.download_page
         super().__init__(main_path)
 
     def data_class(self, main_path):
+        """Implements abstractmethod: Instantiate the dataclass for galleries"""
         return data.GalleryJson(1, main_path)
 
     def tracker(self):
+        """Implements abstractmethod: Instantiate tracker for galleries"""
         return lscat.TrackDownloads(self.data)
 
     def show_instant(self):
+        """Implements abstractmethod: Runs show_instant for galleries"""
         return lscat.show_instant(lscat.TrackDownloads, self.data, True)
 
     def action_before_prefetch(self):
-        """No action needed"""
+        """Implements abstractmethod: No action needed"""
         return True
 
     def print_page_info(self):
+        """Implements abstractmethod: Indicate which posts are multi-image and
+        current page number
+        """
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.current_page_num}')
 
     @abstractmethod
     def handle_prompt(self, keyseqs: 'list[str]'):
-        """Gallery prompt accepts more keys(eqs) than Users, handle them here"""
+        """Abstractmethod for gallery classes: Gallery prompt accepts more
+        keys(eqs) than Users, handle them here"""
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
     def help():
-        """each gallery mode has different keyseqs and help"""
+        """Abstractmethod for gallery classes: each gallery mode has different
+        keyseqs and thus help"""
         raise NotImplementedError
 
     # Unique for Galleries
@@ -237,13 +251,17 @@ class ArtistGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
     def __init__(self, artist_user_id):
+        """Implements abstractmethod: self._artist_user_id only used for
+        _pixivrequest() specific to mode 1"""
         self._artist_user_id = artist_user_id
         super().__init__(KONEKODIR / str(artist_user_id))
 
-    def _pixivrequest(self, **kwargs):
+    def _pixivrequest(self):
+        """Implements abstractmethod: use the user-given id for request"""
         return api.myapi.artist_gallery(self._artist_user_id, self.data.offset)
 
     def handle_prompt(self, keyseqs):
+        """Implements abstractmethod"""
         # Display image (using either coords or image number), the show this prompt
         if keyseqs[0] == 'b':
             pass # Stop gallery instance, return to previous state
@@ -255,6 +273,7 @@ class ArtistGallery(AbstractGallery):
 
     @staticmethod
     def help():
+        """Implements abstractmethod"""
         print(''.join(
             colors.base1 + ['view '] + colors.base2 +
             ['view ', colors.m, 'anual; ',
@@ -294,13 +313,17 @@ class IllustFollowGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
     def __init__(self):
+        """Implements abstractmethod"""
         super().__init__(KONEKODIR / 'illustfollow')
 
     def _pixivrequest(self):
+        """Implements abstractmethod, publicity is private for now
+        (might be configurable in the future)"""
         return api.myapi.illust_follow_request(restrict='private',
                                                offset=self.data.offset)
 
     def go_artist_gallery_coords(self, first_num, second_num):
+        """New method for mode 5 only"""
         selected_image_num = utils.find_number_map(int(first_num), int(second_num))
         if selected_image_num is False: # 0 is valid!
             print('Invalid number!')
@@ -316,6 +339,7 @@ class IllustFollowGallery(AbstractGallery):
         self._back()
 
     def handle_prompt(self, keyseqs):
+        """Implements abstractmethod"""
         # "b" must be handled first, because keyseqs might be empty
         if keyseqs[0] == 'b':
             print('Invalid command! Press h to show help')
@@ -329,6 +353,7 @@ class IllustFollowGallery(AbstractGallery):
 
     @staticmethod
     def help():
+        """Implements abstractmethod"""
         print(''.join(colors.base1 + [
             colors.a, "view artist's illusts; ",
             colors.n, 'ext page;\n',
@@ -353,27 +378,34 @@ class AbstractUsers(AbstractUI, ABC):
     """
     @abstractmethod
     def __init__(self, main_path):
+        """Complements abstractmethod: Define download function for user modes"""
         self.download_function = download.user_download
         super().__init__(main_path)
 
     def data_class(self, main_path):
+        """Implements abstractmethod: Instantiate the dataclass for user modes"""
         return data.UserJson(1, main_path)
 
     def tracker(self):
+        """Implements abstractmethod: Instantiate tracker for user modes"""
         return lscat.TrackDownloadsUsers(self.data)
 
     def show_instant(self):
+        """Implements abstractmethod: Runs show_instant for user modes"""
         return lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
 
     def action_before_prefetch(self):
+        """Implements abstractmethod: Wait for parse_thread to join (if any)"""
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
 
     def print_page_info(self):
+        """Implements abstractmethod: Indicate current page number"""
         print(f'Page {self.data.page_num}')
 
     # Unique to Users
     def go_artist_mode(self, selected_user_num):
+        """Concrete method unique for both user modes"""
         try:
             artist_user_id = self.data.artist_user_id(selected_user_num)
         except IndexError:
@@ -406,6 +438,8 @@ class FollowingUsers(AbstractUsers):
     Parent directory for downloads should go to following/
     """
     def __init__(self, your_id, publicity='private'):
+        """Implements abstractmethod, publicity is private for now
+        (might be configurable in the future)"""
         self._publicity = publicity
         self.your_id = your_id
         super().__init__(KONEKODIR / 'following' / your_id)
@@ -546,10 +580,13 @@ class Image:
         while not self.event.is_set() and slicestart <= 4:
             img = self.data.page_urls[slicestart:slicestart + 1]
 
-            if os.path.isfile(self.data.download_path / pure.split_backslash_last(img[0])):
+            if os.path.isfile(
+                self.data.download_path / pure.split_backslash_last(img[0])
+            ):
                 tracker.update(pure.split_backslash_last(img[0]))
             else:
-                download.async_download_core(self.data.download_path, img, tracker=tracker)
+                download.async_download_core(self.data.download_path, img
+                                             tracker=tracker)
 
             slicestart += 1
 

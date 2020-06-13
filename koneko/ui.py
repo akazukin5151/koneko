@@ -20,39 +20,48 @@ class AbstractUI(ABC):
 
     @abstractmethod
     def data_class(self, main_path):
+        """Action: Instantiate the appropriate data object here"""
         raise NotImplementedError
 
     @abstractmethod
     def tracker(self):
+        """Action: Instantiate the appropriate tracker object here"""
         raise NotImplementedError
 
     @abstractmethod
     def show_instant(self):
+        """Action: define appropriate lscat.show_instant function here"""
         raise NotImplementedError
 
     @abstractmethod
-    def download_function(self):
+    def download_function(self) -> 'func':
+        """Function: pass the appropriate download function object, no arguments"""
         raise NotImplementedError
 
     @abstractmethod
     def action_after_parse(self):
+        """Action: anything to do after parsing/fetching,
+        in the case of images already downloaded (show_instant() first then
+        fetch and parse)
+        """
         raise NotImplementedError
 
     @abstractmethod
     def action_before_prefetch(self):
+        """Action: anything to do before prefetching (either in background or not)"""
         raise NotImplementedError
 
     @abstractmethod
     def print_page_info(self):
+        """Action: statements to print the page info (for gallery only)"""
         raise NotImplementedError
 
-    def _show_page(self):
-        if not utils.dir_not_empty(self.data):
-            print('This is the last page!')
-            self.data.page_num -= 1
-            return False
-        self.show_instant()
-        self.print_page_info()
+    @abstractmethod
+    def _pixivrequest(self) -> 'Json':
+        """Action with return: call the appropriate api request function and
+        return the result
+        """
+        raise NotImplementedError
 
     def start(self, main_path):
         self.data = self.data_class(main_path)
@@ -82,11 +91,6 @@ class AbstractUI(ABC):
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.prefetch_thread.start()
 
-    @abstractmethod
-    def _pixivrequest(self):
-        """Blank method, classes that inherit this ABC must override this"""
-        raise NotImplementedError
-
     def _parse_user_infos(self):
         """Parse json and get list of artist names, profile pic urls, and id"""
         result = self._pixivrequest()
@@ -95,6 +99,7 @@ class AbstractUI(ABC):
     def _prefetch_next_page(self):
         # Wait for initial request to finish, so the data object is instantiated
         # Else next_url won't be set yet
+        self.action_before_prefetch()
         if not self.data.next_url:  # Last page
             return True
 
@@ -129,6 +134,14 @@ class AbstractUI(ABC):
         else:
             print('This is the first page!')
 
+    def _show_page(self):
+        if not utils.dir_not_empty(self.data):
+            print('This is the last page!')
+            self.data.page_num -= 1
+            return False
+        self.show_instant()
+        self.print_page_info()
+
     def reload(self):
         print('This will delete cached images and redownload them. Proceed?')
         ans = input(f'Directory to be deleted: {self.data.main_path}\n')
@@ -158,6 +171,7 @@ class AbstractGallery(AbstractUI, ABC):
         self.print_page_info()
 
     def action_before_prefetch(self):
+        """No action needed"""
         return True
 
     def print_page_info(self):
@@ -165,16 +179,19 @@ class AbstractGallery(AbstractUI, ABC):
         print(f'Page {self.data.current_page_num}')
 
     @abstractmethod
-    def handle_prompt(self, keyseqs):
+    def handle_prompt(self, keyseqs: 'list[str]'):
+        """Action: Gallery prompt accepts more keys(eqs) than Users, handle them here"""
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
     def help():
+        """Action: each gallery mode has different keyseqs and help"""
         raise NotImplementedError
 
     # Unique for Galleries
     def view_image(self, selected_image_num):
+        """Go to image mode"""
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
         idata = data.ImageJson(post_json, image_id)
@@ -361,6 +378,7 @@ class AbstractUsers(AbstractUI, ABC):
         return download.user_download
 
     def action_after_parse(self):
+        """No action needed"""
         return True
 
     def action_before_prefetch(self):
@@ -368,6 +386,7 @@ class AbstractUsers(AbstractUI, ABC):
             self.parse_thread.join()
 
     def print_page_info(self):
+        """No action needed"""
         return True
 
     # Unique to Users

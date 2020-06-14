@@ -4,6 +4,7 @@ import threading
 from abc import ABC
 
 from pixcat import Image
+from placeholder import m
 
 from koneko import utils, config
 
@@ -47,7 +48,7 @@ def show_instant(cls, data, gallerymode=False):
         number_of_cols = config.ncols_config()
 
         spacing = config.get_settings('lscat', 'gallery_print_spacing').map(
-                      lambda s: s.split(',')
+                      m.split(',')
                   ).value_or((9, 17, 17, 17, 17))
 
         for (idx, space) in enumerate(spacing[:number_of_cols]):

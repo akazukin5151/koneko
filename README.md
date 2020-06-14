@@ -104,6 +104,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 * In-depth usage documentation?
 * Functional way of doing ui.py?
+* Safer way to do check_ouput in screens.py
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features

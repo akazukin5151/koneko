@@ -34,9 +34,12 @@ def prefix_artist_name(name: str, number: int) -> str:
     return new_file_name
 
 def print_multiple_imgs(illusts_json: 'Json') -> None:
-    _ = [print(f'{c.RED}#{index}{c.RESET} has {c.BLUE}{pages}{c.RESET} pages', end=', ')
-         for (index, json) in enumerate(illusts_json)
-         if (pages := json['page_count']) > 1]
+    HASHTAG = f'{c.RED}#'
+    HAS = f'{c.RESET} has {c.BLUE}'
+    OF_PAGES = f'{c.RESET} pages'
+    _ = [print(f'{HASHTAG}{index}{HAS}{number}{OF_PAGES}', end=', ')
+         for (index, _json) in enumerate(illusts_json)
+         if (number := _json['page_count']) > 1]
     print('')
 
 

@@ -177,7 +177,7 @@ class AbstractGallery(AbstractUI, ABC):
         current page number
         """
         pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
+        print(f'Page {self.data.page_num}')
 
     @abstractmethod
     def handle_prompt(self, keyseqs: 'list[str]'):
@@ -467,7 +467,7 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     search_string = f"{str(number_prefix).rjust(3, '0')}_*"
 
     os.system('clear')
-    arg = KONEKODIR / str(artist_user_id) / str(data.current_page_num) / search_string
+    arg = KONEKODIR / str(artist_user_id) / str(data.page_num) / search_string
     lscat.icat(arg)
 
     url = pure.url_given_size(post_json, 'large')

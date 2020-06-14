@@ -26,7 +26,7 @@ def test_gallery():
     gdata = data.GalleryJson(1, Path(f"{KONEKODIR}/2232374/"))
     assert gdata
     assert gdata.all_pages_cache == {}
-    assert gdata.current_page_num == 1
+    assert gdata.page_num == 1
     assert gdata.main_path == Path(f"{KONEKODIR}/2232374/")
 
     gdata.update(mode1)
@@ -48,7 +48,7 @@ def test_gallery():
     assert gdata.first_img == "みこっちゃん"
 
     assert gdata.page_num == 1
-    assert gdata.page_num == gdata.current_page_num
+    assert gdata.page_num == gdata.page_num
 
 
 def test_image():

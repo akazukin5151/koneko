@@ -52,7 +52,7 @@ def show_instant(cls, data, gallerymode=False):
 
         for (idx, space) in enumerate(spacing[:number_of_cols]):
             print(' ' * int(space), end='')
-            print(idx+1, end='')
+            print(idx + 1, end='')
         print('\n')
 
 
@@ -182,7 +182,7 @@ def generate_users(path, print_info=True):
             while i < 3:            # Every artist has only 3 previews
                 p_img = yield       # Wait for preview pic
                 Image(p_img).thumbnail(thumbnail_size).show(align='left', y=0,
-                                                 x=preview_xcoords[i])
+                                                            x=preview_xcoords[i])
                 i += 1
 
 def generate_orders(total_pics, artists_count):

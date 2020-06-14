@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko import ui, pure, utils, colors, download
+from koneko import ui, utils, colors, download
 
 TERM = Terminal()
 
@@ -22,19 +22,20 @@ def ask_quit():
 
 
 def open_or_download(gallery, keyseqs: 'list[str]'):
+    letter = keyseqs[0]
     first_num, second_num = keyseqs[-2:]
-    if keyseqs[0] == 'o':
+    if letter == 'o':
         utils.open_link_coords(gallery.data, int(first_num), int(second_num))
 
-    elif keyseqs[0] == 'd':
+    elif letter == 'd':
         download.download_image_coords(gallery.data, int(first_num), int(second_num))
 
     selected_image_num = int(f'{first_num}{second_num}')
 
-    if keyseqs[0] == 'O':
+    if letter == 'O':
         utils.open_link_num(gallery.data, selected_image_num)
 
-    elif keyseqs[0] == 'D':
+    elif letter == 'D':
         download.download_image_num(gallery.data, selected_image_num)
 
 def goto_image(gallery, image_num: int):
@@ -181,9 +182,7 @@ def image_prompt(image):
                 keyseqs = []
 
 def user_prompt(user):
-    """
-    Handles key presses for user views (following users and user search)
-    """
+    """Handles key presses for user views (following users and user search)"""
     keyseqs = []
     with TERM.cbreak():
         while True:

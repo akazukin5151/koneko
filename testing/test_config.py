@@ -15,7 +15,7 @@ def use_test_cfg(monkeypatch):
 
 def test_check_print_info(monkeypatch, use_test_cfg):
     # print_info is on in example config
-    assert config.check_print_info() == True
+    assert config.check_print_info() is True
 
     cfg = configparser.ConfigParser()
     cfg.read('testing/test_config.ini')
@@ -24,22 +24,22 @@ def test_check_print_info(monkeypatch, use_test_cfg):
         cfg.set('misc', 'print_info', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
-        assert config.check_print_info() == True
+        assert config.check_print_info() is True
 
     for setting in ('off', 'no', 'off'):
         cfg.set('misc', 'print_info', setting)
         with open('testing/test_config.ini', 'w') as f:
             cfg.write(f)
-        assert config.check_print_info() == False
+        assert config.check_print_info() is False
 
     # Invalid boolean should default to True
     cfg.set('misc', 'print_info', 'asdf')
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
-    assert config.check_print_info() == True
+    assert config.check_print_info() is True
 
     # Restore default value
-    cfg.set('misc', 'print_info',  'on')
+    cfg.set('misc', 'print_info', 'on')
     with open('testing/test_config.ini', 'w') as f:
         cfg.write(f)
 

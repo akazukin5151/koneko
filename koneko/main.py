@@ -13,7 +13,6 @@ Capitalized tag definitions:
 
 import os
 import sys
-import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -22,7 +21,6 @@ from koneko import ui, api, cli, pure, config, prompt, screens
 
 def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
-
     if len(sys.argv) <= 1:
         # no cli arguments, prompt user for mode selection
         prompted = True
@@ -92,7 +90,7 @@ def main_loop(prompted: bool, main_command, user_input, your_id: str):
             func()
 
         elif main_command == '3':
-            if your_id and not user_input: # your_id stored in config file
+            if your_id and not user_input:  # your_id stored in config file
                 ans = input('Do you want to use the Pixiv ID saved in your config?\n')
                 if ans in {'y', ''}:
                     FollowingUserModeLoop(prompted, your_id).start()

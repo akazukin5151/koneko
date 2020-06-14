@@ -91,7 +91,7 @@ def init_download(data, download_func, tracker):
     if data.page_num == 1:
         print('Cache is outdated, reloading...')
     if data.download_path.is_dir():
-        os.system(f'rm -r {data.download_path}') # shutil.rmtree is better
+        os.system(f'rm -r {data.download_path}')  # shutil.rmtree is better
 
     download_func(data, tracker=tracker)
 

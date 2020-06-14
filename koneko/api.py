@@ -21,7 +21,8 @@ class APIHandler:
 
     def add_credentials(self, credentials):
         """Because the initiation of the class is before the config file is read
-        (and before main() starts)"""
+        (and before main() starts)
+        """
         self._credentials = credentials
 
     def start(self):
@@ -38,9 +39,7 @@ class APIHandler:
             self.api = self.api_queue.get()
 
     def _login(self):
-        """
-        Logins to pixiv in the background, using credentials from config file.
-        """
+        """Logins to pixiv in the background, using credentials from config file"""
         api = AppPixivAPI()
         try:
             api.login(self._credentials['Username'], self._credentials['Password'])

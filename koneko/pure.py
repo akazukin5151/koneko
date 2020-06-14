@@ -14,9 +14,7 @@ from koneko import colors as c
 
 
 def split_backslash_last(string: str) -> str:
-    """
-    Intended for splitting url to get filename, but it has lots of applications...
-    """
+    """Intended for splitting url to get filename, but it has lots of applications..."""
     return string.split('/')[-1]
 
 
@@ -94,9 +92,7 @@ def change_url_to_full(url: str, png=False) -> str:
 
 @funcy.decorator
 def catch_ctrl_c(call: 'func[T]') -> 'T':
-    """
-    See http://hackflow.com/blog/2013/11/03/painless-decorators/
-    """
+    """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
     try:
         return call()
     except KeyboardInterrupt:

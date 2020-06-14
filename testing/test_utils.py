@@ -32,8 +32,8 @@ def test_cd():
 
 
 def test_verify_full_download():
-    assert utils.verify_full_download("testing/files/008_77803142_p0.png") == True
-    assert utils.verify_full_download("testing/files/not_an_image.txt") == False
+    assert utils.verify_full_download("testing/files/008_77803142_p0.png") is True
+    assert utils.verify_full_download("testing/files/not_an_image.txt") is False
     # The above code will remove the file
     os.system("touch testing/files/not_an_image.txt")
 

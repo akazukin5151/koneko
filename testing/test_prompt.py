@@ -217,6 +217,6 @@ def test_user_prompt_seq(monkeypatch, patch_cbreak):
 
     fake_inkey = iter([FakeInKey1(), FakeInKey2()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
-    fakeuser= FakeUser()
+    fakeuser = FakeUser()
     with pytest.raises(CustomExit):
         assert prompt.user_prompt(fakeuser)

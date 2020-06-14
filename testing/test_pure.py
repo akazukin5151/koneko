@@ -36,7 +36,7 @@ def test_prefix_artist_name():
     assert pure.prefix_artist_name("name2", 10) == f"10\n{' ' * 19}name2"
 
 def test_print_multiple_imgs(capsys):
-    assert pure.print_multiple_imgs(page_illusts) == None
+    assert pure.print_multiple_imgs(page_illusts) is None
     captured = capsys.readouterr()
     assert captured.out == "\x1b[31m#14\x1b[39m has \x1b[34m8\x1b[39m pages, \x1b[31m#25\x1b[39m has \x1b[34m50\x1b[39m pages, \n"
 

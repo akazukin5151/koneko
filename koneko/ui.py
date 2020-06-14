@@ -4,7 +4,6 @@ import os
 import sys
 import threading
 from abc import ABC, abstractmethod
-from pathlib import Path
 
 import funcy
 
@@ -36,7 +35,8 @@ class AbstractUI(ABC):
     @abstractmethod
     def show_instant(self):
         """Run the appropriate lscat.show_instant function here
-        (will actually display)"""
+        (will actually display)
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -142,7 +142,7 @@ class AbstractUI(ABC):
         print('This will delete cached images and redownload them. Proceed?')
         ans = input(f'Directory to be deleted: {self.data.main_path}\n')
         if ans == 'y' or not ans:
-            os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
+            os.system(f'rm -r {self.data.main_path}')  # shutil.rmtree is better
             # Will remove all data, but keep info on the main path
             self.start(self.data.main_path)
         prompt.user_prompt(self)
@@ -182,14 +182,16 @@ class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def handle_prompt(self, keyseqs: 'list[str]'):
         """Abstractmethod for gallery classes: Gallery prompt accepts more
-        keys(eqs) than Users, handle them here"""
+        keys(eqs) than Users, handle them here
+        """
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
     def help():
         """Abstractmethod for gallery classes: each gallery mode has different
-        keyseqs and thus help"""
+        keyseqs and thus help
+        """
         raise NotImplementedError
 
     # Unique for Galleries
@@ -253,7 +255,8 @@ class ArtistGallery(AbstractGallery):
     """
     def __init__(self, artist_user_id):
         """Implements abstractmethod: self._artist_user_id only used for
-        _pixivrequest() specific to mode 1"""
+        _pixivrequest() specific to mode 1
+        """
         self._artist_user_id = artist_user_id
         super().__init__(KONEKODIR / str(artist_user_id))
 
@@ -265,12 +268,12 @@ class ArtistGallery(AbstractGallery):
         """Implements abstractmethod"""
         # Display image (using either coords or image number), the show this prompt
         if keyseqs[0] == 'b':
-            pass # Stop gallery instance, return to previous state
+            pass  # Stop gallery instance, return to previous state
         elif keyseqs[0] == 'r':
             self.reload()
         elif keyseqs[0].lower() == 'a':
             print('Invalid command! Press h to show help')
-            prompt.gallery_like_prompt(self) # Go back to while loop
+            prompt.gallery_like_prompt(self)  # Go back to while loop
 
     @staticmethod
     def help():
@@ -319,14 +322,15 @@ class IllustFollowGallery(AbstractGallery):
 
     def _pixivrequest(self):
         """Implements abstractmethod, publicity is private for now
-        (might be configurable in the future)"""
+        (might be configurable in the future)
+        """
         return api.myapi.illust_follow_request(restrict='private',
                                                offset=self.data.offset)
 
     def go_artist_gallery_coords(self, first_num, second_num):
         """New method for mode 5 only"""
         selected_image_num = utils.find_number_map(int(first_num), int(second_num))
-        if selected_image_num is False: # 0 is valid!
+        if selected_image_num is False:  # 0 is valid!
             print('Invalid number!')
         else:
             self.go_artist_gallery_num(selected_image_num)
@@ -344,7 +348,7 @@ class IllustFollowGallery(AbstractGallery):
         # "b" must be handled first, because keyseqs might be empty
         if keyseqs[0] == 'b':
             print('Invalid command! Press h to show help')
-            prompt.gallery_like_prompt(self) # Go back to while loop
+            prompt.gallery_like_prompt(self)  # Go back to while loop
         elif keyseqs[0] == 'r':
             self.reload()
         elif keyseqs[0] == 'a':
@@ -426,7 +430,7 @@ class SearchUsers(AbstractUsers):
     Parent directory for downloads should go to search/
     """
     def __init__(self, user):
-        self.user = user # This is only used for pixivrequest
+        self.user = user  # This is only used for pixivrequest
         super().__init__(KONEKODIR / 'search' / user)
 
     def _pixivrequest(self):
@@ -440,7 +444,8 @@ class FollowingUsers(AbstractUsers):
     """
     def __init__(self, your_id, publicity='private'):
         """Implements abstractmethod, publicity is private for now
-        (might be configurable in the future)"""
+        (might be configurable in the future)
+        """
         self._publicity = publicity
         self.your_id = your_id
         super().__init__(KONEKODIR / 'following' / your_id)

@@ -19,7 +19,7 @@ def test_ycoords():
     assert lscat.ycoords(20) == [0, 9]
 
 def test_icat():
-    assert lscat.icat("testing/files/04_祝！！！.jpg") == None
+    assert lscat.icat("testing/files/04_祝！！！.jpg") is None
 
 def test_show_instant(monkeypatch):
     showed = []
@@ -43,15 +43,15 @@ def test_show_instant(monkeypatch):
     fakedata = FakeData()
     lscat.show_instant(FakeTracker, fakedata, True)
     # First one works for me, but second one works for github
-    assert set(showed) == set([
+    assert set(showed) == {
         'test_config.ini', '004_祝！！！.jpg', 'mode3.json',
         'mode1.json', 'not_an_image.txt', '008_77803142_p0.png',
         '017_ミコニャン.jpg', 'mode2.json'
-    ]) or set(showed) == set([
+    } or set(showed) == {
         '004_祝！！！.jpg', 'mode3.json',
         'mode1.json', 'not_an_image.txt', '008_77803142_p0.png',
         '017_ミコニャン.jpg', 'mode2.json'
-    ])
+    }
 
 
 def test_generate_orders():

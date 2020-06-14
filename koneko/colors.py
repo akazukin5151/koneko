@@ -15,7 +15,7 @@ def _letter(letter: str) -> str:
     return ''.join([RED, '[', MAGENTA, letter, RED, ']', RESET])
 
 def _letter_with_coords(letter: str) -> str:
-    """ letter is magenta, n is blue, [] is red
+    """letter is magenta, n is blue, [] is red
     >>> _letter_with_coords("i")
     ... [i][n]
     """
@@ -23,7 +23,7 @@ def _letter_with_coords(letter: str) -> str:
                     BLUE_N, RESET])
 
 def _two_letter_with_coords(letter: str) -> str:
-    """ [] and {} is red, | is black, o and O is magenta, y and x is blue
+    """[] and {} is red, | is black, o and O is magenta, y and x is blue
     >>> _two_letter_with_coords("o")
     ... [o{y}{x}|O[n]]
     """

@@ -59,15 +59,19 @@ def show_instant(cls, data, gallerymode=False):
 class AbstractTracker(ABC):
     def __init__(self, data):
         self.path = data.download_path
-        self._downloaded = []
+        self._downloaded: 'list[str]' = []
+        self._numlist: 'list[int]' = []
         self._lock = threading.Lock()
         self._counter = 0
-        self.orders: 'List[int]'  # noqa: F821
-        self.generator: 'Generator[string]'  # noqa: F821
+        self.orders: 'list[int]'
+        self.generator: 'generator[str]'
 
-    def update(self, new):
+    def update(self, new: str):
+        # TODO: use 'channels' (queues) instead of shared memory
+        # Or make tracker a generator, but queues are better for performance
         with self._lock:
             self._downloaded.append(new)
+            self._numlist.append(int(new[:3]))
 
         self._inspect()
 
@@ -78,11 +82,12 @@ class AbstractTracker(ABC):
         so the valid order is:
         0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
         """
+        # (for function rather than method:) instead of incrementing counter,
+        # pass in a smaller and smaller slice of self.orders
         next_num = self.orders[self._counter]
-        numlist = [int(f[:3]) for f in self._downloaded]
 
-        if next_num in numlist:
-            pic = self._downloaded[numlist.index(next_num)]
+        if next_num in self._numlist:
+            pic = self._downloaded[self._numlist.index(next_num)]
             # Display page
             if next_num == 0:
                 os.system('clear')
@@ -90,7 +95,7 @@ class AbstractTracker(ABC):
 
             self._counter += 1
             self._downloaded.remove(pic)
-            numlist.remove(next_num)
+            self._numlist.remove(next_num)
             if self._downloaded:
                 self._inspect()
 
@@ -218,6 +223,7 @@ class TrackDownloadsImage(AbstractTracker):
         self.generator.send(None)
 
     def _inspect(self):
+        """Overrides base class because numlist is different"""
         next_num = self.orders[self._counter]
         numlist = [int(f.split('_')[1].replace('p', '')) for f in self._downloaded]
 

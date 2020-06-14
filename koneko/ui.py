@@ -35,24 +35,25 @@ class AbstractUI(ABC):
 
     @abstractmethod
     def show_instant(self):
-        """Run appropriate lscat.show_instant function here (will actually display)"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def action_before_prefetch(self):
-        """Procedure: Anything to do before prefetching (either in background or not)"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def print_page_info(self):
-        """Procedure: Anything to do to print the page info"""
+        """Run the appropriate lscat.show_instant function here
+        (will actually display)"""
         raise NotImplementedError
 
     @abstractmethod
     def _pixivrequest(self) -> 'Json':
-        """Run: call the appropriate api request function and return the result
+        """Run the appropriate api request function and return the result
         Must pass in `offset=self.data.offset` into API for pages to work
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def action_before_prefetch(self) -> None:
+        """Run any procedure before prefetching (either in background or not)"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def print_page_info(self) -> None:
+        """Run any procedure to print the page info"""
         raise NotImplementedError
 
     def start(self, main_path):

@@ -37,10 +37,6 @@ class GalleryJson:
         return self.all_pages_cache[str(self.current_page_num)]['illusts']
 
     @property
-    def cached_pages(self) -> 'list[str]':
-        return self.all_pages_cache.keys()
-
-    @property
     def next_url(self) -> str:
         return self.all_pages_cache[str(self.current_page_num)]['next_url']
 

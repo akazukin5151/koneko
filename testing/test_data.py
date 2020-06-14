@@ -43,8 +43,6 @@ def test_gallery():
 
     assert gdata.image_id(0) == 81547984
 
-    assert list(gdata.cached_pages) == ["1"]
-
     assert gdata.next_url == "https://app-api.pixiv.net/v1/user/illusts?user_id=2232374&filter=for_ios&type=illust&offset=30"
 
     assert gdata.first_img == "みこっちゃん"

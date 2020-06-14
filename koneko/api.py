@@ -45,7 +45,7 @@ class APIHandler:
         try:
             api.login(self._credentials['Username'], self._credentials['Password'])
         except PixivError as e:
-            print("Login failed! Please correct your credentials in ~/.config/koneko/config.ini")
+            print('Login failed! Please correct your credentials in ~/.config/koneko/config.ini')
             print(e)
             print("Press 'q' and enter to exit")
             return

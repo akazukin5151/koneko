@@ -96,7 +96,7 @@ def begin_config() -> ('config', str):
     # Append the default settings to the config file
     # Why not use python? Because it's functional, readable, and
     # this one liner defeats any potential speed benefits
-    example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
+    example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()
     os.system(f'tail {example_cfg} -n +9 >> {config_path}')
 
     credentials = config_object['Credentials']

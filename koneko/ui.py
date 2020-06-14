@@ -472,7 +472,7 @@ def display_image(post_json, artist_user_id, number_prefix, data):
 
     url = pure.url_given_size(post_json, 'large')
     filename = pure.split_backslash_last(url)
-    download_path = (KONEKODIR / str(artist_user_id) / "individual" /
+    download_path = (KONEKODIR / str(artist_user_id) / 'individual' /
                      str(data.image_id(number_prefix)))
     download.download_core(download_path, url, filename)
 
@@ -631,7 +631,7 @@ def previous_image(data):
 
 def jump_to_image(data, selected_image_num: int):
     if selected_image_num <= 0 or selected_image_num > len(data.page_urls):
-        print("Invalid number!")
+        print('Invalid number!')
         return False
 
     # Internally 0-based, but externally 1-based

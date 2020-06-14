@@ -1,9 +1,9 @@
 """Export the colors for [h]elp screen keys"""
 
-RED = "\x1b[31m"
-MAGENTA = "\x1b[35m"
-BLUE = "\x1b[34m"
-RESET = "\x1b[39m"
+RED = '\x1b[31m'
+MAGENTA = '\x1b[35m'
+BLUE = '\x1b[34m'
+RESET = '\x1b[39m'
 BLUE_N = ''.join([RED, '[', BLUE, 'n', RED, ']', RESET])
 
 # Private

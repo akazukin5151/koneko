@@ -81,7 +81,7 @@ def gallery_like_prompt(gallery):
             elif gallery_command.code == 361:  # Escape
                 keyseqs = []
                 # Remove entire line
-                print("\r", "\b \b" * 4, end='', flush=True)
+                print('\r', '\b \b' * 4, end='', flush=True)
 
             elif gallery_command == 'b':
                 return gallery.handle_prompt(['b'])
@@ -91,7 +91,7 @@ def gallery_like_prompt(gallery):
 
             elif gallery_command == 'q':
                 ask_quit()
-                print("Enter a gallery command:")
+                print('Enter a gallery command:')
 
             # Multi char sequence
             if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
@@ -214,7 +214,7 @@ def user_prompt(user):
 
             elif user_prompt_command == 'h':
                 print(''.join([
-                    "view ", colors.BLUE_N, "th artist's illusts ",
+                    'view ', colors.BLUE_N, "th artist's illusts ",
                     colors.n, 'ext page; ',
                     colors.p, 'revious page; ',
                     colors.r, 'eload and re-download all;\n',

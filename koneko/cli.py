@@ -69,7 +69,7 @@ def process_cli_args() -> (str, str):
         number_of_args = 2
     else:
         # Docopt should raise an error anyway
-        raise Exception("Invalid command line arguments!")
+        raise Exception('Invalid command line arguments!')
 
     if number_of_args == 1:
         if 'users' in url_or_str:

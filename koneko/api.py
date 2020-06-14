@@ -54,11 +54,6 @@ class APIHandler:
 
     # API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    def parse_next(self, next_url):
-        """All modes; parse next_url for next page's json"""
-        return self.api.parse_qs(next_url)
-
-    @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @utils.spinner('')
     def artist_gallery(self, artist_user_id, offset):
         """Mode 1"""

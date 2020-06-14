@@ -62,15 +62,17 @@ def get_gen_users_settings():
     )
 
 
+def credentials_from_config(config_object, config_path):
+    config_object.read(config_path)
+    credentials = config_object['Credentials']
+    your_id = credentials.get('ID', '')
+    return credentials, your_id
+
 def begin_config() -> ('config', str):
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
     if config_path.exists():
-        config_object.read(Path('~/.config/koneko/config.ini').expanduser())
-        credentials = config_object['Credentials']
-        # If your_id is stored in the config
-        your_id = credentials.get('ID', '')
-        return credentials, your_id
+        return credentials_from_config(config_object, config_path)
 
     username = input('Please enter your username:\n')
     print('\nPlease enter your password:')
@@ -99,9 +101,7 @@ def begin_config() -> ('config', str):
     example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()
     os.system(f'tail {example_cfg} -n +9 >> {config_path}')
 
-    credentials = config_object['Credentials']
-
-    return credentials, your_id
+    return config_object['Credentials'], your_id
 
 @safe
 def get_config_section(section: str) -> 'Result[config]':

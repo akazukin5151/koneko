@@ -16,17 +16,11 @@ class APIHandler:
         self.api_thread = threading.Thread(target=self._login)
         self._started = False
         self._awaited = False
-        self._credentials: 'Dict'  # noqa: F821
+        self.credentials: 'Dict'
         self.api: 'AppPixivAPI()'
 
-    def add_credentials(self, credentials):
-        """Because the initiation of the class is before the config file is read
-        (and before main() starts)
-        """
-        self._credentials = credentials
-
     def start(self):
-        """Start logging in"""
+        """Start logging in. self.credentials must be available"""
         if not self._started:
             self._started = True
             self.api_thread.start()
@@ -42,7 +36,7 @@ class APIHandler:
         """Logins to pixiv in the background, using credentials from config file"""
         api = AppPixivAPI()
         try:
-            api.login(self._credentials['Username'], self._credentials['Password'])
+            api.login(self.credentials['Username'], self.credentials['Password'])
         except PixivError as e:
             print('Login failed! Please correct your credentials in ~/.config/koneko/config.ini')
             print(e)

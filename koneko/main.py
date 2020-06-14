@@ -46,7 +46,7 @@ def main():
 
         os.system('clear')
 
-    api.myapi.add_credentials(credentials)
+    api.myapi.credentials = credentials
     api.myapi.start()
     # After this part, the API is logging in in the background and we can proceed
 

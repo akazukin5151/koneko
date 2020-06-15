@@ -59,15 +59,18 @@ def show_instant(cls, data, gallerymode=False):
 
 class AbstractTracker(ABC):
     def __init__(self):
-        self._downloaded: 'list[str]' = []
-        self._numlist: 'list[int]' = []
-        self._lock = threading.Lock()
+        # Defined in child classes
         self.orders: 'list[int]'
         self.generator: 'generator[str]'
 
+        self._lock = threading.Lock()
+        self._downloaded: 'list[str]' = []
+        self._numlist: 'list[int]' = []
+
+        self.generator.send(None)
+
     def update(self, new: str):
-        # TODO: use 'channels' (queues) instead of shared memory
-        # Or make tracker a generator, but queues are better for performance
+        # Can't use queues/channels instead of a lock, because of race conditions
         with self._lock:
             self._downloaded.append(new)
             self._numlist.append(int(new[:3]))
@@ -99,12 +102,11 @@ class AbstractTracker(ABC):
 class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
     def __init__(self, data):
-        super().__init__()
         self.orders = list(range(30))
         self.generator = generate_page(data.download_path)
-        self.generator.send(None)
+        super().__init__()
 
-def read_invis(data):
+def read_invis(data) -> int:
     with utils.cd(data.download_path):
         with open('.koneko', 'r') as f:
             return int(f.read())
@@ -112,7 +114,6 @@ def read_invis(data):
 class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
-        super().__init__()
         print_info = config.check_print_info()
 
         try:
@@ -126,7 +127,7 @@ class TrackDownloadsUsers(AbstractTracker):
         self.orders = generate_orders(splitpoint * 4, splitpoint)
 
         self.generator = generate_users(data.download_path, print_info)
-        self.generator.send(None)
+        super().__init__()
 
 def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""

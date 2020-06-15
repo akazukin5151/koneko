@@ -30,17 +30,19 @@ def handle_missing_pics():
 
     os.system('clear')
 
+def handle_cli():
+    # no cli arguments, prompt user for mode selection
+    if len(sys.argv) <= 1:
+        return True, '', ''
+
+    main_command, user_input = cli.process_cli_args()
+    if main_command == 'vh':
+        sys.exit(0)
+    return False, main_command, user_input
+
 def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
-    if len(sys.argv) <= 1:
-        # no cli arguments, prompt user for mode selection
-        prompted = True
-        main_command, user_input =  '', ''
-    else:
-        prompted = False
-        main_command, user_input = cli.process_cli_args()
-        if main_command == 'vh':
-            sys.exit(0)
+    prompted, main_command, user_input = handle_cli()
 
     os.system('clear')
     credentials, your_id = config.begin_config()

@@ -12,6 +12,31 @@ from koneko import lscat
 TERM = Terminal()
 
 
+@safe
+def get_config_section(section: str) -> 'Result[config]':
+    config_object = ConfigParser()
+    config_path = Path('~/.config/koneko/config.ini').expanduser()
+    config_object.read(config_path)
+    section = config_object[section]
+    return section
+
+def get_settings(section: str, setting: str) -> 'Result[str]':
+    cfgsection: 'Result[config]' = get_config_section(section)
+    return cfgsection.map(m.get(setting, ''))
+
+@safe
+def _check_print_info() -> 'Result[bool]':
+    """Returns either Success(True), Success(False) or Failure.
+    Inner boolean represents whether to print columns or not
+    Failure represents no key/setting/config found
+    """
+    section = get_config_section('misc')
+    return section.map(m.getboolean('print_info', fallback=True)).value_or(True)
+
+def check_print_info() -> 'bool':
+    """For a Failure (setting not found), return True by default"""
+    return _check_print_info().value_or(True)
+
 def _width_paddingx() -> int:
     settings = get_config_section('lscat')
     return (
@@ -62,57 +87,42 @@ def begin_config() -> ('config', str):
     config_object = ConfigParser()
     if config_path.exists():
         return credentials_from_config(config_object, config_path)
+    return init_config(config_object, config_path)
 
+
+def init_config(config_object, config_path):
+    config_object = _ask_credentials(config_object)
+    config_object, your_id = _ask_your_id(config_object)
+    _write_config(config_object, config_path)
+    _append_default_config(config_path)
+    return config_object['Credentials'], your_id
+
+def _ask_credentials(config_object):
     username = input('Please enter your username:\n')
     print('\nPlease enter your password:')
     password = getpass()
     config_object['Credentials'] = {'Username': username, 'Password': password}
+    return config_object
 
+def _ask_your_id(config_object):
     print('\nDo you want to save your pixiv ID? It will be more convenient')
     print('to view artists you are following')
     ans = input()
     if ans == 'y' or not ans:
         your_id = input('Please enter your pixiv ID:\n')
         config_object['Credentials'].update({'ID': your_id})
-    else:
-        your_id = ''
+        return config_object, your_id
+    return config_object, ''
 
+def _write_config(config_object, config_path):
     os.system('clear')
-
     config_path.parent.mkdir(exist_ok=True)
     config_path.touch()
     with open(config_path, 'w') as c:
         config_object.write(c)
 
-    # Append the default settings to the config file
+def _append_default_config(config_path):
     # Why not use python? Because it's functional, readable, and
     # this one liner defeats any potential speed benefits
     example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()
     os.system(f'tail {example_cfg} -n +9 >> {config_path}')
-
-    return config_object['Credentials'], your_id
-
-@safe
-def get_config_section(section: str) -> 'Result[config]':
-    config_object = ConfigParser()
-    config_path = Path('~/.config/koneko/config.ini').expanduser()
-    config_object.read(config_path)
-    section = config_object[section]
-    return section
-
-def get_settings(section: str, setting: str) -> 'Result[str]':
-    cfgsection: 'Result[config]' = get_config_section(section)
-    return cfgsection.map(m.get(setting, ''))
-
-@safe
-def _check_print_info() -> 'Result[bool]':
-    """Returns either Success(True), Success(False) or Failure.
-    Inner boolean represents whether to print columns or not
-    Failure represents no key/setting/config found
-    """
-    section = get_config_section('misc')
-    return section.map(m.getboolean('print_info', fallback=True)).value_or(True)
-
-def check_print_info() -> 'bool':
-    """For a Failure (setting not found), return True by default"""
-    return _check_print_info().value_or(True)

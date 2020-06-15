@@ -103,8 +103,9 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 # Roadmap
 
 * In-depth usage documentation?
-* Respect public and private methods and attributes again
+* Consistent public and private methods and attributes again (only show public ones in puml)
 * Functional way of doing ui.py?
+* Make tests more professional
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features

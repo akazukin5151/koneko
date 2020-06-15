@@ -38,6 +38,12 @@ abstract class ui.AbstractUI <<(A, red)>>{
 }
 
 abstract class ui.AbstractGallery <<(A, red)>>{
+    -data_class()
+    -tracker()
+    -show_instant()
+    -action_before_prefetch()
+    -print_page_info()
+    ..New..
     +view_image()
     -_back()
     +{abstract}handle_prompt()
@@ -104,6 +110,12 @@ class ui.SearchUsers <<(C, cyan)>> {
     -_pixivrequest()
 }
 abstract class ui.AbstractUsers <<(A, red)>>{
+    -data_class()
+    -tracker()
+    -show_instant()
+    -action_before_prefetch()
+    -print_page_info()
+    ..New..
     +go_artist_mode()
 }
 ui.AbstractUI <|-up- ui.AbstractUsers

@@ -179,6 +179,7 @@ class AbstractGallery(AbstractUI, ABC):
         pure.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.page_num}')
 
+    # Unique for Galleries
     @abstractmethod
     def handle_prompt(self, keyseqs: 'list[str]'):
         """Abstractmethod for gallery classes: Gallery prompt accepts more
@@ -194,7 +195,6 @@ class AbstractGallery(AbstractUI, ABC):
         """
         raise NotImplementedError
 
-    # Unique for Galleries
     def view_image(self, selected_image_num):
         """Go to image mode"""
         post_json = self.data.post_json(selected_image_num)

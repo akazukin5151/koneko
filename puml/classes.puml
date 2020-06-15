@@ -1,6 +1,6 @@
 @startuml
 
-title main.py
+title koneko
 
 abstract class main.AbstractLoop <<(A, red)>>{
   +start()
@@ -20,14 +20,17 @@ main.AbstractLoop <-up- main.ArtistModeLoop
 main.AbstractLoop <-up[hidden]- illust_follow_mode_loop
 
 abstract class ui.AbstractUI <<(A, red)>>{
-    + {abstract} data
-    + {abstract} download_function
-    +{abstract}data_class()
-    +{abstract}tracker()
-    +{abstract}show_instant()
-    +{abstract}pixivrequest()
-    +{abstract}action_before_prefetch()
-    +{abstract}print_page_info()
+    ..Required attributes..
+    - {abstract} data
+    - {abstract} download_function
+    --
+    -{abstract}data_class()
+    -{abstract}tracker()
+    -{abstract}show_instant()
+    -{abstract}pixivrequest()
+    -{abstract}action_before_prefetch()
+    -{abstract}print_page_info()
+    ..Behaviour..
     +start()
     +next_page()
     +preview_page()
@@ -43,10 +46,11 @@ abstract class ui.AbstractGallery <<(A, red)>>{
 ui.AbstractUI <|-up- ui.AbstractGallery
 
 class ui.ArtistGallery <<(C, cyan)>>{
-    +pixivrequest()
+    - _artist_user_id
+    -_pixivrequest()
 }
 class ui.IllustFollowGallery <<(C, cyan)>>{
-    +pixivrequest()
+    -_pixivrequest()
     +go_artist_gallery_coords()
     +go_artist_gallery_num()
 }
@@ -92,12 +96,12 @@ main.AbstractLoop <-up- main.SearchUsersModeLoop
 
 class ui.FollowingUsers <<(C, cyan)>> {
     - user
-    +pixivrequest()
+    -_pixivrequest()
 }
 class ui.SearchUsers <<(C, cyan)>> {
     - publicity
     - your_id
-    +pixivrequest()
+    -_pixivrequest()
 }
 abstract class ui.AbstractUsers <<(A, red)>>{
     +go_artist_mode()
@@ -110,18 +114,18 @@ main.SearchUsersModeLoop*-down- ui.SearchUsers
 
 
 abstract class lscat.AbstractTracker <<(A, red)>>{
-    + {abstract} orders
-    + {abstract} generator
+    - {abstract} orders
+    - {abstract} generator
     +update()
     -_inspect()
 }
 class lscat.TrackDownloads {
-    + orders
-    + generator
+    - orders
+    - generator
 }
 class lscat.TrackDownloadsUser {
-    + orders
-    + generator
+    - orders
+    - generator
 }
 
 lscat.AbstractTracker <- lscat.TrackDownloadsUser
@@ -201,13 +205,14 @@ data.UserJson *-up-- ui.AbstractUsers
 
 
 class api.APIHandler << (S,#FF7700) Singleton >> {
+    ..Initial login..
     + api
-    + api_queue
-    + api_thread
+    - api_queue
+    - api_thread
     + credentials
     +start()
     +await_login()
-    ..
+    ..Requests..
     +artist_gallery()
     +protected_illust_detail()
     +following_user_request()

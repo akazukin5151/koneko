@@ -128,6 +128,8 @@ def image_prompt(image):
         'n': image.next_image,
         'p': image.previous_image,
         'f': image.show_full_res,
+        'h': _image_help,
+        'q': ask_quit
     }
 
     keyseqs = []
@@ -152,21 +154,6 @@ def image_prompt(image):
             elif image_prompt_command == 'm':
                 print(image.__doc__)
 
-            elif image_prompt_command == 'h':
-                print(''.join([
-                    colors.b, 'ack; ',
-                    colors.n, 'ext image; ',
-                    colors.p, 'revious image; ',
-                    colors.d_, 'ownload image;',
-                    colors.o_, 'pen image in browser;\n',
-                    'show image in', colors.f, 'ull res; ',
-                    colors.q, 'uit (with confirmation); ',
-                    'view ', colors.m, 'anual\n'
-                ]))
-
-            elif image_prompt_command == 'q':
-                ask_quit()
-
             elif image_prompt_command == 'b':
                 return image.leave(False)
 
@@ -181,21 +168,40 @@ def image_prompt(image):
                 ui.jump_to_image(image.data, utils.seq_to_int(keyseqs))
                 keyseqs = []
 
+def _image_help():
+    print(''.join([
+        colors.b, 'ack; ',
+        colors.n, 'ext image; ',
+        colors.p, 'revious image; ',
+        colors.d_, 'ownload image;',
+        colors.o_, 'pen image in browser;\n',
+        'show image in', colors.f, 'ull res; ',
+        colors.q, 'uit (with confirmation); ',
+        'view ', colors.m, 'anual\n'
+    ]))
+
 def user_prompt(user):
     """Handles key presses for user views (following users and user search)"""
+    case = {
+        'p': user.previous_page,
+        'h': _user_help,
+        'q': ask_quit
+    }
     keyseqs = []
     with TERM.cbreak():
         while True:
             print('Enter a user view command:')
             user_prompt_command = TERM.inkey()
 
-            if user_prompt_command == 'n':
+            # Simplify if-else chain with case-switch
+            func = case.get(user_prompt_command, None)
+            if func:
+                func()
+
+            elif user_prompt_command == 'n':
                 user.next_page()
                 # Prevents catching "n" and messing up the cache
                 time.sleep(0.5)
-
-            elif user_prompt_command == 'p':
-                user.previous_page()
 
             elif user_prompt_command == 'r':
                 return user.reload()
@@ -205,21 +211,8 @@ def user_prompt(user):
                 keyseqs.append(user_prompt_command)
                 print(keyseqs)
 
-            elif user_prompt_command == 'q':
-                ask_quit()
-
             elif user_prompt_command == 'm':
                 print(ui.AbstractUsers.__doc__)
-
-            elif user_prompt_command == 'h':
-                print(''.join([
-                    'view ', colors.BLUE_N, "th artist's illusts ",
-                    colors.n, 'ext page; ',
-                    colors.p, 'revious page; ',
-                    colors.r, 'eload and re-download all;\n',
-                    colors.q, 'uit (with confirmation);',
-                    'view ', colors.m, 'anual\n'
-                ]))
 
             elif user_prompt_command:
                 print('Invalid command! Press h to show help')
@@ -229,3 +222,13 @@ def user_prompt(user):
             # Two digit sequence -- view artist given number
             if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
                 return user.go_artist_mode(utils.seq_to_int(keyseqs))
+
+def _user_help():
+    print(''.join([
+        'view ', colors.BLUE_N, "th artist's illusts ",
+        colors.n, 'ext page; ',
+        colors.p, 'revious page; ',
+        colors.r, 'eload and re-download all;\n',
+        colors.q, 'uit (with confirmation);',
+        'view ', colors.m, 'anual\n'
+    ]))

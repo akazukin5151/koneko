@@ -103,6 +103,10 @@ class UserJson:
         self.page_num = page_num
         self.main_path = main_path
         self.offset = 0
+        # Defined in update()
+        self.next_url: str
+        self.profile_pic_urls: 'list[str]'
+        self.image_urls: 'list[str]'
 
         self.ids_cache, self.names_cache = {}, {}
 

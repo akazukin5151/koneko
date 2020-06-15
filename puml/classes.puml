@@ -3,19 +3,21 @@
 title main.py
 
 abstract class main.AbstractLoop <<(A, red)>>{
-  +{abstract}start()
+  +start()
+  -{abstract}_prompt_url_or_id()
+  -_process_url_or_input()
+  -_validate_input()
+  -{abstract}_go_to_mode()
 }
 
 class main.ArtistModeLoop {
-    + mode
-    +start()
 }
 package main {
     object illust_follow_mode_loop
 }
 
-main.AbstractLoop <|-down- main.ArtistModeLoop
-main.AbstractLoop <|-down[hidden]- illust_follow_mode_loop
+main.AbstractLoop <-up- main.ArtistModeLoop
+main.AbstractLoop <-up[hidden]- illust_follow_mode_loop
 
 abstract class ui.AbstractUI <<(A, red)>>{
     + {abstract} data
@@ -34,20 +36,19 @@ abstract class ui.AbstractUI <<(A, red)>>{
 
 abstract class ui.AbstractGallery <<(A, red)>>{
     +view_image()
+    -_back()
     +{abstract}handle_prompt()
     +{abstract}{static}help()
 }
-ui.AbstractUI <-down- ui.AbstractGallery
+ui.AbstractUI <|-up- ui.AbstractGallery
 
 class ui.ArtistGallery <<(C, cyan)>>{
-    +handle_prompt()
-    +{static}help()
+    +pixivrequest()
 }
 class ui.IllustFollowGallery <<(C, cyan)>>{
+    +pixivrequest()
     +go_artist_gallery_coords()
     +go_artist_gallery_num()
-    +handle_prompt()
-    +{static}help()
 }
 main.ArtistModeLoop*-down- ui.ArtistGallery
 
@@ -58,8 +59,7 @@ ui.AbstractGallery <-down- ui.IllustFollowGallery
 ui.AbstractGallery <-down- ui.ArtistGallery
 
 class main.ViewPostModeLoop {
-    + mode
-    +start()
+    -_process_url_or_input()
 }
 package ui {
     object view_post_mode
@@ -70,10 +70,12 @@ class ui.Image <<(C, cyan)>>{
     + open_image()
     + next_image()
     + previous_image()
+    + show_full_res()
+    + jump_to_page()
     + leave()
 }
 
-main.AbstractLoop <|-down- main.ViewPostModeLoop
+main.AbstractLoop <-up- main.ViewPostModeLoop
 main.ViewPostModeLoop ..> view_post_mode
 view_post_mode ..> ui.Image
 display_image ..> ui.Image
@@ -81,22 +83,26 @@ display_image <.. ui.AbstractGallery
 
 
 class main.FollowingUsersModeLoop {
-    + mode
-    +start()
+    -_process_url_or_input()
+    -_validate_input()
 }
-class main.SearchUsersModeLoop {
-    + mode
-    +start()
-}
-main.AbstractLoop <|-down- main.FollowingUsersModeLoop
-main.AbstractLoop <|-down- main.SearchUsersModeLoop
+class main.SearchUsersModeLoop
+main.AbstractLoop <-up- main.FollowingUsersModeLoop
+main.AbstractLoop <-up- main.SearchUsersModeLoop
 
-class ui.FollowingUsers <<(C, cyan)>>
-class ui.SearchUsers <<(C, cyan)>>
+class ui.FollowingUsers <<(C, cyan)>> {
+    - user
+    +pixivrequest()
+}
+class ui.SearchUsers <<(C, cyan)>> {
+    - publicity
+    - your_id
+    +pixivrequest()
+}
 abstract class ui.AbstractUsers <<(A, red)>>{
     +go_artist_mode()
 }
-ui.AbstractUI <-down- ui.AbstractUsers
+ui.AbstractUI <|-up- ui.AbstractUsers
 ui.AbstractUsers <-down- ui.FollowingUsers
 ui.AbstractUsers <-down- ui.SearchUsers
 main.FollowingUsersModeLoop*-down- ui.FollowingUsers
@@ -104,7 +110,10 @@ main.SearchUsersModeLoop*-down- ui.SearchUsers
 
 
 abstract class lscat.AbstractTracker <<(A, red)>>{
+    + {abstract} orders
+    + {abstract} generator
     +update()
+    -_inspect()
 }
 class lscat.TrackDownloads {
     + orders
@@ -141,10 +150,11 @@ package prompt {
 
 
 class data.GalleryJson {
+    + page_num
+    + main_path
     + all_pages_cache
-    + current_page_num
+    + offset
     + current_illusts
-    + cached_pages
     + next_url
     + download_path
     + first_img
@@ -152,35 +162,36 @@ class data.GalleryJson {
     +post_json()
     +artist_user_id()
     +image_id()
+    +url()
 }
 class data.ImageJson {
-    + url
-    + filename
+    + image_id
     + artist_illust_id
     + page_num
-    + number_of_pages
     + page_urls
-    + large_dir
-    + downloaded_images
-    +image_filename()
-    +filepath()
-    +next_img_url()
-    +current_url()
+    + number_of_pages
+    + download_path
+    + image_filename
+    + filepath
+    + next_img_url
+    + current_url
 }
 class data.UserJson {
     + page_num
+    + main_path
+    + offset
     + ids_cache
     + names_cache
     + download_path
-    + names
     + all_urls
+    + names
     + all_names
     + splitpoint
     + first_img
-    +update()
     + next_url
     + profile_pic_urls
     + image_urls
+    +update()
     +artist_user_id()
 }
 
@@ -189,13 +200,14 @@ data.ImageJson *-up-- ui.Image
 data.UserJson *-up-- ui.AbstractUsers
 
 
-class api.APIHandler {
+class api.APIHandler << (S,#FF7700) Singleton >> {
+    + api
     + api_queue
     + api_thread
-    + api
+    + credentials
     +start()
     +await_login()
-    +parse_next()
+    ..
     +artist_gallery()
     +protected_illust_detail()
     +following_user_request()

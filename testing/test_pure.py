@@ -66,11 +66,10 @@ def test_medium_urls():
 
 
 def test_page_urls_in_post():
-    assert len(pure.page_urls_in_post(page_illusts[14], size="medium")) == 2
-    assert pure.page_urls_in_post(page_illusts[14], size="medium")[0] == 8
-    assert len(pure.page_urls_in_post(page_illusts[14], size="medium")[1]) == 8
-    assert pure.page_urls_in_post(page_illusts[0], size="medium")[0] == 1
-    assert len(pure.page_urls_in_post(page_illusts[0], size="medium")[1]) == 1
+    assert pure.page_urls_in_post(page_illusts[14], size="medium") == ['https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p1_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p2_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p3_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p4_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p5_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p6_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p7_master1200.jpg']
+    assert len(pure.page_urls_in_post(page_illusts[14], size="medium")) == 8
+    assert pure.page_urls_in_post(page_illusts[0], size="medium") == ['https://i.pximg.net/c/540x540_70/img-master/img/2020/03/10/04/07/08/80017594_p0_master1200.jpg']
+    assert len(pure.page_urls_in_post(page_illusts[0], size="medium")) == 1
 
 
 def test_post_titles_in_page():

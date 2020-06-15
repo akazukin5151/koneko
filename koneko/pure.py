@@ -67,17 +67,15 @@ def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
     return titles
 
 
-def page_urls_in_post(post_json: 'Json', size='medium') -> (int, 'list[str]'):
+def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':
     """Get the number of pages and each of their urls in a multi-image post."""
     number_of_pages = post_json['page_count']
     if number_of_pages > 1:
         list_of_pages = post_json['meta_pages']
-        page_urls = [url_given_size(list_of_pages[i], size)
-                     for i in range(number_of_pages)]
+        return [url_given_size(list_of_pages[i], size)
+                for i in range(number_of_pages)]
     else:
-        page_urls = [url_given_size(post_json, size)]
-
-    return number_of_pages, page_urls
+        return [url_given_size(post_json, size)]
 
 
 def change_url_to_full(url: str, png=False) -> str:

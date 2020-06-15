@@ -72,10 +72,12 @@ class ImageJson:
         self.artist_user_id = raw['user']['id']
         self.page_num = 0
 
-        self.number_of_pages, self.page_urls = pure.page_urls_in_post(raw, 'large')
+        # These are assigned here not as a method, as raw won't be updated
+        self.page_urls = pure.page_urls_in_post(raw, 'large')
+        self.number_of_pages = len(self.page_urls)
         self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
+        # Store multi image posts within their own dir
         if self.number_of_pages != 1:
-            # Store multi image posts within their own dir
             self.download_path = self.download_path / str(image_id)
 
     @property

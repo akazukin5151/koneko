@@ -5,6 +5,7 @@ from configparser import ConfigParser
 
 from blessed import Terminal
 from returns.result import safe
+from returns.pipeline import flow
 from placeholder import m
 
 from koneko import lscat
@@ -76,7 +77,7 @@ def get_gen_users_settings():
     )
 
 
-def credentials_from_config(config_object, config_path):
+def credentials_from_config(config_object, config_path) -> ('config', str):
     config_object.read(config_path)
     credentials = config_object['Credentials']
     your_id = credentials.get('ID', '')
@@ -90,21 +91,25 @@ def begin_config() -> ('config', str):
     return init_config(config_object, config_path)
 
 
-def init_config(config_object, config_path):
-    config_object = _ask_credentials(config_object)
-    config_object, your_id = _ask_your_id(config_object)
+def init_config(config_object, config_path) -> ('config', str):
+    # Identical to `_ask_your_id(_ask_credentials(config_object))`
+    config_object, your_id = flow(
+        config_object,
+        _ask_credentials,
+        _ask_your_id
+    )
     _write_config(config_object, config_path)
     _append_default_config(config_path)
     return config_object['Credentials'], your_id
 
-def _ask_credentials(config_object):
+def _ask_credentials(config_object) -> 'config':
     username = input('Please enter your username:\n')
     print('\nPlease enter your password:')
     password = getpass()
     config_object['Credentials'] = {'Username': username, 'Password': password}
     return config_object
 
-def _ask_your_id(config_object):
+def _ask_your_id(config_object) -> ('config', str):
     print('\nDo you want to save your pixiv ID? It will be more convenient')
     print('to view artists you are following')
     ans = input()
@@ -114,14 +119,14 @@ def _ask_your_id(config_object):
         return config_object, your_id
     return config_object, ''
 
-def _write_config(config_object, config_path):
+def _write_config(config_object, config_path) -> None:
     os.system('clear')
     config_path.parent.mkdir(exist_ok=True)
     config_path.touch()
     with open(config_path, 'w') as c:
         config_object.write(c)
 
-def _append_default_config(config_path):
+def _append_default_config(config_path) -> None:
     # Why not use python? Because it's functional, readable, and
     # this one liner defeats any potential speed benefits
     example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()

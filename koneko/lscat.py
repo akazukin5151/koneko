@@ -58,12 +58,10 @@ def show_instant(cls, data, gallerymode=False):
 
 
 class AbstractTracker(ABC):
-    def __init__(self, data):
-        self.path = data.download_path
+    def __init__(self):
         self._downloaded: 'list[str]' = []
         self._numlist: 'list[int]' = []
         self._lock = threading.Lock()
-        self._counter = 0
         self.orders: 'list[int]'
         self.generator: 'generator[str]'
 
@@ -83,9 +81,7 @@ class AbstractTracker(ABC):
         so the valid order is:
         0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
         """
-        # (for function rather than method:) instead of incrementing counter,
-        # pass in a smaller and smaller slice of self.orders
-        next_num = self.orders[self._counter]
+        next_num = self.orders[0]
 
         if next_num in self._numlist:
             pic = self._downloaded[self._numlist.index(next_num)]
@@ -94,7 +90,7 @@ class AbstractTracker(ABC):
                 os.system('clear')
             self.generator.send(pic)
 
-            self._counter += 1
+            self.orders = self.orders[1:]
             self._downloaded.remove(pic)
             self._numlist.remove(next_num)
             if self._downloaded:
@@ -103,7 +99,7 @@ class AbstractTracker(ABC):
 class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
     def __init__(self, data):
-        super().__init__(data)
+        super().__init__()
         self.orders = list(range(30))
         self.generator = generate_page(data.download_path)
         self.generator.send(None)
@@ -116,7 +112,7 @@ def read_invis(data):
 class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
-        super().__init__(data)
+        super().__init__()
         print_info = config.check_print_info()
 
         try:

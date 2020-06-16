@@ -2,6 +2,7 @@
 Functionally pure, no side effects (but stores state)
 """
 from placeholder import _
+from pipey import Pipeable as P
 
 from koneko import KONEKODIR, pure
 
@@ -130,11 +131,16 @@ class UserJson:
             page >> pure.Map(_['user']['profile_image_urls']['medium'])
         )
 
+        # [page[i]['illusts'][j]['image_urls']['square_medium']
+        #  for i in range(len(page))
+        #  for j in range(len(page[i]['illusts']))]
+        # where post == page[i] and illust == page[i]['illusts'][j]
         # max(i) == number of artists on this page
         # max(j) == 3 == 3 previews for every artist
-        self.image_urls = [page[i]['illusts'][j]['image_urls']['square_medium']
-                           for i in range(len(page))
-                           for j in range(len(page[i]['illusts']))]
+        self.image_urls = [illust['image_urls']['square_medium']
+                           for post in page
+                           for illust in post['illusts']]
+
 
     def artist_user_id(self, selected_user_num: int) -> str:
         return self.ids_cache[self.page_num][selected_user_num]

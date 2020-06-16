@@ -1,6 +1,8 @@
 """Stores json data from the api. Acts as frontend to access data in a single line.
 Functionally pure, no side effects (but stores state)
 """
+from placeholder import _
+
 from koneko import KONEKODIR, pure
 
 
@@ -118,13 +120,15 @@ class UserJson:
         self.next_url = raw['next_url']
         page = raw['user_previews']
 
-        ids = list(map(self._user_id, page))
+        ids = page >> pure.Map(_['user']['id'])
         self.ids_cache.update({self.page_num: ids})
 
-        names = list(map(self._user_name, page))
+        names = page >> pure.Map(_['user']['name'])
         self.names_cache.update({self.page_num: names})
 
-        self.profile_pic_urls = list(map(self._user_profile_pic, page))
+        self.profile_pic_urls = (
+            page >> pure.Map(_['user']['profile_image_urls']['medium'])
+        )
 
         # max(i) == number of artists on this page
         # max(j) == 3 == 3 previews for every artist

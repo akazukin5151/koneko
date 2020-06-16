@@ -4,6 +4,8 @@ from pathlib import Path
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
+from pipey import Pipeable as P
+
 from koneko import api, pure, utils
 
 
@@ -26,10 +28,15 @@ def async_download_core(download_path, urls, rename_images=False,
     """
     os.makedirs(download_path, exist_ok=True)
 
-    oldnames = list(map(pure.split_backslash_last, urls))
+    oldnames = urls >> pure.Map(pure.split_backslash_last)
     if rename_images:
-        newnames = map(pure.prefix_filename, oldnames, file_names, range(len(urls)))
-        newnames = list(newnames)
+        newnames = (
+            urls
+            >> P(len)
+            >> P(range)
+            >> P(lambda r: map(pure.prefix_filename, oldnames, file_names, r))
+            >> P(list)
+        )
     else:
         newnames = oldnames
 

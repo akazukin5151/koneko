@@ -1,4 +1,5 @@
 """Export the colors for [h]elp screen keys"""
+from pipey import Pipeable as P
 
 RED = '\x1b[31m'
 MAGENTA = '\x1b[35m'
@@ -37,12 +38,15 @@ _tlc = ['a', 'o', 'd']
 _COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
                   'y', RED, '}', RESET])
 
+# Duplicated from pure because circular import
+_Map = P(lambda iterable, func: list(map(func, iterable)))
+
 # Public
-n, p, r, q, m, b, o_, d_, f = list(map(_letter, _letters))
+n, p, r, q, m, b, o_, d_, f = _letters >> _Map(_letter)
 
 i = _letter_with_coords('i')
 
-a, o, d = list(map(_two_letter_with_coords, _tlc))
+a, o, d = _tlc >> _Map(_two_letter_with_coords)
 
 # For galleries
 base1 = [

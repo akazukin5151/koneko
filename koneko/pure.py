@@ -9,9 +9,13 @@ from functools import partial
 from pathlib import Path
 
 import funcy
+from placeholder import _
+from pipey import Pipeable as P
 
 from koneko import colors as c
 
+
+Map = P(lambda iterable, func: list(map(func, iterable)))
 
 def split_backslash_last(string: str) -> str:
     """Intended for splitting url to get filename, but it has lots of applications..."""
@@ -56,15 +60,16 @@ def post_title(current_page_illusts: 'Json', post_number: int) -> str:
 
 
 def medium_urls(current_page_illusts: 'Json') -> 'list[str]':
-    get_medium_url = partial(url_given_size, size='square_medium')
-    urls = list(map(get_medium_url, current_page_illusts))
-    return urls
+    return current_page_illusts >> Map(url_given_size(_, size='square_medium'))
 
 
 def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
-    post_titles = partial(post_title, current_page_illusts)
-    titles = list(map(post_titles, range(len(current_page_illusts))))
-    return titles
+    return (
+        current_page_illusts
+        >> P(len)
+        >> P(range)
+        >> Map(lambda r: post_title(current_page_illusts, r))
+    )
 
 
 def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':

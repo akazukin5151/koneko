@@ -5,8 +5,8 @@ from configparser import ConfigParser
 
 from blessed import Terminal
 from returns.result import safe
-from returns.pipeline import flow
 from placeholder import m
+from pipey import Pipeable as P
 
 from koneko import lscat
 
@@ -45,31 +45,31 @@ def _width_paddingx() -> int:
         settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
     )
 
-def ncols_config():
+def ncols_config() -> 'list[int]':
     return lscat.ncols(TERM.width, *_width_paddingx())
 
-def xcoords_config(offset=0):
+def xcoords_config(offset=0) -> 'list[int]':
     return lscat.xcoords(TERM.width, *_width_paddingx(), offset)
 
-def ycoords_config():
+def ycoords_config() -> 'list[int]':
     settings = get_config_section('lscat')
     img_height = settings.map(m.getint('image_height', fallback=8)).value_or(8)
     paddingy = settings.map(m.getint('images_y_spacing', fallback=1)).value_or(1)
     return lscat.ycoords(TERM.height, img_height, paddingy)
 
-def gallery_page_spacing_config():
+def gallery_page_spacing_config() -> int:
     settings = get_config_section('lscat')
     return settings.map(m.getint('gallery_page_spacing', fallback=23)).value_or(23)
 
-def users_page_spacing_config():
+def users_page_spacing_config() -> int:
     settings = get_config_section('lscat')
     return settings.map(m.getint('users_page_spacing', fallback=20)).value_or(20)
 
-def thumbnail_size_config():
+def thumbnail_size_config() -> int:
     settings = get_config_section('lscat')
     return settings.map(m.getint('image_thumbnail_size', fallback=310)).value_or(310)
 
-def get_gen_users_settings():
+def get_gen_users_settings() -> (int, int):
     settings = get_config_section('lscat')
     return (
         settings.map(m.getint('users_print_name_xcoord', fallback=18)).value_or(18),
@@ -93,11 +93,10 @@ def begin_config() -> ('config', str):
 
 def init_config(config_object, config_path) -> ('config', str):
     # Identical to `_ask_your_id(_ask_credentials(config_object))`
-    config_object, your_id = flow(
-        config_object,
-        _ask_credentials,
-        _ask_your_id
-    )
+    config_object, your_id = (config_object
+                              >> P(_ask_credentials)
+                              >> P(_ask_your_id))
+
     _write_config(config_object, config_path)
     _append_default_config(config_path)
     return config_object['Credentials'], your_id

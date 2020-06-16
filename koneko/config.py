@@ -38,14 +38,14 @@ def check_print_info() -> 'bool':
     """For a Failure (setting not found), return True by default"""
     return _check_print_info().value_or(True)
 
-def _width_paddingx() -> int:
+def _width_paddingx() -> (int, int):
     settings = get_config_section('lscat')
     return (
         settings.map(m.getint('image_width', fallback=18)).value_or(18),
         settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
     )
 
-def ncols_config() -> 'list[int]':
+def ncols_config() -> 'int':
     return lscat.ncols(TERM.width, *_width_paddingx())
 
 def xcoords_config(offset=0) -> 'list[int]':

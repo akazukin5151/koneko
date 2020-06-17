@@ -78,8 +78,7 @@ def get_gen_users_settings() -> (int, int):
 
 
 def credentials_from_config(config_object, config_path) -> ('config', str):
-    config_object.read(config_path)
-    credentials = config_object['Credentials']
+    credentials = get_config_section('Credentials').unwrap()
     your_id = credentials.get('ID', '')
     return credentials, your_id
 

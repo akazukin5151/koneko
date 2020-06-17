@@ -94,9 +94,9 @@ class AbstractTracker(ABC):
             self.generator.send(pic)
 
             self.orders = self.orders[1:]
+            self._downloaded.remove(pic)
+            self._numlist.remove(next_num)
             if self._downloaded:
-                self._downloaded.remove(pic)
-                self._numlist.remove(next_num)
                 self._inspect()
 
 class TrackDownloads(AbstractTracker):

@@ -2,7 +2,6 @@
 Functionally pure, no side effects (but stores state)
 """
 from placeholder import _
-from pipey import Pipeable as P
 
 from koneko import KONEKODIR, pure
 

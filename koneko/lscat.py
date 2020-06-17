@@ -1,4 +1,17 @@
-"""The default image renderer for koneko"""
+"""The default image renderer for koneko.
+
+1) The ui classes start the download with the appropriate tracker instance.
+   The tracker's update method acts as a callback upon a finished download
+2) After each image finishes downloading, the callback is triggered (`tracker.update()`)
+3) The `update()` method stores which images have finished downloading and their
+   respective number, but has not been displayed yet.
+4) On every callback, the `update()` method inspects the list against the given order.
+   If the next image to be shown is in the list, it is displayed.
+5) Immediately, remove the image from the lists and repeat the `_inspect()` method
+   for the next valid image. If there is one, repeat. If not, do nothing and wait for
+   more completed downloads
+"""
+
 import os
 import threading
 from abc import ABC
@@ -10,10 +23,10 @@ from returns.result import safe
 from koneko import utils, config
 
 
-def ncols(term_width, img_width, padding) -> int:
+def ncols(term_width: int, img_width: int, padding: int) -> int:
     return round(term_width / (img_width + padding))
 
-def xcoords(term_width, img_width=18, padding=2, offset=0) -> 'list[int]':
+def xcoords(term_width: int, img_width=18, padding=2, offset=0) -> 'list[int]':
     """Generates the x-coord for each column to pass into pixcat
     If img_width == 18 and 90 > term_width > 110, there will be five columns,
     with spaces of (2, 20, 38, 56, 74)
@@ -23,7 +36,7 @@ def xcoords(term_width, img_width=18, padding=2, offset=0) -> 'list[int]':
     return [col % number_of_columns * img_width + padding + offset
             for col in range(number_of_columns)]
 
-def ycoords(term_height, img_height=8, padding=1) -> 'list[int]':
+def ycoords(term_height: int, img_height=8, padding=1) -> 'list[int]':
     """Generates the y-coord for each row to pass into pixcat
     If img_height == 8 and 27 > term_height >= 18, there will be two rows,
     with spaces of (0, 9)
@@ -34,7 +47,7 @@ def ycoords(term_height, img_height=8, padding=1) -> 'list[int]':
             for row in range(number_of_rows)]
 
 
-def icat(args) -> 'IO':
+def icat(args: str) -> 'IO':
     os.system(f'kitty +kitten icat --silent {args}')
 
 def show_instant(cls, data, gallerymode=False) -> 'IO':
@@ -79,11 +92,9 @@ class AbstractTracker(ABC):
         self._inspect()
 
     def _inspect(self) -> 'IO':
-        """
-        images 0-29 are artist profile pics
-        images 30-119 are previews, 3 for each artist
-        so the valid order is:
-        0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
+        """Inspect the list of images that have finished downloading but not displayed
+        yet. According to the given orders list, if the next image to be displayed
+        is in the list, display it, then look for the next next image and repeat.
         """
         next_num = self.orders[0]
 
@@ -185,7 +196,7 @@ def generate_users(path, print_info=True):
                 i += 1
 
 def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
-    """
+    """Returns the order of images to be displayed
     images 0-29 are artist profile pics
     images 30-119 are previews, 3 for each artist
     so the valid order is:

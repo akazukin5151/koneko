@@ -88,9 +88,6 @@ class AbstractTracker(ABC):
 
         if next_num in self._numlist:
             pic = self._downloaded[self._numlist.index(next_num)]
-            # Display page
-            if next_num == 0:
-                os.system('clear')
             self.generator.send(pic)
 
             self.orders = self.orders[1:]
@@ -134,11 +131,10 @@ def generate_page(path):
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
-
-    # Does not catch if config doesn't exist, because it must exist
     page_spacing = config.gallery_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
 
+    os.system('clear')
     while True:
         # Release control. When _inspect() sends another image,
         # assign to the variables and display it again
@@ -158,12 +154,11 @@ def generate_page(path):
 
 def generate_users(path, print_info=True):
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
-    os.system('clear')
-
     message_xcoord, padding = config.get_gen_users_settings()
     page_spacing = config.users_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
 
+    os.system('clear')
     while True:
         # Wait for artist pic
         a_img = yield
@@ -171,8 +166,7 @@ def generate_users(path, print_info=True):
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
-        if print_info:
-            # Print the message (artist name)
+        if print_info:  # Print the message (artist name)
             print(' ' * message_xcoord, message)
         print('\n' * page_spacing)  # Scroll to new 'page'
 

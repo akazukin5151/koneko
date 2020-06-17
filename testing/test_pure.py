@@ -2,13 +2,15 @@ import sys
 from pathlib import Path
 
 from koneko import pure
-from page_json import *  # Imports the current_page (dict) stored in disk
 
 # Lmao python
 sys.path.append('testing')
 
+# Imports the current_page (dict) stored in disk
+from page_json import *  # isort:skip
 
 page_illusts = page_json["illusts"]
+
 
 def test_split_backslash_last():
     assert (

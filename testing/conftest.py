@@ -2,8 +2,8 @@ import pytest
 
 
 @pytest.fixture()
-def turn_off_print(monkeypatch):
-    monkeypatch.setattr("builtins.print", lambda *a, **k: "")
+def send_enter(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda x: "")
 
 
 def pytest_addoption(parser):

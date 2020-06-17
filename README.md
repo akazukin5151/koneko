@@ -105,7 +105,6 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 * In-depth usage documentation?
 * Consistent public and private methods and attributes again (only show public ones in puml)
 * Functional way of doing ui.py?
-* Make tests more professional
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features
@@ -187,7 +186,7 @@ Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don
 ## Build and upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
 
-**Warning:** ~~you~~ *must* test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` (but now it's automated).
+Test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` is now automated.
 
 Bump version info in `__init__.py`, `setup.py`, and `README.md`
 

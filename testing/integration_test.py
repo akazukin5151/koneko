@@ -43,8 +43,7 @@ def test_mode2_cli(monkeypatch, set_config):
     cli_core(monkeypatch, ('2', 78823485), 'koneko.main.prompt.image_prompt')
 
 @pytest.mark.integration
-def test_mode3_cli(monkeypatch, set_config):
-    monkeypatch.setattr('builtins.input', lambda x: '')
+def test_mode3_cli(monkeypatch, set_config, send_enter):
     cli_core(monkeypatch, ('3', ''), 'koneko.main.prompt.user_prompt')
 
 @pytest.mark.integration

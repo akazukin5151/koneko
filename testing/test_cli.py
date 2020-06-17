@@ -2,9 +2,6 @@ import pytest
 
 from koneko import cli
 
-# No cli args
-# (No longer tested here, as main.py does not call cli if no args)
-
 def test_mode1_link_only(monkeypatch):
     monkeypatch.setattr('koneko.cli.sys.argv',
                         (['koneko', 'https://www.pixiv.net/en/users/2232374']))

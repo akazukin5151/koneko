@@ -13,7 +13,6 @@ from page_json import *  # isort:skip
 page_illusts = page_json["illusts"]
 
 
-# From data.py
 with open('testing/files/mode1.json', 'r') as json_file:
     mode1 = json.load(json_file)
 with open('testing/files/mode2.json', 'r') as json_file:

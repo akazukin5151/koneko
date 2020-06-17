@@ -47,12 +47,15 @@ def test_dir_not_empty():
     data = FakeData()
     assert utils.dir_not_empty(data)
 
-    # Dir exists but is empty
+    # Test dir exists but is empty
+    # If mkdir throws because file exists, just delete it and re-run
+    # In normal situations this dir will be deleted in line 63
+    # However, if any code in between fails, it will not be deleted
     Path('testing/files/empty_dir').mkdir()
     data.download_path = Path('testing/files/empty_dir')
     assert utils.dir_not_empty(data) is False
 
-    # .koneko in dir and first image in dir
+    # Test .koneko in dir and first image in dir
     os.system('touch testing/files/empty_dir/.koneko')
     os.system('cp testing/files/004_祝！！！.jpg testing/files/empty_dir/')
 
@@ -60,7 +63,7 @@ def test_dir_not_empty():
 
     os.system('rm -r testing/files/empty_dir')
 
-    # Throw some errors
+    # Test Throw some errors
     class FakeData:
         def __init__(self):
             self.download_path = Path('testing/files/')

@@ -13,7 +13,6 @@ from page_json import *  # isort:skip
 page_illusts = page_json["illusts"]
 
 
-# From data.py
 with open('testing/files/mode1.json', 'r') as json_file:
     mode1 = json.load(json_file)
 with open('testing/files/mode2.json', 'r') as json_file:
@@ -26,8 +25,8 @@ def test_gallery():
     gdata = data.GalleryJson(1, Path(f"{KONEKODIR}/2232374/"))
     assert gdata
     assert gdata.all_pages_cache == {}
-    assert gdata.current_page_num == 1
-    assert gdata._main_path == Path(f"{KONEKODIR}/2232374/")
+    assert gdata.page_num == 1
+    assert gdata.main_path == Path(f"{KONEKODIR}/2232374/")
 
     gdata.update(mode1)
     assert list(gdata.all_pages_cache.keys()) == ['1']
@@ -43,14 +42,12 @@ def test_gallery():
 
     assert gdata.image_id(0) == 81547984
 
-    assert list(gdata.cached_pages) == ["1"]
-
     assert gdata.next_url == "https://app-api.pixiv.net/v1/user/illusts?user_id=2232374&filter=for_ios&type=illust&offset=30"
 
     assert gdata.first_img == "みこっちゃん"
 
     assert gdata.page_num == 1
-    assert gdata.page_num == gdata.current_page_num
+    assert gdata.page_num == gdata.page_num
 
 
 def test_image():
@@ -72,13 +69,12 @@ def test_image():
 
 
 def test_user():
-    udata = data.UserJson(1, Path(f"{KONEKODIR}/following/"), "2232374")
+    udata = data.UserJson(1, Path(f"{KONEKODIR}/following/2232374"))
     assert udata
 
     udata.update(mode3)
     assert udata.page_num == 1
-    assert udata.main_path == Path(f"{KONEKODIR}/following/")
-    assert udata._input == "2232374"
+    assert udata.main_path == Path(f"{KONEKODIR}/following/2232374")
 
     assert udata.next_url == "https://app-api.pixiv.net/v1/user/following?user_id=2232374&restrict=private&offset=30"
     assert udata.ids_cache == {1: [219621, 1510169, 12612404, 8660134, 15063, 28245700, 33137265, 2702224, 24218478, 625051, 95391, 9427, 1193008, 1554775, 11103, 7309825, 5301174, 4316556, 10573236, 29362997, 809099, 82688, 15608555, 30803054, 18836733, 644670, 2397243, 14211481, 8092144, 8175661]}

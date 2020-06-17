@@ -1,6 +1,9 @@
 """Stores json data from the api. Acts as frontend to access data in a single line.
 Functionally pure, no side effects (but stores state)
 """
+from placeholder import _
+from pipey import Pipeable as P
+
 from koneko import KONEKODIR, pure
 
 
@@ -21,32 +24,29 @@ class GalleryJson:
             ...
         next_url                (next JSON url)         self.next_url
     """
-    def __init__(self, current_page_num: int, main_path: str):
-        self.current_page_num = current_page_num
-        self._main_path = main_path
+    def __init__(self, page_num: int, main_path: str):
+        self.page_num = page_num
+        self.main_path = main_path
         self.all_pages_cache = {}
+        self.offset = 0
 
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
-        self.all_pages_cache[str(self.current_page_num)] = raw
+        self.all_pages_cache[str(self.page_num)] = raw
 
     @property
     def current_illusts(self) -> 'Json':
         """Get the illusts json for this page"""
-        return self.all_pages_cache[str(self.current_page_num)]['illusts']
-
-    @property
-    def cached_pages(self) -> 'list[str]':
-        return self.all_pages_cache.keys()
+        return self.all_pages_cache[str(self.page_num)]['illusts']
 
     @property
     def next_url(self) -> str:
-        return self.all_pages_cache[str(self.current_page_num)]['next_url']
+        return self.all_pages_cache[str(self.page_num)]['next_url']
 
     @property
     def download_path(self) -> str:
         """Get the download path of the current page"""
-        return self._main_path / str(self.current_page_num)
+        return self.main_path / str(self.page_num)
 
     def post_json(self, post_number: int) -> 'Json':
         """Get the post json for a specified post number"""
@@ -64,11 +64,6 @@ class GalleryJson:
     def first_img(self) -> str:
         return pure.post_titles_in_page(self.current_illusts)[0]
 
-    @property
-    def page_num(self) -> int:
-        """Just a wrapper, for init_download"""
-        return self.current_page_num
-
     def url(self, number: int) -> str:
         return pure.url_given_size(self.post_json(number), 'large')
 
@@ -80,10 +75,12 @@ class ImageJson:
         self.artist_user_id = raw['user']['id']
         self.page_num = 0
 
-        self.number_of_pages, self.page_urls = pure.page_urls_in_post(raw, 'large')
+        # These are assigned here not as a method, as raw won't be updated
+        self.page_urls = pure.page_urls_in_post(raw, 'large')
+        self.number_of_pages = len(self.page_urls)
         self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
+        # Store multi image posts within their own dir
         if self.number_of_pages != 1:
-            # Store multi image posts within their own dir
             self.download_path = self.download_path / str(image_id)
 
     @property
@@ -105,35 +102,45 @@ class ImageJson:
 
 class UserJson:
     """Stores data for user views (modes 3 and 4)"""
-    def __init__(self, page_num: int, main_path: str, user_or_id: str):
+    def __init__(self, page_num: int, main_path: str):
         self.page_num = page_num
         self.main_path = main_path
-        self._input = user_or_id
         self.offset = 0
+        # Defined in update()
+        self.next_url: str
+        self.profile_pic_urls: 'list[str]'
+        self.image_urls: 'list[str]'
 
         self.ids_cache, self.names_cache = {}, {}
 
     @property
     def download_path(self) -> str:
-        return self.main_path / self._input / str(self.page_num)
+        return self.main_path / str(self.page_num)
 
     def update(self, raw: 'Json'):
         self.next_url = raw['next_url']
         page = raw['user_previews']
 
-        ids = list(map(self._user_id, page))
+        ids = page >> pure.Map(_['user']['id'])
         self.ids_cache.update({self.page_num: ids})
 
-        names = list(map(self._user_name, page))
+        names = page >> pure.Map(_['user']['name'])
         self.names_cache.update({self.page_num: names})
 
-        self.profile_pic_urls = list(map(self._user_profile_pic, page))
+        self.profile_pic_urls = (
+            page >> pure.Map(_['user']['profile_image_urls']['medium'])
+        )
 
+        # [page[i]['illusts'][j]['image_urls']['square_medium']
+        #  for i in range(len(page))
+        #  for j in range(len(page[i]['illusts']))]
+        # where post == page[i] and illust == page[i]['illusts'][j]
         # max(i) == number of artists on this page
         # max(j) == 3 == 3 previews for every artist
-        self.image_urls = [page[i]['illusts'][j]['image_urls']['square_medium']
-                           for i in range(len(page))
-                           for j in range(len(page[i]['illusts']))]
+        self.image_urls = [illust['image_urls']['square_medium']
+                           for post in page
+                           for illust in post['illusts']]
+
 
     def artist_user_id(self, selected_user_num: int) -> str:
         return self.ids_cache[self.page_num][selected_user_num]

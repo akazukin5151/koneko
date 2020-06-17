@@ -5,7 +5,7 @@ import time
 
 from blessed import Terminal
 
-from koneko import ui, pure, utils, colors, download
+from koneko import ui, utils, colors, download
 
 TERM = Terminal()
 
@@ -22,19 +22,20 @@ def ask_quit():
 
 
 def open_or_download(gallery, keyseqs: 'list[str]'):
+    letter = keyseqs[0]
     first_num, second_num = keyseqs[-2:]
-    if keyseqs[0] == 'o':
+    if letter == 'o':
         utils.open_link_coords(gallery.data, int(first_num), int(second_num))
 
-    elif keyseqs[0] == 'd':
+    elif letter == 'd':
         download.download_image_coords(gallery.data, int(first_num), int(second_num))
 
     selected_image_num = int(f'{first_num}{second_num}')
 
-    if keyseqs[0] == 'O':
+    if letter == 'O':
         utils.open_link_num(gallery.data, selected_image_num)
 
-    elif keyseqs[0] == 'D':
+    elif letter == 'D':
         download.download_image_num(gallery.data, selected_image_num)
 
 def goto_image(gallery, image_num: int):
@@ -68,7 +69,7 @@ def gallery_like_prompt(gallery):
                 gallery.next_page()
 
             elif gallery_command == 'p':
-                ui.previous_page(gallery.data)
+                gallery.previous_page()
 
             elif gallery_command == 'm':
                 print('')
@@ -81,7 +82,7 @@ def gallery_like_prompt(gallery):
             elif gallery_command.code == 361:  # Escape
                 keyseqs = []
                 # Remove entire line
-                print("\r", "\b \b" * 4, end='', flush=True)
+                print('\r', '\b \b' * 4, end='', flush=True)
 
             elif gallery_command == 'b':
                 return gallery.handle_prompt(['b'])
@@ -91,7 +92,7 @@ def gallery_like_prompt(gallery):
 
             elif gallery_command == 'q':
                 ask_quit()
-                print("Enter a gallery command:")
+                print('Enter a gallery command:')
 
             # Multi char sequence
             if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
@@ -127,6 +128,8 @@ def image_prompt(image):
         'n': image.next_image,
         'p': image.previous_image,
         'f': image.show_full_res,
+        'h': _image_help,
+        'q': ask_quit
     }
 
     keyseqs = []
@@ -151,21 +154,6 @@ def image_prompt(image):
             elif image_prompt_command == 'm':
                 print(image.__doc__)
 
-            elif image_prompt_command == 'h':
-                print(''.join([
-                    colors.b, 'ack; ',
-                    colors.n, 'ext image; ',
-                    colors.p, 'revious image; ',
-                    colors.d_, 'ownload image;',
-                    colors.o_, 'pen image in browser;\n',
-                    'show image in', colors.f, 'ull res; ',
-                    colors.q, 'uit (with confirmation); ',
-                    'view ', colors.m, 'anual\n'
-                ]))
-
-            elif image_prompt_command == 'q':
-                ask_quit()
-
             elif image_prompt_command == 'b':
                 return image.leave(False)
 
@@ -180,23 +168,40 @@ def image_prompt(image):
                 ui.jump_to_image(image.data, utils.seq_to_int(keyseqs))
                 keyseqs = []
 
+def _image_help():
+    print(''.join([
+        colors.b, 'ack; ',
+        colors.n, 'ext image; ',
+        colors.p, 'revious image; ',
+        colors.d_, 'ownload image;',
+        colors.o_, 'pen image in browser;\n',
+        'show image in', colors.f, 'ull res; ',
+        colors.q, 'uit (with confirmation); ',
+        'view ', colors.m, 'anual\n'
+    ]))
+
 def user_prompt(user):
-    """
-    Handles key presses for user views (following users and user search)
-    """
+    """Handles key presses for user views (following users and user search)"""
+    case = {
+        'p': user.previous_page,
+        'h': _user_help,
+        'q': ask_quit
+    }
     keyseqs = []
     with TERM.cbreak():
         while True:
             print('Enter a user view command:')
             user_prompt_command = TERM.inkey()
 
-            if user_prompt_command == 'n':
+            # Simplify if-else chain with case-switch
+            func = case.get(user_prompt_command, None)
+            if func:
+                func()
+
+            elif user_prompt_command == 'n':
                 user.next_page()
                 # Prevents catching "n" and messing up the cache
                 time.sleep(0.5)
-
-            elif user_prompt_command == 'p':
-                ui.previous_page_users(user.data)
 
             elif user_prompt_command == 'r':
                 return user.reload()
@@ -206,21 +211,8 @@ def user_prompt(user):
                 keyseqs.append(user_prompt_command)
                 print(keyseqs)
 
-            elif user_prompt_command == 'q':
-                ask_quit()
-
             elif user_prompt_command == 'm':
-                print(ui.Users.__doc__)
-
-            elif user_prompt_command == 'h':
-                print(''.join([
-                    "view ", colors.BLUE_N, "th artist's illusts ",
-                    colors.n, 'ext page; ',
-                    colors.p, 'revious page; ',
-                    colors.r, 'eload and re-download all;\n',
-                    colors.q, 'uit (with confirmation);',
-                    'view ', colors.m, 'anual\n'
-                ]))
+                print(ui.AbstractUsers.__doc__)
 
             elif user_prompt_command:
                 print('Invalid command! Press h to show help')
@@ -230,3 +222,13 @@ def user_prompt(user):
             # Two digit sequence -- view artist given number
             if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
                 return user.go_artist_mode(utils.seq_to_int(keyseqs))
+
+def _user_help():
+    print(''.join([
+        'view ', colors.BLUE_N, "th artist's illusts ",
+        colors.n, 'ext page; ',
+        colors.p, 'revious page; ',
+        colors.r, 'eload and re-download all;\n',
+        colors.q, 'uit (with confirmation);',
+        'view ', colors.m, 'anual\n'
+    ]))

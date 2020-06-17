@@ -5,103 +5,13 @@ from configparser import ConfigParser
 
 from blessed import Terminal
 from returns.result import safe
+from placeholder import m
+from pipey import Pipeable as P
 
 from koneko import lscat
 
 TERM = Terminal()
 
-
-def _width_paddingx() -> int:
-    settings = get_config_section('lscat')
-    return (
-        settings.map(lambda s: s.getint('image_width', fallback=18)).value_or(18),
-        settings.map(lambda s: s.getint('images_x_spacing', fallback=2)).value_or(2)
-    )
-
-def ncols_config():
-    return lscat.ncols(TERM.width, *_width_paddingx())
-
-def xcoords_config(offset=0):
-    return lscat.xcoords(TERM.width, *_width_paddingx(), offset)
-
-def ycoords_config():
-    settings = get_config_section('lscat')
-    img_height = settings.map(
-        lambda s: s.getint('image_height', fallback=8)
-    ).value_or(8)
-    paddingy = settings.map(
-        lambda s: s.getint('images_y_spacing', fallback=1)
-    ).value_or(1)
-    return lscat.ycoords(TERM.height, img_height, paddingy)
-
-def gallery_page_spacing_config():
-    settings = get_config_section('lscat')
-    return settings.map(
-        lambda s: s.getint('gallery_page_spacing', fallback=23)
-    ).value_or(23)
-
-def users_page_spacing_config():
-    settings = get_config_section('lscat')
-    return settings.map(
-        lambda s: s.getint('users_page_spacing', fallback=20)
-    ).value_or(20)
-
-def thumbnail_size_config():
-    settings = get_config_section('lscat')
-    return settings.map(
-        lambda s: s.getint('image_thumbnail_size', fallback=310)
-    ).value_or(310)
-
-def get_gen_users_settings():
-    settings = get_config_section('lscat')
-    return (
-        settings.map(
-            lambda s: s.getint('users_print_name_xcoord', fallback=18)
-        ).value_or(18),
-        settings.map(lambda s: s.getint('images_x_spacing', fallback=2)).value_or(2)
-    )
-
-
-def begin_config() -> ('config', str):
-    config_path = Path('~/.config/koneko/config.ini').expanduser()
-    config_object = ConfigParser()
-    if config_path.exists():
-        config_object.read(Path('~/.config/koneko/config.ini').expanduser())
-        credentials = config_object['Credentials']
-        # If your_id is stored in the config
-        your_id = credentials.get('ID', '')
-        return credentials, your_id
-
-    username = input('Please enter your username:\n')
-    print('\nPlease enter your password:')
-    password = getpass()
-    config_object['Credentials'] = {'Username': username, 'Password': password}
-
-    print('\nDo you want to save your pixiv ID? It will be more convenient')
-    print('to view artists you are following')
-    ans = input()
-    if ans == 'y' or not ans:
-        your_id = input('Please enter your pixiv ID:\n')
-        config_object['Credentials'].update({'ID': your_id})
-    else:
-        your_id = ''
-
-    os.system('clear')
-
-    config_path.parent.mkdir(exist_ok=True)
-    config_path.touch()
-    with open(config_path, 'w') as c:
-        config_object.write(c)
-
-    # Append the default settings to the config file
-    # Why not use python? Because it's functional, readable, and
-    # this one liner defeats any potential speed benefits
-    example_cfg = Path("~/.local/share/koneko/example_config.ini").expanduser()
-    os.system(f'tail {example_cfg} -n +9 >> {config_path}')
-
-    credentials = config_object['Credentials']
-
-    return credentials, your_id
 
 @safe
 def get_config_section(section: str) -> 'Result[config]':
@@ -113,7 +23,7 @@ def get_config_section(section: str) -> 'Result[config]':
 
 def get_settings(section: str, setting: str) -> 'Result[str]':
     cfgsection: 'Result[config]' = get_config_section(section)
-    return cfgsection.map(lambda c: c.get(setting, ''))
+    return cfgsection.map(m.get(setting, ''))
 
 @safe
 def _check_print_info() -> 'Result[bool]':
@@ -122,10 +32,100 @@ def _check_print_info() -> 'Result[bool]':
     Failure represents no key/setting/config found
     """
     section = get_config_section('misc')
-    return section.map(
-        lambda s: s.getboolean('print_info', fallback=True)
-    ).value_or(True)
+    return section.map(m.getboolean('print_info', fallback=True)).value_or(True)
 
 def check_print_info() -> 'bool':
     """For a Failure (setting not found), return True by default"""
     return _check_print_info().value_or(True)
+
+def _width_paddingx() -> (int, int):
+    settings = get_config_section('lscat')
+    return (
+        settings.map(m.getint('image_width', fallback=18)).value_or(18),
+        settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
+    )
+
+def ncols_config() -> 'int':
+    return lscat.ncols(TERM.width, *_width_paddingx())
+
+def xcoords_config(offset=0) -> 'list[int]':
+    return lscat.xcoords(TERM.width, *_width_paddingx(), offset)
+
+def ycoords_config() -> 'list[int]':
+    settings = get_config_section('lscat')
+    img_height = settings.map(m.getint('image_height', fallback=8)).value_or(8)
+    paddingy = settings.map(m.getint('images_y_spacing', fallback=1)).value_or(1)
+    return lscat.ycoords(TERM.height, img_height, paddingy)
+
+def gallery_page_spacing_config() -> int:
+    settings = get_config_section('lscat')
+    return settings.map(m.getint('gallery_page_spacing', fallback=23)).value_or(23)
+
+def users_page_spacing_config() -> int:
+    settings = get_config_section('lscat')
+    return settings.map(m.getint('users_page_spacing', fallback=20)).value_or(20)
+
+def thumbnail_size_config() -> int:
+    settings = get_config_section('lscat')
+    return settings.map(m.getint('image_thumbnail_size', fallback=310)).value_or(310)
+
+def get_gen_users_settings() -> (int, int):
+    settings = get_config_section('lscat')
+    return (
+        settings.map(m.getint('users_print_name_xcoord', fallback=18)).value_or(18),
+        settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
+    )
+
+
+def credentials_from_config(config_object, config_path) -> ('config', str):
+    credentials = get_config_section('Credentials').unwrap()
+    your_id = credentials.get('ID', '')
+    return credentials, your_id
+
+def begin_config() -> ('config', str):
+    config_path = Path('~/.config/koneko/config.ini').expanduser()
+    config_object = ConfigParser()
+    if config_path.exists():
+        return credentials_from_config(config_object, config_path)
+    return init_config(config_object, config_path)
+
+
+def init_config(config_object, config_path) -> ('config', str):
+    # Identical to `_ask_your_id(_ask_credentials(config_object))`
+    config_object, your_id = (config_object
+                              >> P(_ask_credentials)
+                              >> P(_ask_your_id))
+
+    _write_config(config_object, config_path)
+    _append_default_config(config_path)
+    return config_object['Credentials'], your_id
+
+def _ask_credentials(config_object) -> 'config':
+    username = input('Please enter your username:\n')
+    print('\nPlease enter your password:')
+    password = getpass()
+    config_object['Credentials'] = {'Username': username, 'Password': password}
+    return config_object
+
+def _ask_your_id(config_object) -> ('config', str):
+    print('\nDo you want to save your pixiv ID? It will be more convenient')
+    print('to view artists you are following')
+    ans = input()
+    if ans == 'y' or not ans:
+        your_id = input('Please enter your pixiv ID:\n')
+        config_object['Credentials'].update({'ID': your_id})
+        return config_object, your_id
+    return config_object, ''
+
+def _write_config(config_object, config_path) -> None:
+    os.system('clear')
+    config_path.parent.mkdir(exist_ok=True)
+    config_path.touch()
+    with open(config_path, 'w') as c:
+        config_object.write(c)
+
+def _append_default_config(config_path) -> None:
+    # Why not use python? Because it's functional, readable, and
+    # this one liner defeats any potential speed benefits
+    example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()
+    os.system(f'tail {example_cfg} -n +9 >> {config_path}')

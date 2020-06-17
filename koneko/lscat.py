@@ -4,6 +4,8 @@ import threading
 from abc import ABC
 
 from pixcat import Image
+from placeholder import m
+from returns.result import safe
 
 from koneko import utils, config
 
@@ -47,27 +49,32 @@ def show_instant(cls, data, gallerymode=False):
         number_of_cols = config.ncols_config()
 
         spacing = config.get_settings('lscat', 'gallery_print_spacing').map(
-                      lambda s: s.split(',')
+                      m.split(',')
                   ).value_or((9, 17, 17, 17, 17))
 
         for (idx, space) in enumerate(spacing[:number_of_cols]):
             print(' ' * int(space), end='')
-            print(idx+1, end='')
+            print(idx + 1, end='')
         print('\n')
 
 
 class AbstractTracker(ABC):
-    def __init__(self, data):
-        self.path = data.download_path
-        self._downloaded = []
-        self._lock = threading.Lock()
-        self._counter = 0
-        self.orders: 'List[int]'  # noqa: F821
-        self.generator: 'Generator[string]'  # noqa: F821
+    def __init__(self):
+        # Defined in child classes
+        self.orders: 'list[int]'
+        self.generator: 'generator[str]'
 
-    def update(self, new):
+        self._lock = threading.Lock()
+        self._downloaded: 'list[str]' = []
+        self._numlist: 'list[int]' = []
+
+        self.generator.send(None)
+
+    def update(self, new: str):
+        # Can't use queues/channels instead of a lock, because of race conditions
         with self._lock:
             self._downloaded.append(new)
+            self._numlist.append(int(new[:3]))
 
         self._inspect()
 
@@ -78,31 +85,26 @@ class AbstractTracker(ABC):
         so the valid order is:
         0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
         """
-        next_num = self.orders[self._counter]
-        numlist = [int(f[:3]) for f in self._downloaded]
+        next_num = self.orders[0]
 
-        if next_num in numlist:
-            pic = self._downloaded[numlist.index(next_num)]
-            # Display page
-            if next_num == 0:
-                os.system('clear')
+        if next_num in self._numlist:
+            pic = self._downloaded[self._numlist.index(next_num)]
             self.generator.send(pic)
 
-            self._counter += 1
+            self.orders = self.orders[1:]
             self._downloaded.remove(pic)
-            numlist.remove(next_num)
-            if self._downloaded:
+            self._numlist.remove(next_num)
+            if self._downloaded and self.orders:
                 self._inspect()
 
 class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
     def __init__(self, data):
-        super().__init__(data)
         self.orders = list(range(30))
         self.generator = generate_page(data.download_path)
-        self.generator.send(None)
+        super().__init__()
 
-def read_invis(data):
+def read_invis(data) -> int:
     with utils.cd(data.download_path):
         with open('.koneko', 'r') as f:
             return int(f.read())
@@ -110,13 +112,10 @@ def read_invis(data):
 class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
-        super().__init__(data)
         print_info = config.check_print_info()
 
-        try:
-            splitpoint = data.splitpoint
-        except AttributeError:
-            splitpoint = read_invis(data)
+        safe_func = safe(lambda x: data.splitpoint)
+        splitpoint = safe_func().fix(lambda x: read_invis(data)).unwrap()
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is
@@ -124,18 +123,17 @@ class TrackDownloadsUsers(AbstractTracker):
         self.orders = generate_orders(splitpoint * 4, splitpoint)
 
         self.generator = generate_users(data.download_path, print_info)
-        self.generator.send(None)
+        super().__init__()
 
 def generate_page(path):
     """Given number, calculate its coordinates and display it, then yield"""
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
-
-    # Does not catch if config doesn't exist, because it must exist
     page_spacing = config.gallery_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
 
+    os.system('clear')
     while True:
         # Release control. When _inspect() sends another image,
         # assign to the variables and display it again
@@ -152,15 +150,14 @@ def generate_page(path):
             Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
-import time
+
 def generate_users(path, print_info=True):
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
-    os.system('clear')
-
     message_xcoord, padding = config.get_gen_users_settings()
     page_spacing = config.users_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
 
+    os.system('clear')
     while True:
         # Wait for artist pic
         a_img = yield
@@ -168,8 +165,7 @@ def generate_users(path, print_info=True):
         number = a_img.split('_')[0][1:]
         message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
-        if print_info:
-            # Print the message (artist name)
+        if print_info:  # Print the message (artist name)
             print(' ' * message_xcoord, message)
         print('\n' * page_spacing)  # Scroll to new 'page'
 
@@ -182,7 +178,7 @@ def generate_users(path, print_info=True):
             while i < 3:            # Every artist has only 3 previews
                 p_img = yield       # Wait for preview pic
                 Image(p_img).thumbnail(thumbnail_size).show(align='left', y=0,
-                                                 x=preview_xcoords[i])
+                                                            x=preview_xcoords[i])
                 i += 1
 
 def generate_orders(total_pics, artists_count):
@@ -218,6 +214,7 @@ class TrackDownloadsImage(AbstractTracker):
         self.generator.send(None)
 
     def _inspect(self):
+        """Overrides base class because numlist is different"""
         next_num = self.orders[self._counter]
         numlist = [int(f.split('_')[1].replace('p', '')) for f in self._downloaded]
 

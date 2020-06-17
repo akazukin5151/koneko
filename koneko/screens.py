@@ -33,7 +33,7 @@ def begin_prompt(printmessage=True):
     )
 
     cache_size = check_output(
-        f"du -hs --apparent-size {KONEKODIR} | cut -f1",
+        f'du -hs --apparent-size {KONEKODIR} | cut -f1',
         shell=True
     ).decode('utf-8').rstrip()
     print(f'Current cache size: {cache_size}')

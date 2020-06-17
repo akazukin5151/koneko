@@ -1,4 +1,5 @@
 import sys
+from abc import ABC, abstractmethod
 from contextlib import contextmanager
 
 import pytest
@@ -24,8 +25,12 @@ def fakecbreak():
 def patch_cbreak(monkeypatch):
     monkeypatch.setattr('koneko.prompt.TERM.cbreak', fakecbreak)
 
+@pytest.fixture
+def customexit_to_quit(monkeypatch):
+    monkeypatch.setattr('koneko.prompt.sys.exit', raises_customexit)
 
-def test_ask_quit1(monkeypatch, patch_cbreak):
+
+def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit):
     class FakeInKey:
         def __init__(self):
             self.code = True
@@ -34,40 +39,43 @@ def test_ask_quit1(monkeypatch, patch_cbreak):
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     assert not prompt.ask_quit()
 
-def test_ask_quit2(monkeypatch, patch_cbreak):
+def test_ask_quit_enter_and_letter_quits(monkeypatch, patch_cbreak, customexit_to_quit):
     class FakeInKeyCode:
         def __init__(self):
             self.code = 343
 
     fake_inkey = FakeInKeyCode
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         assert prompt.ask_quit()
 
     responses = ['y', 'q', '', 'h']
     for letter in responses:
         fake_inkey.__call__ = lambda x: letter
         monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-        with pytest.raises(SystemExit):
+        with pytest.raises(CustomExit):
             assert prompt.ask_quit()
 
 
-class FakeInKey:
+class FakeInKey(ABC):
+    """Fakes the Keystroke constructor in blessed. See:
+    https://github.com/jquast/blessed/blob/83748bd9e97f9f2fd849588e677d541e162e3fc6/tests/test_keyboard.py#L98
+    """
     def __init__(self):
         self.code = True
 
+    @abstractmethod
     def __call__(self):
-        return Keystroke(ucs=u'n', code=1, name=u'next')
+        raise NotImplementedError
 
 class FakeGallery:
-    def __init__(self):
-        self.data = None
-
     @staticmethod
     def help():                  raise CustomExit()
     def next_page(self):         raise CustomExit()
+    def previous_page(self):     raise CustomExit()
     def handle_prompt(self, *a): raise CustomExit()
     def view_image(self, *a):    raise CustomExit()
+    def __init__(self):          self.data = None
 
 
 def test_gallery_like_prompt(monkeypatch, patch_cbreak):
@@ -89,7 +97,7 @@ def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
 
     fake_inkey = FakeInKeyPrev()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-    monkeypatch.setattr('koneko.ui.previous_page', raises_customexit)
+    monkeypatch.setattr('koneko.ui.AbstractGallery.previous_page', raises_customexit)
     fakegallery = FakeGallery()
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
@@ -187,12 +195,13 @@ def test_image_prompt_seq(monkeypatch, patch_cbreak):
 class FakeUser:
     def __init__(self):           self.data = None
     def next_page(self):          raise CustomExit()
+    def previous_page(self):      raise CustomExit()
     def reload(self):             raise CustomExit()
     def go_artist_mode(self, *a): raise CustomExit()
 
 def test_user_prompt(monkeypatch, patch_cbreak):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
-    monkeypatch.setattr('koneko.ui.previous_page_users', raises_customexit)
+    monkeypatch.setattr('koneko.ui.AbstractUsers.previous_page', raises_customexit)
     fakeuser = FakeUser()
     for letter in (u'n', u'r', u'p', u'q'):
         class FakeInKeyNew(FakeInKey):
@@ -215,6 +224,6 @@ def test_user_prompt_seq(monkeypatch, patch_cbreak):
 
     fake_inkey = iter([FakeInKey1(), FakeInKey2()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
-    fakeuser= FakeUser()
+    fakeuser = FakeUser()
     with pytest.raises(CustomExit):
         assert prompt.user_prompt(fakeuser)

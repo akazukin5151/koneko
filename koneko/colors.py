@@ -1,9 +1,10 @@
 """Export the colors for [h]elp screen keys"""
+from pipey import Pipeable as P
 
-RED = "\x1b[31m"
-MAGENTA = "\x1b[35m"
-BLUE = "\x1b[34m"
-RESET = "\x1b[39m"
+RED = '\x1b[31m'
+MAGENTA = '\x1b[35m'
+BLUE = '\x1b[34m'
+RESET = '\x1b[39m'
 BLUE_N = ''.join([RED, '[', BLUE, 'n', RED, ']', RESET])
 
 # Private
@@ -15,7 +16,7 @@ def _letter(letter: str) -> str:
     return ''.join([RED, '[', MAGENTA, letter, RED, ']', RESET])
 
 def _letter_with_coords(letter: str) -> str:
-    """ letter is magenta, n is blue, [] is red
+    """letter is magenta, n is blue, [] is red
     >>> _letter_with_coords("i")
     ... [i][n]
     """
@@ -23,7 +24,7 @@ def _letter_with_coords(letter: str) -> str:
                     BLUE_N, RESET])
 
 def _two_letter_with_coords(letter: str) -> str:
-    """ [] and {} is red, | is black, o and O is magenta, y and x is blue
+    """[] and {} is red, | is black, o and O is magenta, y and x is blue
     >>> _two_letter_with_coords("o")
     ... [o{y}{x}|O[n]]
     """
@@ -37,12 +38,15 @@ _tlc = ['a', 'o', 'd']
 _COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
                   'y', RED, '}', RESET])
 
+# Duplicated from pure because circular import
+_Map = P(lambda iterable, func: list(map(func, iterable)))
+
 # Public
-n, p, r, q, m, b, o_, d_, f = list(map(_letter, _letters))
+n, p, r, q, m, b, o_, d_, f = _letters >> _Map(_letter)
 
 i = _letter_with_coords('i')
 
-a, o, d = list(map(_two_letter_with_coords, _tlc))
+a, o, d = _tlc >> _Map(_two_letter_with_coords)
 
 # For galleries
 base1 = [

@@ -13,42 +13,44 @@ Capitalized tag definitions:
 
 import os
 import sys
-import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 
 from koneko import ui, api, cli, pure, config, prompt, screens
 
 
+def handle_missing_pics():
+    print('Please wait, downloading welcome image (this will only occur once)...')
+    baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
+    basedir = Path('~/.local/share/koneko/pics').expanduser()
+
+    basedir.mkdir(parents=True)
+    for pic in ('71471144_p0.png', '79494300_p0.png'):
+        os.system(f'curl -s {baseurl}{pic} -o {basedir}{pic}')
+
+    os.system('clear')
+
+def handle_cli():
+    # no cli arguments, prompt user for mode selection
+    if len(sys.argv) <= 1:
+        return True, '', ''
+
+    main_command, user_input = cli.process_cli_args()
+    if main_command == 'vh':
+        sys.exit(0)
+    return False, main_command, user_input
+
 def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
-
-    if len(sys.argv) <= 1:
-        # no cli arguments, prompt user for mode selection
-        prompted = True
-        main_command, user_input =  '', ''
-    else:
-        prompted = False
-        main_command, user_input = cli.process_cli_args()
-        if main_command == 'vh':
-            sys.exit(0)
+    prompted, main_command, user_input = handle_cli()
 
     os.system('clear')
     credentials, your_id = config.begin_config()
 
-    # Handle startup picture missing
     if not Path('~/.local/share/koneko').expanduser().exists():
-        print('Please wait, downloading welcome image (this will only occur once)...')
-        baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
-        basedir = Path('~/.local/share/koneko/pics').expanduser()
+        handle_missing_pics()
 
-        basedir.mkdir(parents=True)
-        for pic in ('71471144_p0.png', '79494300_p0.png'):
-            os.system(f'curl -s {baseurl}{pic} -o {basedir}{pic}')
-
-        os.system('clear')
-
-    api.myapi.add_credentials(credentials)
+    api.myapi.credentials = credentials
     api.myapi.start()
     # After this part, the API is logging in in the background and we can proceed
 
@@ -92,7 +94,7 @@ def main_loop(prompted: bool, main_command, user_input, your_id: str):
             func()
 
         elif main_command == '3':
-            if your_id and not user_input: # your_id stored in config file
+            if your_id and not user_input:  # your_id stored in config file
                 ans = input('Do you want to use the Pixiv ID saved in your config?\n')
                 if ans in {'y', ''}:
                     FollowingUserModeLoop(prompted, your_id).start()
@@ -171,6 +173,7 @@ class ArtistModeLoop(AbstractLoop):
         self._url_or_id = input('Enter artist ID or url:\n')
 
     def _go_to_mode(self):
+        #self.mode = ui.ArtistGallery(self._user_input)
         self.mode = ui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
@@ -213,7 +216,6 @@ class SearchUsersModeLoop(AbstractLoop):
 
     def _go_to_mode(self):
         self.mode = ui.SearchUsers(self._user_input)
-        self.mode.start()
         prompt.user_prompt(self.mode)
         main()
 
@@ -230,7 +232,6 @@ class FollowingUserModeLoop(AbstractLoop):
 
     def _go_to_mode(self):
         self.mode = ui.FollowingUsers(self._user_input)
-        self.mode.start()
         prompt.user_prompt(self.mode)
         main()
 

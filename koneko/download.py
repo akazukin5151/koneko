@@ -1,9 +1,10 @@
 import os
 import itertools
 from pathlib import Path
+from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
-import cytoolz
+from pipey import Pipeable as P
 
 from koneko import api, pure, utils
 
@@ -27,16 +28,21 @@ def async_download_core(download_path, urls, rename_images=False,
     """
     os.makedirs(download_path, exist_ok=True)
 
-    oldnames = list(map(pure.split_backslash_last, urls))
+    oldnames = urls >> pure.Map(pure.split_backslash_last)
     if rename_images:
-        newnames = map(pure.prefix_filename, oldnames, file_names, range(len(urls)))
-        newnames = list(newnames)
+        newnames = (
+            urls
+            >> P(len)
+            >> P(range)
+            >> P(lambda r: map(pure.prefix_filename, oldnames, file_names, r))
+            >> P(list)
+        )
     else:
         newnames = oldnames
 
     filtered = itertools.filterfalse(os.path.isfile, newnames)
     oldnames = itertools.filterfalse(os.path.isfile, oldnames)
-    helper = downloadr(tracker=tracker)
+    helper = partial(downloadr, tracker=tracker)
 
     # Nothing needs to be downloaded
     if not urls:
@@ -47,7 +53,6 @@ def async_download_core(download_path, urls, rename_images=False,
             executor.map(helper, urls, oldnames, filtered)
 
 
-@cytoolz.curry
 def downloadr(url, img_name, new_file_name=None, tracker=None):
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)
@@ -93,7 +98,7 @@ def init_download(data, download_func, tracker):
     if data.page_num == 1:
         print('Cache is outdated, reloading...')
     if data.download_path.is_dir():
-        os.system(f'rm -r {data.download_path}') # shutil.rmtree is better
+        os.system(f'rm -r {data.download_path}')  # shutil.rmtree is better
 
     download_func(data, tracker=tracker)
 
@@ -115,7 +120,7 @@ def download_core(large_dir, url, filename, try_make_dir=True):
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
         with utils.cd(large_dir):
-            downloadr(url, filename, None)
+            downloadr(url, filename)
 
 
 def full_img_details(url, png=False):

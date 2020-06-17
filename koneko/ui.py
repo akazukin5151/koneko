@@ -4,7 +4,6 @@ import os
 import sys
 import threading
 from abc import ABC, abstractmethod
-from pathlib import Path
 
 import funcy
 
@@ -12,59 +11,192 @@ from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
                     prompt, download)
 
 
-def previous_page(data):
-    """Previous page for galleries"""
-    if data.current_page_num > 1:
-        data.current_page_num -= 1
-
-        lscat.show_instant(lscat.TrackDownloads, data, True)
-
-        pure.print_multiple_imgs(data.current_illusts)
-        print(f'Page {data.current_page_num}')
-        print('Enter a gallery command:\n')
-
-    else:
-        print('This is the first page!')
-
-class AbstractGallery(ABC):
-    def __init__(self):
-        self.data = data.GalleryJson(1, self._main_path)
-        self.prefetch_thread: 'threading.Thread'
-        # Defined in child classes
-        self._main_path: 'Path'
-
-        self.start()
-
-    def start(self):
+class AbstractUI(ABC):
+    @abstractmethod
+    def __init__(self, main_path):
+        """Child classes must pass in main_path, and
+        declare the data and download_function attributes as appropriate.
+        Main path includes any user input (eg, artist user id or search string)
         """
-        If artist_user_id dir exists, show immediately (without checking
-        for contents!)
-        Else, fetch current_page json and proceed download -> show -> prefetch
+        self.data: 'data.<class>'
+        self.download_function: 'download.<function>'
+        self.start(main_path)
+
+    @abstractmethod
+    def data_class(self, main_path):
+        """Instantiate the appropriate data object here (with args and bracket)"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def tracker(self):
+        """Instantiate the appropriate tracker object here (with args and bracket)"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def show_instant(self):
+        """Run the appropriate lscat.show_instant function here
+        (will actually display)
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def _pixivrequest(self) -> 'Json':
+        """Run the appropriate api request function and return the result
+        Must pass in `offset=self.data.offset` into API for pages to work
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def action_before_prefetch(self) -> None:
+        """Run any procedure before prefetching (either in background or not)"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def print_page_info(self) -> None:
+        """Run any procedure to print the page info"""
+        raise NotImplementedError
+
+    def start(self, main_path):
+        # self.data defined here not in __init__, so that reload() will wipe cache
+        self.data = self.data_class(main_path)
+        self._parse_and_download()
+        self._prefetch_thread()
+
+    def _parse_and_download(self):
+        """If download path not empty, immediately show.
+        Regardless, proceed to parse & download
         """
         if utils.dir_not_empty(self.data):
-            lscat.show_instant(lscat.TrackDownloads, self.data, True)
-        elif self.data.download_path.is_dir():
+            self.show_instant()
+            api.myapi.await_login()
+            self._parse_user_infos()
+            self.print_page_info()
+            return True
+
+        # No valid cached images, download all from scratch
+        if self.data.download_path.is_dir():
             self.data.download_path.rmdir()
 
         api.myapi.await_login()
-        current_page = self._pixivrequest()
-        self.data.update(current_page)
+        self._parse_user_infos()
+        download.init_download(self.data, self.download_function, self.tracker())
+        self.print_page_info()
 
-        tracker = lscat.TrackDownloads(self.data)
-        # Tracker will cause gallery to show each img as they finish downloading
-        download.init_download(self.data, download.download_page, tracker)
+    def _prefetch_thread(self):
+        """Reassign the thread again and start; as threads can only be started once"""
+        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self.prefetch_thread.start()
 
+    def _parse_user_infos(self):
+        """Parse json and get list of artist names, profile pic urls, and id"""
+        result = self._pixivrequest()
+        self.data.update(result)
+
+    def _prefetch_next_page(self):
+        # Wait for initial request to finish, so the data object is instantiated
+        # Else next_url won't be set yet
+        self.action_before_prefetch()
+        if not self.data.next_url:  # Last page
+            return True
+
+        next_offset = self.data.next_url.split('&')[-1].split('=')[-1]
+        # Won't download if not immediately next page, eg
+        # p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
+        offset_diffs = int(next_offset) - int(self.data.offset)
+        immediate_next: bool = offset_diffs <= 30
+        if not immediate_next:
+            return
+
+        oldnum = self.data.page_num
+        self.data.offset = next_offset
+        self.data.page_num = int(self.data.offset) // 30 + 1
+
+        self._parse_user_infos()
+        download.init_download(self.data, self.download_function, None)
+
+        self.data.page_num = oldnum
+
+    def next_page(self):
+        self.prefetch_thread.join()
+        self.data.page_num += 1
+        self._show_page()
+        self._prefetch_next_page()
+
+    def previous_page(self):
+        if self.data.page_num > 1:
+            self.data.page_num -= 1
+            self.data.offset = int(self.data.offset) - 30
+            self._show_page()
+            return True
+        print('This is the first page!')
+
+    def _show_page(self):
+        if not utils.dir_not_empty(self.data):
+            print('This is the last page!')
+            self.data.page_num -= 1
+            return False
+        self.show_instant()
+        self.print_page_info()
+
+    def reload(self):
+        print('This will delete cached images and redownload them. Proceed?')
+        ans = input(f'Directory to be deleted: {self.data.main_path}\n')
+        if ans == 'y' or not ans:
+            os.system(f'rm -r {self.data.main_path}')  # shutil.rmtree is better
+            # Will remove all data, but keep info on the main path
+            self.start(self.data.main_path)
+        prompt.user_prompt(self)
+
+
+
+class AbstractGallery(AbstractUI, ABC):
+    @abstractmethod
+    def __init__(self, main_path):
+        """Complements abstractmethod: Define download function for galleries"""
+        self.download_function = download.download_page
+        super().__init__(main_path)
+
+    def data_class(self, main_path):
+        """Implements abstractmethod: Instantiate the dataclass for galleries"""
+        return data.GalleryJson(1, main_path)
+
+    def tracker(self):
+        """Implements abstractmethod: Instantiate tracker for galleries"""
+        return lscat.TrackDownloads(self.data)
+
+    def show_instant(self):
+        """Implements abstractmethod: Runs show_instant for galleries"""
+        return lscat.show_instant(lscat.TrackDownloads, self.data, True)
+
+    def action_before_prefetch(self):
+        """Implements abstractmethod: No action needed"""
+        return True
+
+    def print_page_info(self):
+        """Implements abstractmethod: Indicate which posts are multi-image and
+        current page number
+        """
         pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
+        print(f'Page {self.data.page_num}')
 
-        # Make sure the following work:
-        # Gallery -> next page -> image prompt -> back -> prev page
-        if len(self.data.all_pages_cache) == 1:
-            # Prefetch the next page on first gallery load
-            self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
-            self.prefetch_thread.start()
+    # Unique for Galleries
+    @abstractmethod
+    def handle_prompt(self, keyseqs: 'list[str]'):
+        """Abstractmethod for gallery classes: Gallery prompt accepts more
+        keys(eqs) than Users, handle them here
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def help():
+        """Abstractmethod for gallery classes: each gallery mode has different
+        keyseqs and thus help
+        """
+        raise NotImplementedError
 
     def view_image(self, selected_image_num):
+        """Go to image mode"""
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
         idata = data.ImageJson(post_json, image_id)
@@ -85,69 +217,9 @@ class AbstractGallery(ABC):
 
     def _back(self):
         """After user 'back's from image prompt or artist gallery, start mode again"""
-        lscat.show_instant(lscat.TrackDownloads, self.data, True)
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
+        self.show_instant()
+        self.print_page_info()
         prompt.gallery_like_prompt(self)
-
-    def next_page(self):
-        self.prefetch_thread.join()
-        self.data.current_page_num += 1
-        if utils.dir_not_empty(self.data):
-            lscat.show_instant(lscat.TrackDownloads, self.data, True)
-        else:
-            print('This is the last page!')
-            self.data.current_page_num -= 1
-            return False
-
-        pure.print_multiple_imgs(self.data.current_illusts)
-        print(f'Page {self.data.current_page_num}')
-        print('Enter a gallery command:\n')
-
-        # Skip prefetching again for cases like next -> prev -> next
-        if str(self.data.current_page_num + 1) not in self.data.cached_pages:
-            self._prefetch_next_page()
-
-    @abstractmethod
-    def _pixivrequest(self, **kwargs):
-        raise NotImplementedError
-
-    def _prefetch_next_page(self):
-        next_url = self.data.next_url
-        if not next_url:  # this is the last page
-            return
-
-        parse_page = api.myapi.parse_next(next_url)
-        next_page = self._pixivrequest(**parse_page)
-        self.data.all_pages_cache[str(self.data.current_page_num + 1)] = next_page
-
-        download_path = self._main_path / str(self.data.current_page_num + 1)
-
-        if not download_path.is_dir():
-            oldnum = self.data.current_page_num
-            self.data.current_page_num += 1
-            download.download_page(self.data)
-            self.data.current_page_num = oldnum
-
-    def reload(self):
-        print('This will delete cached images and redownload them. Proceed?')
-        ans = input(f'Directory to be deleted: {self._main_path}\n')
-        if ans == 'y' or not ans:
-            os.system(f'rm -r {self._main_path}') # shutil.rmtree is better
-            self.data.all_pages_cache = {} # Ensures prefetch after reloading
-            self.start()
-        prompt.gallery_like_prompt(self)
-        # Regardless of confirmation, need to catch itself with a prompt
-
-    @abstractmethod
-    def handle_prompt(self, keyseqs, gallery_command, selected_image_num,
-                      first_num, second_num):
-        raise NotImplementedError
-
-    @staticmethod
-    @abstractmethod
-    def help():
-        raise NotImplementedError
 
 
 class ArtistGallery(AbstractGallery):
@@ -181,35 +253,35 @@ class ArtistGallery(AbstractGallery):
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
-    def __init__(self, artist_user_id, **kwargs):
-        self._main_path = KONEKODIR / str(artist_user_id)
+    def __init__(self, artist_user_id):
+        """Implements abstractmethod: self._artist_user_id only used for
+        _pixivrequest() specific to mode 1
+        """
         self._artist_user_id = artist_user_id
-        self._kwargs = kwargs
-        super().__init__()
+        super().__init__(KONEKODIR / str(artist_user_id))
 
-    def _pixivrequest(self, **kwargs):
-        if kwargs:
-            return api.myapi.artist_gallery_parse_next(**kwargs) # Parse next
-        else:
-            return api.myapi.artist_gallery_request(self._artist_user_id)
+    def _pixivrequest(self):
+        """Implements abstractmethod: use the user-given id for request"""
+        return api.myapi.artist_gallery(self._artist_user_id, self.data.offset)
 
     def handle_prompt(self, keyseqs):
+        """Implements abstractmethod"""
         # Display image (using either coords or image number), the show this prompt
         if keyseqs[0] == 'b':
-            pass # Stop gallery instance, return to previous state
+            pass  # Stop gallery instance, return to previous state
         elif keyseqs[0] == 'r':
             self.reload()
         elif keyseqs[0].lower() == 'a':
             print('Invalid command! Press h to show help')
-            prompt.gallery_like_prompt(self) # Go back to while loop
+            prompt.gallery_like_prompt(self)  # Go back to while loop
 
     @staticmethod
     def help():
+        """Implements abstractmethod"""
         print(''.join(
             colors.base1 + ['view '] + colors.base2 +
             ['view ', colors.m, 'anual; ',
               colors.b, 'ack\n']))
-
 
 class IllustFollowGallery(AbstractGallery):
     """
@@ -245,18 +317,20 @@ class IllustFollowGallery(AbstractGallery):
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
     def __init__(self):
-        self._main_path = KONEKODIR / 'illustfollow'
-        super().__init__()
+        """Implements abstractmethod"""
+        super().__init__(KONEKODIR / 'illustfollow')
 
-    def _pixivrequest(self, **kwargs):
-        if kwargs:
-            return api.myapi.illust_follow_request(**kwargs) # Parse next
-        else:
-            return api.myapi.illust_follow_request(restrict='private') # Publicity
+    def _pixivrequest(self):
+        """Implements abstractmethod, publicity is private for now
+        (might be configurable in the future)
+        """
+        return api.myapi.illust_follow_request(restrict='private',
+                                               offset=self.data.offset)
 
     def go_artist_gallery_coords(self, first_num, second_num):
+        """New method for mode 5 only"""
         selected_image_num = utils.find_number_map(int(first_num), int(second_num))
-        if selected_image_num is False: # 0 is valid!
+        if selected_image_num is False:  # 0 is valid!
             print('Invalid number!')
         else:
             self.go_artist_gallery_num(selected_image_num)
@@ -270,19 +344,21 @@ class IllustFollowGallery(AbstractGallery):
         self._back()
 
     def handle_prompt(self, keyseqs):
+        """Implements abstractmethod"""
         # "b" must be handled first, because keyseqs might be empty
         if keyseqs[0] == 'b':
             print('Invalid command! Press h to show help')
-            prompt.gallery_like_prompt(self) # Go back to while loop
+            prompt.gallery_like_prompt(self)  # Go back to while loop
         elif keyseqs[0] == 'r':
             self.reload()
         elif keyseqs[0] == 'a':
             self.go_artist_gallery_coords(*keyseqs[-2:])
         elif keyseqs[0] == 'A':
-            self.go_artist_gallery_num(utils.process_digits(keyseqs))
+            self.go_artist_gallery_num(utils.seq_to_int(keyseqs, 1))
 
     @staticmethod
     def help():
+        """Implements abstractmethod"""
         print(''.join(colors.base1 + [
             colors.a, "view artist's illusts; ",
             colors.n, 'ext page;\n',
@@ -291,6 +367,95 @@ class IllustFollowGallery(AbstractGallery):
             colors.q, 'uit (with confirmation); ',
             'view ', colors.m, 'anual\n']))
 
+
+
+class AbstractUsers(AbstractUI, ABC):
+    """
+    User view commands (No need to press enter):
+        {x}{y}             -- display artist illusts on column {x} and row {y}
+        n                  -- view next page
+        p                  -- view previous page
+        r                  -- delete all cached images, re-download and reload view
+        h                  -- show keybindings
+        m                  -- show this manual
+        q                  -- quit (with confirmation)
+
+    """
+    @abstractmethod
+    def __init__(self, main_path):
+        """Complements abstractmethod: Define download function for user modes"""
+        self.download_function = download.user_download
+        super().__init__(main_path)
+
+    def data_class(self, main_path):
+        """Implements abstractmethod: Instantiate the dataclass for user modes"""
+        return data.UserJson(1, main_path)
+
+    def tracker(self):
+        """Implements abstractmethod: Instantiate tracker for user modes"""
+        return lscat.TrackDownloadsUsers(self.data)
+
+    def show_instant(self):
+        """Implements abstractmethod: Runs show_instant for user modes"""
+        return lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
+
+    def action_before_prefetch(self):
+        """Implements abstractmethod: Wait for parse_thread to join (if any)"""
+        with funcy.suppress(AttributeError):
+            self.parse_thread.join()
+
+    def print_page_info(self):
+        """Implements abstractmethod: Indicate current page number"""
+        print(f'Page {self.data.page_num}')
+
+    # Unique to Users
+    def go_artist_mode(self, selected_user_num):
+        """Concrete method unique for both user modes"""
+        try:
+            artist_user_id = self.data.artist_user_id(selected_user_num)
+        except IndexError:
+            print('Invalid number!')
+            return False
+
+        mode = ArtistGallery(artist_user_id)
+        prompt.gallery_like_prompt(mode)
+        # After backing from gallery
+        self._show_page()
+        prompt.user_prompt(self)
+
+
+class SearchUsers(AbstractUsers):
+    """
+    Inherits from AbstractUsers class, define self._input as the search string (user)
+    Parent directory for downloads should go to search/
+    """
+    def __init__(self, user):
+        self.user = user  # This is only used for pixivrequest
+        super().__init__(KONEKODIR / 'search' / user)
+
+    def _pixivrequest(self):
+        return api.myapi.search_user_request(self.user, self.data.offset)
+
+class FollowingUsers(AbstractUsers):
+    """
+    Inherits from AbstractUsers class, define self._input as the user's pixiv ID
+    (Or any other pixiv ID that the user wants to look at their following users)
+    Parent directory for downloads should go to following/
+    """
+    def __init__(self, your_id, publicity='private'):
+        """Implements abstractmethod, publicity is private for now
+        (might be configurable in the future)
+        """
+        self._publicity = publicity
+        self.your_id = your_id
+        super().__init__(KONEKODIR / 'following' / your_id)
+
+    def _pixivrequest(self):
+        return api.myapi.following_user_request(self.your_id, self._publicity,
+                                                self.data.offset)
+
+
+
 def display_image(post_json, artist_user_id, number_prefix, data):
     """Image mode, from an artist mode (mode 1/5 -> mode 2)
     Opens image given by the number (medium-res), downloads large-res and
@@ -298,7 +463,7 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     Alternative to main.view_post_mode(). It does its own stuff before calling
     the Image class for the prompt.
 
-    Unlike the other modes, ui.Image does not handle the initial displaying of images
+    Unlike the other modes, Image does not handle the initial displaying of images
     This is because coming from a gallery mode, the selected image already has a
     square-medium preview downloaded, which can be displayed before the download
     of the large-res completes. Thus, the initial displaying subroutine will be
@@ -307,12 +472,12 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     search_string = f"{str(number_prefix).rjust(3, '0')}_*"
 
     os.system('clear')
-    arg = KONEKODIR / str(artist_user_id) / str(data.current_page_num) / search_string
+    arg = KONEKODIR / str(artist_user_id) / str(data.page_num) / search_string
     lscat.icat(arg)
 
     url = pure.url_given_size(post_json, 'large')
     filename = pure.split_backslash_last(url)
-    download_path = (KONEKODIR / str(artist_user_id) / "individual" /
+    download_path = (KONEKODIR / str(artist_user_id) / 'individual' /
                      str(data.image_id(number_prefix)))
     download.download_core(download_path, url, filename)
 
@@ -328,7 +493,7 @@ def view_post_mode(image_id):
     Fetch all the illust info, download it in the correct directory, then display it.
     If it is a multi-image post, download the next image
     Else or otherwise, open image prompt
-    Unlike the other modes, ui.Image does not handle the initial displaying of images
+    Unlike the other modes, Image does not handle the initial displaying of images
     This is because coming from a gallery mode, the selected image already has a
     square-medium preview downloaded, which can be displayed before the download
     of the large-res completes. Thus, the initial displaying subroutine will be
@@ -421,10 +586,13 @@ class Image:
         while not self.event.is_set() and slicestart <= 4:
             img = self.data.page_urls[slicestart:slicestart + 1]
 
-            if os.path.isfile(self.data.download_path / pure.split_backslash_last(img[0])):
+            if os.path.isfile(
+                self.data.download_path / pure.split_backslash_last(img[0])
+            ):
                 tracker.update(pure.split_backslash_last(img[0]))
             else:
-                download.async_download_core(self.data.download_path, img, tracker=tracker)
+                download.async_download_core(self.data.download_path, img,
+                                             tracker=tracker)
 
             slicestart += 1
 
@@ -468,7 +636,7 @@ def previous_image(data):
 
 def jump_to_image(data, selected_image_num: int):
     if selected_image_num <= 0 or selected_image_num > len(data.page_urls):
-        print("Invalid number!")
+        print('Invalid number!')
         return False
 
     # Internally 0-based, but externally 1-based
@@ -491,162 +659,3 @@ def _prefetch_next_image(data):
     if next_img_url:
         download.async_download_spinner(data.download_path, [next_img_url])
 
-
-
-def previous_page_users(data):
-    """Previous page for users"""
-    if data.page_num > 1:
-        data.page_num -= 1
-        data.offset = int(data.offset) - 30
-        _show_page(data)
-    else:
-        print('This is the first page!')
-
-def _show_page(data):
-    if not utils.dir_not_empty(data):
-        print('This is the last page!')
-        data.page_num -= 1
-        return False
-
-    lscat.show_instant(lscat.TrackDownloadsUsers, data)
-
-class AbstractUsers(ABC):
-    """
-    User view commands (No need to press enter):
-        {x}{y}             -- display artist illusts on column {x} and row {y}
-        n                  -- view next page
-        p                  -- view previous page
-        r                  -- delete all cached images, re-download and reload view
-        h                  -- show keybindings
-        m                  -- show this manual
-        q                  -- quit (with confirmation)
-
-    """
-
-    @abstractmethod
-    def __init__(self, user_or_id):
-        self.data: 'data.UserJson'
-        self._input = user_or_id
-        self.prefetch_thread: 'threading.Thread'
-        # Defined in child classes
-        self._main_path: 'Path'
-
-    def start(self):
-        self.data = data.UserJson(1, self._main_path, self._input)
-        self._parse_and_download()
-        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
-        self.prefetch_thread.start()
-
-    def _parse_and_download(self):
-        """If download path not empty, immediately show. Else parse & download"""
-        if utils.dir_not_empty(self.data):
-            lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
-            api.myapi.await_login()
-            self.parse_thread = threading.Thread(target=self._parse_user_infos)
-            self.parse_thread.start()
-            return True
-
-        # No valid cached images, download all from scratch
-        if self.data.download_path.is_dir():
-            self.data.download_path.rmdir()
-
-        api.myapi.await_login()
-        self._parse_user_infos()
-        tracker = lscat.TrackDownloadsUsers(self.data)
-        download.init_download(self.data, download.user_download, tracker)
-
-    @abstractmethod
-    def _pixivrequest(self):
-        """Blank method, classes that inherit this ABC must override this"""
-        raise NotImplementedError
-
-    @utils.spinner('Parsing info...')
-    def _parse_user_infos(self):
-        """Parse json and get list of artist names, profile pic urls, and id"""
-        result = self._pixivrequest()
-        if not hasattr(self, 'data'):
-            self.data = data.UserJson(1, self._main_path, self._input)
-        else:
-            self.data.update(result)
-
-    def _show_page(self):
-        _show_page(self.data)
-
-    def _prefetch_next_page(self):
-        # TODO: split into download and data parts
-        # Wait for initial request to finish, so the data object is instantiated
-        if hasattr(self, 'parse_thread'):
-            self.parse_thread.join()
-        oldnum = self.data.page_num
-
-        if self.data.next_url:
-            next_offset = api.myapi.parse_next(self.data.next_url)['offset']
-            # Won't download if not immediately next page, eg
-            # p1 (p2 downloaded) -> p2 (p3) -> p1 -> p2 (p4 won't download)
-            if int(next_offset) - int(self.data.offset) <= 30:
-                self.data.offset = next_offset
-                self.data.page_num = int(self.data.offset) // 30 + 1
-
-                self._parse_user_infos()
-                download.init_download(self.data, download.user_download, None)
-
-        self.data.page_num = oldnum
-
-    def next_page(self):
-        self.prefetch_thread.join()
-        self.data.page_num += 1
-        self._show_page()
-
-        self._prefetch_next_page()
-
-    def previous_page(self):
-        previous_page_users(self.data)
-
-    def go_artist_mode(self, selected_user_num):
-        try:
-            artist_user_id = self.data.artist_user_id(selected_user_num)
-        except IndexError:
-            print('Invalid number!')
-        else:
-            mode = ArtistGallery(artist_user_id)
-            prompt.gallery_like_prompt(mode)
-            # After backing from gallery
-            self._show_page()
-            prompt.user_prompt(self)
-
-    def reload(self):
-        print('This will delete cached images and redownload them. Proceed?')
-        ans = input(f'Directory to be deleted: {self._main_path}\n')
-        if ans == 'y' or not ans:
-            os.system(f'rm -r {self.data.main_path}') # shutil.rmtree is better
-            self.__init__(self.data._input)
-            self.start()
-        prompt.user_prompt(self)
-
-
-class SearchUsers(AbstractUsers):
-    """
-    Inherits from AbstractUsers class, define self._input as the search string (user)
-    Parent directory for downloads should go to search/
-    """
-    def __init__(self, user):
-        self._main_path = KONEKODIR / 'search'
-        super().__init__(user)
-
-    def _pixivrequest(self):
-        return api.myapi.search_user_request(self._input, self.data.offset)
-
-class FollowingUsers(AbstractUsers):
-    """
-    Inherits from AbstractUsers class, define self._input as the user's pixiv ID
-    (Or any other pixiv ID that the user wants to look at their following users)
-    Parent directory for downloads should go to following/
-    """
-    def __init__(self, your_id, publicity='private'):
-        self._publicity = publicity
-        self._main_path = KONEKODIR / 'following'
-        super().__init__(your_id)
-
-    def _pixivrequest(self):
-        return api.myapi.following_user_request(self._input, self._publicity,
-                                                self.data.offset)

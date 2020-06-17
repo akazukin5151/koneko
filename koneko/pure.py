@@ -5,25 +5,26 @@ Collection of functions that are pure and side effect free
 
 import os
 import re
+from functools import partial
 from pathlib import Path
 
 import funcy
-import cytoolz
+from placeholder import _
+from pipey import Pipeable as P
 
 from koneko import colors as c
 
 
+Map = P(lambda iterable, func: list(map(func, iterable)))
+
 def split_backslash_last(string: str) -> str:
-    """
-    Intended for splitting url to get filename, but it has lots of applications...
-    """
+    """Intended for splitting url to get filename, but it has lots of applications..."""
     return string.split('/')[-1]
 
 
 def generate_filepath(filename: str) -> Path:
     return Path('~').expanduser() / 'Downloads' / filename
 
-@cytoolz.curry
 def prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
     """old_name_with_ext can be `test.png`, but new_name is `abcd`"""
     img_ext = old_name_with_ext.split('.')[-1]
@@ -37,13 +38,15 @@ def prefix_artist_name(name: str, number: int) -> str:
     return new_file_name
 
 def print_multiple_imgs(illusts_json: 'Json') -> None:
-    _ = [print(f'{c.RED}#{index}{c.RESET} has {c.BLUE}{pages}{c.RESET} pages', end=', ')
-         for (index, json) in enumerate(illusts_json)
-         if (pages := json['page_count']) > 1]
+    HASHTAG = f'{c.RED}#'
+    HAS = f'{c.RESET} has {c.BLUE}'
+    OF_PAGES = f'{c.RESET} pages'
+    _ = [print(f'{HASHTAG}{index}{HAS}{number}{OF_PAGES}', end=', ')
+         for (index, _json) in enumerate(illusts_json)
+         if (number := _json['page_count']) > 1]
     print('')
 
 
-@cytoolz.curry
 def url_given_size(post_json: 'Json', size: str) -> str:
     """
     size : str
@@ -52,34 +55,32 @@ def url_given_size(post_json: 'Json', size: str) -> str:
     return post_json['image_urls'][size]
 
 
-@cytoolz.curry
 def post_title(current_page_illusts: 'Json', post_number: int) -> str:
     return current_page_illusts[post_number]['title']
 
 
 def medium_urls(current_page_illusts: 'Json') -> 'list[str]':
-    get_medium_url = url_given_size(size='square_medium')
-    urls = list(map(get_medium_url, current_page_illusts))
-    return urls
+    return current_page_illusts >> Map(url_given_size(_, size='square_medium'))
 
 
 def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
-    post_titles = post_title(current_page_illusts)
-    titles = list(map(post_titles, range(len(current_page_illusts))))
-    return titles
+    return (
+        current_page_illusts
+        >> P(len)
+        >> P(range)
+        >> Map(lambda r: post_title(current_page_illusts, r))
+    )
 
 
-def page_urls_in_post(post_json: 'Json', size='medium') -> (int, 'list[str]'):
+def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':
     """Get the number of pages and each of their urls in a multi-image post."""
     number_of_pages = post_json['page_count']
     if number_of_pages > 1:
         list_of_pages = post_json['meta_pages']
-        page_urls = [url_given_size(list_of_pages[i], size)
-                     for i in range(number_of_pages)]
+        return [url_given_size(list_of_pages[i], size)
+                for i in range(number_of_pages)]
     else:
-        page_urls = [url_given_size(post_json, size)]
-
-    return number_of_pages, page_urls
+        return [url_given_size(post_json, size)]
 
 
 def change_url_to_full(url: str, png=False) -> str:
@@ -97,9 +98,7 @@ def change_url_to_full(url: str, png=False) -> str:
 
 @funcy.decorator
 def catch_ctrl_c(call: 'func[T]') -> 'T':
-    """
-    See http://hackflow.com/blog/2013/11/03/painless-decorators/
-    """
+    """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
     try:
         return call()
     except KeyboardInterrupt:

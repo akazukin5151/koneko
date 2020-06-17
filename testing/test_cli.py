@@ -2,12 +2,9 @@ import pytest
 
 from koneko import cli
 
-# No cli args
-# (No longer tested here, as main.py does not call cli if no args)
-
 def test_mode1_link_only(monkeypatch):
     monkeypatch.setattr('koneko.cli.sys.argv',
-            (['koneko', 'https://www.pixiv.net/en/users/2232374']))
+                        (['koneko', 'https://www.pixiv.net/en/users/2232374']))
     assert cli.process_cli_args() == ('1', '2232374')
 
 def test_mode1_mode_and_link(monkeypatch):
@@ -18,7 +15,7 @@ def test_mode1_mode_and_link(monkeypatch):
 
 def test_mode2_link_only(monkeypatch):
     monkeypatch.setattr('koneko.cli.sys.argv',
-            (['koneko', 'https://www.pixiv.net/en/artworks/78823485']))
+                        (['koneko', 'https://www.pixiv.net/en/artworks/78823485']))
     assert cli.process_cli_args() == ('2', '78823485')
 
 def test_mode2_mode_and_link(monkeypatch):

@@ -2,13 +2,15 @@ import sys
 from pathlib import Path
 
 from koneko import pure
-from page_json import *  # Imports the current_page (dict) stored in disk
 
 # Lmao python
 sys.path.append('testing')
 
+# Imports the current_page (dict) stored in disk
+from page_json import *  # isort:skip
 
 page_illusts = page_json["illusts"]
+
 
 def test_split_backslash_last():
     assert (
@@ -36,7 +38,7 @@ def test_prefix_artist_name():
     assert pure.prefix_artist_name("name2", 10) == f"10\n{' ' * 19}name2"
 
 def test_print_multiple_imgs(capsys):
-    assert pure.print_multiple_imgs(page_illusts) == None
+    assert pure.print_multiple_imgs(page_illusts) is None
     captured = capsys.readouterr()
     assert captured.out == "\x1b[31m#14\x1b[39m has \x1b[34m8\x1b[39m pages, \x1b[31m#25\x1b[39m has \x1b[34m50\x1b[39m pages, \n"
 
@@ -66,11 +68,10 @@ def test_medium_urls():
 
 
 def test_page_urls_in_post():
-    assert len(pure.page_urls_in_post(page_illusts[14], size="medium")) == 2
-    assert pure.page_urls_in_post(page_illusts[14], size="medium")[0] == 8
-    assert len(pure.page_urls_in_post(page_illusts[14], size="medium")[1]) == 8
-    assert pure.page_urls_in_post(page_illusts[0], size="medium")[0] == 1
-    assert len(pure.page_urls_in_post(page_illusts[0], size="medium")[1]) == 1
+    assert pure.page_urls_in_post(page_illusts[14], size="medium") == ['https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p1_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p2_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p3_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p4_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p5_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p6_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p7_master1200.jpg']
+    assert len(pure.page_urls_in_post(page_illusts[14], size="medium")) == 8
+    assert pure.page_urls_in_post(page_illusts[0], size="medium") == ['https://i.pximg.net/c/540x540_70/img-master/img/2020/03/10/04/07/08/80017594_p0_master1200.jpg']
+    assert len(pure.page_urls_in_post(page_illusts[0], size="medium")) == 1
 
 
 def test_post_titles_in_page():

@@ -1,8 +1,9 @@
 funcy~=1.14
 docopt~=0.6
 pixcat~=0.1
-cytoolz~=0.10
 PixivPy~=3.5
 blessed~=1.17
 pytest~=5.4
 returns~=0.14
+placeholder~=1.1
+pipey~=0.0.1a

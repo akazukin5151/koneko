@@ -103,12 +103,39 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 # Roadmap
 
 * In-depth usage documentation?
-* Refactor ui.py
+* Consistent public and private methods and attributes again (only show public ones in puml)
+* Functional way of doing ui.py?
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features
 
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
+
+## Upcoming changelog (in dev branch)
+
+For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+
+### Version 0.8
+
+* lscat now slightly faster as the image number is calculated only when it finishes downloading, not on every recursion.
+* Fixed opening the manual in user modes not working
+
+#### Code
+* Extract out common behaviour from Gallery and Users ui classes into AbstractUI
+    * Gallery classes is now structued like Users. The most significant difference is the use of `offset` to prefetch and navigate pages.
+    * Unified API requests for each mode
+* Simplified code everywhere
+    * Reduced nesting with early returns
+    * Removed dead code
+    * Split up functions in `config.py`
+    * Split up main function in `main.py`
+    * Split up functions in `cli.py`
+* Remove unused cytoolz dependency
+* More functional style
+    * Use `placeholder` to make lambdas look better
+    * Use `pipey` for functional-style postfix pipes
+    * Using `returns.result` Result container in `config.py` and `splitpoint`
+* Make tests more professional
 
 
 # FAQ
@@ -179,7 +206,7 @@ Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don
 ## Build and upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
 
-**Warning:** ~~you~~ *must* test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` (but now it's automated).
+Test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` is now automated.
 
 Bump version info in `__init__.py`, `setup.py`, and `README.md`
 

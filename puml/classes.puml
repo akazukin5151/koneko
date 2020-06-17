@@ -1,58 +1,75 @@
 @startuml
 
-title main.py
+title koneko
 
-abstract class AbstractLoop <<(A, red)>>{
-  +{abstract}start()
+abstract class main.AbstractLoop <<(A, red)>>{
+  +start()
+  -{abstract}_prompt_url_or_id()
+  -_process_url_or_input()
+  -_validate_input()
+  -{abstract}_go_to_mode()
 }
 
-class ArtistModeLoop {
-    + mode
+class main.ArtistModeLoop {
+}
+package main {
+    object illust_follow_mode_loop
+}
+
+main.AbstractLoop <-up- main.ArtistModeLoop
+main.AbstractLoop <-up[hidden]- illust_follow_mode_loop
+
+abstract class ui.AbstractUI <<(A, red)>>{
+    ..Required attributes..
+    - {abstract} data
+    - {abstract} download_function
+    --
+    -{abstract}data_class()
+    -{abstract}tracker()
+    -{abstract}show_instant()
+    -{abstract}pixivrequest()
+    -{abstract}action_before_prefetch()
+    -{abstract}print_page_info()
+    ..Behaviour..
     +start()
-}
-object illust_follow_mode_loop
-
-AbstractLoop <|-down- ArtistModeLoop: inherits
-AbstractLoop <|-down[hidden]- illust_follow_mode_loop: inherits
-illust_follow_mode_loop -right[hidden]-> ViewPostModeLoop
-illust_follow_mode_loop -right[hidden]-> ArtistModeLoop
-ViewPostModeLoop -left[hidden]-> ArtistModeLoop
-ViewPostModeLoop -right[hidden]-> SearchUsersModeLoop
-ViewPostModeLoop -right[hidden]-> FollowingUsersModeLoop
-
-abstract class ui.AbstractGallery <<(A, red)>>{
     +next_page()
     +preview_page()
-    +open_link_coords()
-    +open_link_num()
-    +download_image_coords()
-    +download_image_num()
-    +view_image()
     +reload()
-    +{abstract}handle_prompt()
 }
+
+abstract class ui.AbstractGallery <<(A, red)>>{
+    -data_class()
+    -tracker()
+    -show_instant()
+    -action_before_prefetch()
+    -print_page_info()
+    ..New..
+    +view_image()
+    -_back()
+    +{abstract}handle_prompt()
+    +{abstract}{static}help()
+}
+ui.AbstractUI <|-up- ui.AbstractGallery
 
 class ui.ArtistGallery <<(C, cyan)>>{
-    +handle_prompt()
+    - _artist_user_id
+    -_pixivrequest()
 }
 class ui.IllustFollowGallery <<(C, cyan)>>{
+    -_pixivrequest()
     +go_artist_gallery_coords()
     +go_artist_gallery_num()
-    +handle_prompt()
 }
-ArtistModeLoop*-down- ui.ArtistGallery: composes mode
+main.ArtistModeLoop*-down- ui.ArtistGallery
 
-illust_follow_mode_loop*-down- ui.IllustFollowGallery: composes mode
+illust_follow_mode_loop*-down- ui.IllustFollowGallery
 
-ui.AbstractGallery <-down- ui.IllustFollowGallery: inherits
+ui.AbstractGallery <-down- ui.IllustFollowGallery
 
-ui.AbstractGallery <-down- ui.ArtistGallery: inherits
+ui.AbstractGallery <-down- ui.ArtistGallery
 
-ui.IllustFollowGallery -right[hidden]-> ui.ArtistGallery
-
-class ViewPostModeLoop {
-    + mode
-    +start()
+class main.ViewPostModeLoop {
+    -_process_url_or_input()
 }
 package ui {
     object view_post_mode
@@ -63,81 +80,97 @@ class ui.Image <<(C, cyan)>>{
     + open_image()
     + next_image()
     + previous_image()
+    + show_full_res()
+    + jump_to_page()
     + leave()
 }
 
-AbstractLoop <|-down- ViewPostModeLoop: inherits
-ViewPostModeLoop ..> view_post_mode
+main.AbstractLoop <-up- main.ViewPostModeLoop
+main.ViewPostModeLoop ..> view_post_mode
 view_post_mode ..> ui.Image
 display_image ..> ui.Image
 display_image <.. ui.AbstractGallery
 
 
-class FollowingUsersModeLoop {
-    + mode
-    +start()
+class main.FollowingUsersModeLoop {
+    -_process_url_or_input()
+    -_validate_input()
 }
-class SearchUsersModeLoop {
-    + mode
-    +start()
-}
-AbstractLoop <|-down- FollowingUsersModeLoop: inherits
-AbstractLoop <|-down- SearchUsersModeLoop: inherits
+class main.SearchUsersModeLoop
+main.AbstractLoop <-up- main.FollowingUsersModeLoop
+main.AbstractLoop <-up- main.SearchUsersModeLoop
 
-class ui.FollowingUsers <<(C, cyan)>>
-class ui.SearchUsers <<(C, cyan)>>
-abstract class ui.AbstractUsers <<(A, red)>>{
-    +go_artist_mode()
-    +next_page()
-    +previous_page()
-    +reload()
-    +start()
+class ui.FollowingUsers <<(C, cyan)>> {
+    - user
+    -_pixivrequest()
 }
-ui.AbstractUsers <-down- ui.FollowingUsers: inherits
-ui.AbstractUsers <-down- ui.SearchUsers: inherits
-FollowingUsersModeLoop*-down- ui.FollowingUsers: composes mode
-SearchUsersModeLoop*-down- ui.SearchUsers: composes mode
+class ui.SearchUsers <<(C, cyan)>> {
+    - publicity
+    - your_id
+    -_pixivrequest()
+}
+abstract class ui.AbstractUsers <<(A, red)>>{
+    -data_class()
+    -tracker()
+    -show_instant()
+    -action_before_prefetch()
+    -print_page_info()
+    ..New..
+    +go_artist_mode()
+}
+ui.AbstractUI <|-up- ui.AbstractUsers
+ui.AbstractUsers <-down- ui.FollowingUsers
+ui.AbstractUsers <-down- ui.SearchUsers
+main.FollowingUsersModeLoop*-down- ui.FollowingUsers
+main.SearchUsersModeLoop*-down- ui.SearchUsers
 
 
 abstract class lscat.AbstractTracker <<(A, red)>>{
-    + path
+    - {abstract} orders
+    - {abstract} generator
     +update()
+    -_inspect()
 }
 class lscat.TrackDownloads {
-    + orders
-    + generator
+    - orders
+    - generator
 }
 class lscat.TrackDownloadsUser {
-    + orders
-    + generator
+    - orders
+    - generator
 }
 
-lscat.AbstractTracker <- lscat.TrackDownloadsUser: inherits
-lscat.AbstractTracker <- lscat.TrackDownloads: inherits
+lscat.AbstractTracker <- lscat.TrackDownloadsUser
+lscat.AbstractTracker <-right- lscat.TrackDownloads
 
-ui.AbstractUsers*.down. lscat.TrackDownloadsUser: composes view
-ui.AbstractGallery*.up lscat.TrackDownloads: composes view
+ui.AbstractUsers *.down. lscat.TrackDownloadsUser
+ui.AbstractGallery *.left lscat.TrackDownloads
 
 lscat.TrackDownloadsUser -up[hidden]-> lscat.TrackDownloads
-lscat.TrackDownloadsUser --up[hidden]-> ui.AbstractGallery
 
 package prompt {
     object user_prompt
-    ui.AbstractUsers <..> user_prompt
-
     object gallery_prompt
-    ui.AbstractGallery <.down.> gallery_prompt
-
     object image_prompt
-    ui.Image <.down..> image_prompt
+
+    user_prompt -down[hidden]-> main.AbstractLoop
+    gallery_prompt -down[hidden]-> main.AbstractLoop
+    image_prompt -down[hidden]-> main.AbstractLoop
+
+    main.ArtistModeLoop *-up-- gallery_prompt
+    main.ViewPostModeLoop *-up-- image_prompt
+    main.FollowingUsersModeLoop *-left-- user_prompt
+    main.SearchUsersModeLoop *-left-- user_prompt
+    illust_follow_mode_loop *-up-- gallery_prompt
 }
 
 
 class data.GalleryJson {
+    + page_num
+    + main_path
     + all_pages_cache
-    + current_page_num
+    + offset
     + current_illusts
-    + cached_pages
     + next_url
     + download_path
     + first_img
@@ -145,52 +178,54 @@ class data.GalleryJson {
     +post_json()
     +artist_user_id()
     +image_id()
+    +url()
 }
 class data.ImageJson {
-    + url
-    + filename
+    + image_id
     + artist_illust_id
     + page_num
-    + number_of_pages
     + page_urls
-    + large_dir
-    + downloaded_images
-    +image_filename()
-    +filepath()
-    +next_img_url()
-    +current_url()
+    + number_of_pages
+    + download_path
+    + image_filename
+    + filepath
+    + next_img_url
+    + current_url
 }
 class data.UserJson {
     + page_num
+    + main_path
+    + offset
     + ids_cache
     + names_cache
     + download_path
-    + names
     + all_urls
+    + names
     + all_names
     + splitpoint
     + first_img
-    +update()
     + next_url
     + profile_pic_urls
     + image_urls
+    +update()
     +artist_user_id()
 }
 
-data.GalleryJson *-up- ui.AbstractGallery: composes data
-data.ImageJson *-up- ui.Image: composes data
-data.UserJson *-up- ui.AbstractUsers: composes data
+data.GalleryJson *-up-- ui.AbstractGallery
+data.ImageJson *-up-- ui.Image
+data.UserJson *-up-- ui.AbstractUsers
 
 
-class api.APIHandler {
-    + api_queue
-    + api_thread
+class api.APIHandler << (S,#FF7700) Singleton >> {
+    ..Initial login..
     + api
+    - api_queue
+    - api_thread
+    + credentials
     +start()
     +await_login()
-    +parse_next()
-    +artist_gallery_parse_next()
-    +artist_gallery_request()
+    ..Requests..
+    +artist_gallery()
     +protected_illust_detail()
     +following_user_request()
     +search_user_request()
@@ -198,6 +233,6 @@ class api.APIHandler {
     +protected_download()
 }
 
-api.APIHandler -right[hidden]-> ui.AbstractUsers
+api.APIHandler ---left[hidden]-> ui.AbstractUI
 
 @enduml

@@ -56,47 +56,44 @@ def process_cli_args() -> (str, str):
         print(__version__)
         return 'vh', ''
     elif args['--help'] or args['-h']:
-        print(__doc__)
+        print(__doc__)  # Docopt should handle this anyway
         return 'vh', ''
 
     # Yes it's a lie
     print('Logging in...')
 
-    # Mode given or not will decide the branches
     if (url_or_str := args['<link>']) or (url_or_str := args['<searchstr>']):
-        number_of_args = 1
-    elif url_or_id := args['<link_or_id>']:
-        number_of_args = 2
+        return parse_no_mode(url_or_str)
+    return parse_mode_given(args)
+
+def parse_no_mode(url_or_str):
+    if 'users' in url_or_str:
+        return '1', pure.process_user_url(url_or_str)
+
+    elif 'artworks' in url_or_str or 'illust_id' in url_or_str:
+        return '2', pure.process_artwork_url(url_or_str)
+
+    # Assume you won't search for '3' or 'f'
+    elif url_or_str == '3' or url_or_str == 'f':
+        return '3', ''
+
+    # Assume you won't search for '5' or 'n'
+    elif url_or_str == '5' or url_or_str == 'n':
+        return '5', ''
+
     else:
-        # Docopt should raise an error anyway
-        raise Exception("Invalid command line arguments!")
+        return '4', url_or_str
 
-    if number_of_args == 1:
-        if 'users' in url_or_str:
-            return '1', pure.process_user_url(url_or_str)
+def parse_mode_given(args):
+    url_or_id = args['<link_or_id>']
 
-        elif 'artworks' in url_or_str or 'illust_id' in url_or_str:
-            return '2', pure.process_artwork_url(url_or_str)
+    if args['1'] or args['a']:
+        return '1', pure.process_user_url(url_or_id)
 
-        # Assume you won't search for '3' or 'f'
-        elif url_or_str == '3' or url_or_str == 'f':
-            return '3', ''
+    elif args['2'] or args['i']:
+        return '2', pure.process_artwork_url(url_or_id)
 
-        # Assume you won't search for '5' or 'n'
-        elif url_or_str == '5' or url_or_str == 'n':
-            return '5', ''
+    elif args['3'] or args['f']:
+        return '3', pure.process_user_url(url_or_id)
+    # Mode 4 isn't needed here, because docopt catches <searchstr>
 
-        else:
-            return '4', url_or_str
-
-    elif number_of_args == 2:
-        if args['1'] or args['a']:
-            return '1', pure.process_user_url(url_or_id)
-
-        elif args['2'] or args['i']:
-            return '2', pure.process_artwork_url(url_or_id)
-
-        elif args['3'] or args['f']:
-            return '3', pure.process_user_url(url_or_id)
-
-        # Mode 4 isn't needed here, because docopt catches <searchstr>

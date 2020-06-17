@@ -41,8 +41,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
 
 @contextmanager
 def cd(newdir: Path) -> None:
-    """
-    Change current script directory, do something, change back to old directory
+    """Change current script directory, do something, change back to old directory
     See https://stackoverflow.com/questions/431684/how-do-i-change-the-working-directory-in-python/24176022#24176022
 
     Parameters
@@ -68,9 +67,7 @@ def _spin(done: 'Event', message: str) -> None:
 
 @funcy.decorator
 def spinner(call: 'func[T]', message='') -> 'T':
-    """
-    See http://hackflow.com/blog/2013/11/03/painless-decorators/
-    """
+    """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
     done = threading.Event()
     spinner_thread = threading.Thread(target=_spin, args=(done, message))
     spinner_thread.start()

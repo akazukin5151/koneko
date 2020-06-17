@@ -1,13 +1,20 @@
 """Kind of pointless; just to test the individual functions don't crash
 (And to bump up the coverage)
+
+Assume that you have valid working credentials and config stored
+in ~/.config/koneko/config.ini
+And internet connection
 """
-
-import sys
-
 import pytest
 
-from koneko import ui, main, utils, config
+from koneko import main, utils, config
 
+
+class CustomExit(SystemExit):
+    pass
+
+def raises_customexit(*a, **k):
+    raise CustomExit()
 
 @pytest.fixture
 def set_config(monkeypatch):
@@ -15,166 +22,72 @@ def set_config(monkeypatch):
     monkeypatch.setattr('koneko.main.config.begin_config',
                         lambda: (credentials, your_id))
 
-@pytest.mark.integration
-def test_mode1(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: ('1', 2232374))
+@pytest.fixture
+def set_argc_to_one(monkeypatch):
+    monkeypatch.setattr('koneko.main.sys.argv', [1])
 
-    # Make the prompt exit (return True will cause main() to loop forever)
-    monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
-                        lambda x: sys.exit(0))
 
-    with pytest.raises(SystemExit):
+
+def cli_core(monkeypatch, args: tuple, prompt: str):
+    monkeypatch.setattr('koneko.main.cli.process_cli_args', lambda: args)
+    monkeypatch.setattr(prompt, raises_customexit)
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
-def test_mode1_input(monkeypatch):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.sys.argv', [1])
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
+def test_mode1_cli(monkeypatch, set_config):
+    cli_core(monkeypatch, ('1', 2232374), 'koneko.main.prompt.gallery_like_prompt')
+
+@pytest.mark.integration
+def test_mode2_cli(monkeypatch, set_config):
+    cli_core(monkeypatch, ('2', 78823485), 'koneko.main.prompt.image_prompt')
+
+@pytest.mark.integration
+def test_mode3_cli(monkeypatch, set_config, send_enter):
+    cli_core(monkeypatch, ('3', ''), 'koneko.main.prompt.user_prompt')
+
+@pytest.mark.integration
+def test_mode4_cli(monkeypatch, set_config):
+    cli_core(monkeypatch, ('4', 'gomzi'), 'koneko.main.prompt.user_prompt')
+
+@pytest.mark.integration
+def test_mode5_cli(monkeypatch, set_config):
+    cli_core(monkeypatch, ('5', ''), 'koneko.main.prompt.gallery_like_prompt')
+
+
+
+def input_core(monkeypatch, responses: iter, prompt: str):
+    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
+    monkeypatch.setattr(prompt, raises_customexit)
+    with pytest.raises(CustomExit):
+        main.main()
+
+@pytest.mark.integration
+def test_mode1_input(monkeypatch, set_argc_to_one):
     responses = iter(['1', 'https://www.pixiv.net/en/users/2232374'])
-    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
-
-    monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
-                        lambda x: sys.exit(0))
-
-    with pytest.raises(SystemExit):
-        main.main()
+    input_core(monkeypatch, responses, 'koneko.main.prompt.gallery_like_prompt')
 
 @pytest.mark.integration
-def test_mode2(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: ('2', 78823485))
-
-    monkeypatch.setattr('koneko.main.ui.prompt.image_prompt',
-                        lambda x: sys.exit(0))
-
-    with pytest.raises(SystemExit):
-        main.main()
-
-@pytest.mark.integration
-def test_mode2_input(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.sys.argv', [1])
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
+def test_mode2_input(monkeypatch, set_argc_to_one):
     responses = iter(['2', 'https://www.pixiv.net/en/artworks/78823485'])
-    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
-
-    monkeypatch.setattr('koneko.main.ui.prompt.image_prompt',
-                        lambda x: sys.exit(0))
-
-    with pytest.raises(SystemExit):
-        main.main()
+    input_core(monkeypatch, responses, 'koneko.main.ui.prompt.image_prompt')
 
 @pytest.mark.integration
-def test_mode3(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: ('3', None))
-
-    monkeypatch.setattr('koneko.main.prompt.user_prompt',
-                        lambda x: sys.exit(0))
-
-    monkeypatch.setattr('builtins.input', lambda x: '')
-
-    with pytest.raises(SystemExit):
-        main.main()
+def test_mode3_input(monkeypatch, set_argc_to_one):
+    responses = iter(['3', ''])
+    input_core(monkeypatch, responses, 'koneko.main.prompt.user_prompt')
 
 @pytest.mark.integration
-def test_mode3_input(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.sys.argv', [1])
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
-    monkeypatch.setattr('builtins.input', lambda x=None: '3')
-
-    monkeypatch.setattr('koneko.main.prompt.user_prompt',
-                        lambda x: sys.exit(0))
-
-    with pytest.raises(SystemExit):
-        main.main()
-
-@pytest.mark.integration
-def test_mode4(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: ('4', 'gomzi'))
-
-    monkeypatch.setattr('koneko.main.prompt.user_prompt',
-                        lambda x: sys.exit(0))
-
-    with pytest.raises(SystemExit):
-        main.main()
-
-@pytest.mark.integration
-def test_mode4_input(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.sys.argv', [1])
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
+def test_mode4_input(monkeypatch, set_argc_to_one):
     responses = iter(['4', 'gomzi'])
-    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
-
-    monkeypatch.setattr('koneko.main.prompt.user_prompt',
-                        lambda x: sys.exit(0))
-
-    with pytest.raises(SystemExit):
-        main.main()
+    input_core(monkeypatch, responses, 'koneko.main.prompt.user_prompt')
 
 @pytest.mark.integration
-def test_mode5(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.cli.process_cli_args',
-                        lambda: ('5', None))
+def test_mode5_input(monkeypatch, set_argc_to_one):
+    responses = iter(['5'])
+    input_core(monkeypatch, responses, 'koneko.main.prompt.gallery_like_prompt')
 
-    monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
-                        lambda x: sys.exit(0))
 
-    with pytest.raises(SystemExit):
-        main.main()
-
-@pytest.mark.integration
-def test_mode5_input(monkeypatch, set_config):
-    """Assume that you have valid working credentials and config stored
-    in ~/.config/koneko/config.ini
-    And internet connection
-    """
-    monkeypatch.setattr('koneko.main.sys.argv', [1])
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
-    monkeypatch.setattr('builtins.input', lambda x=None: '5')
-
-    monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
-                        lambda x: sys.exit(0))
-
-    with pytest.raises(SystemExit):
-        main.main()
 
 @pytest.mark.integration
 def test_open_link(monkeypatch):

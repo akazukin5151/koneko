@@ -9,6 +9,12 @@ import pytest
 from koneko import ui, main, utils, config
 
 
+class CustomExit(SystemExit):
+    pass
+
+def raises_customexit(*a, **k):
+    raise CustomExit()
+
 @pytest.fixture
 def set_config(monkeypatch):
     credentials, your_id = config.begin_config()
@@ -26,9 +32,9 @@ def test_mode1(monkeypatch, set_config):
 
     # Make the prompt exit (return True will cause main() to loop forever)
     monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -43,9 +49,9 @@ def test_mode1_input(monkeypatch):
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
     monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -58,9 +64,9 @@ def test_mode2(monkeypatch, set_config):
                         lambda: ('2', 78823485))
 
     monkeypatch.setattr('koneko.main.ui.prompt.image_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -75,9 +81,9 @@ def test_mode2_input(monkeypatch, set_config):
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
     monkeypatch.setattr('koneko.main.ui.prompt.image_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -90,11 +96,11 @@ def test_mode3(monkeypatch, set_config):
                         lambda: ('3', None))
 
     monkeypatch.setattr('koneko.main.prompt.user_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
     monkeypatch.setattr('builtins.input', lambda x: '')
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -108,9 +114,9 @@ def test_mode3_input(monkeypatch, set_config):
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
     monkeypatch.setattr('koneko.main.prompt.user_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -123,9 +129,9 @@ def test_mode4(monkeypatch, set_config):
                         lambda: ('4', 'gomzi'))
 
     monkeypatch.setattr('koneko.main.prompt.user_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -140,9 +146,9 @@ def test_mode4_input(monkeypatch, set_config):
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
     monkeypatch.setattr('koneko.main.prompt.user_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -155,9 +161,9 @@ def test_mode5(monkeypatch, set_config):
                         lambda: ('5', None))
 
     monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration
@@ -171,9 +177,9 @@ def test_mode5_input(monkeypatch, set_config):
     monkeypatch.setattr('builtins.input', lambda x=None: '5')
 
     monkeypatch.setattr('koneko.main.prompt.gallery_like_prompt',
-                        lambda x: sys.exit(0))
+                        raises_customexit)
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(CustomExit):
         main.main()
 
 @pytest.mark.integration

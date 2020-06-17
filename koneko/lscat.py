@@ -94,7 +94,7 @@ class AbstractTracker(ABC):
             self.orders = self.orders[1:]
             self._downloaded.remove(pic)
             self._numlist.remove(next_num)
-            if self._downloaded:
+            if self._downloaded and self.orders:
                 self._inspect()
 
 class TrackDownloads(AbstractTracker):

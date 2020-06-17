@@ -73,7 +73,7 @@ class APIHandler:
     @utils.spinner('')
     def illust_follow_request(self, restrict, offset):
         """Mode 5"""
-        return self.api.illust_follow(restrict=publicity, offset=offset)
+        return self.api.illust_follow(restrict=restrict, offset=offset)
 
     # Download
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))

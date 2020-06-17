@@ -5,6 +5,7 @@ from abc import ABC
 
 from pixcat import Image
 from placeholder import m
+from returns.result import safe
 
 from koneko import utils, config
 
@@ -113,10 +114,8 @@ class TrackDownloadsUsers(AbstractTracker):
     def __init__(self, data):
         print_info = config.check_print_info()
 
-        try:
-            splitpoint = data.splitpoint
-        except AttributeError:
-            splitpoint = read_invis(data)
+        safe_func = safe(lambda x: data.splitpoint)
+        splitpoint = safe_func().fix(lambda x: read_invis(data)).unwrap()
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is

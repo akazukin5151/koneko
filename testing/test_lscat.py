@@ -86,8 +86,8 @@ def test_TrackDownloads(monkeypatch):
 
 
 def test_TrackDownloadsUser(monkeypatch):
+    monkeypatch.setattr('koneko.lscat.read_invis', lambda x: 30)
     mocked_data = Mock()
-    mocked_data.splitpoint = 30
     mocked_generator = Mock()
     tracker = lscat.TrackDownloadsUsers(mocked_data)
     tracker.generator = mocked_generator

@@ -104,8 +104,8 @@ def test_mode3_input(monkeypatch, set_config):
     And internet connection
     """
     monkeypatch.setattr('koneko.main.sys.argv', [1])
-    monkeypatch.setattr('koneko.cli.process_cli_args', lambda: (None, None))
-    monkeypatch.setattr('builtins.input', lambda x=None: '3')
+    responses = iter(['3', ''])
+    monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
     monkeypatch.setattr('koneko.main.prompt.user_prompt',
                         lambda x: sys.exit(0))

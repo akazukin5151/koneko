@@ -41,7 +41,7 @@ setup(
         'placeholder~=1.1',
         'pipey~=0.0.1a',
     ],
-    extras_requires=['pytest~=5.4'],
+    tests_require=['pytest~=5.4'],
     entry_points={
         'console_scripts': [
             'koneko=koneko.main:main',

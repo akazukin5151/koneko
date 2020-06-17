@@ -117,6 +117,26 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ### Version 0.8
 
+* lscat now slightly faster as the image number is calculated only when it finishes downloading, not on every recursion.
+* Fixed opening the manual in user modes not working
+
+#### Code
+* Extract out common behaviour from Gallery and Users ui classes into AbstractUI
+    * Gallery classes is now structued like Users. The most significant difference is the use of `offset` to prefetch and navigate pages.
+    * Unified API requests for each mode
+* Simplified code everywhere
+    * Reduced nesting with early returns
+    * Removed dead code
+    * Split up functions in `config.py`
+    * Split up main function in `main.py`
+    * Split up functions in `cli.py`
+* Remove unused cytoolz dependency
+* More functional style
+    * Use `placeholder` to make lambdas look better
+    * Use `pipey` for functional-style postfix pipes
+    * Using `returns.result` Result container in `config.py` and `splitpoint`
+* Make tests more professional
+
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!

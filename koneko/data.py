@@ -167,14 +167,3 @@ class UserJson:
     def first_img(self) -> str:
         return self.all_names[0]
 
-    @staticmethod
-    def _user_id(json: 'Json') -> str:
-        return json['user']['id']
-
-    @staticmethod
-    def _user_name(json: 'Json') -> str:
-        return json['user']['name']
-
-    @staticmethod
-    def _user_profile_pic(json: 'Json') -> str:
-        return json['user']['profile_image_urls']['medium']

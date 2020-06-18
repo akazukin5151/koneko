@@ -8,9 +8,9 @@ RESET = '\x1b[39m'
 BLUE_N = ''.join([RED, '[', BLUE, 'n', RED, ']', RESET])
 
 # Private
-def _letter(letter: str) -> str:
+def _letter_with_brackets(letter: str) -> str:
     """[] are red and a is magenta
-    >>> _letter("a")
+    >>> _letter_with_brackets("a")
     ... [a]
     """
     return ''.join([RED, '[', MAGENTA, letter, RED, ']', RESET])
@@ -42,7 +42,7 @@ _COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
 _Map = P(lambda iterable, func: list(map(func, iterable)))
 
 # Public
-n, p, r, q, m, b, o_, d_, f = _letters >> _Map(_letter)
+n, p, r, q, m, b, o_, d_, f = _letters >> _Map(_letter_with_brackets)
 
 i = _letter_with_coords('i')
 

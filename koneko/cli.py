@@ -81,8 +81,7 @@ def parse_no_mode(url_or_str):
     elif url_or_str == '5' or url_or_str == 'n':
         return '5', ''
 
-    else:
-        return '4', url_or_str
+    return '4', url_or_str
 
 def parse_mode_given(args):
     url_or_id = args['<link_or_id>']

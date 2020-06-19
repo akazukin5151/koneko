@@ -1,4 +1,17 @@
-"""The default image renderer for koneko"""
+"""The default image renderer for koneko.
+
+1) The ui classes start the download with the appropriate tracker instance.
+   The tracker's update method acts as a callback upon a finished download
+2) After each image finishes downloading, the callback is triggered (`tracker.update()`)
+3) The `update()` method stores which images have finished downloading and their
+   respective number, but has not been displayed yet.
+4) On every callback, the `update()` method inspects the list against the given order.
+   If the next image to be shown is in the list, it is displayed.
+5) Immediately, remove the image from the lists and repeat the `_inspect()` method
+   for the next valid image. If there is one, repeat. If not, do nothing and wait for
+   more completed downloads
+"""
+
 import os
 import threading
 from abc import ABC
@@ -10,10 +23,10 @@ from returns.result import safe
 from koneko import utils, config
 
 
-def ncols(term_width, img_width, padding):
+def ncols(term_width: int, img_width: int, padding: int) -> int:
     return round(term_width / (img_width + padding))
 
-def xcoords(term_width, img_width=18, padding=2, offset=0):
+def xcoords(term_width: int, img_width=18, padding=2, offset=0) -> 'list[int]':
     """Generates the x-coord for each column to pass into pixcat
     If img_width == 18 and 90 > term_width > 110, there will be five columns,
     with spaces of (2, 20, 38, 56, 74)
@@ -23,7 +36,7 @@ def xcoords(term_width, img_width=18, padding=2, offset=0):
     return [col % number_of_columns * img_width + padding + offset
             for col in range(number_of_columns)]
 
-def ycoords(term_height, img_height=8, padding=1):
+def ycoords(term_height: int, img_height=8, padding=1) -> 'list[int]':
     """Generates the y-coord for each row to pass into pixcat
     If img_height == 8 and 27 > term_height >= 18, there will be two rows,
     with spaces of (0, 9)
@@ -34,10 +47,10 @@ def ycoords(term_height, img_height=8, padding=1):
             for row in range(number_of_rows)]
 
 
-def icat(args):
+def icat(args: str) -> 'IO':
     os.system(f'kitty +kitten icat --silent {args}')
 
-def show_instant(cls, data, gallerymode=False):
+def show_instant(cls, data, gallerymode=False) -> 'IO':
     tracker = cls(data)
     # Filter out invisible files
     # (used to save splitpoint and total_imgs without requesting)
@@ -70,7 +83,7 @@ class AbstractTracker(ABC):
 
         self.generator.send(None)
 
-    def update(self, new: str):
+    def update(self, new: str) -> 'IO':
         # Can't use queues/channels instead of a lock, because of race conditions
         with self._lock:
             self._downloaded.append(new)
@@ -78,12 +91,10 @@ class AbstractTracker(ABC):
 
         self._inspect()
 
-    def _inspect(self):
-        """
-        images 0-29 are artist profile pics
-        images 30-119 are previews, 3 for each artist
-        so the valid order is:
-        0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
+    def _inspect(self) -> 'IO':
+        """Inspect the list of images that have finished downloading but not displayed
+        yet. According to the given orders list, if the next image to be displayed
+        is in the list, display it, then look for the next next image and repeat.
         """
         next_num = self.orders[0]
 
@@ -114,8 +125,11 @@ class TrackDownloadsUsers(AbstractTracker):
     def __init__(self, data):
         print_info = config.check_print_info()
 
-        safe_func = safe(lambda x: data.splitpoint)
-        splitpoint = safe_func().fix(lambda x: read_invis(data)).unwrap()
+        # Tries to access splitpoint attribute in the data instance
+        # If it fails, `fix` it by calling the read_invis() function
+        # Either way, the Success() result is inside the Result[] monad, so unwrap() it
+        safe_func: 'func[Result[int]]' = safe(lambda: data.splitpoint)
+        splitpoint: int = safe_func().fix(lambda x: read_invis(data)).unwrap()
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is
@@ -125,7 +139,7 @@ class TrackDownloadsUsers(AbstractTracker):
         self.generator = generate_users(data.download_path, print_info)
         super().__init__()
 
-def generate_page(path):
+def generate_page(path) -> 'IO':
     """Given number, calculate its coordinates and display it, then yield"""
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
@@ -151,7 +165,7 @@ def generate_page(path):
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
 
-def generate_users(path, print_info=True):
+def generate_users(path, print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
     page_spacing = config.users_page_spacing_config()
@@ -181,16 +195,16 @@ def generate_users(path, print_info=True):
                                                             x=preview_xcoords[i])
                 i += 1
 
-def generate_orders(total_pics, artists_count):
-    """
+def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
+    """Returns the order of images to be displayed
     images 0-29 are artist profile pics
     images 30-119 are previews, 3 for each artist
     so the valid order is:
     0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
     a, p,  p,  p,  a, p,  p,  p,  a, ...
     """
-    artist = list(range(artists_count))
-    prev = list(range(artists_count, total_pics))
+    artist = tuple(range(artists_count))
+    prev = tuple(range(artists_count, total_pics))
     order = []
     a, p = 0, 0
 
@@ -208,41 +222,28 @@ def generate_orders(total_pics, artists_count):
 class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
     def __init__(self, data):
-        super().__init__(data)
         self.orders = list(range(1, 30))
         self.generator = generate_previews(data.download_path)
-        self.generator.send(None)
+        super().__init__(data)
 
-    def _inspect(self):
+    def update(self, new: str):
         """Overrides base class because numlist is different"""
-        next_num = self.orders[self._counter]
-        numlist = [int(f.split('_')[1].replace('p', '')) for f in self._downloaded]
+        with self._lock:
+            self._downloaded.append(new)
+            self._numlist.append(int(f.split('_')[1].replace('p', '')))
 
-        if next_num in numlist:
-            pic = self._downloaded[numlist.index(next_num)]
-            # Display page
-            if next_num == 0:
-                os.system('clear')
-            self.generator.send(pic)
+        self._inspect()
 
-            self._counter += 1
-            self._downloaded.remove(pic)
-            numlist.remove(next_num)
-            if self._downloaded:
-                self._inspect()
-
-def generate_previews(path):
+def generate_previews(path) -> 'IO':
     """Experimental"""
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
-
     thumbnail_size = config.thumbnail_size_config()
 
+    os.system('clear')
     i = 0
     while True:
-        # Release control. When _inspect() sends another image,
-        # assign to the variables and display it again
         image = yield
         i += 1
 

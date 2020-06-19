@@ -4,10 +4,18 @@ import sys
 import time
 
 from blessed import Terminal
+from placeholder import m
 
 from koneko import ui, utils, colors, download
 
 TERM = Terminal()
+
+
+def allf(iterable: 'iter[T]', predicate: 'func(i: T) -> bool') -> bool:
+    for item in iterable:
+        if not predicate(item):
+            return False
+    return True
 
 def ask_quit():
     """Ask for quit confirmation, no need to press enter"""
@@ -95,20 +103,21 @@ def gallery_like_prompt(gallery):
                 print('Enter a gallery command:')
 
             # Multi char sequence
-            if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+            if len(keyseqs) == 2 and allf(keyseqs, m.isdigit()):
                 return goto_image(gallery, utils.seq_to_num(keyseqs))
 
-            elif (len(keyseqs) == 3 and keyseqs[1].isdigit() and keyseqs[2].isdigit()
-                  and keyseqs[0] in sequenceable_keys):
+            elif (len(keyseqs) == 3 and allf(keyseqs[1:], m.isdigit()) and
+                  keyseqs[0] in sequenceable_keys):
 
                 open_or_download(gallery, keyseqs)
 
                 if keyseqs[0] == 'i':
                     return goto_image(gallery, utils.seq_to_int(keyseqs, 1))
+
                 elif keyseqs[0].lower() == 'a':
                     return gallery.handle_prompt(keyseqs)
-                else:
-                    keyseqs = []
+
+                keyseqs = []
 
             if len(keyseqs) > 3:
                 print('\nInvalid command! Press h to show help')
@@ -164,7 +173,7 @@ def image_prompt(image):
                 print('Invalid command! Press h to show help')
 
             # Two digit sequence -- jump to post number
-            if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+            if len(keyseqs) == 2 and  allf(keyseqs, m.isdigit()):
                 ui.jump_to_image(image.data, utils.seq_to_int(keyseqs))
                 keyseqs = []
 
@@ -220,7 +229,7 @@ def user_prompt(user):
 
             # End of the sequence...
             # Two digit sequence -- view artist given number
-            if len(keyseqs) == 2 and keyseqs[0].isdigit() and keyseqs[1].isdigit():
+            if len(keyseqs) == 2 and allf(keyseqs, m.isdigit()):
                 return user.go_artist_mode(utils.seq_to_int(keyseqs))
 
 def _user_help():

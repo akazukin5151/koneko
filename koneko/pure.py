@@ -17,6 +17,7 @@ from koneko import colors as c
 
 Map = P(lambda iterable, func: list(map(func, iterable)))
 
+
 def split_backslash_last(string: str) -> str:
     """Intended for splitting url to get filename, but it has lots of applications..."""
     return string.split('/')[-1]
@@ -25,6 +26,7 @@ def split_backslash_last(string: str) -> str:
 def generate_filepath(filename: str) -> Path:
     return Path('~').expanduser() / 'Downloads' / filename
 
+
 def prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
     """old_name_with_ext can be `test.png`, but new_name is `abcd`"""
     img_ext = old_name_with_ext.split('.')[-1]
@@ -32,10 +34,12 @@ def prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
     new_file_name = f'{number_prefix}_{new_name}.{img_ext}'
     return new_file_name
 
+
 def prefix_artist_name(name: str, number: int) -> str:
     number_prefix = str(number).rjust(2, '0')
     new_file_name = f"{number_prefix}\n{' ' * 19}{name}"
     return new_file_name
+
 
 def print_multiple_imgs(illusts_json: 'Json') -> None:
     HASHTAG = f'{c.RED}#'
@@ -96,6 +100,7 @@ def change_url_to_full(url: str, png=False) -> str:
         url = url.replace('jpg', 'png')
     return url
 
+
 @funcy.decorator
 def catch_ctrl_c(call: 'func[T]') -> 'T':
     """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
@@ -103,6 +108,7 @@ def catch_ctrl_c(call: 'func[T]') -> 'T':
         return call()
     except KeyboardInterrupt:
         os.system('clear')
+
 
 def process_user_url(url_or_id: str) -> str:
     if 'users' in url_or_id:
@@ -114,6 +120,7 @@ def process_user_url(url_or_id: str) -> str:
         user_input = url_or_id
     return user_input
 
+
 def process_artwork_url(url_or_id: str) -> str:
     if 'artworks' in url_or_id:
         user_input = split_backslash_last(url_or_id).split('\\')[0]
@@ -122,3 +129,20 @@ def process_artwork_url(url_or_id: str) -> str:
     else:
         user_input = url_or_id
     return user_input
+
+
+def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':
+    return (
+        urls
+        >> P(len)
+        >> P(range)
+        >> P(lambda r: map(prefix_filename, oldnames_with_ext, newnames, r))
+        >> P(list)
+    )
+
+def full_img_details(url: str, png=False) -> (str, str, Path):
+    # Example of an image that needs to be downloaded in png: 77803142
+    url = change_url_to_full(url, png=png)
+    filename = split_backslash_last(url)
+    filepath = generate_filepath(filename)
+    return url, filename, filepath

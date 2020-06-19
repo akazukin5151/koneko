@@ -15,11 +15,10 @@ class AbstractUI(ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Child classes must pass in main_path, and
-        declare the data and download_function attributes as appropriate.
+        declare the data attribute as appropriate.
         Main path includes any user input (eg, artist user id or search string)
         """
         self.data: 'data.<class>'
-        self.download_function: 'download.<function>'
         self.start(main_path)
 
     @abstractmethod
@@ -79,7 +78,7 @@ class AbstractUI(ABC):
 
         api.myapi.await_login()
         self._parse_user_infos()
-        download.init_download(self.data, self.download_function, self.tracker())
+        download.init_download(self.data, self.tracker())
         self.print_page_info()
 
     def _prefetch_thread(self):
@@ -112,7 +111,7 @@ class AbstractUI(ABC):
         self.data.page_num = int(self.data.offset) // 30 + 1
 
         self._parse_user_infos()
-        download.init_download(self.data, self.download_function, None)
+        download.init_download(self.data, None)
 
         self.data.page_num = oldnum
 
@@ -153,12 +152,11 @@ class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for galleries"""
-        self.download_function = download.download_page
         super().__init__(main_path)
 
     def data_class(self, main_path):
         """Implements abstractmethod: Instantiate the dataclass for galleries"""
-        return data.GalleryJson(1, main_path)
+        return data.GalleryData(1, main_path)
 
     def tracker(self):
         """Implements abstractmethod: Instantiate tracker for galleries"""
@@ -199,7 +197,7 @@ class AbstractGallery(AbstractUI, ABC):
         """Go to image mode"""
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
-        idata = data.ImageJson(post_json, image_id)
+        idata = data.ImageData(post_json, image_id)
 
         display_image(
             post_json,
@@ -384,12 +382,11 @@ class AbstractUsers(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for user modes"""
-        self.download_function = download.user_download
         super().__init__(main_path)
 
     def data_class(self, main_path):
         """Implements abstractmethod: Instantiate the dataclass for user modes"""
-        return data.UserJson(1, main_path)
+        return data.UserData(1, main_path)
 
     def tracker(self):
         """Implements abstractmethod: Instantiate tracker for user modes"""
@@ -479,7 +476,7 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     filename = pure.split_backslash_last(url)
     download_path = (KONEKODIR / str(artist_user_id) / 'individual' /
                      str(data.image_id(number_prefix)))
-    download.download_core(download_path, url, filename)
+    download.download_url(download_path, url, filename)
 
     # BLOCKING: imput is blocking, will not display large image until input
     # received
@@ -507,9 +504,9 @@ def view_post_mode(image_id):
         print('Work has been deleted or the ID does not exist!')
         sys.exit(1)
 
-    idata = data.ImageJson(post_json, image_id)
+    idata = data.ImageData(post_json, image_id)
 
-    download.download_core(idata.download_path, idata.current_url, idata.image_filename)
+    download.download_url(idata.download_path, idata.current_url, idata.image_filename)
     lscat.icat(idata.download_path / idata.image_filename)
     print(f'Page 1/{idata.number_of_pages}')
 
@@ -591,7 +588,7 @@ class Image:
             ):
                 tracker.update(pure.split_backslash_last(img[0]))
             else:
-                download.async_download_core(self.data.download_path, img,
+                download.async_download_no_rename(self.data.download_path, img,
                                              tracker=tracker)
 
             slicestart += 1
@@ -606,9 +603,9 @@ class Image:
 def show_full_res(data):
     # FIXME: some images that need to be downloaded in png won't work
     # Can use verified function above
-    large_url = pure.change_url_to_full(url=data.current_url)
+    large_url = pure.change_url_to_full(data.current_url)
     filename = pure.split_backslash_last(large_url)
-    download.download_core(data.download_path, large_url, filename)
+    download.download_url(data.download_path, large_url, filename)
     lscat.icat(data.download_path / filename)
 
 def next_image(data):

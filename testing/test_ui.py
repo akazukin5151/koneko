@@ -22,7 +22,7 @@ def test_download_image_coords(monkeypatch):
     # Should belong to test_download.py now
     monkeypatch.setattr('koneko.api.myapi.protected_download', lambda x: True)
     monkeypatch.setattr('koneko.utils.verify_full_download', lambda x: True)
-    monkeypatch.setattr('koneko.download.download_core', lambda *a, **k: True)
+    monkeypatch.setattr('koneko.download.download_url', lambda *a, **k: True)
     download.download_image_coords(data, 1, 2)
     # Try if not verified first, then true
     responses = iter([False, True])
@@ -75,7 +75,7 @@ def test_previous_page_users(monkeypatch):
     assert gallery.data.offset == 60
 
 def test_show_full_res(monkeypatch):
-    monkeypatch.setattr('koneko.download.download_core', lambda *a: True)
+    monkeypatch.setattr('koneko.download.download_url', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
     data.current_url = 'fake'
     data.download_path = Path('fake')

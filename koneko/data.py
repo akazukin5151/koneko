@@ -1,13 +1,15 @@
 """Stores json data from the api. Acts as frontend to access data in a single line.
 Functionally pure, no side effects (but stores state)
+Despite GalleryData and UserData having lots of shared attributes/properties/methods,
+there isn't much shared functionality, so there's nothing to extract to an abstract
+base class
 """
 from placeholder import _
-from pipey import Pipeable as P
 
 from koneko import KONEKODIR, pure
 
 
-class GalleryJson:
+class GalleryData:
     """Stores data for gallery modes (mode 1 and 5)
     Structure of the JSON raw:
         illust                  (list of posts)         self.current_illusts
@@ -67,8 +69,16 @@ class GalleryJson:
     def url(self, number: int) -> str:
         return pure.url_given_size(self.post_json(number), 'large')
 
+    @property
+    def all_urls(self) -> 'list[str]':
+        return pure.medium_urls(self.current_illusts)
 
-class ImageJson:
+    @property
+    def all_names(self) -> 'list[str]':
+        return pure.post_titles_in_page(self.current_illusts)
+
+
+class ImageData:
     """Stores data for image view (mode 2)"""
     def __init__(self, raw: 'Json', image_id: str):
         self.image_id = image_id
@@ -100,7 +110,7 @@ class ImageJson:
         return self.page_urls[self.page_num]
 
 
-class UserJson:
+class UserData:
     """Stores data for user views (modes 3 and 4)"""
     def __init__(self, page_num: int, main_path: str):
         self.page_num = page_num
@@ -168,14 +178,3 @@ class UserJson:
     def first_img(self) -> str:
         return self.all_names[0]
 
-    @staticmethod
-    def _user_id(json: 'Json') -> str:
-        return json['user']['id']
-
-    @staticmethod
-    def _user_name(json: 'Json') -> str:
-        return json['user']['name']
-
-    @staticmethod
-    def _user_profile_pic(json: 'Json') -> str:
-        return json['user']['profile_image_urls']['medium']

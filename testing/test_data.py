@@ -22,7 +22,7 @@ with open('testing/files/mode3.json', 'r') as json_file:
 
 
 def test_gallery():
-    gdata = data.GalleryJson(1, Path(f"{KONEKODIR}/2232374/"))
+    gdata = data.GalleryData(1, Path(f"{KONEKODIR}/2232374/"))
     assert gdata
     assert gdata.all_pages_cache == {}
     assert gdata.page_num == 1
@@ -46,12 +46,15 @@ def test_gallery():
 
     assert gdata.first_img == "みこっちゃん"
 
-    assert gdata.page_num == 1
-    assert gdata.page_num == gdata.page_num
+    assert gdata.url(0) == 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2020/05/14/06/45/24/81547984_p0_master1200.jpg'
+
+    assert gdata.all_urls[:3] == ['https://i.pximg.net/c/540x540_10_webp/img-master/img/2020/05/14/06/45/24/81547984_p0_square1200.jpg', 'https://i.pximg.net/c/540x540_10_webp/img-master/img/2020/05/12/06/36/27/81501385_p0_square1200.jpg', 'https://i.pximg.net/c/540x540_10_webp/img-master/img/2020/05/10/23/10/38/81468125_p0_square1200.jpg']
+
+    assert gdata.all_names == ['みこっちゃん', 'おりじなる', '0510', '5.3', 'おりじなる', 'ミコ誕オメ画！', '5.2', '5.1', '310', 'Midnight Sun', '222', 'バレンタイン', '祝！！！', 'あけましておめでとうございます', 'ミコサンタ', 'C97告知', 'ミコバニー', 'たちかわ楽市2019仕様4人組', 'ハロミコ', '夏服', '御坂美琴写真集１０用', '常盤台中学指定体操服改', 'ツイッターまとめ', 'スクミズミコクロ', 'ミズミコ', 'ミコニャン', 'とある画帖', '御坂美琴写真集９', 'ジャンプ！', 'シャワミコ']
 
 
 def test_image():
-    idata = data.ImageJson(mode2["illust"], "76695217")
+    idata = data.ImageData(mode2["illust"], "76695217")
     assert idata
     assert idata.artist_user_id == 2232374
     assert idata.page_num == 0
@@ -69,7 +72,7 @@ def test_image():
 
 
 def test_user():
-    udata = data.UserJson(1, Path(f"{KONEKODIR}/following/2232374"))
+    udata = data.UserData(1, Path(f"{KONEKODIR}/following/2232374"))
     assert udata
 
     udata.update(mode3)

@@ -103,8 +103,8 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 # Roadmap
 
 * In-depth usage documentation?
+* Move functions that do work to pure or utils (as opposed to functions that organise work)
 * Consistent public and private methods and attributes again (only show public ones in puml)
-* Functional way of doing ui.py?
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features
@@ -130,6 +130,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * Split up functions in `config.py`
     * Split up main function in `main.py`
     * Split up functions in `cli.py`
+    * Split up functions in `download.py`
 * Remove unused cytoolz dependency
 * More functional style
     * Use `placeholder` to make lambdas look better

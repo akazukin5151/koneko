@@ -15,11 +15,10 @@ class AbstractUI(ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Child classes must pass in main_path, and
-        declare the data and download_function attributes as appropriate.
+        declare the data attribute as appropriate.
         Main path includes any user input (eg, artist user id or search string)
         """
         self.data: 'data.<class>'
-        self.download_function: 'download.<function>'
         self.start(main_path)
 
     @abstractmethod
@@ -79,7 +78,7 @@ class AbstractUI(ABC):
 
         api.myapi.await_login()
         self._parse_user_infos()
-        download.init_download(self.data, self.download_function, self.tracker())
+        download.init_download(self.data, self.tracker())
         self.print_page_info()
 
     def _prefetch_thread(self):
@@ -112,7 +111,7 @@ class AbstractUI(ABC):
         self.data.page_num = int(self.data.offset) // 30 + 1
 
         self._parse_user_infos()
-        download.init_download(self.data, self.download_function, None)
+        download.init_download(self.data, None)
 
         self.data.page_num = oldnum
 
@@ -153,7 +152,6 @@ class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for galleries"""
-        self.download_function = download.gallery_download
         super().__init__(main_path)
 
     def data_class(self, main_path):
@@ -384,7 +382,6 @@ class AbstractUsers(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for user modes"""
-        self.download_function = download.user_download
         super().__init__(main_path)
 
     def data_class(self, main_path):

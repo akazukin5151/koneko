@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pipey import Pipeable as P
 
 from koneko import api, pure, utils
+from koneko.data import UserJson
 
 
 # - Wrappers around download functions, for downloading multi-images
@@ -18,8 +19,8 @@ def save_number_of_artists(data) -> 'IO':
         with open('.koneko', 'w') as f:
             f.write(str(data.splitpoint))
 
-def init_download(data, download_func, tracker) -> 'IO':
-    """Generic initial download function for AbstractUI (gallery and users)"""
+def init_download(data, tracker) -> 'IO':
+    """Download the illustrations of one page  and rename them."""
     if utils.dir_not_empty(data):
         return True
 
@@ -28,25 +29,10 @@ def init_download(data, download_func, tracker) -> 'IO':
     if data.download_path.is_dir():
         os.system(f'rm -r {data.download_path}')  # shutil.rmtree is better
 
-    download_func(data, tracker=tracker)
-
-    if download_func == user_download:
-        save_number_of_artists()
-
-# The two possible `download_func`s
-def gallery_download(data, tracker=None) -> 'IO':
-    """
-    Download the illustrations on one page of given artist id (using threads),
-    rename them based on the *post title*. Used for gallery modes (1 and 5)
-    """
-    urls = pure.medium_urls(data.current_illusts)
-    titles = pure.post_titles_in_page(data.current_illusts)
-
-    async_download_rename(data.download_path, urls, titles, tracker)
-    # TODO: use data.all_urls and data.all_names like user mode
-
-def user_download(data, tracker=None) -> 'IO':
     async_download_rename(data.download_path, data.all_urls, data.all_names, tracker)
+
+    if isinstance(data, UserJson):
+        save_number_of_artists(data)
 
 
 # - Download functions for multiple images

@@ -66,6 +66,14 @@ class GalleryJson:
     def url(self, number: int) -> str:
         return pure.url_given_size(self.post_json(number), 'large')
 
+    @property
+    def all_urls(self) -> 'list[str]':
+        return pure.medium_urls(self.current_illusts)
+
+    @property
+    def all_names(self) -> 'list[str]':
+        return pure.post_titles_in_page(self.current_illusts)
+
 
 class ImageJson:
     """Stores data for image view (mode 2)"""

@@ -1,5 +1,8 @@
 """Stores json data from the api. Acts as frontend to access data in a single line.
 Functionally pure, no side effects (but stores state)
+Despite GalleryData and UserData having lots of shared attributes/properties/methods,
+there isn't much shared functionality, so there's nothing to extract to an abstract
+base class
 """
 from placeholder import _
 

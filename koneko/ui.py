@@ -197,7 +197,7 @@ class AbstractGallery(AbstractUI, ABC):
         """Go to image mode"""
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
-        idata = data.ImageJson(post_json, image_id)
+        idata = data.ImageData(post_json, image_id)
 
         display_image(
             post_json,
@@ -386,7 +386,7 @@ class AbstractUsers(AbstractUI, ABC):
 
     def data_class(self, main_path):
         """Implements abstractmethod: Instantiate the dataclass for user modes"""
-        return data.UserJson(1, main_path)
+        return data.UserData(1, main_path)
 
     def tracker(self):
         """Implements abstractmethod: Instantiate tracker for user modes"""
@@ -504,7 +504,7 @@ def view_post_mode(image_id):
         print('Work has been deleted or the ID does not exist!')
         sys.exit(1)
 
-    idata = data.ImageJson(post_json, image_id)
+    idata = data.ImageData(post_json, image_id)
 
     download.download_url(idata.download_path, idata.current_url, idata.image_filename)
     lscat.icat(idata.download_path / idata.image_filename)

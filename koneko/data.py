@@ -75,7 +75,7 @@ class GalleryData:
         return pure.post_titles_in_page(self.current_illusts)
 
 
-class ImageJson:
+class ImageData:
     """Stores data for image view (mode 2)"""
     def __init__(self, raw: 'Json', image_id: str):
         self.image_id = image_id
@@ -107,7 +107,7 @@ class ImageJson:
         return self.page_urls[self.page_num]
 
 
-class UserJson:
+class UserData:
     """Stores data for user views (modes 3 and 4)"""
     def __init__(self, page_num: int, main_path: str):
         self.page_num = page_num

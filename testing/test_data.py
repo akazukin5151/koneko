@@ -54,7 +54,7 @@ def test_gallery():
 
 
 def test_image():
-    idata = data.ImageJson(mode2["illust"], "76695217")
+    idata = data.ImageData(mode2["illust"], "76695217")
     assert idata
     assert idata.artist_user_id == 2232374
     assert idata.page_num == 0
@@ -72,7 +72,7 @@ def test_image():
 
 
 def test_user():
-    udata = data.UserJson(1, Path(f"{KONEKODIR}/following/2232374"))
+    udata = data.UserData(1, Path(f"{KONEKODIR}/following/2232374"))
     assert udata
 
     udata.update(mode3)

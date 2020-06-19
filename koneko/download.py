@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pipey import Pipeable as P
 
 from koneko import api, pure, utils
-from koneko.data import UserJson
+from koneko.data import UserData
 
 
 # - Wrappers around download functions, for downloading multi-images
@@ -31,7 +31,7 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
 
     _async_download_rename(data.download_path, data.all_urls, data.all_names, tracker)
 
-    if isinstance(data, UserJson):
+    if isinstance(data, UserData):
         save_number_of_artists(data)
 
 

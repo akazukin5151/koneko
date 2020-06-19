@@ -26,14 +26,14 @@ main.AbstractLoop <-up[hidden]- illust_follow_mode_loop
 abstract class ui.AbstractUI <<(A, red)>>{
     ..Required attribute..
     - {abstract} data
-    ..
+    ..Required behaviour..
     -{abstract}data_class()
     -{abstract}tracker()
     -{abstract}show_instant()
     -{abstract}pixivrequest()
     -{abstract}action_before_prefetch()
     -{abstract}print_page_info()
-    ..Behaviour..
+    ..Common behaviour..
     +start()
     +next_page()
     +preview_page()

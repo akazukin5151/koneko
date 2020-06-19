@@ -128,7 +128,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # Tries to access splitpoint attribute in the data instance
         # If it fails, `fix` it by calling the read_invis() function
         # Either way, the Success() result is inside the Result[] monad, so unwrap() it
-        safe_func: 'func[Result[int]]' = safe(lambda x: data.splitpoint)
+        safe_func: 'func[Result[int]]' = safe(lambda: data.splitpoint)
         splitpoint: int = safe_func().fix(lambda x: read_invis(data)).unwrap()
 
         # splitpoint == number of artists

@@ -9,6 +9,47 @@ from pipey import Pipeable as P
 from koneko import api, pure, utils
 
 
+# - Wrappers around download functions, for downloading multi-images
+def save_number_of_artists(data) -> 'IO':
+    """"Save the number of artists == splitpoint
+    So later accesses, which will not request, can display properly
+    """
+    with utils.cd(data.download_path):
+        with open('.koneko', 'w') as f:
+            f.write(str(data.splitpoint))
+
+def init_download(data, download_func, tracker) -> 'IO':
+    """Generic initial download function for AbstractUI (gallery and users)"""
+    if utils.dir_not_empty(data):
+        return True
+
+    if data.page_num == 1:
+        print('Cache is outdated, reloading...')
+    if data.download_path.is_dir():
+        os.system(f'rm -r {data.download_path}')  # shutil.rmtree is better
+
+    download_func(data, tracker=tracker)
+
+    if download_func == user_download:
+        save_number_of_artists()
+
+# The two possible `download_func`s
+def gallery_download(data, tracker=None) -> 'IO':
+    """
+    Download the illustrations on one page of given artist id (using threads),
+    rename them based on the *post title*. Used for gallery modes (1 and 5)
+    """
+    urls = pure.medium_urls(data.current_illusts)
+    titles = pure.post_titles_in_page(data.current_illusts)
+
+    async_download_rename(data.download_path, urls, titles, tracker)
+    # TODO: use data.all_urls and data.all_names like user mode
+
+def user_download(data, tracker=None) -> 'IO':
+    async_download_rename(data.download_path, data.all_urls, data.all_names, tracker)
+
+
+# - Download functions for multiple images
 def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':
     return (
         urls
@@ -21,19 +62,22 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
 def async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
     newnames_ext = newnames_with_ext(urls, oldnames_ext, newnames)
-    async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext,
-                        tracker)
+    async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext, tracker)
 
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
-    async_filter_and_download(download_path, urls, oldnames_ext, oldnames_ext,
-                        tracker)
+    async_filter_and_download(download_path, urls, oldnames_ext, oldnames_ext, tracker)
+
+@utils.spinner('')
+def async_download_spinner(download_path: Path, urls) -> 'IO':
+    """Batch download in background with spinner. For mode 2; multi-image posts"""
+    async_download_no_rename(download_path, urls)
+
 
 def async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_with_ext,
-                        tracker=None) -> 'IO':
+                              tracker=None) -> 'IO':
     """
-    Rename files with given new name if needed.
-    Submit each url to the ThreadPoolExecutor, so download and rename are concurrent
+    Submit each url to the ThreadPoolExecutor to download and rename in background
     """
     # Nothing needs to be downloaded
     if not urls:
@@ -54,6 +98,8 @@ def download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)
 
+    # Best to rename every completed download in their own thread
+    # to avoid race conditions
     if new_file_name:
         # This character break renames
         if '/' in new_file_name:
@@ -65,46 +111,7 @@ def download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO
         tracker.update(img_name)
 
 
-# - Wrappers around above download functions, for downloading multi-images
-def gallery_download(data, tracker=None) -> 'IO':
-    """
-    Download the illustrations on one page of given artist id (using threads),
-    rename them based on the *post title*. Used for gallery modes (1 and 5)
-    """
-    urls = pure.medium_urls(data.current_illusts)
-    titles = pure.post_titles_in_page(data.current_illusts)
-
-    async_download_rename(data.download_path, urls, titles, tracker)
-    # TODO: use data.all_urls and data.all_names like user mode
-
-def user_download(data, tracker=None) -> 'IO':
-    async_download_rename(data.download_path, data.all_urls, data.all_names,
-                               tracker=tracker)
-
-def init_download(data, download_func, tracker) -> 'IO':
-    if utils.dir_not_empty(data):
-        return True
-
-    if data.page_num == 1:
-        print('Cache is outdated, reloading...')
-    if data.download_path.is_dir():
-        os.system(f'rm -r {data.download_path}')  # shutil.rmtree is better
-
-    download_func(data, tracker=tracker)
-
-    # Save the number of artists == splitpoint
-    # So later accesses, which will not request, can display properly
-    if download_func == user_download:
-        with utils.cd(data.download_path):
-            with open('.koneko', 'w') as f:
-                f.write(str(data.splitpoint))
-
 # - Wrappers around the core functions for downloading one image
-@utils.spinner('')
-def async_download_spinner(download_path: Path, urls) -> 'IO':
-    """Batch download in background with spinner. For mode 2; multi-image posts"""
-    async_download_no_rename(download_path, urls)
-
 # - Synchronous download functions, does not download in background
 @utils.spinner('')
 def download_url(download_path: Path, url, filename: str, try_make_dir=True) -> 'IO':

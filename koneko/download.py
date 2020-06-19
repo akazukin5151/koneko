@@ -9,48 +9,45 @@ from pipey import Pipeable as P
 from koneko import api, pure, utils
 
 
-@utils.spinner('')
-def async_download_spinner(download_path, urls, rename_images=False,
-                           file_names=None):
-    """Batch download and rename, with spinner. For mode 2; multi-image posts"""
-    async_download_core(
-        download_path,
-        urls,
-        rename_images=rename_images,
-        file_names=file_names,
+def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':
+    return (
+        urls
+        >> P(len)
+        >> P(range)
+        >> P(lambda r: map(pure.prefix_filename, oldnames_with_ext, newnames, r))
+        >> P(list)
     )
 
-def async_download_core(download_path, urls, rename_images=False,
-                        file_names=None, tracker=None):
+def async_download_core_rename(download_path, urls, newnames, tracker=None):
+    oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
+    newnames_ext = newnames_with_ext(urls, oldnames_ext, newnames)
+    async_download_core(download_path, urls, oldnames_ext, newnames_ext,
+                        tracker)
+
+def async_download_core_no_rename(download_path, urls, tracker=None):
+    oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
+    async_download_core(download_path, urls, oldnames_ext, oldnames_ext,
+                        tracker)
+
+def async_download_core(download_path, urls, oldnames_with_ext, newnames_with_ext,
+                        tracker=None):
     """
     Rename files with given new name if needed.
     Submit each url to the ThreadPoolExecutor, so download and rename are concurrent
     """
-    os.makedirs(download_path, exist_ok=True)
-
-    oldnames = urls >> pure.Map(pure.split_backslash_last)
-    if rename_images:
-        newnames = (
-            urls
-            >> P(len)
-            >> P(range)
-            >> P(lambda r: map(pure.prefix_filename, oldnames, file_names, r))
-            >> P(list)
-        )
-    else:
-        newnames = oldnames
-
-    filtered = itertools.filterfalse(os.path.isfile, newnames)
-    oldnames = itertools.filterfalse(os.path.isfile, oldnames)
-    helper = partial(downloadr, tracker=tracker)
-
     # Nothing needs to be downloaded
     if not urls:
         return True
 
+    # Filter out already downloaded files
+    downloaded_newnames = itertools.filterfalse(os.path.isfile, newnames_with_ext)
+    downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_with_ext)
+    helper = partial(downloadr, tracker=tracker)
+
+    os.makedirs(download_path, exist_ok=True)
     with utils.cd(download_path):
         with ThreadPoolExecutor(max_workers=len(urls)) as executor:
-            executor.map(helper, urls, oldnames, filtered)
+            executor.map(helper, urls, downloaded_oldnames, downloaded_newnames)
 
 
 def downloadr(url, img_name, new_file_name=None, tracker=None):
@@ -68,6 +65,7 @@ def downloadr(url, img_name, new_file_name=None, tracker=None):
         tracker.update(img_name)
 
 
+# - Wrappers around above download functions, for downloading multi-images
 def download_page(data, tracker=None):
     """
     Download the illustrations on one page of given artist id (using threads),
@@ -76,18 +74,16 @@ def download_page(data, tracker=None):
     urls = pure.medium_urls(data.current_illusts)
     titles = pure.post_titles_in_page(data.current_illusts)
 
-    async_download_core(
-        data.download_path, urls, rename_images=True, file_names=titles,
+    async_download_core_rename(
+        data.download_path, urls, newnames=titles,
         tracker=tracker
     )
 
-# - Wrappers around above download functions, for downloading multi-images
 def user_download(data, tracker=None):
-    async_download_core(
+    async_download_core_rename(
         data.download_path,
         data.all_urls,
-        rename_images=True,
-        file_names=data.all_names,
+        newnames=data.all_names,
         tracker=tracker
     )
 
@@ -112,6 +108,15 @@ def init_download(data, download_func, tracker):
     return True
 
 # - Wrappers around the core functions for downloading one image
+@utils.spinner('')
+def async_download_spinner(download_path, urls):
+    """Batch download and rename, with spinner. For mode 2; multi-image posts"""
+    async_download_core_no_rename(
+        download_path,
+        urls,
+        newnames=None,
+    )
+
 @utils.spinner('')
 def download_core(large_dir, url, filename, try_make_dir=True):
     """Downloads one url, intended for single images only"""
@@ -143,7 +148,7 @@ def download_url_verified(url, png=False):
     else:
         print(f'Image downloaded at {filepath}\n')
 
-# From ui
+# Download full res from ui, on user demand
 def download_image_coords(data, first_num, second_num):
     selected_image_num = utils.find_number_map(int(first_num), int(second_num))
     # 0 is acceptable, but is falsy; but 0 'is not' False

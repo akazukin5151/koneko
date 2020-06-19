@@ -3,15 +3,19 @@
 title koneko
 
 abstract class main.AbstractLoop <<(A, red)>>{
-  +start()
-  -{abstract}_prompt_url_or_id()
-  -_process_url_or_input()
-  -_validate_input()
-  -{abstract}_go_to_mode()
+    +start()
+    -{abstract}_prompt_url_or_id()
+    -_process_url_or_input()
+    -_validate_input()
+    -{abstract}_go_to_mode()
 }
 
 class main.ArtistModeLoop {
+    ..Implements..
+    -_prompt_url_or_id()
+    -_go_to_mode()
 }
+
 package main {
     object illust_follow_mode_loop
 }
@@ -20,9 +24,9 @@ main.AbstractLoop <-up- main.ArtistModeLoop
 main.AbstractLoop <-up[hidden]- illust_follow_mode_loop
 
 abstract class ui.AbstractUI <<(A, red)>>{
-    ..Required attributes..
+    ..Required attribute..
     - {abstract} data
-    --
+    ..
     -{abstract}data_class()
     -{abstract}tracker()
     -{abstract}show_instant()
@@ -33,16 +37,20 @@ abstract class ui.AbstractUI <<(A, red)>>{
     +start()
     +next_page()
     +preview_page()
+    -_parse_and_download()
+    -_prefetch_next_page()
     +reload()
 }
 
 abstract class ui.AbstractGallery <<(A, red)>>{
+    ..Implements..
+    - data
     -data_class()
     -tracker()
     -show_instant()
     -action_before_prefetch()
     -print_page_info()
-    ..New..
+    ..Unique..
     +view_image()
     -_back()
     +{abstract}handle_prompt()
@@ -51,11 +59,19 @@ abstract class ui.AbstractGallery <<(A, red)>>{
 ui.AbstractUI <|-up- ui.AbstractGallery
 
 class ui.ArtistGallery <<(C, cyan)>>{
-    - _artist_user_id
+    ..Implements..
     -_pixivrequest()
+    +handle_prompt()
+    +{static}help()
+    ..Unique..
+    - _artist_user_id
 }
 class ui.IllustFollowGallery <<(C, cyan)>>{
+    ..Implements..
     -_pixivrequest()
+    +handle_prompt()
+    +{static}help()
+    ..Unique..
     +go_artist_gallery_coords()
     +go_artist_gallery_num()
 }
@@ -68,6 +84,10 @@ ui.AbstractGallery <-down- ui.IllustFollowGallery
 ui.AbstractGallery <-down- ui.ArtistGallery
 
 class main.ViewPostModeLoop {
+    ..Implements..
+    -_prompt_url_or_id()
+    -_go_to_mode()
+    ..Overrides..
     -_process_url_or_input()
 }
 package ui {
@@ -75,13 +95,15 @@ package ui {
     object display_image
 }
 class ui.Image <<(C, cyan)>>{
-    + download_image()
-    + open_image()
-    + next_image()
-    + previous_image()
-    + show_full_res()
-    + jump_to_page()
-    + leave()
+    +download_image()
+    +open_image()
+    +next_image()
+    +previous_image()
+    +show_full_res()
+    +jump_to_page()
+    +leave()
+    -_jump()
+    -_prefetch_next_page()
 }
 
 main.AbstractLoop <-up- main.ViewPostModeLoop
@@ -92,29 +114,43 @@ display_image <.. ui.AbstractGallery
 
 
 class main.FollowingUsersModeLoop {
+    ..Implements..
+    -_prompt_url_or_id()
+    -_go_to_mode()
+    ..Overrides..
     -_process_url_or_input()
     -_validate_input()
 }
-class main.SearchUsersModeLoop
+class main.SearchUsersModeLoop {
+    ..Implements..
+    -_prompt_url_or_id()
+    -_go_to_mode()
+}
 main.AbstractLoop <-up- main.FollowingUsersModeLoop
 main.AbstractLoop <-up- main.SearchUsersModeLoop
 
 class ui.FollowingUsers <<(C, cyan)>> {
-    - user
+    ..Implements..
     -_pixivrequest()
+    ..Unique..
+    - user
 }
 class ui.SearchUsers <<(C, cyan)>> {
+    ..Implements..
+    -_pixivrequest()
+    ..Unique..
     - publicity
     - your_id
-    -_pixivrequest()
 }
 abstract class ui.AbstractUsers <<(A, red)>>{
+    ..Implements..
+    - data
     -data_class()
     -tracker()
     -show_instant()
     -action_before_prefetch()
     -print_page_info()
-    ..New..
+    ..Unique..
     +go_artist_mode()
 }
 ui.AbstractUI <|-up- ui.AbstractUsers
@@ -131,10 +167,12 @@ abstract class lscat.AbstractTracker <<(A, red)>>{
     -_inspect()
 }
 class lscat.TrackDownloads {
+    ..Implements..
     - orders
     - generator
 }
 class lscat.TrackDownloadsUser {
+    ..Implements..
     - orders
     - generator
 }
@@ -176,7 +214,7 @@ class data.GalleryJson {
     + first_img
     +update()
     +artist_user_id()
-    --Unique--
+    ..Unique..
     + current_illusts
     +post_json()
     +image_id()
@@ -207,7 +245,7 @@ class data.UserJson {
     + first_img
     +update()
     +artist_user_id()
-    --Unique--
+    ..Unique..
     + names
     + splitpoint
     + profile_pic_urls
@@ -221,7 +259,7 @@ data.UserJson *-up-- ui.AbstractUsers
 
 class api.APIHandler << (S,#FF7700) Singleton >> {
     ..Initial login..
-    + api
+    - api
     - api_queue
     - api_thread
     + credentials

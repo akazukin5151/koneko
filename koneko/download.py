@@ -18,19 +18,19 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
         >> P(list)
     )
 
-def async_download_core_rename(download_path, urls, newnames, tracker=None):
+def async_download_core_rename(download_path, urls, newnames, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
     newnames_ext = newnames_with_ext(urls, oldnames_ext, newnames)
     async_download_core(download_path, urls, oldnames_ext, newnames_ext,
                         tracker)
 
-def async_download_core_no_rename(download_path, urls, tracker=None):
+def async_download_core_no_rename(download_path, urls, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
     async_download_core(download_path, urls, oldnames_ext, oldnames_ext,
                         tracker)
 
 def async_download_core(download_path, urls, oldnames_with_ext, newnames_with_ext,
-                        tracker=None):
+                        tracker=None) -> 'IO':
     """
     Rename files with given new name if needed.
     Submit each url to the ThreadPoolExecutor, so download and rename are concurrent
@@ -50,7 +50,7 @@ def async_download_core(download_path, urls, oldnames_with_ext, newnames_with_ex
             executor.map(helper, urls, downloaded_oldnames, downloaded_newnames)
 
 
-def downloadr(url, img_name, new_file_name=None, tracker=None):
+def downloadr(url, img_name, new_file_name=None, tracker=None) -> 'IO':
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)
 
@@ -66,7 +66,7 @@ def downloadr(url, img_name, new_file_name=None, tracker=None):
 
 
 # - Wrappers around above download functions, for downloading multi-images
-def download_page(data, tracker=None):
+def download_page(data, tracker=None) -> 'IO':
     """
     Download the illustrations on one page of given artist id (using threads),
     rename them based on the *post title*. Used for gallery modes (1 and 5)
@@ -79,7 +79,7 @@ def download_page(data, tracker=None):
         tracker=tracker
     )
 
-def user_download(data, tracker=None):
+def user_download(data, tracker=None) -> 'IO':
     async_download_core_rename(
         data.download_path,
         data.all_urls,
@@ -87,7 +87,7 @@ def user_download(data, tracker=None):
         tracker=tracker
     )
 
-def init_download(data, download_func, tracker):
+def init_download(data, download_func, tracker) -> 'IO':
     if utils.dir_not_empty(data):
         return True
 
@@ -105,11 +105,9 @@ def init_download(data, download_func, tracker):
             with open('.koneko', 'w') as f:
                 f.write(str(data.splitpoint))
 
-    return True
-
 # - Wrappers around the core functions for downloading one image
 @utils.spinner('')
-def async_download_spinner(download_path, urls):
+def async_download_spinner(download_path: Path, urls) -> 'IO':
     """Batch download and rename, with spinner. For mode 2; multi-image posts"""
     async_download_core_no_rename(
         download_path,
@@ -118,24 +116,24 @@ def async_download_spinner(download_path, urls):
     )
 
 @utils.spinner('')
-def download_core(large_dir, url, filename, try_make_dir=True):
+def download_core(download_path: Path, url, filename: str, try_make_dir=True) -> 'IO':
     """Downloads one url, intended for single images only"""
     if try_make_dir:
-        os.makedirs(large_dir, exist_ok=True)
+        os.makedirs(download_path, exist_ok=True)
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
-        with utils.cd(large_dir):
+        with utils.cd(download_path):
             downloadr(url, filename)
 
 
-def full_img_details(url, png=False):
+def full_img_details(url: str, png=False) -> (str, str, Path):
     # Example of an image that needs to be downloaded in png: 77803142
     url = pure.change_url_to_full(url, png=png)
     filename = pure.split_backslash_last(url)
     filepath = pure.generate_filepath(filename)
     return url, filename, filepath
 
-def download_url_verified(url, png=False):
+def download_url_verified(url, png=False) -> 'IO':
     # Returned url might be different if png is True
     url, filename, filepath = full_img_details(url, png=png)
     download_path = Path('~/Downloads').expanduser()
@@ -146,10 +144,10 @@ def download_url_verified(url, png=False):
     if not verified:
         download_url_verified(url, png=True)
     else:
-        print(f'Image downloaded at {filepath}\n')
+        print(f'Image downloaded at {filepath}')
 
 # Download full res from ui, on user demand
-def download_image_coords(data, first_num, second_num):
+def download_image_coords(data, first_num, second_num) -> 'IO':
     selected_image_num = utils.find_number_map(int(first_num), int(second_num))
     # 0 is acceptable, but is falsy; but 0 'is not' False
     if selected_image_num is False:
@@ -157,6 +155,6 @@ def download_image_coords(data, first_num, second_num):
     else:
         download_image_num(data, selected_image_num)
 
-def download_image_num(data, number):
+def download_image_num(data, number) -> 'IO':
     # Update current_page_illusts, in case if you're in another page
     download_url_verified(data.url(number))

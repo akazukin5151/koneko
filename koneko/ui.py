@@ -156,7 +156,7 @@ class AbstractGallery(AbstractUI, ABC):
 
     def data_class(self, main_path):
         """Implements abstractmethod: Instantiate the dataclass for galleries"""
-        return data.GalleryJson(1, main_path)
+        return data.GalleryData(1, main_path)
 
     def tracker(self):
         """Implements abstractmethod: Instantiate tracker for galleries"""

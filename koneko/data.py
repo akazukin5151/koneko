@@ -6,7 +6,7 @@ from placeholder import _
 from koneko import KONEKODIR, pure
 
 
-class GalleryJson:
+class GalleryData:
     """Stores data for gallery modes (mode 1 and 5)
     Structure of the JSON raw:
         illust                  (list of posts)         self.current_illusts

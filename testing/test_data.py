@@ -22,7 +22,7 @@ with open('testing/files/mode3.json', 'r') as json_file:
 
 
 def test_gallery():
-    gdata = data.GalleryJson(1, Path(f"{KONEKODIR}/2232374/"))
+    gdata = data.GalleryData(1, Path(f"{KONEKODIR}/2232374/"))
     assert gdata
     assert gdata.all_pages_cache == {}
     assert gdata.page_num == 1

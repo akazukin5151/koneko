@@ -29,22 +29,21 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
     if data.download_path.is_dir():
         os.system(f'rm -r {data.download_path}')  # shutil.rmtree is better
 
-    async_download_rename(data.download_path, data.all_urls, data.all_names, tracker)
+    _async_download_rename(data.download_path, data.all_urls, data.all_names, tracker)
 
     if isinstance(data, UserJson):
         save_number_of_artists(data)
 
 
 # - Download functions for multiple images
-# private
-def async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
+def _async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
     newnames_ext = pure.newnames_with_ext(urls, oldnames_ext, newnames)
-    async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext, tracker)
+    _async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext, tracker)
 
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
-    async_filter_and_download(download_path, urls, oldnames_ext, oldnames_ext, tracker)
+    _async_filter_and_download(download_path, urls, oldnames_ext, oldnames_ext, tracker)
 
 @utils.spinner('')
 def async_download_spinner(download_path: Path, urls) -> 'IO':
@@ -52,8 +51,7 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
     async_download_no_rename(download_path, urls)
 
 
-# private
-def async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_with_ext,
+def _async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_with_ext,
                               tracker=None) -> 'IO':
     """
     Submit each url to the ThreadPoolExecutor to download and rename in background
@@ -65,7 +63,7 @@ def async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_w
     # Filter out already downloaded files
     downloaded_newnames = itertools.filterfalse(os.path.isfile, newnames_with_ext)
     downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_with_ext)
-    helper = partial(download_then_rename, tracker=tracker)
+    helper = partial(_download_then_rename, tracker=tracker)
 
     os.makedirs(download_path, exist_ok=True)
     with utils.cd(download_path):
@@ -73,8 +71,7 @@ def async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_w
             executor.map(helper, urls, downloaded_oldnames, downloaded_newnames)
 
 
-# private
-def download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':
+def _download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)
 
@@ -101,7 +98,7 @@ def download_url(download_path: Path, url, filename: str, try_make_dir=True) -> 
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
         with utils.cd(download_path):
-            download_then_rename(url, filename)
+            _download_then_rename(url, filename)
 
 def download_url_verified(url, png=False) -> 'IO':
     # Returned url might be different if png is True
@@ -116,7 +113,10 @@ def download_url_verified(url, png=False) -> 'IO':
     else:
         print(f'Image downloaded at {filepath}')
 
-# Download full res from ui, on user demand
+# Download full res from ui, on user demand (from prompt)
+def download_image_num(data, number) -> 'IO':
+    download_url_verified(data.url(number))
+
 def download_image_coords(data, first_num, second_num) -> 'IO':
     selected_image_num = utils.find_number_map(int(first_num), int(second_num))
     # 0 is acceptable, but is falsy; but 0 'is not' False
@@ -125,6 +125,3 @@ def download_image_coords(data, first_num, second_num) -> 'IO':
     else:
         download_image_num(data, selected_image_num)
 
-def download_image_num(data, number) -> 'IO':
-    # Update current_page_illusts, in case if you're in another page
-    download_url_verified(data.url(number))

@@ -18,18 +18,18 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
         >> P(list)
     )
 
-def async_download_core_rename(download_path, urls, newnames, tracker=None) -> 'IO':
+def async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
     newnames_ext = newnames_with_ext(urls, oldnames_ext, newnames)
-    async_download_core(download_path, urls, oldnames_ext, newnames_ext,
+    async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext,
                         tracker)
 
-def async_download_core_no_rename(download_path, urls, tracker=None) -> 'IO':
+def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
-    async_download_core(download_path, urls, oldnames_ext, oldnames_ext,
+    async_filter_and_download(download_path, urls, oldnames_ext, oldnames_ext,
                         tracker)
 
-def async_download_core(download_path, urls, oldnames_with_ext, newnames_with_ext,
+def async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_with_ext,
                         tracker=None) -> 'IO':
     """
     Rename files with given new name if needed.
@@ -42,7 +42,7 @@ def async_download_core(download_path, urls, oldnames_with_ext, newnames_with_ex
     # Filter out already downloaded files
     downloaded_newnames = itertools.filterfalse(os.path.isfile, newnames_with_ext)
     downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_with_ext)
-    helper = partial(downloadr, tracker=tracker)
+    helper = partial(download_then_rename, tracker=tracker)
 
     os.makedirs(download_path, exist_ok=True)
     with utils.cd(download_path):
@@ -50,7 +50,7 @@ def async_download_core(download_path, urls, oldnames_with_ext, newnames_with_ex
             executor.map(helper, urls, downloaded_oldnames, downloaded_newnames)
 
 
-def downloadr(url, img_name, new_file_name=None, tracker=None) -> 'IO':
+def download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)
 
@@ -74,11 +74,11 @@ def gallery_download(data, tracker=None) -> 'IO':
     urls = pure.medium_urls(data.current_illusts)
     titles = pure.post_titles_in_page(data.current_illusts)
 
-    async_download_core_rename(data.download_path, urls, titles, tracker)
+    async_download_rename(data.download_path, urls, titles, tracker)
     # TODO: use data.all_urls and data.all_names like user mode
 
 def user_download(data, tracker=None) -> 'IO':
-    async_download_core_rename(data.download_path, data.all_urls, data.all_names,
+    async_download_rename(data.download_path, data.all_urls, data.all_names,
                                tracker=tracker)
 
 def init_download(data, download_func, tracker) -> 'IO':
@@ -102,13 +102,10 @@ def init_download(data, download_func, tracker) -> 'IO':
 # - Wrappers around the core functions for downloading one image
 @utils.spinner('')
 def async_download_spinner(download_path: Path, urls) -> 'IO':
-    """Batch download and rename, with spinner. For mode 2; multi-image posts"""
-    async_download_core_no_rename(
-        download_path,
-        urls,
-        newnames=None,
-    )
+    """Batch download in background with spinner. For mode 2; multi-image posts"""
+    async_download_no_rename(download_path, urls)
 
+# - Synchronous download functions, does not download in background
 @utils.spinner('')
 def download_url(download_path: Path, url, filename: str, try_make_dir=True) -> 'IO':
     """Downloads one url, intended for single images only"""
@@ -117,7 +114,7 @@ def download_url(download_path: Path, url, filename: str, try_make_dir=True) -> 
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
         with utils.cd(download_path):
-            downloadr(url, filename)
+            download_then_rename(url, filename)
 
 
 def full_img_details(url: str, png=False) -> (str, str, Path):

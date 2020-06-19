@@ -130,6 +130,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * Split up functions in `config.py`
     * Split up main function in `main.py`
     * Split up functions in `cli.py`
+    * Split up functions in `download.py`
 * Remove unused cytoolz dependency
 * More functional style
     * Use `placeholder` to make lambdas look better

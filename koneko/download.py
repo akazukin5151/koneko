@@ -59,6 +59,7 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
         >> P(list)
     )
 
+# private
 def async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
     newnames_ext = newnames_with_ext(urls, oldnames_ext, newnames)
@@ -74,6 +75,7 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
     async_download_no_rename(download_path, urls)
 
 
+# private
 def async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_with_ext,
                               tracker=None) -> 'IO':
     """
@@ -94,6 +96,7 @@ def async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_w
             executor.map(helper, urls, downloaded_oldnames, downloaded_newnames)
 
 
+# private
 def download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url)

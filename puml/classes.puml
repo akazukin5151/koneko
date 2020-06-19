@@ -22,7 +22,6 @@ main.AbstractLoop <-up[hidden]- illust_follow_mode_loop
 abstract class ui.AbstractUI <<(A, red)>>{
     ..Required attributes..
     - {abstract} data
-    - {abstract} download_function
     --
     -{abstract}data_class()
     -{abstract}tracker()
@@ -170,13 +169,16 @@ class data.GalleryJson {
     + main_path
     + all_pages_cache
     + offset
-    + current_illusts
-    + next_url
     + download_path
+    + all_urls
+    + all_names
+    + next_url
     + first_img
     +update()
-    +post_json()
     +artist_user_id()
+    --Unique--
+    + current_illusts
+    +post_json()
     +image_id()
     +url()
 }
@@ -195,20 +197,21 @@ class data.ImageJson {
 class data.UserJson {
     + page_num
     + main_path
-    + offset
     + ids_cache
     + names_cache
+    + offset
     + download_path
     + all_urls
-    + names
     + all_names
-    + splitpoint
-    + first_img
     + next_url
-    + profile_pic_urls
-    + image_urls
+    + first_img
     +update()
     +artist_user_id()
+    --Unique--
+    + names
+    + splitpoint
+    + profile_pic_urls
+    + image_urls
 }
 
 data.GalleryJson *-up-- ui.AbstractGallery

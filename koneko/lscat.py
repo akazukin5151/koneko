@@ -83,7 +83,7 @@ class AbstractTracker(ABC):
 
         self.generator.send(None)
 
-    def update(self, new: str):
+    def update(self, new: str) -> 'IO':
         # Can't use queues/channels instead of a lock, because of race conditions
         with self._lock:
             self._downloaded.append(new)
@@ -139,7 +139,7 @@ class TrackDownloadsUsers(AbstractTracker):
         self.generator = generate_users(data.download_path, print_info)
         super().__init__()
 
-def generate_page(path):
+def generate_page(path) -> 'IO':
     """Given number, calculate its coordinates and display it, then yield"""
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
@@ -165,7 +165,7 @@ def generate_page(path):
                 align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
             )
 
-def generate_users(path, print_info=True):
+def generate_users(path, print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
     page_spacing = config.users_page_spacing_config()
@@ -234,7 +234,7 @@ class TrackDownloadsImage(AbstractTracker):
 
         self._inspect()
 
-def generate_previews(path):
+def generate_previews(path) -> 'IO':
     """Experimental"""
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()

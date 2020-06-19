@@ -66,7 +66,7 @@ def downloadr(url, img_name, new_file_name=None, tracker=None) -> 'IO':
 
 
 # - Wrappers around above download functions, for downloading multi-images
-def download_page(data, tracker=None) -> 'IO':
+def gallery_download(data, tracker=None) -> 'IO':
     """
     Download the illustrations on one page of given artist id (using threads),
     rename them based on the *post title*. Used for gallery modes (1 and 5)

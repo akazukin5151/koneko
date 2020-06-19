@@ -153,7 +153,7 @@ class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for galleries"""
-        self.download_function = download.download_page
+        self.download_function = download.gallery_download
         super().__init__(main_path)
 
     def data_class(self, main_path):

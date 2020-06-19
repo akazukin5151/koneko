@@ -95,3 +95,12 @@ def test_process_artwork_url():
             "76695217")
     assert pure.process_artwork_url("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=76695217") == "76695217"
     assert pure.process_artwork_url("76695217") == "76695217"
+
+def test_newnames_with_ext():
+    assert pure.newnames_with_ext(
+        ['www.example.com/image1.png', 'www.example.com/image2.png',
+            'www.example.com/image3.png'],
+        ['image1.png', 'image2.png', 'image3.png'],
+        ['pic1', 'pic2', 'pic3']
+    ) == ['000_pic1.png', '001_pic2.png', '002_pic3.png']
+

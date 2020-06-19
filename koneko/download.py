@@ -103,17 +103,9 @@ def download_url(download_path: Path, url, filename: str, try_make_dir=True) -> 
         with utils.cd(download_path):
             download_then_rename(url, filename)
 
-
-def full_img_details(url: str, png=False) -> (str, str, Path):
-    # Example of an image that needs to be downloaded in png: 77803142
-    url = pure.change_url_to_full(url, png=png)
-    filename = pure.split_backslash_last(url)
-    filepath = pure.generate_filepath(filename)
-    return url, filename, filepath
-
 def download_url_verified(url, png=False) -> 'IO':
     # Returned url might be different if png is True
-    url, filename, filepath = full_img_details(url, png=png)
+    url, filename, filepath = pure.full_img_details(url, png=png)
     download_path = Path('~/Downloads').expanduser()
 
     download_url(download_path, url, filename, try_make_dir=False)

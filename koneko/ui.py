@@ -603,7 +603,7 @@ class Image:
 def show_full_res(data):
     # FIXME: some images that need to be downloaded in png won't work
     # Can use verified function above
-    large_url = pure.change_url_to_full(url=data.current_url)
+    large_url = pure.change_url_to_full(data.current_url)
     filename = pure.split_backslash_last(large_url)
     download.download_url(data.download_path, large_url, filename)
     lscat.icat(data.download_path / filename)

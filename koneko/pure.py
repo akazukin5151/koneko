@@ -130,6 +130,7 @@ def process_artwork_url(url_or_id: str) -> str:
         user_input = url_or_id
     return user_input
 
+
 def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':
     return (
         urls
@@ -139,3 +140,9 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
         >> P(list)
     )
 
+def full_img_details(url: str, png=False) -> (str, str, Path):
+    # Example of an image that needs to be downloaded in png: 77803142
+    url = change_url_to_full(url, png=png)
+    filename = split_backslash_last(url)
+    filepath = generate_filepath(filename)
+    return url, filename, filepath

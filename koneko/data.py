@@ -88,26 +88,40 @@ class ImageData:
         # These are assigned here not as a method, as raw won't be updated
         self.page_urls = pure.page_urls_in_post(raw, 'large')
         self.number_of_pages = len(self.page_urls)
+        # TODO: unify all mode 2 paths to individual / image_id
+        # / str(image_id)?
         self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
         # Store multi image posts within their own dir
         if self.number_of_pages != 1:
             self.download_path = self.download_path / str(image_id)
 
     @property
-    def image_filename(self) -> str:
-        return pure.split_backslash_last(self.page_urls[self.page_num])
-
-    @property
-    def filepath(self) -> str:
-        return self.download_path / self.image_filename
+    def current_url(self) -> str:
+        return self.page_urls[self.page_num]
 
     @property
     def next_img_url(self) -> str:
         return self.page_urls[self.page_num + 1]
 
     @property
-    def current_url(self) -> str:
-        return self.page_urls[self.page_num]
+    def image_filename(self) -> str:
+        return pure.split_backslash_last(self.current_url)
+
+    @property
+    def filepath(self) -> str:
+        return self.download_path / self.image_filename
+
+    @property
+    def large_url(self) -> str:
+        return pure.url_given_size(self.current_url, 'large')
+
+    @property
+    def large_filename(self) -> str:
+        return pure.split_backslash_last(self.large_url)
+
+    @property
+    def search_string(self, number_prefix: int) -> str:
+        return f"{str(number_prefix).rjust(3, '0')}_*"
 
 
 class UserData:

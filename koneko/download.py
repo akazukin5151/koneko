@@ -36,19 +36,10 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
 
 
 # - Download functions for multiple images
-def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':
-    return (
-        urls
-        >> P(len)
-        >> P(range)
-        >> P(lambda r: map(pure.prefix_filename, oldnames_with_ext, newnames, r))
-        >> P(list)
-    )
-
 # private
 def async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
     oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
-    newnames_ext = newnames_with_ext(urls, oldnames_ext, newnames)
+    newnames_ext = pure.newnames_with_ext(urls, oldnames_ext, newnames)
     async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext, tracker)
 
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':

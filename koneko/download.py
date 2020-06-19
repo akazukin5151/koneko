@@ -19,7 +19,7 @@ def save_number_of_artists(data) -> 'IO':
         with open('.koneko', 'w') as f:
             f.write(str(data.splitpoint))
 
-def init_download(data, tracker) -> 'IO':
+def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
     """Download the illustrations of one page  and rename them."""
     if utils.dir_not_empty(data):
         return True

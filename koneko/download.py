@@ -74,18 +74,12 @@ def gallery_download(data, tracker=None) -> 'IO':
     urls = pure.medium_urls(data.current_illusts)
     titles = pure.post_titles_in_page(data.current_illusts)
 
-    async_download_core_rename(
-        data.download_path, urls, newnames=titles,
-        tracker=tracker
-    )
+    async_download_core_rename(data.download_path, urls, titles, tracker)
+    # TODO: use data.all_urls and data.all_names like user mode
 
 def user_download(data, tracker=None) -> 'IO':
-    async_download_core_rename(
-        data.download_path,
-        data.all_urls,
-        newnames=data.all_names,
-        tracker=tracker
-    )
+    async_download_core_rename(data.download_path, data.all_urls, data.all_names,
+                               tracker=tracker)
 
 def init_download(data, download_func, tracker) -> 'IO':
     if utils.dir_not_empty(data):
@@ -116,7 +110,7 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
     )
 
 @utils.spinner('')
-def download_core(download_path: Path, url, filename: str, try_make_dir=True) -> 'IO':
+def download_url(download_path: Path, url, filename: str, try_make_dir=True) -> 'IO':
     """Downloads one url, intended for single images only"""
     if try_make_dir:
         os.makedirs(download_path, exist_ok=True)
@@ -138,7 +132,7 @@ def download_url_verified(url, png=False) -> 'IO':
     url, filename, filepath = full_img_details(url, png=png)
     download_path = Path('~/Downloads').expanduser()
 
-    download_core(download_path, url, filename, try_make_dir=False)
+    download_url(download_path, url, filename, try_make_dir=False)
 
     verified = utils.verify_full_download(filepath)
     if not verified:

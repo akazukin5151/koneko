@@ -479,7 +479,7 @@ def display_image(post_json, artist_user_id, number_prefix, data):
     filename = pure.split_backslash_last(url)
     download_path = (KONEKODIR / str(artist_user_id) / 'individual' /
                      str(data.image_id(number_prefix)))
-    download.download_core(download_path, url, filename)
+    download.download_url(download_path, url, filename)
 
     # BLOCKING: imput is blocking, will not display large image until input
     # received
@@ -509,7 +509,7 @@ def view_post_mode(image_id):
 
     idata = data.ImageJson(post_json, image_id)
 
-    download.download_core(idata.download_path, idata.current_url, idata.image_filename)
+    download.download_url(idata.download_path, idata.current_url, idata.image_filename)
     lscat.icat(idata.download_path / idata.image_filename)
     print(f'Page 1/{idata.number_of_pages}')
 
@@ -608,7 +608,7 @@ def show_full_res(data):
     # Can use verified function above
     large_url = pure.change_url_to_full(url=data.current_url)
     filename = pure.split_backslash_last(large_url)
-    download.download_core(data.download_path, large_url, filename)
+    download.download_url(data.download_path, large_url, filename)
     lscat.icat(data.download_path / filename)
 
 def next_image(data):

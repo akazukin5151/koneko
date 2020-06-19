@@ -2,8 +2,6 @@
 title download.py
 
 object init_download
-object gallery_download
-object user_download
 object async_download_rename
 object async_download_no_rename
 object async_download_spinner
@@ -15,13 +13,7 @@ object download_image_coords
 object download_image_num
 
 ui -down-|> init_download
-init_download -down-> gallery_download
-init_download -down-> user_download
-ui .down.|> gallery_download
-ui .down.|> user_download
-
-gallery_download -down-> async_download_rename
-user_download -down-> async_download_rename
+init_download -down-> async_download_rename
 
 async_download_rename -down-> async_filter_and_download
 async_download_no_rename -down-> async_filter_and_download

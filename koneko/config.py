@@ -1,3 +1,7 @@
+"""Functions to read and write user configuration.
+The IOResult type is just to mark functions using IO; they don't return an IOResult container
+"""
+
 import os
 from getpass import getpass
 from pathlib import Path
@@ -14,19 +18,19 @@ TERM = Terminal()
 
 
 @safe
-def get_config_section(section: str) -> 'Result[config]':
+def get_config_section(section: str) -> 'IOResult[config]':
     config_object = ConfigParser()
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object.read(config_path)
     section = config_object[section]
     return section
 
-def get_settings(section: str, setting: str) -> 'Result[str]':
+def get_settings(section: str, setting: str) -> 'IOResult[str]':
     cfgsection: 'Result[config]' = get_config_section(section)
     return cfgsection.map(m.get(setting, ''))
 
 @safe
-def _check_print_info() -> 'Result[bool]':
+def _check_print_info() -> 'IOResult[bool]':
     """Returns either Success(True), Success(False) or Failure.
     Inner boolean represents whether to print columns or not
     Failure represents no key/setting/config found
@@ -38,6 +42,8 @@ def check_print_info() -> 'bool':
     """For a Failure (setting not found), return True by default"""
     return _check_print_info().value_or(True)
 
+
+# While not pure (because reading config is IO), they will never fail
 def _width_paddingx() -> (int, int):
     settings = get_config_section('lscat')
     return (
@@ -45,7 +51,7 @@ def _width_paddingx() -> (int, int):
         settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
     )
 
-def ncols_config() -> 'int':
+def ncols_config() -> int:
     return lscat.ncols(TERM.width, *_width_paddingx())
 
 def xcoords_config(offset=0) -> 'list[int]':
@@ -117,14 +123,14 @@ def _ask_your_id(config_object) -> ('config', str):
         return config_object, your_id
     return config_object, ''
 
-def _write_config(config_object, config_path) -> None:
+def _write_config(config_object, config_path) -> 'IO':
     os.system('clear')
     config_path.parent.mkdir(exist_ok=True)
     config_path.touch()
     with open(config_path, 'w') as c:
         config_object.write(c)
 
-def _append_default_config(config_path) -> None:
+def _append_default_config(config_path) -> 'IO':
     # Why not use python? Because it's functional, readable, and
     # this one liner defeats any potential speed benefits
     example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()

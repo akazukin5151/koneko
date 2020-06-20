@@ -1,3 +1,25 @@
+"""Download functions. See ../puml/download.puml. All of them download through
+_download_then_rename(), which downloads through api.myapi.protected_download().
+
+The _async_filter_and_download() branch is for downloading multiple images, and includes:
+    - init_download()
+        - _async_download_rename()
+    - async_download_no_rename()
+        - async_download_spinner()
+
+- ui Gallery and User calls init_download() to reach _async_download_rename()
+- async_download_no_rename() can be directly called, or wrapped with a spinner by
+  async_download_spinner()
+
+The download_url() branch is for downloading one image/url (for mode 2), and includes:
+    - download_url_verified(): a wrapper that ensures png images are properly downloaded
+    - download_image_num(): for downloading an image given its number in gallery modes
+        - download_image_coords(): wrapper given its coords not number
+
+Only download_image_num() and download_image_coords() is reachable from prompt,
+but ui can call download_url()
+"""
+
 import os
 import itertools
 from pathlib import Path

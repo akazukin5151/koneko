@@ -1,4 +1,4 @@
-"""Export the colors for [h]elp screen keys"""
+"""Export the colors for [h]elp screen keys. Functions are pure"""
 from pipey import Pipeable as P
 
 RED = '\x1b[31m'

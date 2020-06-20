@@ -104,6 +104,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 * In-depth usage documentation?
 * Move functions that do work to pure or utils (as opposed to functions that organise work)
+    * As most functions in pure aren't pure in the strict sense, what's the difference between pure and utils?
 * Consistent public and private methods and attributes again (only show public ones in puml)
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 

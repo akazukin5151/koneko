@@ -10,6 +10,10 @@
 5) Immediately, remove the image from the lists and repeat the `_inspect()` method
    for the next valid image. If there is one, repeat. If not, do nothing and wait for
    more completed downloads
+
+TLDR if you want to write your own renderer (with icat or not), the API is:
+    - Provide a `tracker` with an `update()` method that receives completed downloads
+    - Provide a generator that receives images to display in order, from the tracker
 """
 
 import os
@@ -23,6 +27,7 @@ from returns.result import safe
 from koneko import utils, config
 
 
+# Move to pure
 def ncols(term_width: int, img_width: int, padding: int) -> int:
     return round(term_width / (img_width + padding))
 
@@ -115,7 +120,7 @@ class TrackDownloads(AbstractTracker):
         self.generator = generate_page(data.download_path)
         super().__init__()
 
-def read_invis(data) -> int:
+def read_invis(data) -> 'IO[int]':
     with utils.cd(data.download_path):
         with open('.koneko', 'r') as f:
             return int(f.read())

@@ -11,6 +11,7 @@ from koneko import ui, utils, colors, download
 TERM = Terminal()
 
 
+# Should belong in pure
 def allf(iterable: 'iter[T]', predicate: 'func(i: T) -> bool') -> bool:
     for item in iterable:
         if not predicate(item):

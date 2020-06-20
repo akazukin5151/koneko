@@ -44,30 +44,24 @@ def check_print_info() -> 'bool':
 
 
 # While not pure (because reading config is IO), they will never fail
-def _width_paddingx() -> (int, int):
+def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, int):
     settings = get_config_section('lscat')
     return (
-        settings.map(m.getint('image_width', fallback=18)).value_or(18),
-        settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
+        settings.map(m.getint(f'image_{side}', fallback=fallbacks[0])).value_or(fallbacks[0]),
+        settings.map(m.getint(f'images_{dimension}_spacing', fallback=fallbacks[1])).value_or(fallbacks[1])
     )
 
 def ncols_config() -> int:
-    return lscat.ncols(TERM.width, *_width_paddingx())
+    return lscat.ncols(TERM.width, *_width_padding('width', 'x', (18, 2)))
 
 def nrows_config() -> int:
-    settings = get_config_section('lscat')
-    img_height = settings.map(m.getint('image_height', fallback=8)).value_or(8)
-    paddingy = settings.map(m.getint('images_y_spacing', fallback=1)).value_or(1)
-    return lscat.nrows(TERM.height, img_height, paddingy)
+    return lscat.nrows(TERM.height, *_width_padding('height', 'y', (8, 2)))
 
 def xcoords_config(offset=0) -> 'list[int]':
-    return lscat.xcoords(TERM.width, *_width_paddingx(), offset)
+    return lscat.xcoords(TERM.width, *_width_padding('width', 'x', (18, 2)), offset)
 
 def ycoords_config() -> 'list[int]':
-    settings = get_config_section('lscat')
-    img_height = settings.map(m.getint('image_height', fallback=8)).value_or(8)
-    paddingy = settings.map(m.getint('images_y_spacing', fallback=1)).value_or(1)
-    return lscat.ycoords(TERM.height, img_height, paddingy)
+    return lscat.ycoords(TERM.height, *_width_padding('height', 'y', (8, 2)))
 
 def gallery_page_spacing_config() -> int:
     settings = get_config_section('lscat')

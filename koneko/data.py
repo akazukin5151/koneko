@@ -88,8 +88,6 @@ class ImageData:
         # These are assigned here not as a method, as raw won't be updated
         self.page_urls = pure.page_urls_in_post(raw, 'large')
         self.number_of_pages = len(self.page_urls)
-        # TODO: unify all mode 2 paths to individual / image_id
-        # / str(image_id)?
         self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
         # Store multi image posts within their own dir
         if self.number_of_pages != 1:

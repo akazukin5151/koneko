@@ -112,14 +112,9 @@ class ImageData:
         return self.download_path / self.image_filename
 
     @property
-    def large_url(self) -> str:
-        return pure.url_given_size(self.current_url, 'large')
-
-    @property
     def large_filename(self) -> str:
-        return pure.split_backslash_last(self.large_url)
+        return pure.split_backslash_last(self.page_urls[0])
 
-    @property
     def search_string(self, number_prefix: int) -> str:
         return f"{str(number_prefix).rjust(3, '0')}_*"
 

@@ -194,19 +194,29 @@ class AbstractGallery(AbstractUI, ABC):
         raise NotImplementedError
 
     def view_image(self, selected_image_num):
-        """Go to image mode"""
+        """Image mode, from an artist mode (mode 1/5 -> mode 2)
+        Display already downloaded preview (medium-res), downloads large-res and
+        then display that, finally launch the image prompt.
+        Alternative to main.view_post_mode(). It does its own stuff before calling
+        the Image class for the prompt.
+
+        Unlike the other modes, Image does not handle the initial displaying of images
+        This is because coming from a gallery mode, the selected image already has a
+        square-medium preview downloaded, which can be displayed before the download
+        of the large-res completes. Thus, the initial displaying subroutine will be
+        different for a standalone mode or coming from a gallery mode.
+        """
         post_json = self.data.post_json(selected_image_num)
         image_id = post_json.id
         idata = data.ImageData(post_json, image_id)
 
-        display_image(
-            post_json,
-            idata.artist_user_id,
-            selected_image_num,
-            self.data
-        )
+        _display_medium_preview(self.data, idata, selected_image_num)
 
-        # blocking: no way to unblock prompt
+        download.download_url(idata.download_path, idata.page_urls[0],
+                              idata.large_filename)
+
+        lscat.icat(idata.download_path / idata.large_filename)
+
         image = Image(image_id, idata, False)
         prompt.image_prompt(image)
 
@@ -453,37 +463,9 @@ class FollowingUsers(AbstractUsers):
 
 
 
-def display_image(post_json, artist_user_id, number_prefix, data):
-    """Image mode, from an artist mode (mode 1/5 -> mode 2)
-    Opens image given by the number (medium-res), downloads large-res and
-    then display that.
-    Alternative to main.view_post_mode(). It does its own stuff before calling
-    the Image class for the prompt.
-
-    Unlike the other modes, Image does not handle the initial displaying of images
-    This is because coming from a gallery mode, the selected image already has a
-    square-medium preview downloaded, which can be displayed before the download
-    of the large-res completes. Thus, the initial displaying subroutine will be
-    different for a standalone mode or coming from a gallery mode.
-    """
-    search_string = f"{str(number_prefix).rjust(3, '0')}_*"
-
+def _display_medium_preview(gdata, idata, num):
     os.system('clear')
-    arg = KONEKODIR / str(artist_user_id) / str(data.page_num) / search_string
-    lscat.icat(arg)
-
-    url = pure.url_given_size(post_json, 'large')
-    filename = pure.split_backslash_last(url)
-    download_path = (KONEKODIR / str(artist_user_id) / 'individual' /
-                     str(data.image_id(number_prefix)))
-    download.download_url(download_path, url, filename)
-
-    # BLOCKING: imput is blocking, will not display large image until input
-    # received
-
-    os.system('clear')
-    arg = download_path / filename
-    lscat.icat(arg)
+    lscat.icat(gdata.main_path / str(gdata.page_num) / idata.search_string(num))
 
 def view_post_mode(image_id):
     """Image mode, from main (start -> mode 2)

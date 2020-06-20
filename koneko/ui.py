@@ -55,7 +55,7 @@ class AbstractUI(ABC):
         """Run any procedure to print the page info"""
         raise NotImplementedError
 
-    def start(self, main_path: Path) -> 'IO':
+    def start(self, main_path: 'Path') -> 'IO':
         # self.data defined here not in __init__, so that reload() will wipe cache
         self.data = self.data_class(main_path)
         self._parse_and_download()

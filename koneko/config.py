@@ -55,13 +55,13 @@ def ncols_config() -> int:
     return lscat.ncols(TERM.width, *_width_padding('width', 'x', (18, 2)))
 
 def nrows_config() -> int:
-    return lscat.nrows(TERM.height, *_width_padding('height', 'y', (8, 2)))
+    return lscat.nrows(TERM.height, *_width_padding('height', 'y', (8, 1)))
 
 def xcoords_config(offset=0) -> 'list[int]':
     return lscat.xcoords(TERM.width, *_width_padding('width', 'x', (18, 2)), offset)
 
 def ycoords_config() -> 'list[int]':
-    return lscat.ycoords(TERM.height, *_width_padding('height', 'y', (8, 2)))
+    return lscat.ycoords(TERM.height, *_width_padding('height', 'y', (8, 1)))
 
 def gallery_page_spacing_config() -> int:
     settings = get_config_section('lscat')

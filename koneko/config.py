@@ -54,6 +54,12 @@ def _width_paddingx() -> (int, int):
 def ncols_config() -> int:
     return lscat.ncols(TERM.width, *_width_paddingx())
 
+def nrows_config() -> int:
+    settings = get_config_section('lscat')
+    img_height = settings.map(m.getint('image_height', fallback=8)).value_or(8)
+    paddingy = settings.map(m.getint('images_y_spacing', fallback=1)).value_or(1)
+    return lscat.nrows(TERM.height, img_height, paddingy)
+
 def xcoords_config(offset=0) -> 'list[int]':
     return lscat.xcoords(TERM.width, *_width_paddingx(), offset)
 

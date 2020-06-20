@@ -31,6 +31,9 @@ from koneko import utils, config
 def ncols(term_width: int, img_width: int, padding: int) -> int:
     return round(term_width / (img_width + padding))
 
+def nrows(term_height: int, img_height: int, padding: int) -> int:
+    return term_height // (img_height + padding)
+
 def xcoords(term_width: int, img_width=18, padding=2, offset=0) -> 'list[int]':
     """Generates the x-coord for each column to pass into pixcat
     If img_width == 18 and 90 > term_width > 110, there will be five columns,
@@ -149,6 +152,7 @@ def generate_page(path) -> 'IO':
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
+    number_of_rows = config.nrows_config()
     page_spacing = config.gallery_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
 
@@ -162,12 +166,12 @@ def generate_page(path) -> 'IO':
         x = number % number_of_cols
         y = number // number_of_cols
 
-        if number % (number_of_cols * 2) == 0 and number != 0:
+        if number % (number_of_cols * number_of_rows) == 0 and number != 0:
             print('\n' * page_spacing)
 
         with utils.cd(path):
             Image(image).thumbnail(thumbnail_size).show(
-                align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
+                align='left', x=left_shifts[x], y=rowspaces[(y % number_of_rows)]
             )
 
 def generate_users(path, print_info=True) -> 'IO':

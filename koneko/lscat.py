@@ -162,7 +162,7 @@ def generate_page(path) -> 'IO':
         x = number % number_of_cols
         y = number // number_of_cols
 
-        if number % 10 == 0 and number != 0:
+        if number % (number_of_cols * 2) == 0 and number != 0:
             print('\n' * page_spacing)
 
         with utils.cd(path):

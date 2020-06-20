@@ -91,10 +91,9 @@ def _download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'I
 # - Wrappers around the core functions for downloading one image
 # - Synchronous download functions, does not download in background
 @utils.spinner('')
-def download_url(download_path: Path, url, filename: str, try_make_dir=True) -> 'IO':
+def download_url(download_path: Path, url, filename: str) -> 'IO':
     """Downloads one url, intended for single images only"""
-    if try_make_dir:
-        os.makedirs(download_path, exist_ok=True)
+    os.makedirs(download_path, exist_ok=True)
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
         with utils.cd(download_path):

@@ -120,6 +120,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * lscat now slightly faster as the image number is calculated only when it finishes downloading, not on every recursion.
 * Fixed opening the manual in user modes not working
+* Fixed bug in lscat: number of columns now determines when to print page spacings
 
 #### Code
 * Extract out common behaviour from Gallery and Users ui classes into AbstractUI

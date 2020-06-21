@@ -103,8 +103,6 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 # Roadmap
 
 * In-depth usage documentation?
-* Move functions that do work to pure or utils (as opposed to functions that organise work)
-    * As most functions in pure aren't pure in the strict sense, what's the difference between pure and utils?
 * Consistent public and private methods and attributes again (only show public ones in puml)
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
@@ -165,6 +163,7 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 * Run tests with `pytest testing/ -vvvv -l -s` (`--inte` for integration tests)
 * Submit a pull request
 
+Tips: 
 * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
 * If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.

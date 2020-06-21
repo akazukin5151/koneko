@@ -1,11 +1,11 @@
 # Contributing
 * Fork it
 * Edit the files on your fork/branch
-    * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
-* Run tests with `pytest testing/ -vvvv -l -s`
-* Try it with `python setup.py install` then `koneko` to simulate a pip install (or `pip install .`; check out [manual installation](#manual-installation))
-    * If doing the latter, make sure you aren't running the released version on pypi (totally didn't happen to me).
+* Run tests with `pytest testing/ -vvvv -l -s` (`--inte` for integration tests)
 * Submit a pull request
+
+Tips: 
+* If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
 * If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.
 

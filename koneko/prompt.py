@@ -48,65 +48,6 @@ def goto_image(gallery, image_num: int):
         gallery.view_image(image_num)
 
 
-
-def gallery_like_prompt(gallery):
-    """
-    Only contains logic for interpreting key presses, and do the correct action
-    Sequence means a combination of more than one key.
-    When a sequenceable key is pressed, wait for the next keys in the sequence
-        If the sequence is valid, execute their corresponding actions
-    Otherwise for keys that do not need a sequence, execute their actions normally
-    """
-    case = {
-        'n': gallery.next_page,
-        'p': gallery.previous_page,
-        'h': gallery.help,
-        'q': ask_quit,
-        'm': lambda: print('', gallery.__doc__)
-    }
-    keyseqs = []
-    sequenceable_keys = ('o', 'd', 'i', 'O', 'D', 'a', 'A')
-
-    with TERM.cbreak():
-        while True:
-            # Multi char sequence
-            if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
-                image_num = utils.seq_coords_to_int(keyseqs)
-                if image_num is not False:
-                    return goto_image(gallery, image_num)
-                print('\nInvalid command! Press h to show help')
-                keyseqs = []
-
-            elif (len(keyseqs) == 3 and pure.all_satisfy(keyseqs[1:], m.isdigit()) and
-                  keyseqs[0] in sequenceable_keys):
-
-                open_or_download(gallery, keyseqs)
-
-                if keyseqs[0] == 'i':
-                    return goto_image(gallery, pure.concat_seqs_to_int(keyseqs, 1))
-
-                elif keyseqs[0].lower() == 'a':
-                    return gallery.handle_prompt(keyseqs)
-
-                keyseqs = []
-
-
-            if not keyseqs:
-                print('Enter a gallery command:')
-            gallery_command = TERM.inkey()
-            print(gallery_command, end='', flush=True)
-
-
-            # Single char input with action that leaves prompt
-            if gallery_command == 'b':
-                return gallery.handle_prompt(['b'])
-
-            elif gallery_command == 'r':
-                return gallery.handle_prompt(['r'])
-
-            keyseqs = common(case, gallery_command, keyseqs, sequenceable_keys)
-
-
 def common(case: 'dict',
            command: str,
            keyseqs: 'list[str]',
@@ -133,9 +74,78 @@ def common(case: 'dict',
         print('\nInvalid command! Press h to show help')
         return []
 
+# The three prompt functions all follow the same internal structure
+# inside the while loop:
+# 1. Handle multi char input (either 2-digits, or one-letter-2-digits)
+# 2. Ask and wait for user input (blocking)
+# 3. Single char input with action that leaves the prompt
+# 4. common()
+
+def gallery_like_prompt(gallery):
+    """
+    Only contains logic for interpreting key presses, and do the correct action
+    Sequence means a combination of more than one key.
+    When a sequenceable key is pressed, wait for the next keys in the sequence
+        If the sequence is valid, execute their corresponding actions
+    Otherwise for keys that do not need a sequence, execute their actions normally
+    """
+    keyseqs = []
+    sequenceable_keys = ('o', 'd', 'i', 'O', 'D', 'a', 'A')
+    case = {
+        'n': gallery.next_page,
+        'p': gallery.previous_page,
+        'h': gallery.help,
+        'q': ask_quit,
+        'm': lambda: print('', gallery.__doc__)
+    }
+
+    with TERM.cbreak():
+        while True:
+            # 1. Two digit sequence
+            if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
+                image_num = utils.seq_coords_to_int(keyseqs)
+                if image_num is not False:
+                    return goto_image(gallery, image_num)
+                print('\nInvalid command! Press h to show help')
+                keyseqs = []
+
+            # 1. One letter two digit sequence
+            elif (len(keyseqs) == 3 and
+                    pure.all_satisfy(keyseqs[1:], m.isdigit()) and
+                    keyseqs[0] in sequenceable_keys):
+
+                open_or_download(gallery, keyseqs)
+
+                if keyseqs[0] == 'i':
+                    return goto_image(gallery, pure.concat_seqs_to_int(keyseqs, 1))
+
+                elif keyseqs[0].lower() == 'a':
+                    return gallery.handle_prompt(keyseqs)
+
+                keyseqs = []
+
+
+            # 2. Wait for user input
+            if not keyseqs:
+                print('Enter a gallery command:')
+            gallery_command = TERM.inkey()
+            print(gallery_command, end='', flush=True)
+
+
+            # 3. Single char input with action that leaves prompt
+            if gallery_command == 'b':
+                return gallery.handle_prompt(['b'])
+
+            elif gallery_command == 'r':
+                return gallery.handle_prompt(['r'])
+
+            # 4. Common
+            keyseqs = common(case, gallery_command, keyseqs, sequenceable_keys)
+
 
 def image_prompt(image):
     """if-else statements to intercept key presses and do the correct action"""
+    keyseqs = []
     case = {
         'o': image.open_image,
         'd': image.download_image,
@@ -147,25 +157,27 @@ def image_prompt(image):
         'm': lambda: print(image.__doc__)
     }
 
-    keyseqs = []
     with TERM.cbreak():
         while True:
-            # Two digit sequence -- jump to post number
+            # 1. Two digit sequence -- jump to post number
             if len(keyseqs) == 2 and  pure.all_satisfy(keyseqs, m.isdigit()):
                 ui.jump_to_image(image.data, pure.concat_seqs_to_int(keyseqs))
                 keyseqs = []
 
+            # 2. Ask and wait for user input
             if not keyseqs:
                 print('Enter an image view command:')
             image_prompt_command = TERM.inkey()
             print(image_prompt_command, end='', flush=True)
 
+            # 3. Single char input with action that leaves prompt
             if image_prompt_command == 'b':
                 return image.leave(False)
 
             elif image_prompt_command == 'a':
                 return image.leave(True)
 
+            # 4. Common
             keyseqs = common(case, image_prompt_command, keyseqs)
 
 
@@ -174,6 +186,7 @@ def user_prompt(user):
     The only difference between image and user prompts is the `case`,
     action of two-digit-sequence, and single character return
     """
+    keyseqs = []
     case = {
         'n': user.next_page,
         'p': user.previous_page,
@@ -181,21 +194,24 @@ def user_prompt(user):
         'q': ask_quit,
         'm': lambda: print(ui.AbstractUsers.__doc__)
     }
-    keyseqs = []
+
     with TERM.cbreak():
         while True:
-            # Two digit sequence -- view artist given number
+            # 1. Two digit sequence -- view artist given number
             if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
                 return user.go_artist_mode(pure.concat_seqs_to_int(keyseqs))
 
+            # 2. Ask and wait for user input
             if not keyseqs:
                 print('Enter a user view command:')
             user_prompt_command = TERM.inkey()
             print(user_prompt_command, end='', flush=True)
 
+            # 3. Single char input with action that leaves prompt
             if user_prompt_command == 'r':
                 return user.reload()
 
+            # 4. Common
             keyseqs = common(case, user_prompt_command, keyseqs)
 
 

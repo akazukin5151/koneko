@@ -20,7 +20,6 @@ def ask_quit():
             if ans == 'y' or ans == 'q' or ans.code == 343:  # Enter
                 sys.exit(0)
             elif ans:
-                print('Quit cancelled, enter a command')
                 break
 
 
@@ -70,6 +69,7 @@ def gallery_like_prompt(gallery):
 
     with TERM.cbreak():
         while True:
+            print('Enter a gallery command:')
             gallery_command = TERM.inkey()
             print(gallery_command, end='', flush=True)
 
@@ -141,6 +141,7 @@ def image_prompt(image):
         while True:
             print('Enter an image view command:')
             image_prompt_command = TERM.inkey()
+            print(image_prompt_command, end='', flush=True)
 
             # Simplify if-else chain with case-switch
             func = case.get(image_prompt_command, None)
@@ -149,12 +150,12 @@ def image_prompt(image):
 
             elif image_prompt_command.isdigit():
                 keyseqs.append(image_prompt_command)
-                print(keyseqs)
 
             # Escape, backspace
             elif image_prompt_command.code == 361 or image_prompt_command.code == 263:
                 keyseqs = []
-                print(keyseqs)
+                # Remove entire line
+                print('\r', '\b \b' * 4, end='', flush=True)
 
             elif image_prompt_command == 'b':
                 return image.leave(False)
@@ -163,7 +164,7 @@ def image_prompt(image):
                 return image.leave(True)
 
             elif image_prompt_command:
-                print('Invalid command! Press h to show help')
+                print('\nInvalid command! Press h to show help')
 
             # Two digit sequence -- jump to post number
             if len(keyseqs) == 2 and  pure.all_satisfy(keyseqs, m.isdigit()):
@@ -196,6 +197,7 @@ def user_prompt(user):
         while True:
             print('Enter a user view command:')
             user_prompt_command = TERM.inkey()
+            print(user_prompt_command, end='', flush=True)
 
             # Simplify if-else chain with case-switch
             func = case.get(user_prompt_command, None)
@@ -205,7 +207,8 @@ def user_prompt(user):
             # Escape, backspace
             elif user_prompt_command.code == 361 or user_prompt_command.code == 263:
                 keyseqs = []
-                print(keyseqs)
+                # Remove entire line
+                print('\r', '\b \b' * 4, end='', flush=True)
 
             elif user_prompt_command == 'r':
                 return user.reload()
@@ -213,10 +216,9 @@ def user_prompt(user):
             # Wait for the rest of the sequence
             elif user_prompt_command.isdigit():
                 keyseqs.append(user_prompt_command)
-                print(keyseqs)
 
             elif user_prompt_command:
-                print('Invalid command! Press h to show help')
+                print('\nInvalid command! Press h to show help')
                 keyseqs = []
 
             # End of the sequence...

@@ -1,7 +1,6 @@
 """Prompt functions that intercept keyboard input and call the right method"""
 
 import sys
-import time
 
 from blessed import Terminal
 from placeholder import m
@@ -36,7 +35,9 @@ def common(case: 'dict',
            keyseqs: 'list[str]',
            allowed_keys: 'tuple[str]' = tuple()
     ) -> 'list[str]':
-
+    """Actions common to all prompts that do not break out of prompt.
+    Returns keyseqs, modified if needed
+    """
     func = case.get(command, None)
     if func:
         func()
@@ -188,6 +189,7 @@ def user_prompt(user):
             keyseqs = common(case, user_prompt_command, keyseqs)
 
 
+# Basically ui functions that is called on the appropriate user input
 def _image_help():
     print('')
     print(''.join([

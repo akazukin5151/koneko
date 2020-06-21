@@ -138,3 +138,10 @@ def full_img_details(url: str, png=False) -> (str, str, Path):
     filename = split_backslash_last(url)
     filepath = generate_filepath(filename)
     return url, filename, filepath
+
+
+def concat_seqs_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
+    """Takes prompt input key seqs, combine two digits literally as int"""
+    first = keyseqs[start]
+    second = keyseqs[start + 1]
+    return int(f'{first}{second}')

@@ -102,6 +102,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 # Roadmap
 
+* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
 * In-depth usage documentation?
 * Consistent public and private methods and attributes again (only show public ones in puml)
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.

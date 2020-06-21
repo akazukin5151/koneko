@@ -71,7 +71,11 @@ def gallery_like_prompt(gallery):
         while True:
             # Multi char sequence
             if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
-                return goto_image(gallery, utils.seq_coords_to_int(keyseqs))
+                image_num = utils.seq_coords_to_int(keyseqs)
+                if image_num is not False:
+                    return goto_image(gallery, image_num)
+                print('\nInvalid command! Press h to show help')
+                keyseqs = []
 
             elif (len(keyseqs) == 3 and pure.all_satisfy(keyseqs[1:], m.isdigit()) and
                   keyseqs[0] in sequenceable_keys):
@@ -125,11 +129,7 @@ def common(case: 'dict',
         print('\r', '\b \b' * 4, end='', flush=True)
         return []
 
-    elif not command.isdigit():
-        print('\nInvalid command! Press h to show help')
-        return []
-
-    elif len(keyseqs) > 3:
+    elif not command.isdigit() or len(keyseqs) > 3:
         print('\nInvalid command! Press h to show help')
         return []
 

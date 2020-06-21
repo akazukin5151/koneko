@@ -69,34 +69,6 @@ def gallery_like_prompt(gallery):
 
     with TERM.cbreak():
         while True:
-            if not keyseqs:
-                print('Enter a gallery command:')
-            gallery_command = TERM.inkey()
-            print(gallery_command, end='', flush=True)
-
-            if gallery_command.isdigit() or gallery_command in sequenceable_keys:
-                keyseqs.append(gallery_command)
-
-            # Single char input, action does not return
-            func = case.get(gallery_command, None)
-            if func:
-                func()
-
-            # Single char input, action mutates keyseqs
-            # Escape, backspace
-            if gallery_command.code == 361 or gallery_command.code == 263:
-                keyseqs = []
-                # Remove entire line
-                print('\r', '\b \b' * 4, end='', flush=True)
-
-            # Single char input with action that leaves prompt
-            elif gallery_command == 'b':
-                return gallery.handle_prompt(['b'])
-
-            elif gallery_command == 'r':
-                return gallery.handle_prompt(['r'])
-
-
             # Multi char sequence
             if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
                 return goto_image(gallery, utils.seq_coords_to_int(keyseqs))
@@ -114,20 +86,38 @@ def gallery_like_prompt(gallery):
 
                 keyseqs = []
 
-            if len(keyseqs) > 3:
-                print('\nInvalid command! Press h to show help')
-                keyseqs = []
+
+            if not keyseqs:
+                print('Enter a gallery command:')
+            gallery_command = TERM.inkey()
+            print(gallery_command, end='', flush=True)
 
 
-def common(case: 'dict', command: str, keyseqs: 'list[str]') -> 'list[str]':
-    # No return functions
+            # Single char input with action that leaves prompt
+            if gallery_command == 'b':
+                return gallery.handle_prompt(['b'])
+
+            elif gallery_command == 'r':
+                return gallery.handle_prompt(['r'])
+
+            keyseqs = common(case, gallery_command, keyseqs, sequenceable_keys)
+
+
+def common(case: 'dict',
+           command: str,
+           keyseqs: 'list[str]',
+           allowed_keys: 'tuple[str]' = tuple()
+    ) -> 'list[str]':
+
     func = case.get(command, None)
     if func:
         func()
+        return keyseqs
 
     # Wait for the rest of the sequence
-    elif command.isdigit():
+    elif command.isdigit() or command in allowed_keys:
         keyseqs.append(command)
+        return keyseqs
 
     # Escape, backspace
     elif command.code == 361 or command.code == 263:
@@ -139,7 +129,9 @@ def common(case: 'dict', command: str, keyseqs: 'list[str]') -> 'list[str]':
         print('\nInvalid command! Press h to show help')
         return []
 
-    return keyseqs
+    elif len(keyseqs) > 3:
+        print('\nInvalid command! Press h to show help')
+        return []
 
 
 def image_prompt(image):
@@ -178,7 +170,10 @@ def image_prompt(image):
 
 
 def user_prompt(user):
-    """Handles key presses for user views (following users and user search)"""
+    """Handles key presses for user views (following users and user search)
+    The only difference between image and user prompts is the `case`,
+    action of two-digit-sequence, and single character return
+    """
     case = {
         'n': user.next_page,
         'p': user.previous_page,

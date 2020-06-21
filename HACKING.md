@@ -6,6 +6,7 @@
 * colors
 * data *
 * pure *
+
 \* (technically user input is impure, but functions are referentially transparent)
 
 **Impure modules:**

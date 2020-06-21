@@ -111,6 +111,8 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 ## Features
 
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
+* Go to related works from image view (illust_related)
+* View recommended illusts (illust_recommended)
 
 ## Upcoming changelog (in dev branch)
 

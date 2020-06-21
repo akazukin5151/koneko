@@ -13,10 +13,10 @@ import funcy
 from koneko.config import ncols_config
 
 
-# TODO: rename to seq_coords_to_int()
-# TODO: what if find_number_map() returns None?
-def seq_to_num(keyseqs: 'list[str]') -> int:
-    """Takes prompt input key seqs, find the selected image number"""
+def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
+    """Takes prompt input key seqs, find the selected image number.
+    If find_number_map() returns None, prompt.goto_image() will catch it.
+    """
     first_num, second_num = keyseqs[-2:]
     return find_number_map(int(first_num), int(second_num))
 

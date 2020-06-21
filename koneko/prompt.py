@@ -105,7 +105,7 @@ def gallery_like_prompt(gallery):
 
             # Multi char sequence
             if len(keyseqs) == 2 and allf(keyseqs, m.isdigit()):
-                return goto_image(gallery, utils.seq_to_num(keyseqs))
+                return goto_image(gallery, utils.seq_coords_to_int(keyseqs))
 
             elif (len(keyseqs) == 3 and allf(keyseqs[1:], m.isdigit()) and
                   keyseqs[0] in sequenceable_keys):

@@ -286,6 +286,7 @@ class ArtistGallery(AbstractGallery):
     @staticmethod
     def help():
         """Implements abstractmethod"""
+        print('')
         print(''.join(
             colors.base1 + ['view '] + colors.base2 +
             ['view ', colors.m, 'anual; ',
@@ -367,6 +368,7 @@ class IllustFollowGallery(AbstractGallery):
     @staticmethod
     def help():
         """Implements abstractmethod"""
+        print('')
         print(''.join(colors.base1 + [
             colors.a, "view artist's illusts; ",
             colors.n, 'ext page;\n',

@@ -20,6 +20,7 @@ def ask_quit():
             if ans == 'y' or ans == 'q' or ans.code == 343:  # Enter
                 sys.exit(0)
             elif ans:
+                print('Quit cancelled, enter a command')
                 break
 
 
@@ -48,26 +49,6 @@ def goto_image(gallery, image_num: int):
         gallery.view_image(image_num)
 
 
-def single_char_action(gallery_command, gallery):
-    """Actions do not return (break out of input receive while loop)"""
-    if gallery_command == 'n':
-        gallery.next_page()
-
-    elif gallery_command == 'p':
-        gallery.previous_page()
-
-    elif gallery_command == 'm':
-        print('')
-        print(gallery.__doc__)
-
-    elif gallery_command == 'h':
-        print('')
-        gallery.help()
-
-    elif gallery_command == 'q':
-        ask_quit()
-        print('Enter a gallery command:')
-
 
 def gallery_like_prompt(gallery):
     """
@@ -77,6 +58,13 @@ def gallery_like_prompt(gallery):
         If the sequence is valid, execute their corresponding actions
     Otherwise for keys that do not need a sequence, execute their actions normally
     """
+    case = {
+        'n': gallery.next_page,
+        'p': gallery.previous_page,
+        'h': gallery.help,
+        'q': ask_quit,
+        'm': lambda: print('', gallery.__doc__)
+    }
     keyseqs = []
     sequenceable_keys = ('o', 'd', 'i', 'O', 'D', 'a', 'A')
 
@@ -89,7 +77,9 @@ def gallery_like_prompt(gallery):
                 keyseqs.append(gallery_command)
 
             # Single char input, action does not return
-            single_char_action(gallery_command, gallery)
+            func = case.get(gallery_command, None)
+            if func:
+                func()
 
             # Single char input, action mutates keyseqs
             if gallery_command.code == 361:  # Escape

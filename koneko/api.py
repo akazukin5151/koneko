@@ -1,4 +1,4 @@
-"""Handles (almost) all Pixiv API interactions, eg async login, requests"""
+"""Handles all Pixiv API interactions, eg async login, requests"""
 
 import queue
 import threading
@@ -16,8 +16,9 @@ class APIHandler:
         self.api_thread = threading.Thread(target=self._login)
         self._started = False
         self._awaited = False
+        # To be set later (because singleton is instantiated before config)
         self.credentials: 'Dict'
-        self.api: 'AppPixivAPI()'
+        self.api: 'AppPixivAPI()'  # Object to login and request on
 
     def start(self):
         """Start logging in. self.credentials must be available"""
@@ -47,7 +48,7 @@ class APIHandler:
         self.api_queue.put(api)
 
 
-    # API request functions for each mode
+    # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @utils.spinner('')
     def artist_gallery(self, artist_user_id, offset):

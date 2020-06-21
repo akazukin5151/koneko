@@ -66,7 +66,7 @@ def process_cli_args() -> (str, str):
         return parse_no_mode(url_or_str)
     return parse_mode_given(args)
 
-# The two functions are pure, but the input isn't
+
 def parse_no_mode(url_or_str: str) -> (str, str):
     if 'users' in url_or_str:
         return '1', pure.process_user_url(url_or_str)

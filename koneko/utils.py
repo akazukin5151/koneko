@@ -38,7 +38,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
 
 
 @contextmanager
-def cd(newdir: Path) -> None:
+def cd(newdir: Path) -> 'IO':
     """Change current script directory, do something, change back to old directory
     See https://stackoverflow.com/questions/431684/how-do-i-change-the-working-directory-in-python/24176022#24176022
 

@@ -1,5 +1,24 @@
 # Hacking
 
+## Pure and impure modules
+**Pure modules:**
+* cli *
+* colors
+* data *
+* pure *
+\* (technically user input is impure, but functions are referentially transparent)
+
+**Impure modules:**
+* api
+* config (but some functions will never fail)
+* download
+* lscat
+* main
+* prompt
+* screens
+* ui
+* utils
+
 ## Flowchart of modes and their connections:
 
 ![Flowchart UML](http://plantuml.com:80/plantuml/png/dPDD2y8m38Rl_HM5dZtejfk8YYY2Dy6BY1IDTHWtwGVYltVMhfkrAdWgIzuyUPUcGwMvrEQCX1W5Eww0ZgJEbTuAZWZorlNn-PaBwFdFQObONlD2RBajK8bFBO7BtR6Efmq1qLJaGrsPDKsjZIvb4u3BydGRem4I6A7zphgTtyXS77Ldu6f_oYkb-uNNhZtA5lnQp2H04ONuR0lnFCAq0mOD4ig4XR-Fp094pGud7pCZ0YDVcURYB2M1fPGo2NiIN9IjhE8nBv-alaKQjUjeqS5db3qkPfMN29gyBOUjRmJjuV-I8XpyOcHHN_znwuqBXqE6KEohHtG7)

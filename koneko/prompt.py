@@ -11,13 +11,6 @@ from koneko import ui, pure, utils, colors, download
 TERM = Terminal()
 
 
-# Should belong in pure
-def allf(iterable: 'iter[T]', predicate: 'func(i: T) -> bool') -> bool:
-    for item in iterable:
-        if not predicate(item):
-            return False
-    return True
-
 def ask_quit():
     """Ask for quit confirmation, no need to press enter"""
     print('\nAre you sure you want to exit?')
@@ -104,10 +97,10 @@ def gallery_like_prompt(gallery):
                 print('Enter a gallery command:')
 
             # Multi char sequence
-            if len(keyseqs) == 2 and allf(keyseqs, m.isdigit()):
+            if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
                 return goto_image(gallery, utils.seq_coords_to_int(keyseqs))
 
-            elif (len(keyseqs) == 3 and allf(keyseqs[1:], m.isdigit()) and
+            elif (len(keyseqs) == 3 and pure.all_satisfy(keyseqs[1:], m.isdigit()) and
                   keyseqs[0] in sequenceable_keys):
 
                 open_or_download(gallery, keyseqs)
@@ -174,7 +167,7 @@ def image_prompt(image):
                 print('Invalid command! Press h to show help')
 
             # Two digit sequence -- jump to post number
-            if len(keyseqs) == 2 and  allf(keyseqs, m.isdigit()):
+            if len(keyseqs) == 2 and  pure.all_satisfy(keyseqs, m.isdigit()):
                 ui.jump_to_image(image.data, pure.concat_seqs_to_int(keyseqs))
                 keyseqs = []
 
@@ -230,7 +223,7 @@ def user_prompt(user):
 
             # End of the sequence...
             # Two digit sequence -- view artist given number
-            if len(keyseqs) == 2 and allf(keyseqs, m.isdigit()):
+            if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
                 return user.go_artist_mode(pure.concat_seqs_to_int(keyseqs))
 
 def _user_help():

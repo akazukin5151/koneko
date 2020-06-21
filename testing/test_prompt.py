@@ -8,12 +8,6 @@ from blessed.keyboard import Keystroke
 from koneko import prompt
 
 
-def test_allf():
-    assert prompt.allf(range(3), lambda x: x == 3) is False
-    assert prompt.allf(range(3), lambda x: x < 10) is True
-    assert prompt.allf(range(3), lambda x: x >= 0) is True
-
-
 class CustomExit(Exception):
     pass
 

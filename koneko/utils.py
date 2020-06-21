@@ -1,3 +1,5 @@
+"""Small functions that do IO (file read/write, user input, network request, configs)"""
+
 import os
 import imghdr
 import itertools
@@ -11,12 +13,15 @@ import funcy
 from koneko.config import ncols_config
 
 
+# TODO: move to pure; rename to concat_seqs_to_int()
 def seq_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
     """Takes prompt input key seqs, combine two digits literally as int"""
     first = keyseqs[start]
     second = keyseqs[start + 1]
     return int(f'{first}{second}')
 
+# TODO: rename to seq_coords_to_int()
+# TODO: what if find_number_map() returns None?
 def seq_to_num(keyseqs: 'list[str]') -> int:
     """Takes prompt input key seqs, find the selected image number"""
     first_num, second_num = keyseqs[-2:]

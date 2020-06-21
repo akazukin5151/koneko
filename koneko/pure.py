@@ -1,6 +1,7 @@
 """
 Collection of functions that are pure and side effect free
-    (Excluding print)
+Excluding printing, should not directly do any IO (file r/w, user input), including configs
+Most input data come from impure sources (user input or network request), but this is allowed here
 """
 
 import os
@@ -101,6 +102,7 @@ def change_url_to_full(url: str, png=False) -> str:
     return url
 
 
+# TODO: move to utils
 @funcy.decorator
 def catch_ctrl_c(call: 'func[T]') -> 'T':
     """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""

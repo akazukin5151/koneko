@@ -12,12 +12,6 @@ from koneko import lscat, pure
 sys.path.append('testing')
 
 
-def test_xcoords():
-    assert lscat.xcoords(100) == [2, 20, 38, 56, 74]
-
-def test_ycoords():
-    assert lscat.ycoords(20) == [0, 9]
-
 def test_icat():
     assert lscat.icat("testing/files/04_祝！！！.jpg") is None
 

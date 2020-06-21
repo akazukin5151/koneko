@@ -147,6 +147,33 @@ def concat_seqs_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
     return int(f'{first}{second}')
 
 
+# From lscat
+def ncols(term_width: int, img_width: int, padding: int) -> int:
+    return round(term_width / (img_width + padding))
+
+def nrows(term_height: int, img_height: int, padding: int) -> int:
+    return term_height // (img_height + padding)
+
+def xcoords(term_width: int, img_width=18, padding=2, offset=0) -> 'list[int]':
+    """Generates the x-coord for each column to pass into pixcat
+    If img_width == 18 and 90 > term_width > 110, there will be five columns,
+    with spaces of (2, 20, 38, 56, 74)
+    Meaning the first col has x-coordinates 2 and second col of 20
+    """
+    number_of_columns = ncols(term_width, img_width, padding)
+    return [col % number_of_columns * img_width + padding + offset
+            for col in range(number_of_columns)]
+
+def ycoords(term_height: int, img_height=8, padding=1) -> 'list[int]':
+    """Generates the y-coord for each row to pass into pixcat
+    If img_height == 8 and 27 > term_height >= 18, there will be two rows,
+    with spaces of (0, 9)
+    Meaning the first row has y-coordinates 0 and second row of 9
+    """
+    number_of_rows = term_height // (img_height + padding)
+    return [row * (img_height + padding)
+            for row in range(number_of_rows)]
+
 def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     """Returns the order of images to be displayed
     images 0-29 are artist profile pics
@@ -169,3 +196,4 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
             p += 1
 
     return order
+

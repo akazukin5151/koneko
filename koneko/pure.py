@@ -145,3 +145,27 @@ def concat_seqs_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
     first = keyseqs[start]
     second = keyseqs[start + 1]
     return int(f'{first}{second}')
+
+
+def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
+    """Returns the order of images to be displayed
+    images 0-29 are artist profile pics
+    images 30-119 are previews, 3 for each artist
+    so the valid order is:
+    0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
+    a, p,  p,  p,  a, p,  p,  p,  a, ...
+    """
+    artist = tuple(range(artists_count))
+    prev = tuple(range(artists_count, total_pics))
+    order = []
+    a, p = 0, 0
+
+    for i in range(total_pics):
+        if i % 4 == 0:
+            order.append(artist[a])
+            a += 1
+        else:
+            order.append(prev[p])
+            p += 1
+
+    return order

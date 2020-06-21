@@ -24,7 +24,7 @@ from pixcat import Image
 from placeholder import m
 from returns.result import safe
 
-from koneko import utils, config
+from koneko import pure, utils, config
 
 
 # Move to pure
@@ -142,7 +142,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is
         # splitpoint * 3 + splitpoint == splitpoint * 4
-        self.orders = generate_orders(splitpoint * 4, splitpoint)
+        self.orders = pure.generate_orders(splitpoint * 4, splitpoint)
 
         self.generator = generate_users(data.download_path, print_info)
         super().__init__()
@@ -203,29 +203,6 @@ def generate_users(path, print_info=True) -> 'IO':
                 Image(p_img).thumbnail(thumbnail_size).show(align='left', y=0,
                                                             x=preview_xcoords[i])
                 i += 1
-
-def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
-    """Returns the order of images to be displayed
-    images 0-29 are artist profile pics
-    images 30-119 are previews, 3 for each artist
-    so the valid order is:
-    0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
-    a, p,  p,  p,  a, p,  p,  p,  a, ...
-    """
-    artist = tuple(range(artists_count))
-    prev = tuple(range(artists_count, total_pics))
-    order = []
-    a, p = 0, 0
-
-    for i in range(total_pics):
-        if i % 4 == 0:
-            order.append(artist[a])
-            a += 1
-        else:
-            order.append(prev[p])
-            p += 1
-
-    return order
 
 
 class TrackDownloadsImage(AbstractTracker):

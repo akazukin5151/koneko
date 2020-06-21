@@ -69,7 +69,8 @@ def gallery_like_prompt(gallery):
 
     with TERM.cbreak():
         while True:
-            print('Enter a gallery command:')
+            if not keyseqs:
+                print('Enter a gallery command:')
             gallery_command = TERM.inkey()
             print(gallery_command, end='', flush=True)
 
@@ -118,13 +119,31 @@ def gallery_like_prompt(gallery):
                 keyseqs = []
 
 
+def common(case: 'dict', command: str, keyseqs: 'list[str]') -> 'list[str]':
+    # No return functions
+    func = case.get(command, None)
+    if func:
+        func()
+
+    # Wait for the rest of the sequence
+    elif command.isdigit():
+        keyseqs.append(command)
+
+    # Escape, backspace
+    elif command.code == 361 or command.code == 263:
+        # Remove entire line
+        print('\r', '\b \b' * 4, end='', flush=True)
+        return []
+
+    elif not command.isdigit():
+        print('\nInvalid command! Press h to show help')
+        return []
+
+    return keyseqs
+
+
 def image_prompt(image):
-    """
-    if-else statements to intercept key presses and do the correct action
-    current_page and current_page_num is for gallery view -> next page(s) ->
-    image prompt -> back
-    kwargs are to store info for posts with multiple pages/images
-    """
+    """if-else statements to intercept key presses and do the correct action"""
     case = {
         'o': image.open_image,
         'd': image.download_image,
@@ -139,49 +158,24 @@ def image_prompt(image):
     keyseqs = []
     with TERM.cbreak():
         while True:
-            print('Enter an image view command:')
-            image_prompt_command = TERM.inkey()
-            print(image_prompt_command, end='', flush=True)
-
-            # Simplify if-else chain with case-switch
-            func = case.get(image_prompt_command, None)
-            if func:
-                func()
-
-            elif image_prompt_command.isdigit():
-                keyseqs.append(image_prompt_command)
-
-            # Escape, backspace
-            elif image_prompt_command.code == 361 or image_prompt_command.code == 263:
-                keyseqs = []
-                # Remove entire line
-                print('\r', '\b \b' * 4, end='', flush=True)
-
-            elif image_prompt_command == 'b':
-                return image.leave(False)
-
-            elif image_prompt_command == 'a':
-                return image.leave(True)
-
-            elif image_prompt_command:
-                print('\nInvalid command! Press h to show help')
-
             # Two digit sequence -- jump to post number
             if len(keyseqs) == 2 and  pure.all_satisfy(keyseqs, m.isdigit()):
                 ui.jump_to_image(image.data, pure.concat_seqs_to_int(keyseqs))
                 keyseqs = []
 
-def _image_help():
-    print(''.join([
-        colors.b, 'ack; ',
-        colors.n, 'ext image; ',
-        colors.p, 'revious image; ',
-        colors.d_, 'ownload image;',
-        colors.o_, 'pen image in browser;\n',
-        'show image in', colors.f, 'ull res; ',
-        colors.q, 'uit (with confirmation); ',
-        'view ', colors.m, 'anual\n'
-    ]))
+            if not keyseqs:
+                print('Enter an image view command:')
+            image_prompt_command = TERM.inkey()
+            print(image_prompt_command, end='', flush=True)
+
+            if image_prompt_command == 'b':
+                return image.leave(False)
+
+            elif image_prompt_command == 'a':
+                return image.leave(True)
+
+            keyseqs = common(case, image_prompt_command, keyseqs)
+
 
 def user_prompt(user):
     """Handles key presses for user views (following users and user search)"""
@@ -195,38 +189,36 @@ def user_prompt(user):
     keyseqs = []
     with TERM.cbreak():
         while True:
-            print('Enter a user view command:')
-            user_prompt_command = TERM.inkey()
-            print(user_prompt_command, end='', flush=True)
-
-            # Simplify if-else chain with case-switch
-            func = case.get(user_prompt_command, None)
-            if func:
-                func()
-
-            # Escape, backspace
-            elif user_prompt_command.code == 361 or user_prompt_command.code == 263:
-                keyseqs = []
-                # Remove entire line
-                print('\r', '\b \b' * 4, end='', flush=True)
-
-            elif user_prompt_command == 'r':
-                return user.reload()
-
-            # Wait for the rest of the sequence
-            elif user_prompt_command.isdigit():
-                keyseqs.append(user_prompt_command)
-
-            elif user_prompt_command:
-                print('\nInvalid command! Press h to show help')
-                keyseqs = []
-
-            # End of the sequence...
             # Two digit sequence -- view artist given number
             if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
                 return user.go_artist_mode(pure.concat_seqs_to_int(keyseqs))
 
+            if not keyseqs:
+                print('Enter a user view command:')
+            user_prompt_command = TERM.inkey()
+            print(user_prompt_command, end='', flush=True)
+
+            if user_prompt_command == 'r':
+                return user.reload()
+
+            keyseqs = common(case, user_prompt_command, keyseqs)
+
+
+def _image_help():
+    print('')
+    print(''.join([
+        colors.b, 'ack; ',
+        colors.n, 'ext image; ',
+        colors.p, 'revious image; ',
+        colors.d_, 'ownload image;',
+        colors.o_, 'pen image in browser;\n',
+        'show image in', colors.f, 'ull res; ',
+        colors.q, 'uit (with confirmation); ',
+        'view ', colors.m, 'anual\n'
+    ]))
+
 def _user_help():
+    print('')
     print(''.join([
         'view ', colors.BLUE_N, "th artist's illusts ",
         colors.n, 'ext page; ',
@@ -235,3 +227,5 @@ def _user_help():
         colors.q, 'uit (with confirmation);',
         'view ', colors.m, 'anual\n'
     ]))
+
+

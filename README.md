@@ -103,13 +103,14 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 # Roadmap
 
 * In-depth usage documentation?
-* Move functions that do work to pure or utils (as opposed to functions that organise work)
 * Consistent public and private methods and attributes again (only show public ones in puml)
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features
 
 * Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
+* Go to related works from image view (illust_related)
+* View recommended illusts (illust_recommended)
 
 ## Upcoming changelog (in dev branch)
 
@@ -119,6 +120,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * lscat now slightly faster as the image number is calculated only when it finishes downloading, not on every recursion.
 * Fixed opening the manual in user modes not working
+* Fixed bug in lscat: number of columns now determines when to print page spacings
+* Improvement for lscat: the screen will be filled with the most rows as possible
 
 #### Code
 * Extract out common behaviour from Gallery and Users ui classes into AbstractUI
@@ -127,10 +130,13 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Simplified code everywhere
     * Reduced nesting with early returns
     * Removed dead code
-    * Split up functions in `config.py`
-    * Split up main function in `main.py`
-    * Split up functions in `cli.py`
-    * Split up functions in `download.py`
+    * Split up functions in:
+        * `config.py`
+        * `main.py`
+        * `cli.py`
+        * `download.py`
+    * Renamed data classes (eg GalleryJson to GalleryData)
+    * Simplify `ui.display_page()`
 * Remove unused cytoolz dependency
 * More functional style
     * Use `placeholder` to make lambdas look better
@@ -157,6 +163,7 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 * Run tests with `pytest testing/ -vvvv -l -s` (`--inte` for integration tests)
 * Submit a pull request
 
+Tips: 
 * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
 * If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.

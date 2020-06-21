@@ -4,10 +4,10 @@ from subprocess import check_output
 
 import pixcat
 
-from koneko import KONEKODIR, ui, cli, pure, __version__
+from koneko import KONEKODIR, ui, cli, utils, __version__
 
 
-def begin_prompt(printmessage=True):
+def begin_prompt(printmessage=True) -> 'IO[str]':
     messages = (
         '',
         f'Welcome to koneko v{__version__}\n',
@@ -41,8 +41,8 @@ def begin_prompt(printmessage=True):
     command = input('Enter a command: ')
     return command
 
-@pure.catch_ctrl_c
-def show_man_loop():
+@utils.catch_ctrl_c
+def show_man_loop() -> 'IO':
     os.system('clear')
     print(cli.__doc__)
     print(' ' * 3, '=' * 30)
@@ -59,8 +59,8 @@ def show_man_loop():
             os.system('clear')
             break
 
-@pure.catch_ctrl_c
-def clear_cache_loop():
+@utils.catch_ctrl_c
+def clear_cache_loop() -> 'IO':
     print('Do you want to remove all cached images?')
     print('This will not remove images you explicitly downloaded to ~/Downloads.')
     print(f'Directory to be deleted: {KONEKODIR}')
@@ -75,8 +75,8 @@ def clear_cache_loop():
             os.system('clear')
             break
 
-@pure.catch_ctrl_c
-def info_screen_loop():
+@utils.catch_ctrl_c
+def info_screen_loop() -> 'IO':
     os.system('clear')
     messages = (
         '',

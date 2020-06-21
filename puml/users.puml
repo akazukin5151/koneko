@@ -1,65 +1,12 @@
 @startuml
 title Users (mode 3 or 4)
 
-== Mode selection ==
-actor User
-User -> ui ++: Mode 3 or 4
-ui --> User: Ask for user id
-User --> ui: Pixiv id
-ui -> api ++: JSON request
-return JSON response
-database udata
-create udata
-ui -> udata: Stores response
-create lscat
-ui -> lscat: Add tracker
-ui -> download: Download images
-activate download
-download -> lscat ++: Image 2 done
-download -> lscat: Image 1 done
-lscat -> User: Display image 1
-lscat -> User: Display image 2
-download -> lscat: Image 3 done
-deactivate download
-lscat -> User: Display image 3
-deactivate lscat
-group prefetching
-    ui -> udata ++: next_url
-    return next_url
-    ui -> api ++: parse_next()
-    return JSON response
-    ui -> udata: Stores response
-    ui -> download: Download images
-    activate download
-    deactivate download
-end
-return Prompt
-|||
-
-== Next page ==
-User -> ui ++: Next Page
-ui --> User: show_page()
-ui -> ui: prefetch
-return
-|||
-
-== Previous page ==
-User -> ui ++: previous_page()
-return show_page()
-|||
 
 == Go artist mode ==
 User -> ui ++: go_artist_mode()
-ui -> udata ++: artist_user_id
+ui -> data ++: artist_user_id
 return artist_user_id
 return ArtistGallery
-|||
-
-== Reload ==
-User -> ui ++: reload()
-ui -> User: Are you sure?
-User -> ui: Confirmation
-return start()
 |||
 
 

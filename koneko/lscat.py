@@ -10,6 +10,10 @@
 5) Immediately, remove the image from the lists and repeat the `_inspect()` method
    for the next valid image. If there is one, repeat. If not, do nothing and wait for
    more completed downloads
+
+TLDR if you want to write your own renderer (with icat or not), the API is:
+    - Provide a `tracker` with an `update()` method that receives completed downloads
+    - Provide a generator that receives images to display in order, from the tracker
 """
 
 import os
@@ -20,31 +24,7 @@ from pixcat import Image
 from placeholder import m
 from returns.result import safe
 
-from koneko import utils, config
-
-
-def ncols(term_width: int, img_width: int, padding: int) -> int:
-    return round(term_width / (img_width + padding))
-
-def xcoords(term_width: int, img_width=18, padding=2, offset=0) -> 'list[int]':
-    """Generates the x-coord for each column to pass into pixcat
-    If img_width == 18 and 90 > term_width > 110, there will be five columns,
-    with spaces of (2, 20, 38, 56, 74)
-    Meaning the first col has x-coordinates 2 and second col of 20
-    """
-    number_of_columns = ncols(term_width, img_width, padding)
-    return [col % number_of_columns * img_width + padding + offset
-            for col in range(number_of_columns)]
-
-def ycoords(term_height: int, img_height=8, padding=1) -> 'list[int]':
-    """Generates the y-coord for each row to pass into pixcat
-    If img_height == 8 and 27 > term_height >= 18, there will be two rows,
-    with spaces of (0, 9)
-    Meaning the first row has y-coordinates 0 and second row of 9
-    """
-    number_of_rows = term_height // (img_height + padding)
-    return [row * (img_height + padding)
-            for row in range(number_of_rows)]
+from koneko import pure, utils, config
 
 
 def icat(args: str) -> 'IO':
@@ -115,7 +95,7 @@ class TrackDownloads(AbstractTracker):
         self.generator = generate_page(data.download_path)
         super().__init__()
 
-def read_invis(data) -> int:
+def read_invis(data) -> 'IO[int]':
     with utils.cd(data.download_path):
         with open('.koneko', 'r') as f:
             return int(f.read())
@@ -134,7 +114,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is
         # splitpoint * 3 + splitpoint == splitpoint * 4
-        self.orders = generate_orders(splitpoint * 4, splitpoint)
+        self.orders = pure.generate_orders(splitpoint * 4, splitpoint)
 
         self.generator = generate_users(data.download_path, print_info)
         super().__init__()
@@ -144,6 +124,7 @@ def generate_page(path) -> 'IO':
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
+    number_of_rows = config.nrows_config()
     page_spacing = config.gallery_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
 
@@ -157,12 +138,12 @@ def generate_page(path) -> 'IO':
         x = number % number_of_cols
         y = number // number_of_cols
 
-        if number % 10 == 0 and number != 0:
+        if number % (number_of_cols * number_of_rows) == 0 and number != 0:
             print('\n' * page_spacing)
 
         with utils.cd(path):
             Image(image).thumbnail(thumbnail_size).show(
-                align='left', x=left_shifts[x], y=rowspaces[(y % 2)]
+                align='left', x=left_shifts[x], y=rowspaces[(y % number_of_rows)]
             )
 
 def generate_users(path, print_info=True) -> 'IO':
@@ -194,29 +175,6 @@ def generate_users(path, print_info=True) -> 'IO':
                 Image(p_img).thumbnail(thumbnail_size).show(align='left', y=0,
                                                             x=preview_xcoords[i])
                 i += 1
-
-def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
-    """Returns the order of images to be displayed
-    images 0-29 are artist profile pics
-    images 30-119 are previews, 3 for each artist
-    so the valid order is:
-    0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
-    a, p,  p,  p,  a, p,  p,  p,  a, ...
-    """
-    artist = tuple(range(artists_count))
-    prev = tuple(range(artists_count, total_pics))
-    order = []
-    a, p = 0, 0
-
-    for i in range(total_pics):
-        if i % 4 == 0:
-            order.append(artist[a])
-            a += 1
-        else:
-            order.append(prev[p])
-            p += 1
-
-    return order
 
 
 class TrackDownloadsImage(AbstractTracker):

@@ -66,7 +66,8 @@ def process_cli_args() -> (str, str):
         return parse_no_mode(url_or_str)
     return parse_mode_given(args)
 
-def parse_no_mode(url_or_str):
+
+def parse_no_mode(url_or_str: str) -> (str, str):
     if 'users' in url_or_str:
         return '1', pure.process_user_url(url_or_str)
 
@@ -83,7 +84,7 @@ def parse_no_mode(url_or_str):
 
     return '4', url_or_str
 
-def parse_mode_given(args):
+def parse_mode_given(args: 'dict') -> (str, str):
     url_or_id = args['<link_or_id>']
 
     if args['1'] or args['a']:

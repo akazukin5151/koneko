@@ -94,20 +94,27 @@ class ImageData:
             self.download_path = self.download_path / str(image_id)
 
     @property
-    def image_filename(self) -> str:
-        return pure.split_backslash_last(self.page_urls[self.page_num])
-
-    @property
-    def filepath(self) -> str:
-        return self.download_path / self.image_filename
+    def current_url(self) -> str:
+        return self.page_urls[self.page_num]
 
     @property
     def next_img_url(self) -> str:
         return self.page_urls[self.page_num + 1]
 
     @property
-    def current_url(self) -> str:
-        return self.page_urls[self.page_num]
+    def image_filename(self) -> str:
+        return pure.split_backslash_last(self.current_url)
+
+    @property
+    def filepath(self) -> str:
+        return self.download_path / self.image_filename
+
+    @property
+    def large_filename(self) -> str:
+        return pure.split_backslash_last(self.page_urls[0])
+
+    def search_string(self, number_prefix: int) -> str:
+        return f"{str(number_prefix).rjust(3, '0')}_*"
 
 
 class UserData:

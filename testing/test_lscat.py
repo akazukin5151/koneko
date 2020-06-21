@@ -6,17 +6,11 @@ from unittest.mock import Mock
 
 import pytest
 
-from koneko import lscat
+from koneko import lscat, pure
 
 # Lmao python
 sys.path.append('testing')
 
-
-def test_xcoords():
-    assert lscat.xcoords(100) == [2, 20, 38, 56, 74]
-
-def test_ycoords():
-    assert lscat.ycoords(20) == [0, 9]
 
 def test_icat():
     assert lscat.icat("testing/files/04_祝！！！.jpg") is None
@@ -54,10 +48,6 @@ def test_show_instant(monkeypatch):
     }
 
 
-def test_generate_orders():
-    assert lscat.generate_orders(120, 30) == [0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, 3, 39, 40, 41, 4, 42, 43, 44, 5, 45, 46, 47, 6, 48, 49, 50, 7, 51, 52, 53, 8, 54, 55, 56, 9, 57, 58, 59, 10, 60, 61, 62, 11, 63, 64, 65, 12, 66, 67, 68, 13, 69, 70, 71, 14, 72, 73, 74, 15, 75, 76, 77, 16, 78, 79, 80, 17, 81, 82, 83, 18, 84, 85, 86, 19, 87, 88, 89, 20, 90, 91, 92, 21, 93, 94, 95, 22, 96, 97, 98, 23, 99, 100, 101, 24, 102, 103, 104, 25, 105, 106, 107, 26, 108, 109, 110, 27, 111, 112, 113, 28, 114, 115, 116, 29, 117, 118, 119]
-
-
 def test_TrackDownloads(monkeypatch):
     mocked_data = Mock()
     mocked_generator = Mock()
@@ -92,7 +82,7 @@ def test_TrackDownloadsUser(monkeypatch):
     tracker = lscat.TrackDownloadsUsers(mocked_data)
     tracker.generator = mocked_generator
 
-    correct_order = lscat.generate_orders(120, 30)
+    correct_order = pure.generate_orders(120, 30)
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]
 

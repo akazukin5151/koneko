@@ -1,3 +1,7 @@
+"""Functions to read and write user configuration.
+The IOResult type is just to mark functions using IO; they don't return an IOResult container
+"""
+
 import os
 from getpass import getpass
 from pathlib import Path
@@ -8,25 +12,25 @@ from returns.result import safe
 from placeholder import m
 from pipey import Pipeable as P
 
-from koneko import lscat
+from koneko import pure, lscat
 
 TERM = Terminal()
 
 
 @safe
-def get_config_section(section: str) -> 'Result[config]':
+def get_config_section(section: str) -> 'IOResult[config]':
     config_object = ConfigParser()
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object.read(config_path)
     section = config_object[section]
     return section
 
-def get_settings(section: str, setting: str) -> 'Result[str]':
+def get_settings(section: str, setting: str) -> 'IOResult[str]':
     cfgsection: 'Result[config]' = get_config_section(section)
     return cfgsection.map(m.get(setting, ''))
 
 @safe
-def _check_print_info() -> 'Result[bool]':
+def _check_print_info() -> 'IOResult[bool]':
     """Returns either Success(True), Success(False) or Failure.
     Inner boolean represents whether to print columns or not
     Failure represents no key/setting/config found
@@ -38,24 +42,26 @@ def check_print_info() -> 'bool':
     """For a Failure (setting not found), return True by default"""
     return _check_print_info().value_or(True)
 
-def _width_paddingx() -> (int, int):
+
+# While not pure (because reading config is IO), they will never fail
+def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, int):
     settings = get_config_section('lscat')
     return (
-        settings.map(m.getint('image_width', fallback=18)).value_or(18),
-        settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
+        settings.map(m.getint(f'image_{side}', fallback=fallbacks[0])).value_or(fallbacks[0]),
+        settings.map(m.getint(f'images_{dimension}_spacing', fallback=fallbacks[1])).value_or(fallbacks[1])
     )
 
-def ncols_config() -> 'int':
-    return lscat.ncols(TERM.width, *_width_paddingx())
+def ncols_config() -> int:
+    return pure.ncols(TERM.width, *_width_padding('width', 'x', (18, 2)))
+
+def nrows_config() -> int:
+    return pure.nrows(TERM.height, *_width_padding('height', 'y', (8, 1)))
 
 def xcoords_config(offset=0) -> 'list[int]':
-    return lscat.xcoords(TERM.width, *_width_paddingx(), offset)
+    return pure.xcoords(TERM.width, *_width_padding('width', 'x', (18, 2)), offset)
 
 def ycoords_config() -> 'list[int]':
-    settings = get_config_section('lscat')
-    img_height = settings.map(m.getint('image_height', fallback=8)).value_or(8)
-    paddingy = settings.map(m.getint('images_y_spacing', fallback=1)).value_or(1)
-    return lscat.ycoords(TERM.height, img_height, paddingy)
+    return pure.ycoords(TERM.height, *_width_padding('height', 'y', (8, 1)))
 
 def gallery_page_spacing_config() -> int:
     settings = get_config_section('lscat')
@@ -117,14 +123,14 @@ def _ask_your_id(config_object) -> ('config', str):
         return config_object, your_id
     return config_object, ''
 
-def _write_config(config_object, config_path) -> None:
+def _write_config(config_object, config_path) -> 'IO':
     os.system('clear')
     config_path.parent.mkdir(exist_ok=True)
     config_path.touch()
     with open(config_path, 'w') as c:
         config_object.write(c)
 
-def _append_default_config(config_path) -> None:
+def _append_default_config(config_path) -> 'IO':
     # Why not use python? Because it's functional, readable, and
     # this one liner defeats any potential speed benefits
     example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()

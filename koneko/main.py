@@ -19,7 +19,7 @@ from pathlib import Path
 from koneko import ui, api, cli, pure, config, prompt, screens
 
 
-def handle_missing_pics():
+def handle_missing_pics() -> 'IO':
     print('Please wait, downloading welcome image (this will only occur once)...')
     baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
     basedir = Path('~/.local/share/koneko/pics').expanduser()
@@ -30,7 +30,7 @@ def handle_missing_pics():
 
     os.system('clear')
 
-def handle_cli():
+def handle_cli() -> (bool, str, str):
     # no cli arguments, prompt user for mode selection
     if len(sys.argv) <= 1:
         return True, '', ''

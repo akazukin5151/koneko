@@ -1,3 +1,5 @@
+"""Small functions that do IO (file read/write, user input, network request, configs)"""
+
 import os
 import imghdr
 import itertools
@@ -11,14 +13,10 @@ import funcy
 from koneko.config import ncols_config
 
 
-def seq_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
-    """Takes prompt input key seqs, combine two digits literally as int"""
-    first = keyseqs[start]
-    second = keyseqs[start + 1]
-    return int(f'{first}{second}')
-
-def seq_to_num(keyseqs: 'list[str]') -> int:
-    """Takes prompt input key seqs, find the selected image number"""
+def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
+    """Takes prompt input key seqs, find the selected image number.
+    If find_number_map() returns None, prompt.goto_image() will catch it.
+    """
     first_num, second_num = keyseqs[-2:]
     return find_number_map(int(first_num), int(second_num))
 
@@ -40,7 +38,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
 
 
 @contextmanager
-def cd(newdir: Path) -> None:
+def cd(newdir: Path) -> 'IO':
     """Change current script directory, do something, change back to old directory
     See https://stackoverflow.com/questions/431684/how-do-i-change-the-working-directory-in-python/24176022#24176022
 
@@ -100,13 +98,21 @@ def dir_not_empty(data: 'Data') -> bool:
 
     return False
 
+@funcy.decorator
+def catch_ctrl_c(call: 'func[T]') -> 'T':
+    """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
+    try:
+        return call()
+    except KeyboardInterrupt:
+        os.system('clear')
+
 # From ui
-def open_in_browser(image_id):
+def open_in_browser(image_id) -> 'IO':
     link = f'https://www.pixiv.net/artworks/{image_id}'
     os.system(f'xdg-open {link}')
     print(f'Opened {link} in browser!')
 
-def open_link_coords(data, first_num, second_num):
+def open_link_coords(data, first_num, second_num) -> 'IO':
     selected_image_num = find_number_map(int(first_num), int(second_num))
     # 0 is acceptable; 0 is falsy but not False
     if selected_image_num is False:
@@ -114,7 +120,7 @@ def open_link_coords(data, first_num, second_num):
     else:
         open_link_num(data, selected_image_num)
 
-def open_link_num(data, number):
+def open_link_num(data, number) -> 'IO':
     # Update current_page_illusts, in case if you're in another page
     open_in_browser(data.image_id(number))
 

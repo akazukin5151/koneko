@@ -102,16 +102,6 @@ def change_url_to_full(url: str, png=False) -> str:
     return url
 
 
-# TODO: move to utils
-@funcy.decorator
-def catch_ctrl_c(call: 'func[T]') -> 'T':
-    """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
-    try:
-        return call()
-    except KeyboardInterrupt:
-        os.system('clear')
-
-
 def process_user_url(url_or_id: str) -> str:
     if 'users' in url_or_id:
         if '\\' in url_or_id:

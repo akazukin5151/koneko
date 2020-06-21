@@ -105,6 +105,14 @@ def dir_not_empty(data: 'Data') -> bool:
 
     return False
 
+@funcy.decorator
+def catch_ctrl_c(call: 'func[T]') -> 'T':
+    """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
+    try:
+        return call()
+    except KeyboardInterrupt:
+        os.system('clear')
+
 # From ui
 def open_in_browser(image_id) -> 'IO':
     link = f'https://www.pixiv.net/artworks/{image_id}'

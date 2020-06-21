@@ -4,7 +4,7 @@ from subprocess import check_output
 
 import pixcat
 
-from koneko import KONEKODIR, ui, cli, pure, __version__
+from koneko import KONEKODIR, ui, cli, utils, __version__
 
 
 def begin_prompt(printmessage=True) -> 'IO[str]':
@@ -41,7 +41,7 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
     command = input('Enter a command: ')
     return command
 
-@pure.catch_ctrl_c
+@utils.catch_ctrl_c
 def show_man_loop() -> 'IO':
     os.system('clear')
     print(cli.__doc__)
@@ -59,7 +59,7 @@ def show_man_loop() -> 'IO':
             os.system('clear')
             break
 
-@pure.catch_ctrl_c
+@utils.catch_ctrl_c
 def clear_cache_loop() -> 'IO':
     print('Do you want to remove all cached images?')
     print('This will not remove images you explicitly downloaded to ~/Downloads.')
@@ -75,7 +75,7 @@ def clear_cache_loop() -> 'IO':
             os.system('clear')
             break
 
-@pure.catch_ctrl_c
+@utils.catch_ctrl_c
 def info_screen_loop() -> 'IO':
     os.system('clear')
     messages = (

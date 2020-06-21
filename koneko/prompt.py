@@ -82,7 +82,8 @@ def gallery_like_prompt(gallery):
                 func()
 
             # Single char input, action mutates keyseqs
-            if gallery_command.code == 361:  # Escape
+            # Escape, backspace
+            if gallery_command.code == 361 or gallery_command.code == 263:
                 keyseqs = []
                 # Remove entire line
                 print('\r', '\b \b' * 4, end='', flush=True)
@@ -150,7 +151,8 @@ def image_prompt(image):
                 keyseqs.append(image_prompt_command)
                 print(keyseqs)
 
-            elif image_prompt_command.code == 361:  # Escape
+            # Escape, backspace
+            elif image_prompt_command.code == 361 or image_prompt_command.code == 263:
                 keyseqs = []
                 print(keyseqs)
 
@@ -199,6 +201,11 @@ def user_prompt(user):
             func = case.get(user_prompt_command, None)
             if func:
                 func()
+
+            # Escape, backspace
+            elif user_prompt_command.code == 361 or user_prompt_command.code == 263:
+                keyseqs = []
+                print(keyseqs)
 
             elif user_prompt_command == 'r':
                 return user.reload()

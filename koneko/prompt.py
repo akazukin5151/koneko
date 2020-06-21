@@ -47,6 +47,28 @@ def goto_image(gallery, image_num: int):
     else:
         gallery.view_image(image_num)
 
+
+def single_char_action(gallery_command, gallery):
+    """Actions do not return (break out of input receive while loop)"""
+    if gallery_command == 'n':
+        gallery.next_page()
+
+    elif gallery_command == 'p':
+        gallery.previous_page()
+
+    elif gallery_command == 'm':
+        print('')
+        print(gallery.__doc__)
+
+    elif gallery_command == 'h':
+        print('')
+        gallery.help()
+
+    elif gallery_command == 'q':
+        ask_quit()
+        print('Enter a gallery command:')
+
+
 def gallery_like_prompt(gallery):
     """
     Only contains logic for interpreting key presses, and do the correct action
@@ -66,35 +88,22 @@ def gallery_like_prompt(gallery):
             if gallery_command.isdigit() or gallery_command in sequenceable_keys:
                 keyseqs.append(gallery_command)
 
-            # Single char input
-            if gallery_command == 'n':
-                gallery.next_page()
+            # Single char input, action does not return
+            single_char_action(gallery_command, gallery)
 
-            elif gallery_command == 'p':
-                gallery.previous_page()
-
-            elif gallery_command == 'm':
-                print('')
-                print(gallery.__doc__)
-
-            elif gallery_command == 'h':
-                print('')
-                gallery.help()
-
-            elif gallery_command.code == 361:  # Escape
+            # Single char input, action mutates keyseqs
+            if gallery_command.code == 361:  # Escape
                 keyseqs = []
                 # Remove entire line
                 print('\r', '\b \b' * 4, end='', flush=True)
 
+            # Single char input with action that leaves prompt
             elif gallery_command == 'b':
                 return gallery.handle_prompt(['b'])
 
             elif gallery_command == 'r':
                 return gallery.handle_prompt(['r'])
 
-            elif gallery_command == 'q':
-                ask_quit()
-                print('Enter a gallery command:')
 
             # Multi char sequence
             if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
@@ -132,7 +141,8 @@ def image_prompt(image):
         'p': image.previous_image,
         'f': image.show_full_res,
         'h': _image_help,
-        'q': ask_quit
+        'q': ask_quit,
+        'm': lambda: print(image.__doc__)
     }
 
     keyseqs = []
@@ -153,9 +163,6 @@ def image_prompt(image):
             elif image_prompt_command.code == 361:  # Escape
                 keyseqs = []
                 print(keyseqs)
-
-            elif image_prompt_command == 'm':
-                print(image.__doc__)
 
             elif image_prompt_command == 'b':
                 return image.leave(False)
@@ -186,9 +193,11 @@ def _image_help():
 def user_prompt(user):
     """Handles key presses for user views (following users and user search)"""
     case = {
+        'n': user.next_page,
         'p': user.previous_page,
         'h': _user_help,
-        'q': ask_quit
+        'q': ask_quit,
+        'm': lambda: print(ui.AbstractUsers.__doc__)
     }
     keyseqs = []
     with TERM.cbreak():
@@ -201,11 +210,6 @@ def user_prompt(user):
             if func:
                 func()
 
-            elif user_prompt_command == 'n':
-                user.next_page()
-                # Prevents catching "n" and messing up the cache
-                time.sleep(0.5)
-
             elif user_prompt_command == 'r':
                 return user.reload()
 
@@ -213,9 +217,6 @@ def user_prompt(user):
             elif user_prompt_command.isdigit():
                 keyseqs.append(user_prompt_command)
                 print(keyseqs)
-
-            elif user_prompt_command == 'm':
-                print(ui.AbstractUsers.__doc__)
 
             elif user_prompt_command:
                 print('Invalid command! Press h to show help')

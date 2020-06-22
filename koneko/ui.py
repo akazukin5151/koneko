@@ -498,7 +498,7 @@ def view_post_mode(image_id) -> 'IO':
 
     image = Image(image_id, idata, True)
 
-    experimental = config.get_settings('experimental', 'image_mode_previews')
+    experimental = config.get_settings('experimental', 'image_mode_previews').value_or('on')
     if experimental == 'on':
         event = threading.Event()
         thread = threading.Thread(target=image.preview)

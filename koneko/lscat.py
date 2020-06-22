@@ -182,13 +182,13 @@ class TrackDownloadsImage(AbstractTracker):
     def __init__(self, data):
         self.orders = list(range(1, 30))
         self.generator = generate_previews(data.download_path)
-        super().__init__(data)
+        super().__init__()
 
     def update(self, new: str):
         """Overrides base class because numlist is different"""
         with self._lock:
             self._downloaded.append(new)
-            self._numlist.append(int(f.split('_')[1].replace('p', '')))
+            self._numlist.append(int(new.split('_')[1].replace('p', '')))
 
         self._inspect()
 
@@ -199,7 +199,6 @@ def generate_previews(path) -> 'IO':
     _xcoords = (left_shifts[0], left_shifts[-1])
     thumbnail_size = config.thumbnail_size_config()
 
-    os.system('clear')
     i = 0
     while True:
         image = yield

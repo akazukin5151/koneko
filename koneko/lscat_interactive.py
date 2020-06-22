@@ -71,7 +71,7 @@ def browse_cache():
     path = pick_dir()
     data = FakeData(path)
 
-    ans = input('Should this directory be a grid (gallery), or users? [y/N] ')
+    ans = input('Should this directory be a grid (gallery), or users? [Y/n] ')
 
     if ans == 'n':
         lscat.show_instant(lscat.TrackDownloadsUsers, data)
@@ -92,11 +92,15 @@ def pick_dir():
 
         if ans == 'q':
             sys.exit(0)
+
         elif ans == 'y':
             return path
 
+        elif ans == 'b':
+            path = path.parent
+            continue
+
         path = path / files[int(ans)]
-        print(path)
 
 
 

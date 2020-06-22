@@ -161,7 +161,7 @@ I'd like to fix this but I'd rather not use mechanize but I don't know how to do
 
 First, koneko is intended to work for full screen terminals, so don't tile it around unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine.
 
-You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.7 onwards.
+You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.8 onwards.
 
 # Contributing
 * Fork it
@@ -192,7 +192,7 @@ When test installing with pip, don't forget to use `pip install .` or `python se
 
 Test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` is now automated.
 
-Bump version info in `__init__.py`, `setup.py`, and `README.md`
+Bump version info in `__init__.py`, `setup.py`, `README.md`, and `CONTRIBUTING.md`
 
 ```sh
 python setup.py sdist bdist_wheel

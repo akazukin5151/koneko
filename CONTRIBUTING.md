@@ -45,7 +45,7 @@ Note: if you want to make some edits, you should install it in a conda environme
 ```sh
 # Use the latest stable version (recommended for usage)
 # Make sure the version number is the latest
-git clone -b 'v0.6.2' --depth 1 https://github.com/twenty5151/koneko.git
+git clone -b 'v0.8' --depth 1 https://github.com/twenty5151/koneko.git
 # Use the master branch for upcoming features:
 git clone -b master https://github.com/twenty5151/koneko.git
 # Use the dev branch for latest features, fixes, and instability (recommended for contributers):

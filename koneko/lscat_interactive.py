@@ -26,27 +26,27 @@ def main():
     ans = input('\nPlease select an action:\n')
 
     case = {
-        '1': lambda x: print('Not implemented yet!'),
-        '2': display_test,
-        '3': display_test,
+        '1': config_assistance,
+        '2': display_gallery,
+        '3': display_user,
         '4': display_path
     }
     func = case.get(ans, None)
     if func:
-        func(ans)
+        func()
     else:
         print('Invalid command! Exiting...')
 
 
-def display_test(ans):
-    if ans == '2':
-        data = FakeData.gallery()
-        lscat.show_instant(lscat.TrackDownloads, data, True)
-    else:
-        data = FakeData.user()
-        lscat.show_instant(lscat.TrackDownloadsUsers, data)
+def display_gallery():
+    data = FakeData.gallery()
+    lscat.show_instant(lscat.TrackDownloads, data, True)
 
-def display_path(ans):
+def display_user():
+    data = FakeData.user()
+    lscat.show_instant(lscat.TrackDownloadsUsers, data)
+
+def display_path():
     path = input('Please paste in your path:\n')
     if not Path(path).is_dir():
         print('Invalid path!')
@@ -54,6 +54,10 @@ def display_path(ans):
 
     data = FakeData(path)
     lscat.show_instant(lscat.TrackDownloads, data, True)
+
+
+def config_assistance():
+    print('todo')
 
 
 if __name__ == '__main__':

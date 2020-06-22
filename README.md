@@ -146,7 +146,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 * Interactive helper UI to assist configuring lscat numbers.
-    * Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
+    [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
 * Show frequently searched IDs/strings with an option to select them.
 * Show existing IDs in the cache and delete their directories.
 * Offline mode for browsing the existing cache (opening up lscat will do most of this, only thing missing is to show frequent or existing dirs)

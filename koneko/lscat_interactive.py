@@ -18,7 +18,7 @@ class FakeData:
 
 
 def main():
-    print('Welcome to lscat')
+    print('Welcome to the lscat interactive script')
     print('1. Launch koneko configuration assistance')
     print('2. Display KONEKODIR / testgallery')
     print('3. Display KONEKODIR / testuser')
@@ -41,20 +41,19 @@ def main():
 def display_test(ans):
     if ans == '2':
         data = FakeData.gallery()
-        lscat.show_instant(lscat.TrackDownloads, data)
+        lscat.show_instant(lscat.TrackDownloads, data, True)
     else:
         data = FakeData.user()
         lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
 def display_path(ans):
-
     path = input('Please paste in your path:\n')
     if not Path(path).is_dir():
         print('Invalid path!')
         return
 
     data = FakeData(path)
-    lscat.show_instant(lscat.TrackDownloads, data)
+    lscat.show_instant(lscat.TrackDownloads, data, True)
 
 
 if __name__ == '__main__':

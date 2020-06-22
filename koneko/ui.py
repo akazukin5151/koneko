@@ -11,6 +11,7 @@ from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
                     prompt, download)
 
 
+
 class AbstractUI(ABC):
     @abstractmethod
     def __init__(self, main_path) -> 'IO':
@@ -498,14 +499,10 @@ def view_post_mode(image_id) -> 'IO':
 
     image = Image(image_id, idata, True)
 
-    image_preview(image)
+    image.start_preview()
 
     prompt.image_prompt(image)
 
-def image_preview(image):
-    if config.check_image_preview() and image.data.number_of_pages > 1:
-        image.thread = threading.Thread(target=image.preview)
-        image.thread.start()
 
 class Image:
     """
@@ -524,6 +521,7 @@ class Image:
     def __init__(self, image_id, idata, firstmode=False):
         self.data = idata
         self.event = threading.Event()
+        self.thread: 'threading.Thread'
         self._firstmode = firstmode
 
     def open_image(self) -> 'IO':
@@ -538,14 +536,17 @@ class Image:
     def next_image(self) -> 'IO':
         self.event.set()
         next_image(self.data)
+        self.start_preview()
 
     def previous_image(self) -> 'IO':
         self.event.set()
         previous_image(self.data)
+        self.start_preview()
 
     def jump_to_image(self, selected_image_num: int) -> 'IO':
         self.event.set()
         jump_to_image(self.data, selected_image_num)
+        self.start_preview()
 
     def _jump(self) -> 'IO':
         _jump(self.data)
@@ -564,6 +565,12 @@ class Image:
             prompt.gallery_like_prompt(mode)
         # Else: image prompt and class ends, goes back to previous mode
 
+    def start_preview(self):
+        if config.check_image_preview() and self.data.number_of_pages > 1:
+            self.event = threading.Event()  # Reset event, in case if it's set
+            self.thread = threading.Thread(target=self.preview)
+            self.thread.start()
+
     def preview(self) -> 'IO':
         """Download the next four images in the background and/or display them
         one at a time, so if user interrupts, it won't hang.
@@ -579,7 +586,7 @@ class Image:
                 tracker.update(name)
             else:
                 download.async_download_no_rename(
-                    self.data.download_path, url, tracker=tracker
+                    self.data.download_path, [url], tracker=tracker
                 )
 
             i += 1

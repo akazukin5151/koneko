@@ -13,7 +13,7 @@ sys.path.append('testing')
 
 
 def test_icat():
-    assert lscat.icat("testing/files/04_祝！！！.jpg") is None
+    lscat.icat("./testing/files/004_祝！！！.jpg")
 
 def test_show_instant(monkeypatch):
     showed = []

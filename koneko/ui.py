@@ -498,14 +498,15 @@ def view_post_mode(image_id) -> 'IO':
 
     image = Image(image_id, idata, True)
 
-    experimental = config.get_settings('experimental', 'image_mode_previews').value_or('on')
-    if experimental == 'on':
-        event = threading.Event()
-        thread = threading.Thread(target=image.preview)
-        image.set_thread_event(thread, event)
-        thread.start()
+    image_preview(image)
 
     prompt.image_prompt(image)
+
+def image_preview(image):
+    if config.check_image_preview():
+        image.event = threading.Event()
+        image.thread = threading.Thread(target=image.preview)
+        image.thread.start()
 
 class Image:
     """
@@ -578,11 +579,6 @@ class Image:
                                              tracker=tracker)
 
             slicestart += 1
-
-    def set_thread_event(self, thread, event):
-        """Experimental"""
-        self.thread = thread
-        self.event = event
 
 
 

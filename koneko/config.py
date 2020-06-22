@@ -30,17 +30,24 @@ def get_settings(section: str, setting: str) -> 'IOResult[str]':
     return cfgsection.map(m.get(setting, ''))
 
 @safe
-def _check_print_info() -> 'IOResult[bool]':
+def _get_bool_config(section: str, setting: str, fallback: bool) -> 'IOResult[bool]':
     """Returns either Success(True), Success(False) or Failure.
-    Inner boolean represents whether to print columns or not
+    Inner boolean represents the value
     Failure represents no key/setting/config found
     """
-    section = get_config_section('misc')
-    return section.map(m.getboolean('print_info', fallback=True)).value_or(True)
+    section = get_config_section(section)
+    return section.map(m.getboolean(setting, fallback=fallback)).value_or(fallback)
+
+def get_bool_config(section: str, setting: str, fallback: bool) -> bool:
+    """Reads requested section and setting, returning the fallback on failure."""
+    return _get_bool_config(section, setting, fallback).value_or(fallback)
+
+def check_image_preview():
+    return get_bool_config('experimental', 'image_mode_previews', False)
 
 def check_print_info() -> 'bool':
     """For a Failure (setting not found), return True by default"""
-    return _check_print_info().value_or(True)
+    return get_bool_config('misc', 'print_info', True)
 
 
 # While not pure (because reading config is IO), they will never fail

@@ -109,7 +109,6 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 ## Features
 
-* Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
 
@@ -120,10 +119,13 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ### Version 0.8
 
 * lscat now slightly faster as the image number is calculated only when it finishes downloading, not on every recursion.
-* Fixed opening the manual in user modes not working
-* Fixed bug in lscat: number of columns now determines when to print page spacings
 * Improvement for lscat: the screen will be filled with the most rows as possible
 * HACKING.md split from CONTRIBUTING.md to better assist other developers
+* Image view can now preview the next four images in multi-image posts (need to enable its experimental flag)
+
+#### Fixed
+* Fixed opening the manual in user modes not working
+* Fixed bug in lscat: number of columns now determines when to print page spacings
 
 #### Code
 * Extract out common behaviour from Gallery and Users ui classes into AbstractUI
@@ -180,37 +182,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#conda-environment)
 
 ## Manual installation
 
-Note: if you want to make some edits, you should install it in a conda environment. See above
-
-```sh
-# Use the latest stable version (recommended for usage)
-# Make sure the version number is the latest
-git clone -b 'v0.7' --depth 1 https://github.com/twenty5151/koneko.git
-# Use the master branch for upcoming features:
-git clone -b master https://github.com/twenty5151/koneko.git
-# Use the dev branch for latest features, fixes, and instability (recommended for contributers):
-git clone -b dev https://github.com/twenty5151/koneko.git
-
-# Run the tests (for those who want to edit)
-# Add --inte for integration testing, but don't be surprised if it fails
-pytest testing/ -vvvv -l -s 
-
-cd koneko
-# Manually install without PyPI; for general usage
-# Both will correctly copy the required pictures
-pip install .
-# or
-python setup.py install
-# or
-# Manually install for development, changes will be immediately reflected
-python setup.py develop
-
-# On certain shells with implicit cd, typing `koneko` might cd into the dir
-# Instead of running the executable
-cd ~
-# Use anywhere:
-koneko
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md#manual-installation)
 
 ## Unit tests
 Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don't be surprised if it fails
@@ -230,7 +202,7 @@ pip install koneko --upgrade
 
 # Manual
 
-For usage, see [Usage](MANUAL.md#Usage). For configuration, see [Configuration](MANUAL.md#Configuration)
+For usage, see the [usage section](MANUAL.md#Usage). For configuration, see the [configuration section](MANUAL.md#Configuration)
 
 # Trackers avoided
 <details>

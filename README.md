@@ -58,7 +58,7 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 See also: [manual installation](#manual-installation)
 
 0. Install [kitty](https://github.com/kovidgoyal/kitty)
-1. `pip install koneko` (or if you use [conda](MANUAL.md#conda-environment)...):
+1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...):
 2. Run `koneko`
 
 ## Requirements
@@ -176,7 +176,7 @@ See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Conda environment
 
-See [MANUAL.md](MANUAL.md#conda-environment)
+See [CONTRIBUTING.md](CONTRIBUTING.md#conda-environment)
 
 ## Manual installation
 

@@ -20,7 +20,23 @@ Tips:
 
 ## Conda environment
 
-See [MANUAL.md](MANUAL.md#conda-environment)
+```sh
+conda create -n koneko
+conda activate koneko
+conda env list                  # make sure you're in the correct environment...
+conda install -n koneko pip     # and make sure pip is installed...
+which pip                       # and pip is in your conda directory
+
+# Or use manual installation instructions below
+# If you're using a separate conda env, you probably want to make some edits
+pip install koneko
+
+# Use anywhere (but only in this conda env):
+koneko
+
+# To remove the conda env:
+conda remove --name koneko --all
+```
 
 ## Manual installation
 

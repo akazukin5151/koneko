@@ -629,8 +629,11 @@ def jump_to_image(data, selected_image_num: int):
 def _jump(data):
     """Downloads next image if not downloaded, display it, prefetch next"""
     if not (data.download_path / data.image_filename).is_dir():
-        download.async_download_spinner(data.download_path,
-                                        [data.current_url])
+        download.async_download_spinner(
+            data.download_path, [data.current_url]
+        )
+
+    os.system('clear')
 
     lscat.icat(data.filepath)
 

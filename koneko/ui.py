@@ -504,7 +504,6 @@ def view_post_mode(image_id) -> 'IO':
 
 def image_preview(image):
     if config.check_image_preview() and image.data.number_of_pages > 1:
-        image.event = threading.Event()
         image.thread = threading.Thread(target=image.preview)
         image.thread.start()
 
@@ -524,6 +523,7 @@ class Image:
     """
     def __init__(self, image_id, idata, firstmode=False):
         self.data = idata
+        self.event = threading.Event()
         self._firstmode = firstmode
 
     def open_image(self) -> 'IO':
@@ -536,12 +536,15 @@ class Image:
         show_full_res(self.data)
 
     def next_image(self) -> 'IO':
+        self.event.set()
         next_image(self.data)
 
     def previous_image(self) -> 'IO':
+        self.event.set()
         previous_image(self.data)
 
     def jump_to_image(self, selected_image_num: int) -> 'IO':
+        self.event.set()
         jump_to_image(self.data, selected_image_num)
 
     def _jump(self) -> 'IO':
@@ -553,6 +556,7 @@ class Image:
         _prefetch_next_image(self.data)
 
     def leave(self, force=False) -> 'IO':
+        self.event.set()
         if self._firstmode or force:
             # Came from view post mode, don't know current page num
             # Defaults to page 1

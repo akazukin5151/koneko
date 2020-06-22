@@ -102,6 +102,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 # Roadmap
 
+* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
 * In-depth usage documentation?
 * Consistent public and private methods and attributes again (only show public ones in puml)
 * Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
@@ -122,6 +123,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed opening the manual in user modes not working
 * Fixed bug in lscat: number of columns now determines when to print page spacings
 * Improvement for lscat: the screen will be filled with the most rows as possible
+* HACKING.md split from CONTRIBUTING.md to better assist other developers
 
 #### Code
 * Extract out common behaviour from Gallery and Users ui classes into AbstractUI
@@ -137,12 +139,14 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         * `download.py`
     * Renamed data classes (eg GalleryJson to GalleryData)
     * Simplify `ui.display_page()`
+    * Extract common code in `prompt.py`; follow a common structure
 * Remove unused cytoolz dependency
 * More functional style
     * Use `placeholder` to make lambdas look better
     * Use `pipey` for functional-style postfix pipes
     * Using `returns.result` Result container in `config.py` and `splitpoint`
 * Make tests more professional
+* Move functions around modules to better reflect (im)purity
 
 
 # FAQ

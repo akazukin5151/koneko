@@ -45,6 +45,7 @@ setup(
     entry_points={
         'console_scripts': [
             'koneko=koneko.main:main',
+            'lscat=koneko.lscat_interactive:main'
         ]
     },
 )

@@ -223,16 +223,4 @@ def generate_previews(path, min_num) -> 'IO':
                 align='left', x=_xcoords[x], y=rowspaces[y]
             )
 
-if __name__ == '__main__':
-    from koneko import KONEKODIR
 
-    class FakeData:
-        def __init__(self):
-            # Either testuser or testgallery
-            self.download_path = KONEKODIR / 'testgallery'
-
-    data = FakeData()
-    # Use whichever mode you pasted into the test dir
-    # For Users, make sure it has a .koneko file
-    #show_instant(TrackDownloadsUsers, data)
-    show_instant(TrackDownloads, data)

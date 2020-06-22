@@ -140,16 +140,24 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 # Roadmap
 
-* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
-* Reloading then going back just redraws the current mode again, with possible instability
 * In-depth usage documentation?
 * Consistent public and private methods and attributes again
-* Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
 
 ## Features
 
+* Interactive helper UI to assist configuring lscat numbers.
+    * Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
+* Show frequently searched IDs/strings with an option to select them.
+* Show existing IDs in the cache and delete their directories.
+* Offline mode for browsing the existing cache (opening up lscat will do most of this, only thing missing is to show frequent or existing dirs)
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
+
+## Known bugs
+* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
+* Reloading then going back just redraws the current mode again, with possible instability
+* There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
+* Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!

@@ -90,7 +90,7 @@ def get_gen_users_settings() -> (int, int):
     )
 
 def image_text_offset() -> int:
-    settings = get_config_section('lscat')
+    settings = get_config_section('experimental')
     return settings.map(m.getint('image_mode_text_offset', fallback=4)).value_or(4)
 
 

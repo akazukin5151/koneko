@@ -503,7 +503,7 @@ def view_post_mode(image_id) -> 'IO':
     prompt.image_prompt(image)
 
 def image_preview(image):
-    if config.check_image_preview():
+    if config.check_image_preview() and image.data.number_of_pages > 1:
         image.event = threading.Event()
         image.thread = threading.Thread(target=image.preview)
         image.thread.start()
@@ -561,24 +561,24 @@ class Image:
         # Else: image prompt and class ends, goes back to previous mode
 
     def preview(self) -> 'IO':
-        """Experimental"""
-        if self.data.number_of_pages == 1:
-            return True
-
+        """Download the next four images in the background and/or display them
+        one at a time, so if user interrupts, it won't hang.
+        """
         tracker = lscat.TrackDownloadsImage(self.data)
-        slicestart = self.data.page_num
-        while not self.event.is_set() and slicestart <= 4:
-            img = self.data.page_urls[slicestart:slicestart + 1]
+        i = 1
+        while not self.event.is_set() and i <= 4:
+            url = self.data.page_urls[self.data.page_num + i]
+            name = pure.split_backslash_last(url)
+            path = self.data.download_path / name
 
-            if os.path.isfile(
-                self.data.download_path / pure.split_backslash_last(img[0])
-            ):
-                tracker.update(pure.split_backslash_last(img[0]))
+            if path.is_file():
+                tracker.update(name)
             else:
-                download.async_download_no_rename(self.data.download_path, img,
-                                             tracker=tracker)
+                download.async_download_no_rename(
+                    self.data.download_path, url, tracker=tracker
+                )
 
-            slicestart += 1
+            i += 1
 
 
 

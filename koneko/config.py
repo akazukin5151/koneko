@@ -89,6 +89,11 @@ def get_gen_users_settings() -> (int, int):
         settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
     )
 
+def image_text_offset() -> int:
+    settings = get_config_section('lscat')
+    return settings.map(m.getint('image_mode_text_offset', fallback=4)).value_or(4)
+
+
 
 def credentials_from_config(config_object, config_path) -> ('config', str):
     credentials = get_config_section('Credentials').unwrap()

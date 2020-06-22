@@ -589,6 +589,9 @@ class Image:
                     self.data.download_path, [url], tracker=tracker
                 )
 
+            if i == 4:  # Last pic
+                print('\n' * config.image_text_offset())
+
             i += 1
 
 

@@ -100,18 +100,6 @@ koneko 5 # Mode 5
 ```
 For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
-# Roadmap
-
-* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
-* In-depth usage documentation?
-* Consistent public and private methods and attributes again (only show public ones in puml)
-* Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
-
-## Features
-
-* Go to related works from image view (illust_related)
-* View recommended illusts (illust_recommended)
-
 ## Upcoming changelog (in dev branch)
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
@@ -127,7 +115,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed opening the manual in user modes not working
 * Fixed bug in lscat: number of columns now determines when to print page spacings
 
-#### Code
+#### Code maintenance
 * Extract out common behaviour from Gallery and Users ui classes into AbstractUI
     * Gallery classes is now structued like Users. The most significant difference is the use of `offset` to prefetch and navigate pages.
     * Unified API requests for each mode
@@ -150,6 +138,18 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Make tests more professional
 * Move functions around modules to better reflect (im)purity
 
+# Roadmap
+
+* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
+* Reloading then going back just redraws the current mode again, with possible instability
+* In-depth usage documentation?
+* Consistent public and private methods and attributes again
+* Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
+
+## Features
+
+* Go to related works from image view (illust_related)
+* View recommended illusts (illust_recommended)
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!
@@ -159,9 +159,9 @@ I'd like to fix this but I'd rather not use mechanize but I don't know how to do
 
 * I'm having problems with lscat
 
-First, koneko is intended to work for full screen terminals, so don't tile it around unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine.
+For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
 
-You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.8 onwards.
+You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
 
 # Contributing
 * Fork it

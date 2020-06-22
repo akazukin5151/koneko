@@ -24,19 +24,24 @@ class FakeData:
 
 
 def main():
+    os.system('clear')
     print('Welcome to the lscat interactive script')
     print('1. Launch koneko configuration assistance')
     print('2. Display KONEKODIR / testgallery')
     print('3. Display KONEKODIR / testuser')
-    print('4. Display a specified path')
-    ans = input('\nPlease select an action:\n')
+    print('4. Browse a cached dir to display')
+    print('5. Display a specified path')
+    ans = input('\nPlease select an action: ')
+    print('')
 
     case = {
         '1': config_assistance,
         '2': display_gallery,
         '3': display_user,
-        '4': display_path
+        '4': browse_cache,
+        '5': display_path
     }
+
     func = case.get(ans, None)
     if func:
         func()
@@ -62,17 +67,58 @@ def display_path():
     lscat.show_instant(lscat.TrackDownloads, data, True)
 
 
+def browse_cache():
+    path = pick_dir()
+    data = FakeData(path)
+
+    ans = input('Should this directory be a grid (gallery), or users? [y/N] ')
+
+    if ans == 'n':
+        lscat.show_instant(lscat.TrackDownloadsUsers, data)
+    else:
+        lscat.show_instant(lscat.TrackDownloads, data, True)
+
+def pick_dir():
+    path = KONEKODIR
+
+    while True:
+        files = sorted(os.listdir(path))
+        for i, f in enumerate(files):
+            print(i, '--', f)
+
+        print('\nSelect a directory to view (enter its index)')
+        print('If you want to display this directory, enter "y"')
+        ans = input()
+
+        if ans == 'q':
+            sys.exit(0)
+        elif ans == 'y':
+            return path
+
+        path = path / files[int(ans)]
+        print(path)
+
+
+
 def config_assistance():
     term = Terminal()
 
     size = thumbnail_size(term)
     gallery_spacing = gallery_page_spacing(term, size)
 
+    print('\nYour recommended settings are:')
+    print(f'image_thumbnail_size = {size}')
+    print(f'gallery_page_spacing = {gallery_spacing}')
+
+    input('\nEnter any key to quit')
+
 def thumbnail_size(term):
     print('=== Thumbnail size ===')
     print('This will display an image whose thumbnail size can be varied')
     print('Use +/= to increase the size, and -/_ to decrease it')
     print('Use q to exit the program, and press enter to confirm the size')
+
+    print('\nKeep in mind this size will be used for a grid of images')
 
     input('Enter any key to continue\n')
     os.system('clear')

@@ -13,9 +13,7 @@ from koneko import KONEKODIR, lscat, config
 # Globals
 term = Terminal()
 # Must make a copy before using this reference
-SAMPLE_IMAGE = Image(
-    KONEKODIR.parent / 'pics' / '71471144_p0.png'
-)
+SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
 
 # Utility functions used in multiple places
@@ -36,6 +34,13 @@ def print_cols(spacing, ncols):
 def line_width(spacing, ncols):
     return sum(spacing) + ncols
 
+def print_doc(doc):
+    os.system('clear')
+    bottom = term.height - 7
+    move_cursor_down(bottom)
+    print(doc)
+
+
 # More specialised but still small functions
 class FakeData:
     def __init__(self, path):
@@ -52,10 +57,14 @@ class FakeData:
 
 
 def display_user_row(thumbnail_size, preview_xcoords, padding):
-    copy(SAMPLE_IMAGE).thumbnail(thumbnail_size).show(align='left', x=padding)
+    (copy(SAMPLE_IMAGE)
+        .thumbnail(thumbnail_size)
+        .show(align='left', x=padding, y=0))
 
     for px in preview_xcoords:
-        copy(SAMPLE_IMAGE).thumbnail(thumbnail_size).show(align='left', x=px, y=0)
+        (copy(SAMPLE_IMAGE)
+            .thumbnail(thumbnail_size)
+            .show(align='left', x=px, y=0))
 
 
 def print_info(message_xcoord):
@@ -69,6 +78,7 @@ def show_single(x, thumbnail_size):
     return img
 
 
+# Main functions that organise work
 def main():
     os.system('clear')
     print(*('Welcome to the lscat interactive script',
@@ -209,19 +219,15 @@ def config_assistance():
     input('\nEnter any key to quit\n')
 
 
-def print_thumbnail_help():
-    os.system('clear')
-    bottom = term.height - 7
-    move_cursor_down(bottom)
-    print(*('=== Thumbnail size ===',
-        'This will display an image whose thumbnail size can be varied',
-        'Use +/= to increase the size, and -/_ to decrease it',
-        'Use q to exit the program, and press enter to confirm the size',
-        '\nKeep in mind this size will be used for a grid of images'),
-        sep='\n')
-
 def thumbnail_size_assistant():
-    print_thumbnail_help()
+    """=== Thumbnail size ===
+    This will display an image whose thumbnail size can be varied
+    Use +/= to increase the size, and -/_ to decrease it
+    Use q to exit the program, and press enter to confirm the size
+
+    Keep in mind this size will be used for a grid of images
+    """
+    print_doc(thumbnail_size_assistant.__doc__)
 
     image = copy(SAMPLE_IMAGE)
 
@@ -250,16 +256,17 @@ def thumbnail_size_assistant():
 
 
 def xpadding_assistant(thumbnail_size):
-    print('\n=== Image x spacing ===')
-    print('1) Move the second image so that it is just to the right of the first image')
-    print('Use +/= to move it to the right, and -/_ to move it to the left.\n'
-          'Press enter to confirm')
-    print('2) Based on the position of the second image, adjust its position to suit you.\n'
-          'This value will be the x spacing')
-    print('\nUse q to exit the program, and press enter to go to the next assistant\n')
+    """=== Image x spacing ===
+    1) Move the second image so that it is just to the right of the first image
+       Use +/= to move it to the right, and -/_ to move it to the left.
+       Press enter to confirm
 
-    input('\nEnter any key to continue\n')
-    os.system('clear')
+    2) Based on the position of the second image, adjust its position to suit you.
+       This value will be the x spacing
+
+    Use q to exit the program, and press enter to go to the next assistant
+    """
+    print_doc(xpadding_assistant.__doc__)
 
     show_single(config.xcoords_config()[0], thumbnail_size)
 
@@ -333,13 +340,13 @@ def find_image_width(thumbnail_size):
 
 
 def ncols_assistant(thumbnail_size):
-    print('\n=== Number of columns ===')
-    print('Use +/= to show another column, and -/_ to hide the rightmost column')
-    print('Increase the number of columns just until no more can fit in your screen')
-    print('Use q to exit the program, and press enter to go to the next assistant\n')
+    """=== Number of columns ===
+    Use +/= to show another column, and -/_ to hide the rightmost column
+    Increase the number of columns just until no more can fit in your screen
 
-    input('\nEnter any key to continue\n')
-    os.system('clear')
+    Use q to exit the program, and press enter to go to the next assistant
+    """
+    print_doc(ncols_assistant.__doc__)
 
     xcoords = config.xcoords_config() * 2
 
@@ -373,6 +380,7 @@ def ncols_assistant(thumbnail_size):
 
 
 def page_spacing_assistant(thumbnail_size):
+    # This doesn't use print_doc() as a clean state is needed
     print('\n=== Page spacing ===')
     print('This will display an image, then print newlines.')
     print('Your desired setting is the number when '
@@ -402,6 +410,7 @@ def gallery_print_spacing_assistant():
     print('For example:')
     print('x' * 9, '1', 'x' * 17, '2', 'x' * 17, '3', '...', sep='')
 
+    # TODO: print key info in selecting screen
     print('\nUse +/= to increase the spacing, and -/_ to decrease it')
     print('Use q to exit the program, and press enter to go to the next assistant\n')
     print('Use left and right arrow keys to change the current space selection')
@@ -459,14 +468,13 @@ def gallery_print_spacing_assistant():
 
 
 def user_print_name_spacing_assistant(thumbnail_size):
-    print('\n=== User print name xcoord ===')
-    print('This will display an image, then print a sample index and artist name.')
-    print('\nUse +/= to move the text right, and -/_ to move it left')
-    print('Adjust the position as you see fit')
-    print('Use q to exit the program, and press enter to confirm the current position')
+    """=== User print name xcoord ===
+    Use +/= to move the text right, and -/_ to move it left
+    Adjust the position as you see fit
 
-    input('\nEnter any key to continue\n')
-    os.system('clear')
+    Use q to exit the program, and press enter to confirm the current position
+    """
+    print_doc(user_print_name_spacing_assistant.__doc__)
 
     spacing, padding = config.get_gen_users_settings()
     preview_xcoords = config.xcoords_config(offset=1)[-3:]

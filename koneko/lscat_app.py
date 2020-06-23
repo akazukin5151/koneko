@@ -109,7 +109,7 @@ def config_assistance():
 
     print('=== Configuration assistance ===')
     print('1. Thumbnail size')
-    print('2. Gallery page spacing')
+    print('2. Page spacing')
     print('3. Gallery print spacing')
     print('4. User mode print info x-position')
     print('Please select an action index')
@@ -122,7 +122,7 @@ def config_assistance():
         size = config.thumbnail_size_config()
 
     if ans in {'2', 'a'}:
-        gallery_spacing = gallery_page_spacing(term, size)
+        p_spacing = page_spacing(term, size)
 
     if ans in {'3', 'a'}:
         g_print_spacing = gallery_print_spacing(term)
@@ -135,7 +135,7 @@ def config_assistance():
     if ans in {'1', 'a'}:
         print(f'image_thumbnail_size = {size}')
     if ans in {'2', 'a'}:
-        print(f'gallery_page_spacing = {gallery_spacing}')
+        print(f'page_spacing = {p_spacing}')
     if ans in {'3', 'a'}:
         print(f'gallery_print_spacing = {g_print_spacing}')
     if ans in {'4', 'a'}:
@@ -181,8 +181,8 @@ def thumbnail_size(term):
             # TODO: preview a grid with chosen size
 
 
-def gallery_page_spacing(term, thumbnail_size):
-    print('=== Gallery page spacing ===')
+def page_spacing(term, thumbnail_size):
+    print('=== Page spacing ===')
     print('This will display an image, then print newlines.')
     print('Your desired setting is the number when '
           'the image completely scrolls out of view')

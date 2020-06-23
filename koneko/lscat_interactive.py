@@ -111,6 +111,7 @@ def config_assistance():
     print('1. Thumbnail size')
     print('2. Gallery page spacing')
     print('3. Gallery print spacing')
+    print('4. User mode print info x-position')
     print('Please select an action index')
     print('Or enter "a" to use all')
     ans = input()
@@ -126,6 +127,9 @@ def config_assistance():
     if ans in {'3', 'a'}:
         g_print_spacing = gallery_print_spacing(term)
 
+    if ans in {'4', 'a'}:
+        user_name_spacing = user_print_name_spacing(term, size)
+
 
     print('\nYour recommended settings are:')
     if ans in {'1', 'a'}:
@@ -133,7 +137,9 @@ def config_assistance():
     if ans in {'2', 'a'}:
         print(f'gallery_page_spacing = {gallery_spacing}')
     if ans in {'3', 'a'}:
-        print(f'gallery_print_spacing= {g_print_spacing}')
+        print(f'gallery_print_spacing = {g_print_spacing}')
+    if ans in {'4', 'a'}:
+        print(f'users_print_name_xcoord = {user_name_spacing}')
 
     input('\nEnter any key to quit\n')
 
@@ -228,7 +234,7 @@ def gallery_print_spacing(term):
 
     while True:
         with term.cbreak():
-            move_cursor_up_2()
+            move_cursor_up(2)
             erase_line()
             print_cols(spacing, ncols)
             erase_line()
@@ -254,9 +260,8 @@ def gallery_print_spacing(term):
 
             # left arrow
             elif ans.code == 260 or ans in {'a', 'h'}:
-                current_selection -= 1
-                if current_selection < 0:
-                    current_selection = 0
+                if current_selection > 0:
+                    current_selection -= 1
 
             elif ans == 'q':
                 sys.exit(0)
@@ -265,8 +270,11 @@ def gallery_print_spacing(term):
                 return spacing
 
 
-def move_cursor_up_2():
-    print('\033[2A', end='', flush=True)
+def move_cursor_up(num):
+    print(f'\033[{num}A', end='', flush=True)
+
+def move_cursor_down():
+    print('\033[1B', end='', flush=True)
 
 def erase_line():
     print('\033[K', end='', flush=True)
@@ -278,6 +286,54 @@ def print_cols(spacing, ncols):
 
 def line_width(spacing, ncols):
     return sum(spacing) + ncols
+
+
+def user_print_name_spacing(term, thumbnail_size):
+    print('=== User print name xcoord ===')
+    print('This will display an image, then print a sample index and artist name.')
+    print('\nUse +/= to move the text right, and -/_ to move it left')
+    print('Adjust the position as you see fit')
+    print('Use q to exit the program, and press enter to confirm the current position')
+
+    input('\nEnter any key to continue\n')
+    os.system('clear')
+
+    Image(
+        KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    ).thumbnail(thumbnail_size).show(align='left')
+    move_cursor_up(3)
+
+    spacing, _ = config.get_gen_users_settings()
+
+    while True:
+        with term.cbreak():
+            move_cursor_up(2)
+
+            erase_line()
+            move_cursor_down()
+            erase_line()
+            move_cursor_up(1)
+            print_info(spacing)
+
+            ans = term.inkey()
+
+            if ans in {'+', '='}:
+                spacing += 1
+
+            elif ans in {'-', '_'}:
+                if spacing > 0:
+                    spacing -= 1
+
+            elif ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                print('\n')
+                return spacing
+
+def print_info(message_xcoord):
+    print(' ' * message_xcoord, '000', '\n',
+          ' ' * message_xcoord, 'Example artist', sep='')
 
 
 if __name__ == '__main__':

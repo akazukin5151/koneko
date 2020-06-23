@@ -153,7 +153,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] images_x_spacing 
     - [ ] images_y_spacing 
     - [x] gallery_print_spacing 
-    - [ ] users_print_name_xcoord 
+    - [x] users_print_name_xcoord 
     - [x] gallery_page_spacing 
     - [ ] users_page_spacing 
     - [ ] image_mode_text_offset

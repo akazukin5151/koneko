@@ -72,9 +72,10 @@ def ycoords_config() -> 'list[int]':
 
 def gallery_page_spacing_config() -> int:
     settings = get_config_section('lscat')
-    return settings.map(m.getint('gallery_page_spacing', fallback=23)).value_or(23)
+    return settings.map(m.getint('page_spacing', fallback=23)).value_or(23)
 
 def users_page_spacing_config() -> int:
+    # Because user modes print two lines of info. The other 1 is an offset
     return gallery_page_spacing_config() + 3
 
 def thumbnail_size_config() -> int:

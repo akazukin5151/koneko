@@ -21,7 +21,7 @@ See [example config](example_config.ini) for reference.
 
 ## Page spacing
 ### number of `\n` to print after every page, until all rows are out of view
-* `gallery_page_spacing`: for gallery modes (default: 23)
+* `page_spacing`: for gallery modes (default: 23)
 * The next row cannot be displayed without covering another row, so printing newlines will shift the terminal screen down, until the last row is out of view.
 * Find a value such that the completed four-picture row is completely out of view.
 * Acts on the y-axis

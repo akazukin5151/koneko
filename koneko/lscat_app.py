@@ -165,13 +165,13 @@ def config_assistance():
     print(*('\n=== Configuration assistance ===',
         'Please select an action index',
         '1. Thumbnail size',
-        'A. x-padding',
-        'B. y-padding',
-        '2. Number of columns',
-        'C. Number of rows',
-        '3. Page spacing',
-        '4. Gallery print spacing',
-        '5. User mode print info x-position',
+        '2. x-padding',
+        '3. y-padding',
+        '4. Number of columns',
+        '5. Number of rows',
+        '6. Page spacing',
+        '7. Gallery print spacing',
+        '8. User mode print info x-position',
         'a. (Run all of the above)\n'), sep='\n')
     ans = input()
 
@@ -180,19 +180,19 @@ def config_assistance():
     else:
         size = config.thumbnail_size_config()
 
-    if ans in {'A', 'a'}:
+    if ans in {'2', 'a'}:
         xpadding = xpadding_assistant(size)
 
-    if ans in {'2', 'a'}:
+    if ans in {'4', 'a'}:
         ncols = ncols_assistant(size)
 
-    if ans in {'3', 'a'}:
+    if ans in {'6', 'a'}:
         page_spacing = page_spacing_assistant(size)
 
-    if ans in {'4', 'a'}:
+    if ans in {'7', 'a'}:
         gallery_print_spacing = gallery_print_spacing_assistant()
 
-    if ans in {'5', 'a'}:
+    if ans in {'8', 'a'}:
         user_info_xcoord = user_print_name_spacing_assistant(size)
 
 
@@ -200,20 +200,20 @@ def config_assistance():
     if ans in {'1', 'a'}:
         print(f'image_thumbnail_size = {size}')
 
-    if ans in {'A', 'a'}:
+    if ans in {'2', 'a'}:
         print(f'images_x_spacing = {xpadding}')
 
-    if ans in {'2', 'a'}:
+    if ans in {'4', 'a'}:
         print(f'number_of_columns = {ncols}')
 
-    if ans in {'3', 'a'}:
+    if ans in {'6', 'a'}:
         print(f'page_spacing = {page_spacing}')
 
-    if ans in {'4', 'a'}:
+    if ans in {'7', 'a'}:
         print(f'gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
-    if ans in {'5', 'a'}:
+    if ans in {'8', 'a'}:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 
     input('\nEnter any key to quit\n')

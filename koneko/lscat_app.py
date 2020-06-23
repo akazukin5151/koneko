@@ -11,6 +11,23 @@ from koneko import KONEKODIR, lscat, config
 
 term = Terminal()
 
+def move_cursor_up(num):
+    print(f'\033[{num}A', end='', flush=True)
+
+def move_cursor_down(num=1):
+    print(f'\033[{num}B', end='', flush=True)
+
+def erase_line():
+    print('\033[K', end='', flush=True)
+
+def print_cols(spacing, ncols):
+    for (idx, space) in enumerate(spacing[:ncols]):
+        print(' ' * int(space), end='', flush=True)
+        print(idx + 1, end='', flush=True)
+
+def line_width(spacing, ncols):
+    return sum(spacing) + ncols
+
 class FakeData:
     def __init__(self, path):
         self.download_path = path
@@ -23,6 +40,29 @@ class FakeData:
     def user(cls):
         # Make sure it has a .koneko file
         return cls(KONEKODIR / 'testuser')
+
+def display_user_row(thumbnail_size, preview_xcoords, padding):
+    Image(
+        KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    ).thumbnail(thumbnail_size).show(align='left', x=padding)
+
+    for px in preview_xcoords:
+        Image(
+            KONEKODIR.parent / 'pics' / '71471144_p0.png'
+        ).thumbnail(thumbnail_size).show(align='left', x=px, y=0)
+
+
+def print_info(message_xcoord):
+    print(' ' * message_xcoord, '000', '\n',
+          ' ' * message_xcoord, 'Example artist', sep='')
+
+
+def show_single(x, thumbnail_size):
+    img = Image(
+        KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    ).thumbnail(thumbnail_size)
+    img.show(align='left', x=x, y=0)
+    return img
 
 
 def main():
@@ -168,7 +208,7 @@ def config_assistance():
 def print_thumbnail_help():
     os.system('clear')
     bottom = term.height - 7
-    print(f'\033[{bottom}B', end='', flush=True) # move cursor down
+    move_cursor_down(bottom)
     print(*('=== Thumbnail size ===',
         'This will display an image whose thumbnail size can be varied',
         'Use +/= to increase the size, and -/_ to decrease it',
@@ -205,6 +245,129 @@ def thumbnail_size_assistant():
 
             #elif ans == 't':
             # TODO: preview a grid with chosen size
+
+
+def xpadding_assistant(thumbnail_size):
+    print('\n=== Image x spacing ===')
+    print('1) Move the second image so that it is just to the right of the first image')
+    print('Use +/= to move it to the right, and -/_ to move it to the left.\n'
+          'Press enter to confirm')
+    print('2) Based on the position of the second image, adjust its position to suit you.\n'
+          'This value will be the x spacing')
+    print('\nUse q to exit the program, and press enter to go to the next assistant\n')
+
+    input('\nEnter any key to continue\n')
+    os.system('clear')
+
+    show_single(config.xcoords_config()[0], thumbnail_size)
+
+    image_width, image = find_image_width(thumbnail_size)
+
+    spaces = 0
+    while True:
+        with term.cbreak():
+            # erase_line() doesn't work here
+            print('\r' + ' ' * 20, end='', flush=True)
+            print('\r', end='', flush=True)
+            print(f'x spacing = {spaces}', end='', flush=True)
+
+            ans = term.inkey()
+
+            if ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                return spaces
+
+            elif spaces >= 0:
+                image.hide()
+                move_cursor_up(1)
+
+            if ans in {'+', '='}:
+                spaces += 1
+
+            elif ans in {'-', '_'} and spaces > 0:
+                spaces -= 1
+
+            image = show_single(image_width + spaces, thumbnail_size)
+
+
+def find_image_width(thumbnail_size):
+    image = None
+    spaces = 0
+    valid = True
+
+    while True:
+        with term.cbreak():
+            if valid:
+                erase_line()
+                print(f'image width = {spaces}', end='', flush=True)
+
+            ans = term.inkey()
+
+            if ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                erase_line()
+                return spaces, image
+
+            elif spaces > 0 and image:
+                image.hide()
+                move_cursor_up(1)
+
+            if ans in {'+', '='}:
+                spaces += 1
+
+            elif ans in {'-', '_'} and spaces > 0:
+                spaces -= 1
+
+            else:
+                valid = False
+                continue
+
+            image = show_single(spaces, thumbnail_size)
+            valid = True
+
+
+def ncols_assistant(thumbnail_size):
+    print('\n=== Number of columns ===')
+    print('Use +/= to show another column, and -/_ to hide the rightmost column')
+    print('Increase the number of columns just until no more can fit in your screen')
+    print('Use q to exit the program, and press enter to go to the next assistant\n')
+
+    input('\nEnter any key to continue\n')
+    os.system('clear')
+
+    xcoords = config.xcoords_config() * 2
+
+    show_single(xcoords[0], thumbnail_size)
+
+    images = []  # LIFO stack
+    i = 0  # Zero index to make indexing `images` easier
+    while True:
+        with term.cbreak():
+            erase_line()
+            print(f'Number of columns = {i + 1}', end='', flush=True)
+
+            ans = term.inkey()
+
+            if ans in {'+', '='}:
+                images.append(show_single(xcoords[i + 1], thumbnail_size))
+                i += 1
+
+            elif ans in {'-', '_'} and images:
+                i -= 1
+                images[i].hide()
+                images.pop(i)
+                move_cursor_up(1)
+
+            elif ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                print('')
+                return i + 1  # Zero index
 
 
 def page_spacing_assistant(thumbnail_size):
@@ -295,24 +458,6 @@ def gallery_print_spacing_assistant():
                 return spacing
 
 
-def move_cursor_up(num):
-    print(f'\033[{num}A', end='', flush=True)
-
-def move_cursor_down():
-    print('\033[1B', end='', flush=True)
-
-def erase_line():
-    print('\033[K', end='', flush=True)
-
-def print_cols(spacing, ncols):
-    for (idx, space) in enumerate(spacing[:ncols]):
-        print(' ' * int(space), end='', flush=True)
-        print(idx + 1, end='', flush=True)
-
-def line_width(spacing, ncols):
-    return sum(spacing) + ncols
-
-
 def user_print_name_spacing_assistant(thumbnail_size):
     print('\n=== User print name xcoord ===')
     print('This will display an image, then print a sample index and artist name.')
@@ -353,151 +498,4 @@ def user_print_name_spacing_assistant(thumbnail_size):
             elif ans.code == 343:  # Enter
                 print('\n' * 3)
                 return spacing
-
-
-def display_user_row(thumbnail_size, preview_xcoords, padding):
-    Image(
-        KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(thumbnail_size).show(align='left', x=padding)
-
-    for px in preview_xcoords:
-        Image(
-            KONEKODIR.parent / 'pics' / '71471144_p0.png'
-        ).thumbnail(thumbnail_size).show(align='left', x=px, y=0)
-
-
-def print_info(message_xcoord):
-    print(' ' * message_xcoord, '000', '\n',
-          ' ' * message_xcoord, 'Example artist', sep='')
-
-
-def ncols_assistant(thumbnail_size):
-    print('\n=== Number of columns ===')
-    print('Use +/= to show another column, and -/_ to hide the rightmost column')
-    print('Increase the number of columns just until no more can fit in your screen')
-    print('Use q to exit the program, and press enter to go to the next assistant\n')
-
-    input('\nEnter any key to continue\n')
-    os.system('clear')
-
-    xcoords = config.xcoords_config() * 2
-
-    show_single(xcoords[0], thumbnail_size)
-
-    images = []  # LIFO stack
-    i = 0  # Zero index to make indexing `images` easier
-    while True:
-        with term.cbreak():
-            erase_line()
-            print(f'Number of columns = {i + 1}', end='', flush=True)
-
-            ans = term.inkey()
-
-            if ans in {'+', '='}:
-                images.append(show_single(xcoords[i + 1], thumbnail_size))
-                i += 1
-
-            elif ans in {'-', '_'} and images:
-                i -= 1
-                images[i].hide()
-                images.pop(i)
-                move_cursor_up(1)
-
-            elif ans == 'q':
-                sys.exit(0)
-
-            elif ans.code == 343:  # Enter
-                print('')
-                return i + 1  # Zero index
-
-
-def show_single(x, thumbnail_size):
-    img = Image(
-        KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(thumbnail_size)
-    img.show(align='left', x=x, y=0)
-    return img
-
-
-def xpadding_assistant(thumbnail_size):
-    print('\n=== Image x spacing ===')
-    print('1) Move the second image so that it is just to the right of the first image')
-    print('Use +/= to move it to the right, and -/_ to move it to the left.\n'
-          'Press enter to confirm')
-    print('2) Based on the position of the second image, adjust its position to suit you.\n'
-          'This value will be the x spacing')
-    print('\nUse q to exit the program, and press enter to go to the next assistant\n')
-
-    input('\nEnter any key to continue\n')
-    os.system('clear')
-
-    show_single(config.xcoords_config()[0], thumbnail_size)
-
-    image_width, image = find_image_width(thumbnail_size)
-
-    spaces = 0
-    while True:
-        with term.cbreak():
-            # erase_line() doesn't work here
-            print('\r' + ' ' * 20, end='', flush=True)
-            print('\r', end='', flush=True)
-            print(f'x spacing = {spaces}', end='', flush=True)
-
-            ans = term.inkey()
-
-            if ans == 'q':
-                sys.exit(0)
-
-            elif ans.code == 343:  # Enter
-                return spaces
-
-            elif spaces >= 0:
-                image.hide()
-                move_cursor_up(1)
-
-            if ans in {'+', '='}:
-                spaces += 1
-
-            elif ans in {'-', '_'} and spaces > 0:
-                spaces -= 1
-
-            image = show_single(image_width + spaces, thumbnail_size)
-
-
-def find_image_width(thumbnail_size):
-    image = None
-    spaces = 0
-    valid = True
-
-    while True:
-        with term.cbreak():
-            if valid:
-                erase_line()
-                print(f'image width = {spaces}', end='', flush=True)
-
-            ans = term.inkey()
-
-            if ans == 'q':
-                sys.exit(0)
-
-            elif ans.code == 343:  # Enter
-                erase_line()
-                return spaces, image
-
-            elif spaces > 0 and image:
-                image.hide()
-                move_cursor_up(1)
-
-            if ans in {'+', '='}:
-                spaces += 1
-
-            elif ans in {'-', '_'} and spaces > 0:
-                spaces -= 1
-
-            else:
-                valid = False
-                continue
-
-            image = show_single(spaces, thumbnail_size)
-            valid = True
 

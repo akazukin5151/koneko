@@ -106,11 +106,13 @@ def pick_dir():
 
 def config_assistance():
     term = Terminal()
-
-    print('=== Configuration assistance ===')
+    print('\n=== Configuration assistance ===')
     print('Please select an action index')
     print('1. Thumbnail size')
+    print('A. x-padding')
+    print('B. y-padding')
     print('2. Number of columns')
+    print('C. Number of rows')
     print('3. Page spacing')
     print('4. Gallery print spacing')
     print('5. User mode print info x-position')
@@ -121,6 +123,9 @@ def config_assistance():
         size = thumbnail_size_assistant(term)
     else:
         size = config.thumbnail_size_config()
+
+    if ans in {'A', 'a'}:
+        xpadding = xpadding_assistant(term, size)
 
     if ans in {'2', 'a'}:
         ncols = ncols_assistant(term, size)
@@ -138,13 +143,20 @@ def config_assistance():
     print('\nYour recommended settings are:')
     if ans in {'1', 'a'}:
         print(f'image_thumbnail_size = {size}')
+
+    if ans in {'A', 'a'}:
+        print(f'images_x_spacing = {xpadding}')
+
     if ans in {'2', 'a'}:
         print(f'number_of_columns = {ncols}')
+
     if ans in {'3', 'a'}:
         print(f'page_spacing = {page_spacing}')
+
     if ans in {'4', 'a'}:
         print(f'gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
+
     if ans in {'5', 'a'}:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 
@@ -398,6 +410,90 @@ def show_single(x, thumbnail_size):
     ).thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=0)
     return img
+
+
+def xpadding_assistant(term, thumbnail_size):
+    print('\n=== Image x spacing ===')
+    print('1) Move the second image so that it is just to the right of the first image')
+    print('Use +/= to move it to the right, and -/_ to move it to the left.\n'
+          'Press enter to confirm')
+    print('2) Based on the position of the second image, adjust its position to suit you.\n'
+          'This value will be the x spacing')
+    print('\nUse q to exit the program, and press enter to go to the next assistant\n')
+
+    input('\nEnter any key to continue\n')
+    os.system('clear')
+
+    show_single(config.xcoords_config()[0], thumbnail_size)
+
+    image_width, image = find_image_width(term, thumbnail_size)
+
+    spaces = 0
+    while True:
+        with term.cbreak():
+            # erase_line() doesn't work here
+            print('\r' + ' ' * 20, end='', flush=True)
+            print('\r', end='', flush=True)
+            print(f'x spacing = {spaces}', end='', flush=True)
+
+            ans = term.inkey()
+
+            if ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                return spaces
+
+            elif spaces >= 0:
+                image.hide()
+                move_cursor_up(1)
+
+            if ans in {'+', '='}:
+                spaces += 1
+
+            elif ans in {'-', '_'} and spaces > 0:
+                spaces -= 1
+
+            image = show_single(image_width + spaces, thumbnail_size)
+
+
+def find_image_width(term, thumbnail_size):
+    image = None
+    spaces = 0
+    valid = True
+
+    while True:
+        with term.cbreak():
+            if valid:
+                erase_line()
+                print(f'image width = {spaces}', end='', flush=True)
+
+            ans = term.inkey()
+
+            if ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                erase_line()
+                return spaces, image
+
+            elif spaces > 0 and image:
+                image.hide()
+                move_cursor_up(1)
+
+            if ans in {'+', '='}:
+                spaces += 1
+
+            elif ans in {'-', '_'} and spaces > 0:
+                spaces -= 1
+
+            else:
+                valid = False
+                continue
+
+            image = show_single(spaces, thumbnail_size)
+            valid = True
+
 
 
 

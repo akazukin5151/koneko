@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+from copy import copy
 from pathlib import Path
 
 from pixcat import Image
@@ -9,8 +10,15 @@ from blessed import Terminal
 from koneko import KONEKODIR, lscat, config
 
 
+# Globals
 term = Terminal()
+# Must make a copy before using this reference
+SAMPLE_IMAGE = Image(
+    KONEKODIR.parent / 'pics' / '71471144_p0.png'
+)
 
+
+# Utility functions used in multiple places
 def move_cursor_up(num):
     print(f'\033[{num}A', end='', flush=True)
 
@@ -28,6 +36,7 @@ def print_cols(spacing, ncols):
 def line_width(spacing, ncols):
     return sum(spacing) + ncols
 
+# More specialised but still small functions
 class FakeData:
     def __init__(self, path):
         self.download_path = path
@@ -38,18 +47,15 @@ class FakeData:
 
     @classmethod
     def user(cls):
-        # Make sure it has a .koneko file
+        # It needs to have a .koneko file
         return cls(KONEKODIR / 'testuser')
 
+
 def display_user_row(thumbnail_size, preview_xcoords, padding):
-    Image(
-        KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(thumbnail_size).show(align='left', x=padding)
+    copy(SAMPLE_IMAGE).thumbnail(thumbnail_size).show(align='left', x=padding)
 
     for px in preview_xcoords:
-        Image(
-            KONEKODIR.parent / 'pics' / '71471144_p0.png'
-        ).thumbnail(thumbnail_size).show(align='left', x=px, y=0)
+        copy(SAMPLE_IMAGE).thumbnail(thumbnail_size).show(align='left', x=px, y=0)
 
 
 def print_info(message_xcoord):
@@ -58,9 +64,7 @@ def print_info(message_xcoord):
 
 
 def show_single(x, thumbnail_size):
-    img = Image(
-        KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(thumbnail_size)
+    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=0)
     return img
 
@@ -219,9 +223,7 @@ def print_thumbnail_help():
 def thumbnail_size_assistant():
     print_thumbnail_help()
 
-    image = Image(
-        KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    )
+    image = copy(SAMPLE_IMAGE)
 
     size = 300  # starting size
     with term.cbreak():
@@ -379,9 +381,7 @@ def page_spacing_assistant(thumbnail_size):
     input('Enter any key to continue\n')
     os.system('clear')
 
-    Image(
-        KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(thumbnail_size).show(align='left')
+    copy(SAMPLE_IMAGE).thumbnail(thumbnail_size).show(align='left')
 
     time.sleep(0.5)
 

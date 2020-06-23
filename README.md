@@ -110,9 +110,9 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
     - [ ] ~~image_width~~ (remove)
     - [ ] ~~image_height~~ (remove)
-    - [ ] images_x_spacing
+    - [x] images_x_spacing
     - [ ] images_y_spacing 
-    - [ ] number_of_columns (replace)
+    - [x] number_of_columns (replace)
     - [ ] number_of_rows (replace)
     - [x] image_thumbnail_size 
     - [x] page_spacing 

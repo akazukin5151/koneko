@@ -298,12 +298,19 @@ def user_print_name_spacing(term, thumbnail_size):
     input('\nEnter any key to continue\n')
     os.system('clear')
 
+    spacing, _ = config.get_gen_users_settings()
+    preview_xcoords = config.xcoords_config(offset=1)[-3:]
+
     Image(
         KONEKODIR.parent / 'pics' / '71471144_p0.png'
     ).thumbnail(thumbnail_size).show(align='left')
-    move_cursor_up(5)
 
-    spacing, _ = config.get_gen_users_settings()
+    for px in preview_xcoords:
+        Image(
+            KONEKODIR.parent / 'pics' / '71471144_p0.png'
+        ).thumbnail(thumbnail_size).show(align='left', x=px, y=0)
+
+    move_cursor_up(5)
 
     while True:
         with term.cbreak():
@@ -327,7 +334,7 @@ def user_print_name_spacing(term, thumbnail_size):
                 sys.exit(0)
 
             elif ans.code == 343:  # Enter
-                print('\n')
+                print('\n' * 3)
                 return spacing
 
 def print_info(message_xcoord):

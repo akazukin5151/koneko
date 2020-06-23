@@ -392,13 +392,14 @@ def ncols_assistant(term, thumbnail_size):
                 return i + 1  # Zero index
 
 
-
 def show_single(x, thumbnail_size):
     img = Image(
         KONEKODIR.parent / 'pics' / '71471144_p0.png'
     ).thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=0)
     return img
+
+
 
 if __name__ == '__main__':
     main()

@@ -76,7 +76,7 @@ def gallery_page_spacing_config() -> int:
 
 def users_page_spacing_config() -> int:
     # Because user modes print two lines of info. The other 1 is an offset
-    return gallery_page_spacing_config() + 3
+    return gallery_page_spacing_config() - 3
 
 def thumbnail_size_config() -> int:
     settings = get_config_section('lscat')

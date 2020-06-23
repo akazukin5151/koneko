@@ -222,15 +222,15 @@ def gallery_print_spacing(term):
     lscat.show_instant(lscat.TrackDownloads, data)
     print('\n')
 
-    factor = config.ncols_config() - 5
-    spacing = [9, 17, 17, 17, 17] + [17] * factor
+    ncols = config.ncols_config()
+    spacing = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
     current_selection = 0
 
     while True:
         with term.cbreak():
             move_cursor_up_2()
             erase_line()
-            print_cols(spacing)
+            print_cols(spacing, ncols)
             erase_line()
             print(f'\nAdjusting number {current_selection+1}', flush=True)
 
@@ -238,8 +238,7 @@ def gallery_print_spacing(term):
 
             if ans in {'+', '='}:
                 new = int(spacing[current_selection]) + 1
-                # TODO calculate total length of the current string, then compare
-                if new < term.width:
+                if line_width(spacing, ncols) < term.width:
                     spacing[current_selection] = new
 
             elif ans in {'-', '_'}:
@@ -269,13 +268,17 @@ def gallery_print_spacing(term):
 def move_cursor_up_2():
     print('\033[2A', end='', flush=True)
 
-def print_cols(spacing):
-    for (idx, space) in enumerate(spacing[:config.ncols_config()]):
+def erase_line():
+    print('\033[K', end='', flush=True)
+
+def print_cols(spacing, ncols):
+    for (idx, space) in enumerate(spacing[:ncols]):
         print(' ' * int(space), end='', flush=True)
         print(idx + 1, end='', flush=True)
 
-def erase_line():
-    print('\033[K', end='', flush=True)
+def line_width(spacing, ncols):
+    return sum(spacing) + ncols
+
 
 if __name__ == '__main__':
     main()

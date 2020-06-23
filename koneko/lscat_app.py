@@ -137,7 +137,8 @@ def config_assistance():
     if ans in {'2', 'a'}:
         print(f'page_spacing = {page_spacing}')
     if ans in {'3', 'a'}:
-        print(f'gallery_print_spacing = {gallery_print_spacing}')
+        print(f'gallery_print_spacing =',
+              ','.join((str(x) for x in gallery_print_spacing)))
     if ans in {'4', 'a'}:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 

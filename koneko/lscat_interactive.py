@@ -301,19 +301,18 @@ def user_print_name_spacing(term, thumbnail_size):
     Image(
         KONEKODIR.parent / 'pics' / '71471144_p0.png'
     ).thumbnail(thumbnail_size).show(align='left')
-    move_cursor_up(3)
+    move_cursor_up(5)
 
     spacing, _ = config.get_gen_users_settings()
 
     while True:
         with term.cbreak():
-            move_cursor_up(2)
-
+            erase_line()         # Erase the first line
+            move_cursor_down()   # Go down and erase the second line
             erase_line()
-            move_cursor_down()
-            erase_line()
-            move_cursor_up(1)
-            print_info(spacing)
+            move_cursor_up(1)    # Go back up to the original position
+            print_info(spacing)  # Print info takes up 2 lines
+            move_cursor_up(2)    # so go back to the top
 
             ans = term.inkey()
 

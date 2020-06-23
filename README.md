@@ -104,49 +104,9 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.8
+### Version 0.9
 
-* lscat now slightly faster as the image number is calculated only when it finishes downloading, not on every recursion.
-* Improvement for lscat: the screen will be filled with the most rows as possible
-* HACKING.md split from CONTRIBUTING.md to better assist other developers
-* Image view can now preview the next four images in multi-image posts (need to enable its experimental flag)
-
-#### Fixed
-* Fixed opening the manual in user modes not working
-* Fixed bug in lscat: number of columns now determines when to print page spacings
-
-#### Code maintenance
-* Extract out common behaviour from Gallery and Users ui classes into AbstractUI
-    * Gallery classes is now structued like Users. The most significant difference is the use of `offset` to prefetch and navigate pages.
-    * Unified API requests for each mode
-* Simplified code everywhere
-    * Reduced nesting with early returns
-    * Removed dead code
-    * Split up functions in:
-        * `config.py`
-        * `main.py`
-        * `cli.py`
-        * `download.py`
-    * Renamed data classes (eg GalleryJson to GalleryData)
-    * Simplify `ui.display_page()`
-    * Extract common code in `prompt.py`; follow a common structure
-* Remove unused cytoolz dependency
-* More functional style
-    * Use `placeholder` to make lambdas look better
-    * Use `pipey` for functional-style postfix pipes
-    * Using `returns.result` Result container in `config.py` and `splitpoint`
-* Make tests more professional
-* Move functions around modules to better reflect (im)purity
-
-# Roadmap
-
-* Phase out `image_width` and `image_height` settings in favour of directly specifying number of columns and rows. In the lscat assistant, `images_x_spacing` and `images_y_spacing` will determine x and y coords of images (removing the need for `config.ncols_config`, `config.nrows_config`, `config.xcoords_config`, `config.ycoords_config`, `pure.ncols`, and `pure.nrows`). ncols and nrows will then be determined from its own setting.
-* In-depth usage documentation?
-* Consistent public and private methods and attributes again
-
-## Features
-
-* Interactive helper UI to assist configuring lscat numbers.
+* Interactive helper UI to assist configuring lscat numbers (`lscat_app.py`).
     - [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
     - [ ] ~~image_width~~ (remove)
     - [ ] ~~image_height~~ (remove)
@@ -159,6 +119,19 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] gallery_print_spacing 
     - [x] users_print_name_xcoord 
     - [ ] image_mode_text_offset
+
+#### Fixed
+
+#### Code maintenance
+
+# Roadmap
+
+* Phase out `image_width` and `image_height` settings in favour of directly specifying number of columns and rows. In the lscat assistant, `images_x_spacing` and `images_y_spacing` will determine x and y coords of images (removing the need for `config.ncols_config`, `config.nrows_config`, `config.xcoords_config`, `config.ycoords_config`, `pure.ncols`, and `pure.nrows`). ncols and nrows will then be determined from its own setting.
+* In-depth usage documentation?
+* Consistent public and private methods and attributes again
+
+## Features
+
 * Show frequently searched IDs/strings with an option to select them.
 * Show existing IDs in the cache and delete their directories.
 * Offline mode for browsing the existing cache (opening up lscat will do most of this, only thing missing is to show frequent or existing dirs)

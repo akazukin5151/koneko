@@ -155,7 +155,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] gallery_print_spacing 
     - [x] users_print_name_xcoord 
     - [x] gallery_page_spacing 
-    - [ ] users_page_spacing 
     - [ ] image_mode_text_offset
 * Show frequently searched IDs/strings with an option to select them.
 * Show existing IDs in the cache and delete their directories.

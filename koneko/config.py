@@ -75,8 +75,7 @@ def gallery_page_spacing_config() -> int:
     return settings.map(m.getint('gallery_page_spacing', fallback=23)).value_or(23)
 
 def users_page_spacing_config() -> int:
-    settings = get_config_section('lscat')
-    return settings.map(m.getint('users_page_spacing', fallback=20)).value_or(20)
+    return gallery_page_spacing_config() + 3
 
 def thumbnail_size_config() -> int:
     settings = get_config_section('lscat')

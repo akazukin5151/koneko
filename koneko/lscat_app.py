@@ -117,33 +117,33 @@ def config_assistance():
     ans = input()
 
     if ans in {'1', 'a'}:
-        size = thumbnail_size(term)
+        size = thumbnail_size_assistant(term)
     else:
         size = config.thumbnail_size_config()
 
     if ans in {'2', 'a'}:
-        p_spacing = page_spacing(term, size)
+        page_spacing = page_spacing_assistant(term, size)
 
     if ans in {'3', 'a'}:
-        g_print_spacing = gallery_print_spacing(term)
+        gallery_print_spacing = gallery_print_spacing_assistant(term)
 
     if ans in {'4', 'a'}:
-        user_name_spacing = user_print_name_spacing(term, size)
+        user_info_xcoord = user_print_name_spacing_assistant(term, size)
 
 
     print('\nYour recommended settings are:')
     if ans in {'1', 'a'}:
         print(f'image_thumbnail_size = {size}')
     if ans in {'2', 'a'}:
-        print(f'page_spacing = {p_spacing}')
+        print(f'page_spacing = {page_spacing}')
     if ans in {'3', 'a'}:
-        print(f'gallery_print_spacing = {g_print_spacing}')
+        print(f'gallery_print_spacing = {gallery_print_spacing}')
     if ans in {'4', 'a'}:
-        print(f'users_print_name_xcoord = {user_name_spacing}')
+        print(f'users_print_name_xcoord = {user_info_xcoord}')
 
     input('\nEnter any key to quit\n')
 
-def thumbnail_size(term):
+def thumbnail_size_assistant(term):
     print('=== Thumbnail size ===')
     print('This will display an image whose thumbnail size can be varied')
     print('Use +/= to increase the size, and -/_ to decrease it')
@@ -181,7 +181,7 @@ def thumbnail_size(term):
             # TODO: preview a grid with chosen size
 
 
-def page_spacing(term, thumbnail_size):
+def page_spacing_assistant(term, thumbnail_size):
     print('=== Page spacing ===')
     print('This will display an image, then print newlines.')
     print('Your desired setting is the number when '
@@ -207,15 +207,14 @@ def page_spacing(term, thumbnail_size):
     return input()
 
 
-def gallery_print_spacing(term):
+def gallery_print_spacing_assistant(term):
     print('=== Gallery print spacing ===')
     print('Print spacing is the number of blank spaces between each number')
     print('For example:')
     print('x' * 9, '1', 'x' * 17, '2', 'x' * 17, '3', '...', sep='')
 
     print('\nUse +/= to increase the spacing, and -/_ to decrease it')
-    print('Use q to exit the program, and press enter to confirm the number\n'
-          'and select the next width to toggle')
+    print('Use q to exit the program, and press enter to go to the next assistant\n')
     print('Use left and right arrow keys to change the current space selection')
 
     print('\nPick a directory to preview in grid first')
@@ -288,7 +287,7 @@ def line_width(spacing, ncols):
     return sum(spacing) + ncols
 
 
-def user_print_name_spacing(term, thumbnail_size):
+def user_print_name_spacing_assistant(term, thumbnail_size):
     print('=== User print name xcoord ===')
     print('This will display an image, then print a sample index and artist name.')
     print('\nUse +/= to move the text right, and -/_ to move it left')

@@ -135,7 +135,7 @@ def config_assistance():
     if ans in {'3', 'a'}:
         print(f'gallery_print_spacing= {g_print_spacing}')
 
-    input('\nEnter any key to quit')
+    input('\nEnter any key to quit\n')
 
 def thumbnail_size(term):
     print('=== Thumbnail size ===')
@@ -208,7 +208,7 @@ def gallery_print_spacing(term):
     print('x' * 9, '1', 'x' * 17, '2', 'x' * 17, '3', '...', sep='')
 
     print('\nUse +/= to increase the spacing, and -/_ to decrease it')
-    print('Use q to exit the program, and press enter to confirm the number '
+    print('Use q to exit the program, and press enter to confirm the number\n'
           'and select the next width to toggle')
     print('Use left and right arrow keys to change the current space selection')
 
@@ -220,24 +220,19 @@ def gallery_print_spacing(term):
     path = pick_dir()
     data = FakeData(path)
     lscat.show_instant(lscat.TrackDownloads, data)
-
-    spacing = config.get_settings('lscat', 'gallery_print_spacing').map(
-                  lambda m: m.split(',')
-              ).value_or((9, 17, 17, 17, 17))
-
-
-    current_selection = 0
     print('\n')
+
+    factor = config.ncols_config() - 5
+    spacing = [9, 17, 17, 17, 17] + [17] * factor
+    current_selection = 0
+
     while True:
         with term.cbreak():
-            # TODO: extract out to separate functions
-            print('\033[2A', end='', flush=True)  # Move cursor up 2
-            print('\r', '\b \b' * 4, end='', flush=True)  # Erase entire line
-            for (idx, space) in enumerate(spacing[:config.ncols_config()]):
-                print(' ' * int(space), end='', flush=True)
-                print(idx + 1, end='', flush=True)
-            print('\033[K', end='', flush=True)  # Erase to end of line
-            print(f'\ncurrent number = {current_selection+1}', flush=True)
+            move_cursor_up_2()
+            erase_line()
+            print_cols(spacing)
+            erase_line()
+            print(f'\nAdjusting number {current_selection+1}', flush=True)
 
             ans = term.inkey()
 
@@ -271,6 +266,16 @@ def gallery_print_spacing(term):
                 return spacing
 
 
+def move_cursor_up_2():
+    print('\033[2A', end='', flush=True)
+
+def print_cols(spacing):
+    for (idx, space) in enumerate(spacing[:config.ncols_config()]):
+        print(' ' * int(space), end='', flush=True)
+        print(idx + 1, end='', flush=True)
+
+def erase_line():
+    print('\033[K', end='', flush=True)
 
 if __name__ == '__main__':
     main()

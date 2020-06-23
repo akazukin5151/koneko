@@ -107,12 +107,26 @@ def pick_dir():
 def config_assistance():
     term = Terminal()
 
-    size = thumbnail_size(term)
-    gallery_spacing = gallery_page_spacing(term, size)
+    print('=== Configuration assistance ===')
+    print('1. Thumbnail size')
+    print('2. Gallery page spacing')
+    print('Please select an action index')
+    print('Or enter "a" to use all')
+    ans = input()
+
+    if ans in {'1', 'a'}:
+        size = thumbnail_size(term)
+    else:
+        size = config.thumbnail_size_config()
+
+    if ans in {'2', 'a'}:
+        gallery_spacing = gallery_page_spacing(term, size)
 
     print('\nYour recommended settings are:')
-    print(f'image_thumbnail_size = {size}')
-    print(f'gallery_page_spacing = {gallery_spacing}')
+    if ans in {'1', 'a'}:
+        print(f'image_thumbnail_size = {size}')
+    if ans in {'2', 'a'}:
+        print(f'gallery_page_spacing = {gallery_spacing}')
 
     input('\nEnter any key to quit')
 
@@ -174,7 +188,7 @@ def gallery_page_spacing(term, thumbnail_size):
         time.sleep(0.1)
 
     print('When the image just completely scrolls out of view, '
-          'what is the lowest number?')
+          'what is the largest number?')
     print('(By default on kitty, ctrl+shift+up/down '
           'scrolls up/down a line)')
     return input()

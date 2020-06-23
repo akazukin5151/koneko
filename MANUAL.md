@@ -1,23 +1,3 @@
-## Conda environment
-
-```sh
-conda create -n koneko
-conda activate koneko
-conda env list                  # make sure you're in the correct environment...
-conda install -n koneko pip     # and make sure pip is installed...
-which pip                       # and pip is in your conda directory
-
-# Or use manual installation instructions below
-# If you're using a separate conda env, you probably want to make some edits
-pip install koneko
-
-# Use anywhere (but only in this conda env):
-koneko
-
-# To remove the conda env:
-conda remove --name koneko --all
-```
-
 # Configuration
 
 See [example config](example_config.ini) for reference.
@@ -57,6 +37,10 @@ See [example config](example_config.ini) for reference.
 ## Misc
 * `print_info`: Turns off printing the column numbers for the gallery, and number+artist name for user modes.
 * Anything not exactly ('1', 'yes', 'true', or 'on') will be considered off
+
+## Experimental
+* `image_mode_previews`: In view post mode (mode 2), preview the next four images for multi-image posts. Unstable because of pixcat implementation details -- it prints out escape codes that moves the terminal cursor, changing the location of other print statements.
+* `image_mode_text_offset`: number of '\n' newlines to print after displaying all four image previews, to mitigate the cursor being moved higher.
 
 # Usage
 

@@ -58,7 +58,7 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 See also: [manual installation](#manual-installation)
 
 0. Install [kitty](https://github.com/kovidgoyal/kitty)
-1. `pip install koneko` (or if you use [conda](MANUAL.md#conda-environment)...):
+1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...):
 2. Run `koneko`
 
 ## Requirements
@@ -100,19 +100,6 @@ koneko 5 # Mode 5
 ```
 For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
-# Roadmap
-
-* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
-* In-depth usage documentation?
-* Consistent public and private methods and attributes again (only show public ones in puml)
-* Startup time seems to be slow, but the delay is before the first line even executes. Import time is fast. `pip install` using the wheel seems to be faster.
-
-## Features
-
-* Image view should preview the next few images in multi-image posts (currently experimental feature for first image)
-* Go to related works from image view (illust_related)
-* View recommended illusts (illust_recommended)
-
 ## Upcoming changelog (in dev branch)
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
@@ -120,12 +107,15 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ### Version 0.8
 
 * lscat now slightly faster as the image number is calculated only when it finishes downloading, not on every recursion.
-* Fixed opening the manual in user modes not working
-* Fixed bug in lscat: number of columns now determines when to print page spacings
 * Improvement for lscat: the screen will be filled with the most rows as possible
 * HACKING.md split from CONTRIBUTING.md to better assist other developers
+* Image view can now preview the next four images in multi-image posts (need to enable its experimental flag)
 
-#### Code
+#### Fixed
+* Fixed opening the manual in user modes not working
+* Fixed bug in lscat: number of columns now determines when to print page spacings
+
+#### Code maintenance
 * Extract out common behaviour from Gallery and Users ui classes into AbstractUI
     * Gallery classes is now structued like Users. The most significant difference is the use of `offset` to prefetch and navigate pages.
     * Unified API requests for each mode
@@ -148,6 +138,26 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Make tests more professional
 * Move functions around modules to better reflect (im)purity
 
+# Roadmap
+
+* In-depth usage documentation?
+* Consistent public and private methods and attributes again
+
+## Features
+
+* Interactive helper UI to assist configuring lscat numbers.
+    * Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
+* Show frequently searched IDs/strings with an option to select them.
+* Show existing IDs in the cache and delete their directories.
+* Offline mode for browsing the existing cache (opening up lscat will do most of this, only thing missing is to show frequent or existing dirs)
+* Go to related works from image view (illust_related)
+* View recommended illusts (illust_recommended)
+
+## Known bugs
+* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
+* Reloading then going back just redraws the current mode again, with possible instability
+* There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
+* Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below
 
 # FAQ
 * Pixiv keeps emailing me saying I've logged in, every time I use this app!
@@ -157,9 +167,9 @@ I'd like to fix this but I'd rather not use mechanize but I don't know how to do
 
 * I'm having problems with lscat
 
-First, koneko is intended to work for full screen terminals, so don't tile it around unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine.
+For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
 
-You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.7 onwards.
+You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
 
 # Contributing
 * Fork it
@@ -176,41 +186,11 @@ See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Conda environment
 
-See [MANUAL.md](MANUAL.md#conda-environment)
+See [CONTRIBUTING.md](CONTRIBUTING.md#conda-environment)
 
 ## Manual installation
 
-Note: if you want to make some edits, you should install it in a conda environment. See above
-
-```sh
-# Use the latest stable version (recommended for usage)
-# Make sure the version number is the latest
-git clone -b 'v0.7' --depth 1 https://github.com/twenty5151/koneko.git
-# Use the master branch for upcoming features:
-git clone -b master https://github.com/twenty5151/koneko.git
-# Use the dev branch for latest features, fixes, and instability (recommended for contributers):
-git clone -b dev https://github.com/twenty5151/koneko.git
-
-# Run the tests (for those who want to edit)
-# Add --inte for integration testing, but don't be surprised if it fails
-pytest testing/ -vvvv -l -s 
-
-cd koneko
-# Manually install without PyPI; for general usage
-# Both will correctly copy the required pictures
-pip install .
-# or
-python setup.py install
-# or
-# Manually install for development, changes will be immediately reflected
-python setup.py develop
-
-# On certain shells with implicit cd, typing `koneko` might cd into the dir
-# Instead of running the executable
-cd ~
-# Use anywhere:
-koneko
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md#manual-installation)
 
 ## Unit tests
 Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don't be surprised if it fails
@@ -220,7 +200,7 @@ When test installing with pip, don't forget to use `pip install .` or `python se
 
 Test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` is now automated.
 
-Bump version info in `__init__.py`, `setup.py`, and `README.md`
+Bump version info in `__init__.py`, `setup.py`, `README.md`, and `CONTRIBUTING.md`
 
 ```sh
 python setup.py sdist bdist_wheel
@@ -230,7 +210,7 @@ pip install koneko --upgrade
 
 # Manual
 
-For usage, see [Usage](MANUAL.md#Usage). For configuration, see [Configuration](MANUAL.md#Configuration)
+For usage, see the [usage section](MANUAL.md#Usage). For configuration, see the [configuration section](MANUAL.md#Configuration)
 
 # Trackers avoided
 <details>

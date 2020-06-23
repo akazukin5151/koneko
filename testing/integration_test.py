@@ -17,12 +17,6 @@ def raises_customexit(*a, **k):
     raise CustomExit()
 
 @pytest.fixture
-def set_config(monkeypatch):
-    credentials, your_id = config.begin_config()
-    monkeypatch.setattr('koneko.main.config.begin_config',
-                        lambda: (credentials, your_id))
-
-@pytest.fixture
 def set_argc_to_one(monkeypatch):
     monkeypatch.setattr('koneko.main.sys.argv', [1])
 
@@ -35,23 +29,23 @@ def cli_core(monkeypatch, args: tuple, prompt: str):
         main.main()
 
 @pytest.mark.integration
-def test_mode1_cli(monkeypatch, set_config):
+def test_mode1_cli(monkeypatch):
     cli_core(monkeypatch, ('1', 2232374), 'koneko.main.prompt.gallery_like_prompt')
 
 @pytest.mark.integration
-def test_mode2_cli(monkeypatch, set_config):
+def test_mode2_cli(monkeypatch):
     cli_core(monkeypatch, ('2', 78823485), 'koneko.main.prompt.image_prompt')
 
 @pytest.mark.integration
-def test_mode3_cli(monkeypatch, set_config, send_enter):
+def test_mode3_cli(monkeypatch, send_enter):
     cli_core(monkeypatch, ('3', ''), 'koneko.main.prompt.user_prompt')
 
 @pytest.mark.integration
-def test_mode4_cli(monkeypatch, set_config):
+def test_mode4_cli(monkeypatch):
     cli_core(monkeypatch, ('4', 'gomzi'), 'koneko.main.prompt.user_prompt')
 
 @pytest.mark.integration
-def test_mode5_cli(monkeypatch, set_config):
+def test_mode5_cli(monkeypatch):
     cli_core(monkeypatch, ('5', ''), 'koneko.main.prompt.gallery_like_prompt')
 
 

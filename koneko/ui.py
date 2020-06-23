@@ -11,6 +11,7 @@ from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
                     prompt, download)
 
 
+
 class AbstractUI(ABC):
     @abstractmethod
     def __init__(self, main_path) -> 'IO':
@@ -498,14 +499,10 @@ def view_post_mode(image_id) -> 'IO':
 
     image = Image(image_id, idata, True)
 
-    experimental = config.get_settings('experimental', 'image_mode_previews')
-    if experimental == 'on':
-        event = threading.Event()
-        thread = threading.Thread(target=image.preview)
-        image.set_thread_event(thread, event)
-        thread.start()
+    image.start_preview()
 
     prompt.image_prompt(image)
+
 
 class Image:
     """
@@ -523,6 +520,8 @@ class Image:
     """
     def __init__(self, image_id, idata, firstmode=False):
         self.data = idata
+        self.event = threading.Event()
+        self.thread: 'threading.Thread'
         self._firstmode = firstmode
 
     def open_image(self) -> 'IO':
@@ -535,13 +534,19 @@ class Image:
         show_full_res(self.data)
 
     def next_image(self) -> 'IO':
+        self.event.set()
         next_image(self.data)
+        self.start_preview()
 
     def previous_image(self) -> 'IO':
+        self.event.set()
         previous_image(self.data)
+        self.start_preview()
 
     def jump_to_image(self, selected_image_num: int) -> 'IO':
+        self.event.set()
         jump_to_image(self.data, selected_image_num)
+        self.start_preview()
 
     def _jump(self) -> 'IO':
         _jump(self.data)
@@ -552,6 +557,7 @@ class Image:
         _prefetch_next_image(self.data)
 
     def leave(self, force=False) -> 'IO':
+        self.event.set()
         if self._firstmode or force:
             # Came from view post mode, don't know current page num
             # Defaults to page 1
@@ -559,30 +565,34 @@ class Image:
             prompt.gallery_like_prompt(mode)
         # Else: image prompt and class ends, goes back to previous mode
 
+    def start_preview(self):
+        if config.check_image_preview() and self.data.number_of_pages > 1:
+            self.event = threading.Event()  # Reset event, in case if it's set
+            self.thread = threading.Thread(target=self.preview)
+            self.thread.start()
+
     def preview(self) -> 'IO':
-        """Experimental"""
-        if self.data.number_of_pages == 1:
-            return True
-
+        """Download the next four images in the background and/or display them
+        one at a time, so if user interrupts, it won't hang.
+        """
         tracker = lscat.TrackDownloadsImage(self.data)
-        slicestart = self.data.page_num
-        while not self.event.is_set() and slicestart <= 4:
-            img = self.data.page_urls[slicestart:slicestart + 1]
+        i = 1
+        while not self.event.is_set() and i <= 4:
+            url = self.data.page_urls[self.data.page_num + i]
+            name = pure.split_backslash_last(url)
+            path = self.data.download_path / name
 
-            if os.path.isfile(
-                self.data.download_path / pure.split_backslash_last(img[0])
-            ):
-                tracker.update(pure.split_backslash_last(img[0]))
+            if path.is_file():
+                tracker.update(name)
             else:
-                download.async_download_no_rename(self.data.download_path, img,
-                                             tracker=tracker)
+                download.async_download_no_rename(
+                    self.data.download_path, [url], tracker=tracker
+                )
 
-            slicestart += 1
+            if i == 4:  # Last pic
+                print('\n' * config.image_text_offset())
 
-    def set_thread_event(self, thread, event):
-        """Experimental"""
-        self.thread = thread
-        self.event = event
+            i += 1
 
 
 
@@ -629,8 +639,11 @@ def jump_to_image(data, selected_image_num: int):
 def _jump(data):
     """Downloads next image if not downloaded, display it, prefetch next"""
     if not (data.download_path / data.image_filename).is_dir():
-        download.async_download_spinner(data.download_path,
-                                        [data.current_url])
+        download.async_download_spinner(
+            data.download_path, [data.current_url]
+        )
+
+    os.system('clear')
 
     lscat.icat(data.filepath)
 

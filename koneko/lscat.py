@@ -27,8 +27,14 @@ from returns.result import safe
 from koneko import pure, utils, config
 
 
-def icat(args: str) -> 'IO':
-    os.system(f'kitty +kitten icat --silent {args}')
+def icat(path: str) -> 'IO':
+    """icat and pixcat behaves differently. pixcat prints out the escape codes,
+    shifting the current cursor position, but calling a system command does not.
+    I abuse this fact in the main generators to make printing pages easier, and
+    user mode is possible only because of this fact.
+    """
+    #os.system(f'kitty +kitten icat --silent {args}')
+    Image(path).show()
 
 def show_instant(cls, data, gallerymode=False) -> 'IO':
     tracker = cls(data)
@@ -180,32 +186,32 @@ def generate_users(path, print_info=True) -> 'IO':
 class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
     def __init__(self, data):
-        self.orders = list(range(1, 30))
-        self.generator = generate_previews(data.download_path)
-        super().__init__(data)
+        min_num = data.page_num + 1
+        self.orders = list(range(min_num, 30))
+        self.generator = generate_previews(data.download_path, min_num)
+        super().__init__()
 
     def update(self, new: str):
         """Overrides base class because numlist is different"""
         with self._lock:
             self._downloaded.append(new)
-            self._numlist.append(int(f.split('_')[1].replace('p', '')))
+            self._numlist.append(int(new.split('_')[1].replace('p', '')))
 
         self._inspect()
 
-def generate_previews(path) -> 'IO':
+def generate_previews(path, min_num) -> 'IO':
     """Experimental"""
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
     thumbnail_size = config.thumbnail_size_config()
 
-    os.system('clear')
     i = 0
     while True:
         image = yield
         i += 1
 
-        number = int(image.split('_')[1].replace('p', '')) - 1
+        number = int(image.split('_')[1].replace('p', '')) - min_num
         y = number % 2
         if i <= 2:
             x = 0

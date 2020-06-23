@@ -108,12 +108,13 @@ def config_assistance():
     term = Terminal()
 
     print('=== Configuration assistance ===')
-    print('1. Thumbnail size')
-    print('2. Page spacing')
-    print('3. Gallery print spacing')
-    print('4. User mode print info x-position')
     print('Please select an action index')
-    print('Or enter "a" to use all')
+    print('1. Thumbnail size')
+    print('2. Number of columns')
+    print('3. Page spacing')
+    print('4. Gallery print spacing')
+    print('5. User mode print info x-position')
+    print('a. (Run all of the above)\n')
     ans = input()
 
     if ans in {'1', 'a'}:
@@ -122,12 +123,15 @@ def config_assistance():
         size = config.thumbnail_size_config()
 
     if ans in {'2', 'a'}:
-        page_spacing = page_spacing_assistant(term, size)
+        ncols = ncols_assistant(term, size)
 
     if ans in {'3', 'a'}:
-        gallery_print_spacing = gallery_print_spacing_assistant(term)
+        page_spacing = page_spacing_assistant(term, size)
 
     if ans in {'4', 'a'}:
+        gallery_print_spacing = gallery_print_spacing_assistant(term)
+
+    if ans in {'5', 'a'}:
         user_info_xcoord = user_print_name_spacing_assistant(term, size)
 
 
@@ -135,17 +139,19 @@ def config_assistance():
     if ans in {'1', 'a'}:
         print(f'image_thumbnail_size = {size}')
     if ans in {'2', 'a'}:
-        print(f'page_spacing = {page_spacing}')
+        print(f'number_of_columns = {ncols}')
     if ans in {'3', 'a'}:
+        print(f'page_spacing = {page_spacing}')
+    if ans in {'4', 'a'}:
         print(f'gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
-    if ans in {'4', 'a'}:
+    if ans in {'5', 'a'}:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 
     input('\nEnter any key to quit\n')
 
 def thumbnail_size_assistant(term):
-    print('=== Thumbnail size ===')
+    print('\n=== Thumbnail size ===')
     print('This will display an image whose thumbnail size can be varied')
     print('Use +/= to increase the size, and -/_ to decrease it')
     print('Use q to exit the program, and press enter to confirm the size')
@@ -183,7 +189,7 @@ def thumbnail_size_assistant(term):
 
 
 def page_spacing_assistant(term, thumbnail_size):
-    print('=== Page spacing ===')
+    print('\n=== Page spacing ===')
     print('This will display an image, then print newlines.')
     print('Your desired setting is the number when '
           'the image completely scrolls out of view')
@@ -209,7 +215,7 @@ def page_spacing_assistant(term, thumbnail_size):
 
 
 def gallery_print_spacing_assistant(term):
-    print('=== Gallery print spacing ===')
+    print('\n=== Gallery print spacing ===')
     print('Print spacing is the number of blank spaces between each number')
     print('For example:')
     print('x' * 9, '1', 'x' * 17, '2', 'x' * 17, '3', '...', sep='')
@@ -289,7 +295,7 @@ def line_width(spacing, ncols):
 
 
 def user_print_name_spacing_assistant(term, thumbnail_size):
-    print('=== User print name xcoord ===')
+    print('\n=== User print name xcoord ===')
     print('This will display an image, then print a sample index and artist name.')
     print('\nUse +/= to move the text right, and -/_ to move it left')
     print('Adjust the position as you see fit')
@@ -345,6 +351,54 @@ def print_info(message_xcoord):
     print(' ' * message_xcoord, '000', '\n',
           ' ' * message_xcoord, 'Example artist', sep='')
 
+
+def ncols_assistant(term, thumbnail_size):
+    print('\n=== Number of columns ===')
+    print('Use +/= to show another column, and -/_ to hide the rightmost column')
+    print('Increase the number of columns just until no more can fit in your screen')
+    print('Use q to exit the program, and press enter to go to the next assistant\n')
+
+    input('\nEnter any key to continue\n')
+    os.system('clear')
+
+    xcoords = config.xcoords_config() * 2
+
+    show_single(xcoords[0], thumbnail_size)
+
+    images = []  # LIFO stack
+    i = 0  # Zero index to make indexing `images` easier
+    while True:
+        with term.cbreak():
+            erase_line()
+            print(f'Number of columns = {i + 1}', end='', flush=True)
+
+            ans = term.inkey()
+
+            if ans in {'+', '='}:
+                images.append(show_single(xcoords[i + 1], thumbnail_size))
+                i += 1
+
+            elif ans in {'-', '_'} and images:
+                i -= 1
+                images[i].hide()
+                images.pop(i)
+                move_cursor_up(1)
+
+            elif ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                print('')
+                return i + 1  # Zero index
+
+
+
+def show_single(x, thumbnail_size):
+    img = Image(
+        KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    ).thumbnail(thumbnail_size)
+    img.show(align='left', x=x, y=0)
+    return img
 
 if __name__ == '__main__':
     main()

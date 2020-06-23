@@ -9,6 +9,8 @@ from blessed import Terminal
 from koneko import KONEKODIR, lscat, config
 
 
+term = Terminal()
+
 class FakeData:
     def __init__(self, path):
         self.download_path = path
@@ -25,12 +27,13 @@ class FakeData:
 
 def main():
     os.system('clear')
-    print('Welcome to the lscat interactive script')
-    print('1. Launch koneko configuration assistance')
-    print('2. Display KONEKODIR / testgallery')
-    print('3. Display KONEKODIR / testuser')
-    print('4. Browse a cached dir to display')
-    print('5. Display a specified path')
+    print(*('Welcome to the lscat interactive script',
+        '1. Launch koneko configuration assistance',
+        '2. Display KONEKODIR / testgallery',
+        '3. Display KONEKODIR / testuser',
+        '4. Browse a cached dir to display',
+        '5. Display a specified path'), sep='\n')
+
     ans = input('\nPlease select an action: ')
     print('')
 
@@ -71,12 +74,12 @@ def browse_cache():
     path = pick_dir()
     data = FakeData(path)
 
-    ans = input('Should this directory be a grid (gallery), or users? [Y/n] ')
+    ans = input('Does this directory have a .koneko file? [y/N] ')
 
     if ans == 'n':
-        lscat.show_instant(lscat.TrackDownloadsUsers, data)
-    else:
         lscat.show_instant(lscat.TrackDownloads, data, True)
+    else:
+        lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
 def pick_dir():
     path = KONEKODIR
@@ -105,39 +108,38 @@ def pick_dir():
 
 
 def config_assistance():
-    term = Terminal()
-    print('\n=== Configuration assistance ===')
-    print('Please select an action index')
-    print('1. Thumbnail size')
-    print('A. x-padding')
-    print('B. y-padding')
-    print('2. Number of columns')
-    print('C. Number of rows')
-    print('3. Page spacing')
-    print('4. Gallery print spacing')
-    print('5. User mode print info x-position')
-    print('a. (Run all of the above)\n')
+    print(*('\n=== Configuration assistance ===',
+        'Please select an action index',
+        '1. Thumbnail size',
+        'A. x-padding',
+        'B. y-padding',
+        '2. Number of columns',
+        'C. Number of rows',
+        '3. Page spacing',
+        '4. Gallery print spacing',
+        '5. User mode print info x-position',
+        'a. (Run all of the above)\n'), sep='\n')
     ans = input()
 
     if ans in {'1', 'a'}:
-        size = thumbnail_size_assistant(term)
+        size = thumbnail_size_assistant()
     else:
         size = config.thumbnail_size_config()
 
     if ans in {'A', 'a'}:
-        xpadding = xpadding_assistant(term, size)
+        xpadding = xpadding_assistant(size)
 
     if ans in {'2', 'a'}:
-        ncols = ncols_assistant(term, size)
+        ncols = ncols_assistant(size)
 
     if ans in {'3', 'a'}:
-        page_spacing = page_spacing_assistant(term, size)
+        page_spacing = page_spacing_assistant(size)
 
     if ans in {'4', 'a'}:
-        gallery_print_spacing = gallery_print_spacing_assistant(term)
+        gallery_print_spacing = gallery_print_spacing_assistant()
 
     if ans in {'5', 'a'}:
-        user_info_xcoord = user_print_name_spacing_assistant(term, size)
+        user_info_xcoord = user_print_name_spacing_assistant(size)
 
 
     print('\nYour recommended settings are:')
@@ -162,23 +164,28 @@ def config_assistance():
 
     input('\nEnter any key to quit\n')
 
-def thumbnail_size_assistant(term):
-    print('\n=== Thumbnail size ===')
-    print('This will display an image whose thumbnail size can be varied')
-    print('Use +/= to increase the size, and -/_ to decrease it')
-    print('Use q to exit the program, and press enter to confirm the size')
 
-    print('\nKeep in mind this size will be used for a grid of images')
-
-    input('Enter any key to continue\n')
+def print_thumbnail_help():
     os.system('clear')
-    size = 300
+    bottom = term.height - 7
+    print(f'\033[{bottom}B', end='', flush=True) # move cursor down
+    print(*('=== Thumbnail size ===',
+        'This will display an image whose thumbnail size can be varied',
+        'Use +/= to increase the size, and -/_ to decrease it',
+        'Use q to exit the program, and press enter to confirm the size',
+        '\nKeep in mind this size will be used for a grid of images'),
+        sep='\n')
+
+def thumbnail_size_assistant():
+    print_thumbnail_help()
+
     image = Image(
         KONEKODIR.parent / 'pics' / '71471144_p0.png'
     )
 
-    while True:
-        with term.cbreak():
+    size = 300  # starting size
+    with term.cbreak():
+        while True:
             image.thumbnail(size).show(align='left', x=0, y=0)
 
             ans = term.inkey()
@@ -200,7 +207,7 @@ def thumbnail_size_assistant(term):
             # TODO: preview a grid with chosen size
 
 
-def page_spacing_assistant(term, thumbnail_size):
+def page_spacing_assistant(thumbnail_size):
     print('\n=== Page spacing ===')
     print('This will display an image, then print newlines.')
     print('Your desired setting is the number when '
@@ -226,7 +233,7 @@ def page_spacing_assistant(term, thumbnail_size):
     return input()
 
 
-def gallery_print_spacing_assistant(term):
+def gallery_print_spacing_assistant():
     print('\n=== Gallery print spacing ===')
     print('Print spacing is the number of blank spaces between each number')
     print('For example:')
@@ -306,7 +313,7 @@ def line_width(spacing, ncols):
     return sum(spacing) + ncols
 
 
-def user_print_name_spacing_assistant(term, thumbnail_size):
+def user_print_name_spacing_assistant(thumbnail_size):
     print('\n=== User print name xcoord ===')
     print('This will display an image, then print a sample index and artist name.')
     print('\nUse +/= to move the text right, and -/_ to move it left')
@@ -364,7 +371,7 @@ def print_info(message_xcoord):
           ' ' * message_xcoord, 'Example artist', sep='')
 
 
-def ncols_assistant(term, thumbnail_size):
+def ncols_assistant(thumbnail_size):
     print('\n=== Number of columns ===')
     print('Use +/= to show another column, and -/_ to hide the rightmost column')
     print('Increase the number of columns just until no more can fit in your screen')
@@ -412,7 +419,7 @@ def show_single(x, thumbnail_size):
     return img
 
 
-def xpadding_assistant(term, thumbnail_size):
+def xpadding_assistant(thumbnail_size):
     print('\n=== Image x spacing ===')
     print('1) Move the second image so that it is just to the right of the first image')
     print('Use +/= to move it to the right, and -/_ to move it to the left.\n'
@@ -426,7 +433,7 @@ def xpadding_assistant(term, thumbnail_size):
 
     show_single(config.xcoords_config()[0], thumbnail_size)
 
-    image_width, image = find_image_width(term, thumbnail_size)
+    image_width, image = find_image_width(thumbnail_size)
 
     spaces = 0
     while True:
@@ -457,7 +464,7 @@ def xpadding_assistant(term, thumbnail_size):
             image = show_single(image_width + spaces, thumbnail_size)
 
 
-def find_image_width(term, thumbnail_size):
+def find_image_width(thumbnail_size):
     image = None
     spaces = 0
     valid = True
@@ -494,8 +501,3 @@ def find_image_width(term, thumbnail_size):
             image = show_single(spaces, thumbnail_size)
             valid = True
 
-
-
-
-if __name__ == '__main__':
-    main()

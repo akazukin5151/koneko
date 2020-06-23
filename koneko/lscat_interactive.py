@@ -110,6 +110,7 @@ def config_assistance():
     print('=== Configuration assistance ===')
     print('1. Thumbnail size')
     print('2. Gallery page spacing')
+    print('3. Gallery print spacing')
     print('Please select an action index')
     print('Or enter "a" to use all')
     ans = input()
@@ -122,11 +123,17 @@ def config_assistance():
     if ans in {'2', 'a'}:
         gallery_spacing = gallery_page_spacing(term, size)
 
+    if ans in {'3', 'a'}:
+        g_print_spacing = gallery_print_spacing(term)
+
+
     print('\nYour recommended settings are:')
     if ans in {'1', 'a'}:
         print(f'image_thumbnail_size = {size}')
     if ans in {'2', 'a'}:
         print(f'gallery_page_spacing = {gallery_spacing}')
+    if ans in {'3', 'a'}:
+        print(f'gallery_print_spacing= {g_print_spacing}')
 
     input('\nEnter any key to quit')
 
@@ -192,6 +199,77 @@ def gallery_page_spacing(term, thumbnail_size):
     print('(By default on kitty, ctrl+shift+up/down '
           'scrolls up/down a line)')
     return input()
+
+
+def gallery_print_spacing(term):
+    print('=== Gallery print spacing ===')
+    print('Print spacing is the number of blank spaces between each number')
+    print('For example:')
+    print('x' * 9, '1', 'x' * 17, '2', 'x' * 17, '3', '...', sep='')
+
+    print('\nUse +/= to increase the spacing, and -/_ to decrease it')
+    print('Use q to exit the program, and press enter to confirm the number '
+          'and select the next width to toggle')
+    print('Use left and right arrow keys to change the current space selection')
+
+    print('\nPick a directory to preview in grid first')
+
+    input('\nEnter any key to continue\n')
+    os.system('clear')
+
+    path = pick_dir()
+    data = FakeData(path)
+    lscat.show_instant(lscat.TrackDownloads, data)
+
+    spacing = config.get_settings('lscat', 'gallery_print_spacing').map(
+                  lambda m: m.split(',')
+              ).value_or((9, 17, 17, 17, 17))
+
+
+    current_selection = 0
+    print('\n')
+    while True:
+        with term.cbreak():
+            # TODO: extract out to separate functions
+            print('\033[2A', end='', flush=True)  # Move cursor up 2
+            print('\r', '\b \b' * 4, end='', flush=True)  # Erase entire line
+            for (idx, space) in enumerate(spacing[:config.ncols_config()]):
+                print(' ' * int(space), end='', flush=True)
+                print(idx + 1, end='', flush=True)
+            print('\033[K', end='', flush=True)  # Erase to end of line
+            print(f'\ncurrent number = {current_selection+1}', flush=True)
+
+            ans = term.inkey()
+
+            if ans in {'+', '='}:
+                new = int(spacing[current_selection]) + 1
+                # TODO calculate total length of the current string, then compare
+                if new < term.width:
+                    spacing[current_selection] = new
+
+            elif ans in {'-', '_'}:
+                spacing[current_selection] = int(spacing[current_selection]) - 1
+                if spacing[current_selection] < 0:
+                    spacing[current_selection] = 0
+
+            # right arrow
+            elif ans.code == 261 or ans in {'d', 'l'}:
+                current_selection += 1
+                if current_selection >= len(spacing):
+                    current_selection -= 1
+
+            # left arrow
+            elif ans.code == 260 or ans in {'a', 'h'}:
+                current_selection -= 1
+                if current_selection < 0:
+                    current_selection = 0
+
+            elif ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                return spacing
+
 
 
 if __name__ == '__main__':

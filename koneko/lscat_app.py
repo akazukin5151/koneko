@@ -20,6 +20,10 @@ MINUS = {'-', '_'}
 
 
 # Utility functions used in multiple places
+def check_quit(ans):
+    if ans == 'q':
+        sys.exit(0)
+
 def move_cursor_up(num):
     if num > 0:
         print(f'\033[{num}A', end='', flush=True)
@@ -156,11 +160,9 @@ def pick_dir():
         print('\nSelect a directory to view (enter its index)')
         print('If you want to display this directory, enter "y"')
         ans = input()
+        check_quit(ans)
 
-        if ans == 'q':
-            sys.exit(0)
-
-        elif ans == 'y':
+        if ans == 'y':
             return path
 
         elif ans == 'b':
@@ -253,6 +255,7 @@ def thumbnail_size_assistant():
             image.thumbnail(size).show(align='left', x=0, y=0)
 
             ans = term.inkey()
+            check_quit(ans)
 
             if ans in PLUS:
                 size += 20
@@ -260,9 +263,6 @@ def thumbnail_size_assistant():
             elif ans in MINUS:
                 image.hide()
                 size -= 20
-
-            elif ans == 'q':
-                sys.exit(0)
 
             elif ans.code == 343:  # Enter
                 return size
@@ -288,7 +288,8 @@ def xpadding_assistant(thumbnail_size):
             config.xcoords_config()[0],
             'x',
             False,
-            xpadding_assistant.__doc__
+            xpadding_assistant.__doc__,
+            'width'
         )
 
 def ypadding_assistant(thumbnail_size):
@@ -308,15 +309,16 @@ def ypadding_assistant(thumbnail_size):
             config.xcoords_config()[1],
             'y',
             True,
-            ypadding_assistant.__doc__
+            ypadding_assistant.__doc__,
+            'height'
         )
 
-def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc):
+def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc, width_or_height):
     print_doc(doc)
 
     show_single(default_x, thumbnail_size)
 
-    image_width, image = find_image_width(thumbnail_size, show_func, move)
+    image_width, image = find_image_width(thumbnail_size, show_func, move, width_or_height)
     if move:
         move_cursor_down(image_width)
 
@@ -331,14 +333,12 @@ def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc)
             print(f'{dimension} spacing = {spaces}', end='', flush=True)
 
             ans = term.inkey()
+            check_quit(ans)
 
-            if ans == 'q':
-                sys.exit(0)
-
-            elif ans.code == 343:  # Enter
+            if ans.code == 343:  # Enter
                 return spaces
 
-            elif spaces >= 0:
+            if spaces >= 0:
                 image.hide()
                 move_cursor_up(1)
 
@@ -351,7 +351,7 @@ def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc)
             image = show_func(image_width + spaces, thumbnail_size)
 
 
-def find_image_width(thumbnail_size, show_func, move):
+def find_image_width(thumbnail_size, show_func, move, width_or_height):
     image = None
     spaces = 0
     valid = True
@@ -365,18 +365,16 @@ def find_image_width(thumbnail_size, show_func, move):
                 if move:
                     move_cursor_up(spaces)
                 erase_line()
-                print(f'image width = {spaces}', end='', flush=True)
+                print(f'image {width_or_height} = {spaces}', end='', flush=True)
 
             ans = term.inkey()
+            check_quit(ans)
 
-            if ans == 'q':
-                sys.exit(0)
-
-            elif ans.code == 343:  # Enter
+            if ans.code == 343:  # Enter
                 erase_line()
                 return spaces, image
 
-            elif spaces > 0 and image:
+            if spaces > 0 and image:
                 image.hide()
                 move_cursor_up(1)
 
@@ -415,6 +413,7 @@ def ncols_assistant(thumbnail_size):
             print(f'Number of columns = {i + 1}', end='', flush=True)
 
             ans = term.inkey()
+            check_quit(ans)
 
             if ans in PLUS:
                 images.append(show_single(xcoords[i + 1], thumbnail_size))
@@ -425,9 +424,6 @@ def ncols_assistant(thumbnail_size):
                 images[i].hide()
                 images.pop(i)
                 move_cursor_up(1)
-
-            elif ans == 'q':
-                sys.exit(0)
 
             elif ans.code == 343:  # Enter
                 print('')
@@ -493,6 +489,7 @@ def gallery_print_spacing_assistant():
             print(f'\nAdjusting number {current_selection+1}', flush=True)
 
             ans = term.inkey()
+            check_quit(ans)
 
             if ans in PLUS:
                 new = int(spacing[current_selection]) + 1
@@ -514,9 +511,6 @@ def gallery_print_spacing_assistant():
             elif ans.code == 260 or ans in {'a', 'h'}:
                 if current_selection > 0:
                     current_selection -= 1
-
-            elif ans == 'q':
-                sys.exit(0)
 
             elif ans.code == 343:  # Enter
                 return spacing
@@ -547,6 +541,7 @@ def user_print_name_spacing_assistant(thumbnail_size):
             move_cursor_up(2)    # so go back to the top
 
             ans = term.inkey()
+            check_quit(ans)
 
             if ans in PLUS:
                 spacing += 1
@@ -554,9 +549,6 @@ def user_print_name_spacing_assistant(thumbnail_size):
             elif ans in MINUS:
                 if spacing > 0:
                     spacing -= 1
-
-            elif ans == 'q':
-                sys.exit(0)
 
             elif ans.code == 343:  # Enter
                 print('\n' * 3)

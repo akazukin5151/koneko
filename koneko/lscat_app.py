@@ -192,10 +192,10 @@ def config_assistance():
         size = config.thumbnail_size_config()
 
     if ans in {'2', 'a'}:
-        xpadding = xpadding_assistant(size)
+        xpadding, image_width = xpadding_assistant(size)
 
     if ans in {'3', 'a'}:
-        ypadding = ypadding_assistant(size)
+        ypadding, image_height = ypadding_assistant(size)
 
     if ans in {'4', 'a'}:
         page_spacing = page_spacing_assistant(size)
@@ -212,9 +212,11 @@ def config_assistance():
         print(f'image_thumbnail_size = {size}')
 
     if ans in {'2', 'a'}:
+        print(f'image_width = {image_width}')
         print(f'images_x_spacing = {xpadding}')
 
     if ans in {'3', 'a'}:
+        print(f'image_height = {image_height}')
         print(f'images_y_spacing = {ypadding}')
 
     if ans in {'4', 'a'}:
@@ -314,7 +316,7 @@ def abstract_padding(
         dimension: str,
         width_or_height: str,
         move: bool,
-    ) -> 'IO':
+    ) -> 'IO[tuple[int, int]]':
 
     print_doc(doc)
 
@@ -344,7 +346,7 @@ def abstract_padding(
             check_quit(ans)
 
             if ans.code == ENTER:
-                return spaces
+                return spaces, image_width
 
             if spaces >= 0:
                 image.hide()

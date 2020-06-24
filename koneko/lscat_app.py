@@ -320,8 +320,8 @@ def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc)
 
     spaces = 0
 
-    while True:
-        with term.cbreak():
+    with term.cbreak():
+        while True:
             if move:
                 move_cursor_up(spaces)
             print('\r' + ' ' * 20, end='', flush=True)
@@ -357,8 +357,8 @@ def find_image_width(thumbnail_size, show_func, move):
     if move:
         move_cursor_down(1)
 
-    while True:
-        with term.cbreak():
+    with term.cbreak():
+        while True:
             if valid:
                 if move:
                     move_cursor_up(spaces)
@@ -407,8 +407,8 @@ def ncols_assistant(thumbnail_size):
 
     images = []  # LIFO stack
     i = 0  # Zero index to make indexing `images` easier
-    while True:
-        with term.cbreak():
+    with term.cbreak():
+        while True:
             erase_line()
             print(f'Number of columns = {i + 1}', end='', flush=True)
 
@@ -482,8 +482,8 @@ def gallery_print_spacing_assistant():
     spacing = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
     current_selection = 0
 
-    while True:
-        with term.cbreak():
+    with term.cbreak():
+        while True:
             move_cursor_up(2)
             erase_line()
             print_cols(spacing, ncols)
@@ -535,8 +535,8 @@ def user_print_name_spacing_assistant(thumbnail_size):
     display_user_row(thumbnail_size, preview_xcoords, padding)
     move_cursor_up(5)
 
-    while True:
-        with term.cbreak():
+    with term.cbreak():
+        while True:
             erase_line()         # Erase the first line
             move_cursor_down()   # Go down and erase the second line
             erase_line()

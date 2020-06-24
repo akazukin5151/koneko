@@ -15,6 +15,8 @@ from koneko import KONEKODIR, lscat, config
 term = Terminal()
 # Must make a copy before using this reference
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
+PLUS = {'+', '='}
+MINUS = {'-', '_'}
 
 
 # Utility functions used in multiple places
@@ -252,10 +254,10 @@ def thumbnail_size_assistant():
 
             ans = term.inkey()
 
-            if ans in {'+', '='}:
+            if ans in PLUS:
                 size += 20
 
-            elif ans in {'-', '_'}:
+            elif ans in MINUS:
                 image.hide()
                 size -= 20
 
@@ -340,10 +342,10 @@ def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc)
                 image.hide()
                 move_cursor_up(1)
 
-            if ans in {'+', '='}:
+            if ans in PLUS:
                 spaces += 1
 
-            elif ans in {'-', '_'} and spaces > 0:
+            elif ans in MINUS and spaces > 0:
                 spaces -= 1
 
             image = show_func(image_width + spaces, thumbnail_size)
@@ -378,10 +380,10 @@ def find_image_width(thumbnail_size, show_func, move):
                 image.hide()
                 move_cursor_up(1)
 
-            if ans in {'+', '='}:
+            if ans in PLUS:
                 spaces += 1
 
-            elif ans in {'-', '_'} and spaces > 0:
+            elif ans in MINUS and spaces > 0:
                 spaces -= 1
 
             else:
@@ -414,11 +416,11 @@ def ncols_assistant(thumbnail_size):
 
             ans = term.inkey()
 
-            if ans in {'+', '='}:
+            if ans in PLUS:
                 images.append(show_single(xcoords[i + 1], thumbnail_size))
                 i += 1
 
-            elif ans in {'-', '_'} and images:
+            elif ans in MINUS and images:
                 i -= 1
                 images[i].hide()
                 images.pop(i)
@@ -492,12 +494,12 @@ def gallery_print_spacing_assistant():
 
             ans = term.inkey()
 
-            if ans in {'+', '='}:
+            if ans in PLUS:
                 new = int(spacing[current_selection]) + 1
                 if line_width(spacing, ncols) < term.width:
                     spacing[current_selection] = new
 
-            elif ans in {'-', '_'}:
+            elif ans in MINUS:
                 spacing[current_selection] = int(spacing[current_selection]) - 1
                 if spacing[current_selection] < 0:
                     spacing[current_selection] = 0
@@ -546,10 +548,10 @@ def user_print_name_spacing_assistant(thumbnail_size):
 
             ans = term.inkey()
 
-            if ans in {'+', '='}:
+            if ans in PLUS:
                 spacing += 1
 
-            elif ans in {'-', '_'}:
+            elif ans in MINUS:
                 if spacing > 0:
                     spacing -= 1
 

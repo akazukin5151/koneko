@@ -17,6 +17,7 @@ term = Terminal()
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 PLUS = {'+', '='}
 MINUS = {'-', '_'}
+ENTER = 343
 
 
 # Utility functions used in multiple places
@@ -264,7 +265,7 @@ def thumbnail_size_assistant():
                 image.hide()
                 size -= 20
 
-            elif ans.code == 343:  # Enter
+            elif ans.code == ENTER:
                 return size
 
             #elif ans == 't':
@@ -350,7 +351,7 @@ def abstract_padding(
             ans = term.inkey()
             check_quit(ans)
 
-            if ans.code == 343:  # Enter
+            if ans.code == ENTER:
                 return spaces
 
             if spaces >= 0:
@@ -382,7 +383,7 @@ def find_image_width(thumbnail_size, show_func, move, width_or_height):
             ans = term.inkey()
             check_quit(ans)
 
-            if ans.code == 343:  # Enter
+            if ans.code == ENTER:
                 erase_line()
                 return spaces, image
 
@@ -437,7 +438,7 @@ def ncols_assistant(thumbnail_size):
                 images.pop(i)
                 move_cursor_up(1)
 
-            elif ans.code == 343:  # Enter
+            elif ans.code == ENTER:
                 print('')
                 return i + 1  # Zero index
 
@@ -524,7 +525,7 @@ def gallery_print_spacing_assistant():
                 if current_selection > 0:
                     current_selection -= 1
 
-            elif ans.code == 343:  # Enter
+            elif ans.code == ENTER:
                 return spacing
 
 
@@ -562,7 +563,7 @@ def user_print_name_spacing_assistant(thumbnail_size):
                 if spacing > 0:
                     spacing -= 1
 
-            elif ans.code == 343:  # Enter
+            elif ans.code == ENTER:
                 print('\n' * 3)
                 return spacing
 

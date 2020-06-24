@@ -113,7 +113,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] images_x_spacing
     - [x] images_y_spacing 
     - [x] number_of_columns (replace)
-    - [ ] number_of_rows (replace)
+    - [x] number_of_rows (replace)
     - [x] image_thumbnail_size 
     - [x] page_spacing 
     - [x] gallery_print_spacing 

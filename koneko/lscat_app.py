@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from pixcat import Image
 from blessed import Terminal
 
-from koneko import KONEKODIR, lscat, config
+from koneko import KONEKODIR, lscat, config, pure
 
 
 # Globals
@@ -193,6 +193,9 @@ def config_assistance():
 
     if ans in {'2', 'a'}:
         xpadding, image_width = xpadding_assistant(size)
+    else:
+        _, xpadding = config.get_gen_users_settings()
+        image_width, _ = config._width_padding('width', 'x', (0, 2))
 
     if ans in {'3', 'a'}:
         ypadding, image_height = ypadding_assistant(size)
@@ -201,10 +204,15 @@ def config_assistance():
         page_spacing = page_spacing_assistant(size)
 
     if ans in {'5', 'a'}:
+        # TODO: Propagate thumbnail size & paddings
         gallery_print_spacing = gallery_print_spacing_assistant()
 
     if ans in {'6', 'a'}:
-        user_info_xcoord = user_print_name_spacing_assistant(size)
+        user_info_xcoord = user_print_name_spacing_assistant(
+            size,
+            xpadding,
+            image_width
+        )
 
 
     print('\nYour recommended settings are:')
@@ -485,7 +493,7 @@ def gallery_print_spacing_assistant():
                 return spacing
 
 
-def user_print_name_spacing_assistant(thumbnail_size):
+def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
     """=== User print name xcoord ===
     Use +/= to move the text right, and -/_ to move it left
     Adjust the position as you see fit
@@ -494,10 +502,11 @@ def user_print_name_spacing_assistant(thumbnail_size):
     """
     print_doc(user_print_name_spacing_assistant.__doc__)
 
-    spacing, padding = config.get_gen_users_settings()
-    preview_xcoords = config.xcoords_config(offset=1)[-3:]
+    # Spacing is needed for a default xcoord
+    spacing, _ = config.get_gen_users_settings()
+    preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
 
-    display_user_row(thumbnail_size, preview_xcoords, padding)
+    display_user_row(thumbnail_size, preview_xcoords, xpadding)
     move_cursor_up(5)
 
     with term.cbreak():

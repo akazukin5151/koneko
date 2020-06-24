@@ -90,7 +90,13 @@ def show_single_x(x, thumbnail_size):
     return _show_single(x, 0, thumbnail_size)
 
 def show_single_y(y, thumbnail_size):
+    # Default usage of config module
     return _show_single(config.xcoords_config()[1], y, thumbnail_size)
+
+def show_instant_sample(thumbnail_size, xpadding, image_width):
+    xcoords = pure.xcoords(term.width, image_width, xpadding)
+    for x in xcoords:
+        _show_single(x, 0, thumbnail_size)
 
 
 # Main functions that organise work
@@ -189,11 +195,12 @@ def config_assistance():
     if ans in {'1', 'a'}:
         size = thumbnail_size_assistant()
     else:
-        size = config.thumbnail_size_config()
+        size = config.thumbnail_size_config()  # Fallback
 
     if ans in {'2', 'a'}:
         xpadding, image_width = xpadding_assistant(size)
     else:
+        # Fallbacks
         _, xpadding = config.get_gen_users_settings()
         image_width, _ = config._width_padding('width', 'x', (0, 2))
 
@@ -204,8 +211,9 @@ def config_assistance():
         page_spacing = page_spacing_assistant(size)
 
     if ans in {'5', 'a'}:
-        # TODO: Propagate thumbnail size & paddings
-        gallery_print_spacing = gallery_print_spacing_assistant()
+        gallery_print_spacing = gallery_print_spacing_assistant(
+            size, xpadding, image_width
+        )
 
     if ans in {'6', 'a'}:
         user_info_xcoord = user_print_name_spacing_assistant(
@@ -288,7 +296,7 @@ def xpadding_assistant(thumbnail_size):
     return abstract_padding(
             thumbnail_size,
             show_single_x,
-            config.xcoords_config()[0],
+            config.xcoords_config()[0],  # Default
             xpadding_assistant.__doc__,
             'x',
             'width',
@@ -309,7 +317,7 @@ def ypadding_assistant(thumbnail_size):
     return abstract_padding(
             thumbnail_size,
             show_single_y,
-            config.xcoords_config()[1],
+            config.xcoords_config()[1],  # Default
             ypadding_assistant.__doc__,
             'y',
             'height',
@@ -432,28 +440,28 @@ def page_spacing_assistant(thumbnail_size):
     return input()
 
 
-def gallery_print_spacing_assistant():
-    print('\n=== Gallery print spacing ===')
-    print('Print spacing is the number of blank spaces between each number')
-    print('For example:')
-    print('x' * 9, '1', 'x' * 17, '2', 'x' * 17, '3', '...', sep='')
-
+def gallery_print_spacing_assistant(size, image_width, xpadding):
     # TODO: print key info in selecting screen
+    print('\n=== Gallery print spacing ===')
     print('\nUse +/= to increase the spacing, and -/_ to decrease it')
     print('Use q to exit the program, and press enter to go to the next assistant\n')
     print('Use left and right arrow keys to change the current space selection')
-
-    print('\nPick a directory to preview in grid first')
-
-    input('\nEnter any key to continue\n')
+    print('\nDo you want to preview an existing cache dir? [y/n]\n'
+          "To keep your chosen thumbnail size, image width and x spacing, select 'n'.")
+    ans = input()
     os.system('clear')
 
-    path = pick_dir()
-    data = FakeData(path)
-    lscat.show_instant(lscat.TrackDownloads, data)
+    if ans == 'y':
+        path = pick_dir()
+        data = FakeData(path)
+        lscat.show_instant(lscat.TrackDownloads, data)
+        ncols = config.ncols_config()  # Default fallback, on user choice
+    else:
+        show_instant_sample(size, image_width, xpadding)
+        ncols = pure.ncols(term.width, image_width, xpadding)
+
     print('\n')
 
-    ncols = config.ncols_config()
     spacing = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
     current_selection = 0
 
@@ -502,8 +510,7 @@ def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
     """
     print_doc(user_print_name_spacing_assistant.__doc__)
 
-    # Spacing is needed for a default xcoord
-    spacing, _ = config.get_gen_users_settings()
+    spacing, _ = config.get_gen_users_settings()  # Default
     preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
 
     display_user_row(thumbnail_size, preview_xcoords, xpadding)

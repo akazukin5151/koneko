@@ -286,10 +286,10 @@ def xpadding_assistant(thumbnail_size):
             thumbnail_size,
             show_single,
             config.xcoords_config()[0],
-            'x',
-            False,
             xpadding_assistant.__doc__,
-            'width'
+            'x',
+            'width',
+            False,
         )
 
 def ypadding_assistant(thumbnail_size):
@@ -307,18 +307,33 @@ def ypadding_assistant(thumbnail_size):
             thumbnail_size,
             show_single_y,
             config.xcoords_config()[1],
-            'y',
-            True,
             ypadding_assistant.__doc__,
-            'height'
+            'y',
+            'height',
+            True,
         )
 
-def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc, width_or_height):
+def abstract_padding(
+        thumbnail_size: int,
+        show_func: 'func',
+        default_x: int,
+        doc: str,
+        dimension: str,
+        width_or_height: str,
+        move: bool,
+    ) -> 'IO':
+
     print_doc(doc)
 
     show_single(default_x, thumbnail_size)
 
-    image_width, image = find_image_width(thumbnail_size, show_func, move, width_or_height)
+    image_width, image = find_image_width(
+        thumbnail_size,
+        show_func,
+        move,
+        width_or_height
+    )
+
     if move:
         move_cursor_down(image_width)
 

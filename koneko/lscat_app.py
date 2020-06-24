@@ -223,7 +223,7 @@ def config_assistance():
         )
 
 
-    print('\nYour recommended settings are:')
+    print('\n\nYour recommended settings are:')
     if ans in {'1', 'a'}:
         print(f'image_thumbnail_size = {size}')
 
@@ -417,6 +417,7 @@ def find_image_width(thumbnail_size, show_func, move, width_or_height):
 
 def page_spacing_assistant(thumbnail_size):
     # This doesn't use print_doc() as a clean state is needed
+    os.system('clear')
     print('\n=== Page spacing ===')
     print('This will display an image, then print newlines.')
     print('Your desired setting is the number when '
@@ -441,15 +442,16 @@ def page_spacing_assistant(thumbnail_size):
 
 
 def gallery_print_spacing_assistant(size, image_width, xpadding):
-    # TODO: print key info in selecting screen
-    print('\n=== Gallery print spacing ===')
-    print('\nUse +/= to increase the spacing, and -/_ to decrease it')
-    print('Use q to exit the program, and press enter to go to the next assistant\n')
-    print('Use left and right arrow keys to change the current space selection')
-    print('\nDo you want to preview an existing cache dir? [y/n]\n'
-          "To keep your chosen thumbnail size, image width and x spacing, select 'n'.")
+    """=== Gallery print spacing ===
+    Use +/= to increase the spacing, and -/_ to decrease it
+    Use q to exit the program, and press enter to go to the next assistant
+    Use left and right arrow keys to change the current space selection
+
+    Do you want to preview an existing cache dir? [y/n]
+    To keep your chosen thumbnail size, image width and x spacing, select 'n'.
+    """
+    print_doc(gallery_print_spacing_assistant.__doc__)
     ans = input()
-    os.system('clear')
 
     if ans == 'y':
         path = pick_dir()

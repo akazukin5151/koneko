@@ -108,12 +108,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Interactive helper UI to assist configuring lscat numbers (`lscat_app.py`).
     - [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
-    - [ ] ~~image_width~~ (remove)
-    - [ ] ~~image_height~~ (remove)
+    - [ ] image_width
+    - [ ] image_height
     - [x] images_x_spacing
     - [x] images_y_spacing 
-    - [x] number_of_columns (replace)
-    - [x] number_of_rows (replace)
     - [x] image_thumbnail_size 
     - [x] page_spacing 
     - [x] gallery_print_spacing 
@@ -126,7 +124,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 # Roadmap
 
-* Phase out `image_width` and `image_height` settings in favour of directly specifying number of columns and rows. In the lscat assistant, `images_x_spacing` and `images_y_spacing` will determine x and y coords of images (removing the need for `config.ncols_config`, `config.nrows_config`, `config.xcoords_config`, `config.ycoords_config`, `pure.ncols`, and `pure.nrows`). ncols and nrows will then be determined from its own setting.
 * In-depth usage documentation?
 * Consistent public and private methods and attributes again
 

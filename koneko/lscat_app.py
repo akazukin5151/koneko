@@ -180,11 +180,9 @@ def config_assistance():
         '1. Thumbnail size',
         '2. x-padding',
         '3. y-padding',
-        '4. Number of columns',
-        '5. Number of rows',
-        '6. Page spacing',
-        '7. Gallery print spacing',
-        '8. User mode print info x-position',
+        '4. Page spacing',
+        '5. Gallery print spacing',
+        '6. User mode print info x-position',
         'a. (Run all of the above)\n'), sep='\n')
     ans = input()
 
@@ -200,18 +198,12 @@ def config_assistance():
         ypadding = ypadding_assistant(size)
 
     if ans in {'4', 'a'}:
-        ncols = ncols_assistant(size)
-
-    if ans in {'5', 'a'}:
-        nrows = nrows_assistant(size)
-
-    if ans in {'6', 'a'}:
         page_spacing = page_spacing_assistant(size)
 
-    if ans in {'7', 'a'}:
+    if ans in {'5', 'a'}:
         gallery_print_spacing = gallery_print_spacing_assistant()
 
-    if ans in {'8', 'a'}:
+    if ans in {'6', 'a'}:
         user_info_xcoord = user_print_name_spacing_assistant(size)
 
 
@@ -226,19 +218,13 @@ def config_assistance():
         print(f'images_y_spacing = {ypadding}')
 
     if ans in {'4', 'a'}:
-        print(f'number_of_columns = {ncols}')
-
-    if ans in {'5', 'a'}:
-        print(f'number_of_rows = {nrows}')
-
-    if ans in {'6', 'a'}:
         print(f'page_spacing = {page_spacing}')
 
-    if ans in {'7', 'a'}:
+    if ans in {'5', 'a'}:
         print(f'gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
-    if ans in {'8', 'a'}:
+    if ans in {'6', 'a'}:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 
     input('\nEnter any key to quit\n')
@@ -410,86 +396,6 @@ def find_image_width(thumbnail_size, show_func, move, width_or_height):
             image = show_func(spaces, thumbnail_size)
             valid = True
 
-
-def ncols_assistant(thumbnail_size):
-    """=== Number of columns ===
-    Use +/= to show another column, and -/_ to hide the rightmost column
-    Increase the number of columns just until no more can fit in your screen
-
-    Use q to exit the program, and press enter to go to the next assistant
-    """
-    print_doc(ncols_assistant.__doc__)
-
-    xcoords = config.xcoords_config() * 2
-
-    show_single_x(xcoords[0], thumbnail_size)
-
-    images = []  # LIFO stack
-    i = 0  # Zero index to make indexing `images` easier
-    with term.cbreak():
-        while True:
-            erase_line()
-            print(f'Number of columns = {i + 1}', end='', flush=True)
-
-            ans = term.inkey()
-            check_quit(ans)
-
-            if ans in PLUS:
-                images.append(show_single_x(xcoords[i + 1], thumbnail_size))
-                i += 1
-
-            elif ans in MINUS and images:
-                i -= 1
-                images[i].hide()
-                images.pop(i)
-                move_cursor_up(1)
-
-            elif ans.code == ENTER:
-                print('')
-                return i + 1  # Zero index
-
-
-def nrows_assistant(thumbnail_size):
-    """=== Number of rows ===
-    Use +/= to show another row, and -/_ to hide the bottom-most row
-    Increase the number of rows just until no more can fit in your screen
-
-    Use q to exit the program, and press enter to go to the next assistant
-    """
-    print_doc(nrows_assistant.__doc__)
-
-    # FIXME: remove this dependency to also allow users to add arbitary new rows
-    # And also extract out common code between ncols and nrows assistants
-    ycoords = config.ycoords_config() * 2
-
-    show_single_y(ycoords[0], thumbnail_size)
-
-    images = []  # LIFO stack
-    i = 0  # Zero index to make indexing `images` easier
-    with term.cbreak():
-        while True:
-            # This fixes the cursor at row 5 (ignores 10)
-            # Works for some magical reason so I'm leaving it for now
-            print("\033[5;10H")
-            erase_line()
-            print(f'Number of rows = {i + 1}', end='', flush=True)
-
-            ans = term.inkey()
-            check_quit(ans)
-
-            if ans in PLUS:
-                images.append(show_single_y(ycoords[i + 1], thumbnail_size))
-                i += 1
-
-            elif ans in MINUS and images:
-                i -= 1
-                images[i].hide()
-                images.pop(i)
-                move_cursor_up(1)
-
-            elif ans.code == ENTER:
-                print('\n' * 10)
-                return i + 1  # Zero index
 
 def page_spacing_assistant(thumbnail_size):
     # This doesn't use print_doc() as a clean state is needed

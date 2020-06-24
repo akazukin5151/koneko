@@ -81,16 +81,16 @@ def print_info(message_xcoord):
     print(' ' * message_xcoord, '000', '\n',
           ' ' * message_xcoord, 'Example artist', sep='')
 
-
-def show_single(x, thumbnail_size):
+def _show_single(x, y, thumbnail_size):
     img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
-    img.show(align='left', x=x, y=0)
+    img.show(align='left', x=x, y=y)
     return img
+
+def show_single_x(x, thumbnail_size):
+    return _show_single(x, 0, thumbnail_size)
 
 def show_single_y(y, thumbnail_size):
-    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
-    img.show(align='left', x=config.xcoords_config()[1], y=y)
-    return img
+    return _show_single(config.xcoords_config()[1], y, thumbnail_size)
 
 
 # Main functions that organise work
@@ -285,7 +285,7 @@ def xpadding_assistant(thumbnail_size):
     """
     return abstract_padding(
             thumbnail_size,
-            show_single,
+            show_single_x,
             config.xcoords_config()[0],
             xpadding_assistant.__doc__,
             'x',
@@ -326,7 +326,7 @@ def abstract_padding(
 
     print_doc(doc)
 
-    show_single(default_x, thumbnail_size)
+    show_single_x(default_x, thumbnail_size)
 
     image_width, image = find_image_width(
         thumbnail_size,
@@ -416,7 +416,7 @@ def ncols_assistant(thumbnail_size):
 
     xcoords = config.xcoords_config() * 2
 
-    show_single(xcoords[0], thumbnail_size)
+    show_single_x(xcoords[0], thumbnail_size)
 
     images = []  # LIFO stack
     i = 0  # Zero index to make indexing `images` easier
@@ -429,7 +429,7 @@ def ncols_assistant(thumbnail_size):
             check_quit(ans)
 
             if ans in PLUS:
-                images.append(show_single(xcoords[i + 1], thumbnail_size))
+                images.append(show_single_x(xcoords[i + 1], thumbnail_size))
                 i += 1
 
             elif ans in MINUS and images:

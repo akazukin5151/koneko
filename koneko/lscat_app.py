@@ -77,6 +77,11 @@ def show_single(x, thumbnail_size):
     img.show(align='left', x=x, y=0)
     return img
 
+def show_single_y(y, thumbnail_size):
+    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
+    img.show(align='left', x=config.xcoords_config()[1], y=y)
+    return img
+
 
 # Main functions that organise work
 def main():
@@ -183,6 +188,9 @@ def config_assistance():
     if ans in {'2', 'a'}:
         xpadding = xpadding_assistant(size)
 
+    if ans in {'3', 'a'}:
+        ypadding = ypadding_assistant(size)
+
     if ans in {'4', 'a'}:
         ncols = ncols_assistant(size)
 
@@ -202,6 +210,9 @@ def config_assistance():
 
     if ans in {'2', 'a'}:
         print(f'images_x_spacing = {xpadding}')
+
+    if ans in {'3', 'a'}:
+        print(f'images_y_spacing = {ypadding}')
 
     if ans in {'4', 'a'}:
         print(f'number_of_columns = {ncols}')
@@ -301,14 +312,19 @@ def xpadding_assistant(thumbnail_size):
             image = show_single(image_width + spaces, thumbnail_size)
 
 
-def find_image_width(thumbnail_size):
+def find_image_width(thumbnail_size, func=show_single, move=False):
     image = None
     spaces = 0
     valid = True
 
+    if move:
+        move_cursor_down(1)
+
     while True:
         with term.cbreak():
             if valid:
+                if move:
+                    move_cursor_up(spaces)
                 erase_line()
                 print(f'image width = {spaces}', end='', flush=True)
 
@@ -335,8 +351,56 @@ def find_image_width(thumbnail_size):
                 valid = False
                 continue
 
-            image = show_single(spaces, thumbnail_size)
+            image = func(spaces, thumbnail_size)
             valid = True
+
+
+def ypadding_assistant(thumbnail_size):
+    """=== Image y spacing ===
+    1) Move the second image so that it is just to the bottom of the first image
+       Use +/= to move it downwards, and -/_ to move it upwards.
+       Press enter to confirm
+
+    2) Based on the current height of the second image, adjust its height to suit you.
+       This value will be the y spacing
+
+    Use q to exit the program, and press enter to go to the next assistant
+    """
+    print_doc(xpadding_assistant.__doc__)
+
+    show_single(config.xcoords_config()[1], thumbnail_size)
+
+    image_width, image = find_image_width(thumbnail_size, show_single_y, True)
+    move_cursor_down(image_width)
+
+    spaces = 0
+    while True:
+        with term.cbreak():
+            if spaces > 0:
+                move_cursor_up(spaces)  # TODO: func should do nothing on 0
+            print('\r' + ' ' * 20, end='', flush=True)
+            print('\r', end='', flush=True)
+            print(f'y spacing = {spaces}', end='', flush=True)
+
+            ans = term.inkey()
+
+            if ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                return spaces
+
+            elif spaces >= 0:
+                image.hide()
+                move_cursor_up(1)
+
+            if ans in {'+', '='}:
+                spaces += 1
+
+            elif ans in {'-', '_'} and spaces > 0:
+                spaces -= 1
+
+            image = show_single_y(image_width + spaces, thumbnail_size)
 
 
 def ncols_assistant(thumbnail_size):

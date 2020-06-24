@@ -108,8 +108,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Interactive helper UI to assist configuring lscat numbers (`lscat_app.py`).
     - [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
-    - [ ] image_width
-    - [ ] image_height
+    - [x] image_width
+    - [x] image_height
     - [x] images_x_spacing
     - [x] images_y_spacing 
     - [x] image_thumbnail_size 

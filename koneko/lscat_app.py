@@ -19,10 +19,12 @@ SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
 # Utility functions used in multiple places
 def move_cursor_up(num):
-    print(f'\033[{num}A', end='', flush=True)
+    if num > 0:
+        print(f'\033[{num}A', end='', flush=True)
 
 def move_cursor_down(num=1):
-    print(f'\033[{num}B', end='', flush=True)
+    if num > 0:
+        print(f'\033[{num}B', end='', flush=True)
 
 def erase_line():
     print('\033[K', end='', flush=True)
@@ -267,46 +269,6 @@ def thumbnail_size_assistant():
             # TODO: preview a grid with chosen size
 
 
-def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc):
-    print_doc(doc)
-
-    show_single(default_x, thumbnail_size)
-
-    image_width, image = find_image_width(thumbnail_size, show_func, move)
-    if move:
-        move_cursor_down(image_width)
-
-    spaces = 0
-
-    while True:
-        with term.cbreak():
-            if move and spaces > 0:
-                move_cursor_up(spaces)  # TODO: func should do nothing on 0
-            print('\r' + ' ' * 20, end='', flush=True)
-            print('\r', end='', flush=True)
-            print(f'{dimension} spacing = {spaces}', end='', flush=True)
-
-            ans = term.inkey()
-
-            if ans == 'q':
-                sys.exit(0)
-
-            elif ans.code == 343:  # Enter
-                return spaces
-
-            elif spaces >= 0:
-                image.hide()
-                move_cursor_up(1)
-
-            if ans in {'+', '='}:
-                spaces += 1
-
-            elif ans in {'-', '_'} and spaces > 0:
-                spaces -= 1
-
-            image = show_func(image_width + spaces, thumbnail_size)
-
-
 def xpadding_assistant(thumbnail_size):
     """=== Image x spacing ===
     1) Move the second image so that it is just to the right of the first image
@@ -346,6 +308,46 @@ def ypadding_assistant(thumbnail_size):
             True,
             ypadding_assistant.__doc__
         )
+
+def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc):
+    print_doc(doc)
+
+    show_single(default_x, thumbnail_size)
+
+    image_width, image = find_image_width(thumbnail_size, show_func, move)
+    if move:
+        move_cursor_down(image_width)
+
+    spaces = 0
+
+    while True:
+        with term.cbreak():
+            if move:
+                move_cursor_up(spaces)
+            print('\r' + ' ' * 20, end='', flush=True)
+            print('\r', end='', flush=True)
+            print(f'{dimension} spacing = {spaces}', end='', flush=True)
+
+            ans = term.inkey()
+
+            if ans == 'q':
+                sys.exit(0)
+
+            elif ans.code == 343:  # Enter
+                return spaces
+
+            elif spaces >= 0:
+                image.hide()
+                move_cursor_up(1)
+
+            if ans in {'+', '='}:
+                spaces += 1
+
+            elif ans in {'-', '_'} and spaces > 0:
+                spaces -= 1
+
+            image = show_func(image_width + spaces, thumbnail_size)
+
 
 def find_image_width(thumbnail_size, show_func, move):
     image = None

@@ -111,7 +111,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] ~~image_width~~ (remove)
     - [ ] ~~image_height~~ (remove)
     - [x] images_x_spacing
-    - [ ] images_y_spacing 
+    - [x] images_y_spacing 
     - [x] number_of_columns (replace)
     - [ ] number_of_rows (replace)
     - [x] image_thumbnail_size 

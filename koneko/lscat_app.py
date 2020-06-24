@@ -3,6 +3,7 @@ import sys
 import time
 from copy import copy
 from pathlib import Path
+from abc import ABC, abstractmethod
 
 from pixcat import Image
 from blessed import Terminal
@@ -266,30 +267,24 @@ def thumbnail_size_assistant():
             # TODO: preview a grid with chosen size
 
 
-def xpadding_assistant(thumbnail_size):
-    """=== Image x spacing ===
-    1) Move the second image so that it is just to the right of the first image
-       Use +/= to move it to the right, and -/_ to move it to the left.
-       Press enter to confirm
+def abstract_padding(thumbnail_size, show_func, default_x, dimension, move, doc):
+    print_doc(doc)
 
-    2) Based on the position of the second image, adjust its position to suit you.
-       This value will be the x spacing
+    show_single(default_x, thumbnail_size)
 
-    Use q to exit the program, and press enter to go to the next assistant
-    """
-    print_doc(xpadding_assistant.__doc__)
-
-    show_single(config.xcoords_config()[0], thumbnail_size)
-
-    image_width, image = find_image_width(thumbnail_size)
+    image_width, image = find_image_width(thumbnail_size, show_func, move)
+    if move:
+        move_cursor_down(image_width)
 
     spaces = 0
+
     while True:
         with term.cbreak():
-            # erase_line() doesn't work here
+            if move and spaces > 0:
+                move_cursor_up(spaces)  # TODO: func should do nothing on 0
             print('\r' + ' ' * 20, end='', flush=True)
             print('\r', end='', flush=True)
-            print(f'x spacing = {spaces}', end='', flush=True)
+            print(f'{dimension} spacing = {spaces}', end='', flush=True)
 
             ans = term.inkey()
 
@@ -309,10 +304,50 @@ def xpadding_assistant(thumbnail_size):
             elif ans in {'-', '_'} and spaces > 0:
                 spaces -= 1
 
-            image = show_single(image_width + spaces, thumbnail_size)
+            image = show_func(image_width + spaces, thumbnail_size)
 
 
-def find_image_width(thumbnail_size, func=show_single, move=False):
+def xpadding_assistant(thumbnail_size):
+    """=== Image x spacing ===
+    1) Move the second image so that it is just to the right of the first image
+       Use +/= to move it to the right, and -/_ to move it to the left.
+       Press enter to confirm
+
+    2) Based on the position of the second image, adjust its position to suit you.
+       This value will be the x spacing
+
+    Use q to exit the program, and press enter to go to the next assistant
+    """
+    return abstract_padding(
+            thumbnail_size,
+            show_single,
+            config.xcoords_config()[0],
+            'x',
+            False,
+            xpadding_assistant.__doc__
+        )
+
+def ypadding_assistant(thumbnail_size):
+    """=== Image y spacing ===
+    1) Move the second image so that it is just to the bottom of the first image
+       Use +/= to move it downwards, and -/_ to move it upwards.
+       Press enter to confirm
+
+    2) Based on the current height of the second image, adjust its height to suit you.
+       This value will be the y spacing
+
+    Use q to exit the program, and press enter to go to the next assistant
+    """
+    return abstract_padding(
+            thumbnail_size,
+            show_single_y,
+            config.xcoords_config()[1],
+            'y',
+            True,
+            ypadding_assistant.__doc__
+        )
+
+def find_image_width(thumbnail_size, show_func, move):
     image = None
     spaces = 0
     valid = True
@@ -351,56 +386,8 @@ def find_image_width(thumbnail_size, func=show_single, move=False):
                 valid = False
                 continue
 
-            image = func(spaces, thumbnail_size)
+            image = show_func(spaces, thumbnail_size)
             valid = True
-
-
-def ypadding_assistant(thumbnail_size):
-    """=== Image y spacing ===
-    1) Move the second image so that it is just to the bottom of the first image
-       Use +/= to move it downwards, and -/_ to move it upwards.
-       Press enter to confirm
-
-    2) Based on the current height of the second image, adjust its height to suit you.
-       This value will be the y spacing
-
-    Use q to exit the program, and press enter to go to the next assistant
-    """
-    print_doc(xpadding_assistant.__doc__)
-
-    show_single(config.xcoords_config()[1], thumbnail_size)
-
-    image_width, image = find_image_width(thumbnail_size, show_single_y, True)
-    move_cursor_down(image_width)
-
-    spaces = 0
-    while True:
-        with term.cbreak():
-            if spaces > 0:
-                move_cursor_up(spaces)  # TODO: func should do nothing on 0
-            print('\r' + ' ' * 20, end='', flush=True)
-            print('\r', end='', flush=True)
-            print(f'y spacing = {spaces}', end='', flush=True)
-
-            ans = term.inkey()
-
-            if ans == 'q':
-                sys.exit(0)
-
-            elif ans.code == 343:  # Enter
-                return spaces
-
-            elif spaces >= 0:
-                image.hide()
-                move_cursor_up(1)
-
-            if ans in {'+', '='}:
-                spaces += 1
-
-            elif ans in {'-', '_'} and spaces > 0:
-                spaces -= 1
-
-            image = show_single_y(image_width + spaces, thumbnail_size)
 
 
 def ncols_assistant(thumbnail_size):

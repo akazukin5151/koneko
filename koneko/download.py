@@ -126,7 +126,7 @@ def download_url_verified(url, png=False) -> 'IO':
     url, filename, filepath = pure.full_img_details(url, png=png)
     download_path = Path('~/Downloads').expanduser()
 
-    download_url(download_path, url, filename, try_make_dir=False)
+    download_url(download_path, url, filename)
 
     verified = utils.verify_full_download(filepath)
     if not verified:

@@ -356,9 +356,6 @@ def find_image_width(thumbnail_size, show_func, move, width_or_height):
     spaces = 0
     valid = True
 
-    if move:
-        move_cursor_down(1)
-
     with term.cbreak():
         while True:
             if valid:

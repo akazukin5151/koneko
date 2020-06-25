@@ -360,8 +360,7 @@ def abstract_padding(
         while True:
             if move:
                 move_cursor_up(spaces)
-            write('\r' + ' ' * 20)
-            write('\r')
+            write('\r' + ' ' * 20 + '\r')
             write(f'{dimension} spacing = {spaces}')
 
             ans = term.inkey()
@@ -390,16 +389,15 @@ def find_image_width(thumbnail_size, show_func, move, width_or_height):
 
     with term.cbreak():
         while True:
-            if valid:
-                if move:
-                    move_cursor_up(spaces)
-                erase_line()
-                write(f'image {width_or_height} = {spaces}')
+            if move:
+                move_cursor_up(spaces)
+            erase_line()
+            write(f'image {width_or_height} = {spaces}')
 
             ans = term.inkey()
             check_quit(ans)
 
-            if ans.code == ENTER:
+            if ans.code == ENTER and image:
                 erase_line()
                 return spaces, image
 
@@ -413,12 +411,7 @@ def find_image_width(thumbnail_size, show_func, move, width_or_height):
             elif ans in MINUS and spaces > 0:
                 spaces -= 1
 
-            else:
-                valid = False
-                continue
-
             image = show_func(spaces, thumbnail_size)
-            valid = True
 
 
 def page_spacing_assistant(thumbnail_size):
@@ -470,6 +463,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
 
     print('\n')
 
+    # Just the default settings; len(first_list) == 5
     spacing = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
     current_selection = 0
 
@@ -495,14 +489,13 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
                     spacing[current_selection] = 0
 
             # right arrow
-            elif ans.code == 261 or ans in {'d', 'l'}:
+            elif (ans.code == 261 or ans in {'d', 'l'} and
+                    current_selection < len(spacing)):
                 current_selection += 1
-                if current_selection >= len(spacing):
-                    current_selection -= 1
 
             # left arrow
-            elif ans.code == 260 or ans in {'a', 'h'}:
-                if current_selection > 0:
+            elif (ans.code == 260 or ans in {'a', 'h'} and
+                    current_selection > 0):
                     current_selection -= 1
 
             elif ans.code == ENTER:
@@ -539,9 +532,8 @@ def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
             if ans in PLUS:
                 spacing += 1
 
-            elif ans in MINUS:
-                if spacing > 0:
-                    spacing -= 1
+            elif ans in MINUS and spacing > 0:
+                spacing -= 1
 
             elif ans.code == ENTER:
                 print('\n' * 3)

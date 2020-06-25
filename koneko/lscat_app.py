@@ -359,6 +359,15 @@ class AbstractImageAdjuster(ABC):
     def is_input_valid(self):
         raise NotImplementedError
 
+    def hide_show_print(self):
+        hide_if_exist(self.image)
+
+        self.image = self.show_func_args()
+
+        self.maybe_move_up()
+        write('\r' + ' ' * 20 + '\r')
+        self.write()
+
     def start(self):
         self.maybe_move_down()
 
@@ -368,13 +377,7 @@ class AbstractImageAdjuster(ABC):
         with term.cbreak():
             while True:
                 if self.is_input_valid():
-                    hide_if_exist(self.image)
-
-                    self.image = self.show_func_args()
-
-                    self.maybe_move_up()
-                    write('\r' + ' ' * 20 + '\r')
-                    self.write()
+                    self.hide_show_print()
 
                 ans = term.inkey()
                 check_quit(ans)
@@ -436,7 +439,7 @@ class XPadding(AbstractPadding):
         # Padding ABC
         self.doc = xpadding_assistant.__doc__
         self.default_x = config.xcoords_config()[0]
-        self.find_dim_func = FindImageDimensionX
+        self.find_dim_func = FindImageWidth
 
     def write(self):
         write(f'x spacing = {self.spaces}')
@@ -448,7 +451,10 @@ class XPadding(AbstractPadding):
         return True
 
     def show_func_args(self):
-        return self.show_func(self.default_x + self.width_or_height + self.spaces, self.thumbnail_size)
+        return self.show_func(
+            self.default_x + self.width_or_height + self.spaces,
+            self.thumbnail_size
+        )
 
 
 class YPadding(AbstractPadding):
@@ -462,7 +468,7 @@ class YPadding(AbstractPadding):
         # Padding ABC
         self.doc = ypadding_assistant.__doc__
         self.default_x = config.xcoords_config()[1]
-        self.find_dim_func = FindImageDimensionY
+        self.find_dim_func = FindImageHeight
 
     def write(self):
         write(f'y spacing = {self.spaces}')
@@ -474,12 +480,17 @@ class YPadding(AbstractPadding):
         move_cursor_up(self.spaces)
 
     def show_func_args(self):
-        return self.show_func(self.width_or_height + self.spaces, self.thumbnail_size)
+        return self.show_func(
+            self.width_or_height + self.spaces,
+            self.thumbnail_size
+        )
 
 
-class AbstractFindImageDimension(AbstractImageAdjuster, ABC):
-    def __init__(self, thumbnail_size):
-        self.thumbnail_size = thumbnail_size
+class FindImageDimension(AbstractImageAdjuster, ABC):
+    def __init__(self):
+        # Base
+        # Defined in child classes
+        self.thumbnail_size: int
         self.show_func: 'func'
         self.side_label: str
         self.start_spaces: int
@@ -504,25 +515,25 @@ class AbstractFindImageDimension(AbstractImageAdjuster, ABC):
         return self.spaces >= self.start_spaces and self.valid
 
 
-class FindImageDimensionX(AbstractFindImageDimension):
+class FindImageWidth(FindImageDimension):
     def __init__(self, thumbnail_size):
         self.thumbnail_size = thumbnail_size
         self.show_func = show_single_x
         self.side_label = 'width'
         self.start_spaces = config.xcoords_config()[0]
-        self.image = None
+        super().__init__()
 
     def maybe_move_up(self):
         return True
 
 
-class FindImageDimensionY(AbstractFindImageDimension):
+class FindImageHeight(FindImageDimension):
     def __init__(self, thumbnail_size):
         self.thumbnail_size = thumbnail_size
         self.show_func = show_single_y
         self.side_label = 'height'
         self.start_spaces = 0
-        self.image = None
+        super().__init__()
 
     def maybe_move_up(self):
         move_cursor_up(self.spaces)

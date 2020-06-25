@@ -609,7 +609,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
 
             # right arrow
             elif (ans.code == 261 or ans in {'d', 'l'} and
-                    current_selection < len(spacings)):
+                    current_selection < len(spacings) - 1):
                 current_selection += 1
 
             # left arrow

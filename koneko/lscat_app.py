@@ -302,7 +302,6 @@ def xpadding_assistant(thumbnail_size):
             xpadding_assistant.__doc__,
             'x',
             'width',
-            False,
         )
 
 def ypadding_assistant(thumbnail_size):
@@ -317,14 +316,14 @@ def ypadding_assistant(thumbnail_size):
     Use q to exit the program, and press enter to go to the next assistant
     """
     return abstract_padding(
-            thumbnail_size,
-            show_single_y,
-            config.xcoords_config()[1],  # Default
-            ypadding_assistant.__doc__,
-            'y',
-            'height',
-            True,
-        )
+        thumbnail_size,
+        show_single_y,
+        config.xcoords_config()[1],  # Default
+        ypadding_assistant.__doc__,
+        'y',
+        'height',
+    )
+
 
 def abstract_padding(
         thumbnail_size: int,
@@ -333,31 +332,38 @@ def abstract_padding(
         doc: str,
         dimension: str,
         side_label: str,
-        move: bool,
     ) -> 'IO[tuple[int, int]]':
 
     print_doc(doc)
 
     show_single_x(default_x, thumbnail_size)
-
+    # REFACTOR: the while loop in that function is similar to this one as well
     width_or_height, image = find_image_dimension(
         thumbnail_size,
         show_func,
-        move,
-        side_label
+        side_label,
+        default_x if dimension == 'x' else 0
     )
 
-    if move:
+    if dimension == 'y':
         move_cursor_down(width_or_height)
 
     spaces = 0
+    valid = True
 
     with term.cbreak():
         while True:
-            if move:
-                move_cursor_up(spaces)
-            write('\r' + ' ' * 20 + '\r')
-            write(f'{dimension} spacing = {spaces}')
+            if valid:
+                maybe_hide(image)
+
+                if dimension == 'y':
+                    image = show_func(width_or_height + spaces, thumbnail_size)
+                else:
+                    image = show_func(default_x + width_or_height + spaces, thumbnail_size)
+
+                maybe_move(dimension == 'y', spaces)
+                write('\r' + ' ' * 20 + '\r')
+                write(f'{dimension} spacing = {spaces}')
 
             ans = term.inkey()
             check_quit(ans)
@@ -365,49 +371,62 @@ def abstract_padding(
             if ans.code == ENTER:
                 return spaces, width_or_height
 
-            if spaces >= 0:
-                image.hide()
-                move_cursor_up(1)
-
             if ans in PLUS:
                 spaces += 1
+                valid = True
 
             elif ans in MINUS and spaces > 0:
                 spaces -= 1
+                valid = True
 
-            image = show_func(width_or_height + spaces, thumbnail_size)
+            else:
+                valid = False
 
 
-def find_image_dimension(thumbnail_size, show_func, move, side_label):
+def maybe_hide(image):
+    if image:
+        image.hide()
+        move_cursor_up(1)
+
+def maybe_move(cond, spaces):
+    if cond:
+        move_cursor_up(spaces)
+
+
+def find_image_dimension(thumbnail_size, show_func, side_label, default_x):
     image = None
-    spaces = 0
+    spaces = default_x
+    valid = True
 
-    # FIXME: on invalid input, an image will be displayed at x=0 but never moved.
     with term.cbreak():
         while True:
-            if move:
-                move_cursor_up(spaces)
-            erase_line()
-            write(f'image {side_label} = {spaces}')
+            if spaces >= default_x and valid:
+                maybe_hide(image)
+
+                image = show_func(spaces, thumbnail_size)
+
+                maybe_move(side_label == 'height', spaces)
+                erase_line()
+                write(f'image {side_label} = {spaces - default_x}')
 
             ans = term.inkey()
             check_quit(ans)
 
             if ans.code == ENTER and image:
                 erase_line()
-                return spaces, image
-
-            if spaces > 0 and image:  # Why this condition?
-                image.hide()
-                move_cursor_up(1)
+                return spaces - default_x, image
 
             if ans in PLUS:
                 spaces += 1
+                valid = True
 
-            elif ans in MINUS and spaces > 0:
+            elif ans in MINUS and spaces > default_x:
                 spaces -= 1
+                valid = True
 
-            image = show_func(spaces, thumbnail_size)
+            else:
+                valid = False
+
 
 
 def page_spacing_assistant(thumbnail_size):

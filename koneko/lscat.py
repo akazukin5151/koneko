@@ -164,10 +164,11 @@ def generate_users(path, print_info=True) -> 'IO':
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
-        message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
-        if print_info:  # Print the message (artist name)
-            print(' ' * message_xcoord, message)
+        if print_info:
+            print(' ' * message_xcoord, number, '\n',
+                  ' ' * message_xcoord, artist_name,
+                  sep='')
         print('\n' * page_spacing)  # Scroll to new 'page'
 
         with utils.cd(path):

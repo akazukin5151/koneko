@@ -543,17 +543,19 @@ class FindImageHeight(FindImageDimension):
 def page_spacing_assistant(thumbnail_size):
     # This doesn't use print_doc() as a clean state is needed
     os.system('clear')
-    print('=== Page spacing ===')
-    print('This will display an image, then print newlines.')
-    print('Your desired setting is the number when '
-          'the image completely scrolls out of view')
+    print(*(
+        '=== Page spacing ===',
+        'This will display an image, then print newlines.',
+        'Your desired setting is the number when '
+        'the image completely scrolls out of view',),
+      sep='\n')
 
     input('\nEnter any key to continue\n')
     os.system('clear')
 
     copy(SAMPLE_IMAGE).thumbnail(thumbnail_size).show(align='left')
 
-    time.sleep(0.5)
+    time.sleep(0.1)
 
     for i in range(term.height + 5):
         print(i)
@@ -563,7 +565,12 @@ def page_spacing_assistant(thumbnail_size):
           'what is the largest number?')
     print('(By default on kitty, ctrl+shift+up/down '
           'scrolls up/down a line)')
-    return input()
+
+    while True:
+        ans = input()
+        if ans.isdigit():
+            return ans
+        print('Must enter a number!')
 
 
 def gallery_print_spacing_assistant(size, image_width, xpadding):

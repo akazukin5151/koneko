@@ -3,12 +3,11 @@ import sys
 import time
 from copy import copy
 from pathlib import Path
-from abc import ABC, abstractmethod
 
 from pixcat import Image
 from blessed import Terminal
 
-from koneko import KONEKODIR, lscat, config, pure
+from koneko import KONEKODIR, pure, lscat, config
 
 
 # Globals
@@ -21,25 +20,28 @@ ENTER = 343
 
 
 # Utility functions used in multiple places
+def write(string):
+    print(string, end='', flush=True)
+
 def check_quit(ans):
     if ans == 'q':
         sys.exit(0)
 
 def move_cursor_up(num):
     if num > 0:
-        print(f'\033[{num}A', end='', flush=True)
+        write(f'\033[{num}A')
 
 def move_cursor_down(num=1):
     if num > 0:
-        print(f'\033[{num}B', end='', flush=True)
+        write(f'\033[{num}B')
 
 def erase_line():
-    print('\033[K', end='', flush=True)
+    write('\033[K')
 
 def print_cols(spacing, ncols):
     for (idx, space) in enumerate(spacing[:ncols]):
-        print(' ' * int(space), end='', flush=True)
-        print(idx + 1, end='', flush=True)
+        write(' ' * int(space))
+        write(idx + 1)
 
 def line_width(spacing, ncols):
     return sum(spacing) + ncols
@@ -354,9 +356,9 @@ def abstract_padding(
         while True:
             if move:
                 move_cursor_up(spaces)
-            print('\r' + ' ' * 20, end='', flush=True)
-            print('\r', end='', flush=True)
-            print(f'{dimension} spacing = {spaces}', end='', flush=True)
+            write('\r' + ' ' * 20)
+            write('\r')
+            write(f'{dimension} spacing = {spaces}')
 
             ans = term.inkey()
             check_quit(ans)
@@ -388,7 +390,7 @@ def find_image_width(thumbnail_size, show_func, move, width_or_height):
                 if move:
                     move_cursor_up(spaces)
                 erase_line()
-                print(f'image {width_or_height} = {spaces}', end='', flush=True)
+                write(f'image {width_or_height} = {spaces}')
 
             ans = term.inkey()
             check_quit(ans)
@@ -447,8 +449,8 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     Use q to exit the program, and press enter to go to the next assistant
     Use left and right arrow keys to change the current space selection
 
-    Do you want to preview an existing cache dir? [y/n]
-    To keep your chosen thumbnail size, image width and x spacing, select 'n'.
+    Do you want to preview an existing cache dir? [y/N]
+    To keep your chosen thumbnail size, image width and x spacing, enter 'n'.
     """
     print_doc(gallery_print_spacing_assistant.__doc__)
     ans = input()

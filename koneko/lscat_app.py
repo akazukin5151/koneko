@@ -38,13 +38,13 @@ def move_cursor_down(num=1):
 def erase_line():
     write('\033[K')
 
-def print_cols(spacing, ncols):
-    for (idx, space) in enumerate(spacing[:ncols]):
+def print_cols(spacings, ncols):
+    for (idx, space) in enumerate(spacings[:ncols]):
         write(' ' * int(space))
         write(idx + 1)
 
-def line_width(spacing, ncols):
-    return sum(spacing) + ncols
+def line_width(spacings, ncols):
+    return sum(spacings) + ncols
 
 def print_doc(doc):
     """Prints a given string in the bottom of the terminal"""
@@ -413,12 +413,12 @@ def find_image_dimension(thumbnail_size, show_func, move, width_or_height):
 def page_spacing_assistant(thumbnail_size):
     # This doesn't use print_doc() as a clean state is needed
     os.system('clear')
-    print('\n=== Page spacing ===')
+    print('=== Page spacing ===')
     print('This will display an image, then print newlines.')
     print('Your desired setting is the number when '
           'the image completely scrolls out of view')
 
-    input('Enter any key to continue\n')
+    input('\nEnter any key to continue\n')
     os.system('clear')
 
     copy(SAMPLE_IMAGE).thumbnail(thumbnail_size).show(align='left')
@@ -460,14 +460,14 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     print('\n')
 
     # Just the default settings; len(first_list) == 5
-    spacing = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
+    spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
     current_selection = 0
 
     with term.cbreak():
         while True:
             move_cursor_up(2)
             erase_line()
-            print_cols(spacing, ncols)
+            print_cols(spacings, ncols)
             erase_line()
             print(f'\nAdjusting number {current_selection+1}', flush=True)
 
@@ -475,18 +475,18 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
             check_quit(ans)
 
             if ans in PLUS:
-                new = int(spacing[current_selection]) + 1
-                if line_width(spacing, ncols) < term.width:
-                    spacing[current_selection] = new
+                new = int(spacings[current_selection]) + 1
+                if line_width(spacings, ncols) < term.width:
+                    spacings[current_selection] = new
 
             elif ans in MINUS:
-                spacing[current_selection] = int(spacing[current_selection]) - 1
-                if spacing[current_selection] < 0:
-                    spacing[current_selection] = 0
+                spacings[current_selection] = int(spacings[current_selection]) - 1
+                if spacings[current_selection] < 0:
+                    spacings[current_selection] = 0
 
             # right arrow
             elif (ans.code == 261 or ans in {'d', 'l'} and
-                    current_selection < len(spacing)):
+                    current_selection < len(spacings)):
                 current_selection += 1
 
             # left arrow
@@ -495,7 +495,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
                     current_selection -= 1
 
             elif ans.code == ENTER:
-                return spacing
+                return spacings
 
 
 def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
@@ -507,7 +507,7 @@ def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
     """
     print_doc(user_print_name_spacing_assistant.__doc__)
 
-    spacing, _ = config.get_gen_users_settings()  # Default
+    spacings, _ = config.get_gen_users_settings()  # Default
     preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
 
     display_user_row(thumbnail_size, preview_xcoords, xpadding)
@@ -519,19 +519,19 @@ def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
             move_cursor_down()   # Go down and erase the second line
             erase_line()
             move_cursor_up(1)    # Go back up to the original position
-            print_info(spacing)  # Print info takes up 2 lines
+            print_info(spacings)  # Print info takes up 2 lines
             move_cursor_up(2)    # so go back to the top
 
             ans = term.inkey()
             check_quit(ans)
 
             if ans in PLUS:
-                spacing += 1
+                spacings += 1
 
-            elif ans in MINUS and spacing > 0:
-                spacing -= 1
+            elif ans in MINUS and spacings > 0:
+                spacings -= 1
 
             elif ans.code == ENTER:
                 print('\n' * 3)
-                return spacing
+                return spacings
 

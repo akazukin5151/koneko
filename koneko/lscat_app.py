@@ -505,7 +505,7 @@ def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
     """
     print_doc(user_print_name_spacing_assistant.__doc__)
 
-    spacings, _ = config.get_gen_users_settings()  # Default
+    spacing, _ = config.get_gen_users_settings()  # Default
     preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
 
     display_user_row(thumbnail_size, preview_xcoords, xpadding)
@@ -517,19 +517,19 @@ def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
             move_cursor_down()   # Go down and erase the second line
             erase_line()
             move_cursor_up(1)    # Go back up to the original position
-            print_info(spacings)  # Print info takes up 2 lines
+            print_info(spacing)  # Print info takes up 2 lines
             move_cursor_up(2)    # so go back to the top
 
             ans = term.inkey()
             check_quit(ans)
 
             if ans in PLUS:
-                spacings += 1
+                spacing += 1
 
-            elif ans in MINUS and spacings > 0:
-                spacings -= 1
+            elif ans in MINUS and spacing > 0:
+                spacing -= 1
 
             elif ans.code == ENTER:
                 print('\n' * 3)
-                return spacings
+                return spacing
 

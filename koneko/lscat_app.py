@@ -168,6 +168,7 @@ def pick_dir():
 
         print('\nSelect a directory to view (enter its index)')
         print('If you want to display this directory, enter "y"')
+        print("Enter 'b' to move up a directory")
         ans = input()
         check_quit(ans)
 
@@ -178,7 +179,10 @@ def pick_dir():
             path = path.parent
             continue
 
-        path = path / files[int(ans)]
+        if ans.isdigit():
+            path = path / files[int(ans)]
+        else:
+            print('Invalid command!')
 
 
 

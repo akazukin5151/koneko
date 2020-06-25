@@ -48,7 +48,8 @@ def line_width(spacing, ncols):
 
 def print_doc(doc):
     os.system('clear')
-    bottom = term.height - 7
+    number_of_newlines = doc.count('\n')
+    bottom = term.height - (number_of_newlines + 2)
     move_cursor_down(bottom)
     print(doc)
 

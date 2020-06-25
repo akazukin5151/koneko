@@ -97,6 +97,11 @@ def display_user_row(thumbnail_size, preview_xcoords, padding):
     for px in preview_xcoords:
         show_single_x(px, thumbnail_size)
 
+def hide_if_exist(image):
+    if image:
+        image.hide()
+        move_cursor_up(1)
+
 
 # Main functions that organise work
 def main():
@@ -312,150 +317,215 @@ def ypadding_assistant(thumbnail_size):
     return YPadding(thumbnail_size).start()
 
 
-class AbstractPadding:
+class AbstractImageAdjuster(ABC):
     def __init__(self):
         # Defined in child classes
-        self.doc: str
         self.thumbnail_size: int
-        self.dimension: str
-        self.default_x: int
-        self.start_x: int
         self.show_func: 'func'
         self.side_label: str
+        self.start_spaces: int
+        self.image: 'pixcat.Image'
 
         # Defined in start()
         self.width_or_height: int
         self.spaces: int
+        self.valid: bool
 
     @abstractmethod
-    def maybe_move(self):
+    def write(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def maybe_move_up(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def maybe_move_down(self):
         raise NotImplementedError
 
     @abstractmethod
     def show_func_args(self):
         raise NotImplementedError
+
+    @abstractmethod
+    def maybe_erase(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def return_tup(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def is_input_valid(self):
+        raise NotImplementedError
+
+    def start(self):
+        self.maybe_move_down()
+
+        self.spaces = self.start_spaces
+        self.valid = True
+
+        with term.cbreak():
+            while True:
+                if self.is_input_valid():
+                    hide_if_exist(self.image)
+
+                    self.image = self.show_func_args()
+
+                    self.maybe_move_up()
+                    write('\r' + ' ' * 20 + '\r')
+                    self.write()
+
+                ans = term.inkey()
+                check_quit(ans)
+
+                if ans.code == ENTER and self.image:
+                    self.maybe_erase()
+                    return self.return_tup()
+
+                if ans in PLUS:
+                    self.spaces += 1
+                    self.valid = True
+
+                elif ans in MINUS and self.spaces > self.start_spaces:
+                    self.spaces -= 1
+                    self.valid = True
+
+                else:
+                    self.valid = False
+
+
+class AbstractPadding(AbstractImageAdjuster, ABC):
+    def __init__(self):
+        # Base
+        self.start_spaces = 0
+
+        # New attributes
+        self.doc: str
+        self.default_x: int
+        self.find_dim_func: 'func'
+
+    def maybe_erase(self):
+        return True
+
+    def return_tup(self):
+        return self.spaces, self.width_or_height
+
+    def is_input_valid(self) -> bool:
+        return bool(self.valid)
 
     def start(self):
         print_doc(self.doc)
 
         show_single_x(self.default_x, self.thumbnail_size)
 
-        self.width_or_height, image = find_image_dimension(
+        self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
-            self.show_func,
-            self.side_label,
-            self.default_x if self.dimension == 'x' else 0
-        )
+        ).start()
 
-        self.maybe_move()
-
-        self.spaces = 0
-        valid = True
-
-        with term.cbreak():
-            while True:
-                if valid:
-                    maybe_hide(image)
-
-                    image = self.show_func_args()
-
-                    maybe_move(self.dimension == 'y', self.spaces)
-                    write('\r' + ' ' * 20 + '\r')
-                    write(f'{self.dimension} spacing = {self.spaces}')
-
-                ans = term.inkey()
-                check_quit(ans)
-
-                if ans.code == ENTER:
-                    return self.spaces, self.width_or_height
-
-                if ans in PLUS:
-                    self.spaces += 1
-                    valid = True
-
-                elif ans in MINUS and self.spaces > 0:
-                    self.spaces -= 1
-                    valid = True
-
-                else:
-                    valid = False
+        return super().start()
 
 class XPadding(AbstractPadding):
     def __init__(self, thumbnail_size):
-        self.doc = xpadding_assistant.__doc__
+        super().__init__()
+        # Base
         self.thumbnail_size = thumbnail_size
-        self.dimension = 'x'
-        self.default_x = config.xcoords_config()[0]
-        self.start_x = self.default_x
         self.show_func = show_single_x
         self.side_label = 'width'
 
-    def maybe_move(self, *a):
+        # Padding ABC
+        self.doc = xpadding_assistant.__doc__
+        self.default_x = config.xcoords_config()[0]
+        self.find_dim_func = FindImageDimensionX
+
+    def write(self):
+        write(f'x spacing = {self.spaces}')
+
+    def maybe_move_down(self, *a):
+        return True
+
+    def maybe_move_up(self):
         return True
 
     def show_func_args(self):
         return self.show_func(self.default_x + self.width_or_height + self.spaces, self.thumbnail_size)
 
+
 class YPadding(AbstractPadding):
     def __init__(self, thumbnail_size):
-        self.doc = ypadding_assistant.__doc__
+        super().__init__()
+        # Base
         self.thumbnail_size = thumbnail_size
-        self.dimension = 'y'
-        self.default_x = config.xcoords_config()[1]
-        self.start_x = 0
         self.show_func = show_single_y
         self.side_label = 'height'
 
-    def maybe_move(self):
+        # Padding ABC
+        self.doc = ypadding_assistant.__doc__
+        self.default_x = config.xcoords_config()[1]
+        self.find_dim_func = FindImageDimensionY
+
+    def write(self):
+        write(f'y spacing = {self.spaces}')
+
+    def maybe_move_down(self):
         move_cursor_down(self.width_or_height)
+
+    def maybe_move_up(self):
+        move_cursor_up(self.spaces)
 
     def show_func_args(self):
         return self.show_func(self.width_or_height + self.spaces, self.thumbnail_size)
 
 
-def maybe_hide(image):
-    if image:
-        image.hide()
-        move_cursor_up(1)
+class AbstractFindImageDimension(AbstractImageAdjuster, ABC):
+    def __init__(self, thumbnail_size):
+        self.thumbnail_size = thumbnail_size
+        self.show_func: 'func'
+        self.side_label: str
+        self.start_spaces: int
+        self.image = None
 
-def maybe_move(cond, spaces):
-    if cond:
-        move_cursor_up(spaces)
+    def write(self):
+        write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
+
+    def maybe_move_down(self):
+        return True
+
+    def show_func_args(self):
+        return self.show_func(self.spaces, self.thumbnail_size)
+
+    def maybe_erase(self):
+        erase_line()
+
+    def return_tup(self):
+        return self.spaces - self.start_spaces, self.image
+
+    def is_input_valid(self):
+        return self.spaces >= self.start_spaces and self.valid
 
 
-def find_image_dimension(thumbnail_size, show_func, side_label, start_x):
-    image = None
-    spaces = start_x
-    valid = True
+class FindImageDimensionX(AbstractFindImageDimension):
+    def __init__(self, thumbnail_size):
+        self.thumbnail_size = thumbnail_size
+        self.show_func = show_single_x
+        self.side_label = 'width'
+        self.start_spaces = config.xcoords_config()[0]
+        self.image = None
 
-    with term.cbreak():
-        while True:
-            if spaces >= start_x and valid:
-                maybe_hide(image)
+    def maybe_move_up(self):
+        return True
 
-                image = show_func(spaces, thumbnail_size)
 
-                maybe_move(side_label == 'height', spaces)
-                erase_line()
-                write(f'image {side_label} = {spaces - start_x}')
+class FindImageDimensionY(AbstractFindImageDimension):
+    def __init__(self, thumbnail_size):
+        self.thumbnail_size = thumbnail_size
+        self.show_func = show_single_y
+        self.side_label = 'height'
+        self.start_spaces = 0
+        self.image = None
 
-            ans = term.inkey()
-            check_quit(ans)
-
-            if ans.code == ENTER and image:
-                erase_line()
-                return spaces - start_x, image
-
-            if ans in PLUS:
-                spaces += 1
-                valid = True
-
-            elif ans in MINUS and spaces > start_x:
-                spaces -= 1
-                valid = True
-
-            else:
-                valid = False
+    def maybe_move_up(self):
+        move_cursor_up(self.spaces)
 
 
 

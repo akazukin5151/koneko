@@ -227,7 +227,7 @@ def config_assistance():
         )
 
     if ans in {'6', 'a'}:
-        user_info_xcoord = user_print_name_spacing_assistant(
+        user_info_xcoord = user_info_assistant(
             size,
             xpadding,
             image_width
@@ -626,14 +626,14 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
                 return spacings
 
 
-def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
+def user_info_assistant(thumbnail_size, xpadding, image_width):
     """=== User print name xcoord ===
     Use +/= to move the text right, and -/_ to move it left
     Adjust the position as you see fit
 
     Use q to exit the program, and press enter to confirm the current position
     """
-    print_doc(user_print_name_spacing_assistant.__doc__)
+    print_doc(user_info_assistant.__doc__)
 
     spacing, _ = config.get_gen_users_settings()  # Default
     preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
@@ -643,12 +643,7 @@ def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
 
     with term.cbreak():
         while True:
-            erase_line()         # Erase the first line
-            move_cursor_down()   # Go down and erase the second line
-            erase_line()
-            move_cursor_up(1)    # Go back up to the original position
-            print_info(spacing)  # Print info takes up 2 lines
-            move_cursor_up(2)    # so go back to the top
+            update_user_info(spacing)
 
             ans = term.inkey()
             check_quit(ans)
@@ -663,3 +658,11 @@ def user_print_name_spacing_assistant(thumbnail_size, xpadding, image_width):
                 print('\n' * 3)
                 return spacing
 
+
+def update_user_info(spacing):
+    erase_line()         # Erase the first line
+    move_cursor_down()   # Go down and erase the second line
+    erase_line()
+    move_cursor_up(1)    # Go back up to the original position
+    print_info(spacing)  # Print info takes up 2 lines
+    move_cursor_up(2)    # so go back to the top

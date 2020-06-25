@@ -468,21 +468,19 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
             move_cursor_up(2)
             erase_line()
             print_cols(spacings, ncols)
-            erase_line()
-            print(f'\nAdjusting number {current_selection+1}', flush=True)
+            print('\n\nAdjusting the number of spaces between '
+                  f'{current_selection} and {current_selection+1}',
+                  flush=True)
+            move_cursor_up(1)
 
             ans = term.inkey()
             check_quit(ans)
 
-            if ans in PLUS:
-                new = int(spacings[current_selection]) + 1
-                if line_width(spacings, ncols) < term.width:
-                    spacings[current_selection] = new
+            if ans in PLUS and line_width(spacings, ncols) < term.width:
+                spacings[current_selection] += 1
 
-            elif ans in MINUS:
-                spacings[current_selection] = int(spacings[current_selection]) - 1
-                if spacings[current_selection] < 0:
-                    spacings[current_selection] = 0
+            elif ans in MINUS and spacings[current_selection] > 0:
+                spacings[current_selection] -= 1
 
             # right arrow
             elif (ans.code == 261 or ans in {'d', 'l'} and

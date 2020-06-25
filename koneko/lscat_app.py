@@ -183,6 +183,9 @@ def pick_dir():
 
 
 def config_assistance():
+    """Some assistants return a new setting, which should be propagated
+    to other assistants.
+    """
     print(*('\n=== Configuration assistance ===',
         'Please select an action index',
         '1. Thumbnail size',
@@ -280,9 +283,6 @@ def thumbnail_size_assistant():
             elif ans.code == ENTER:
                 return size
 
-            #elif ans == 't':
-            # TODO: preview a grid with chosen size
-
 
 def xpadding_assistant(thumbnail_size):
     """=== Image x spacing ===
@@ -340,7 +340,7 @@ def abstract_padding(
 
     show_single_x(default_x, thumbnail_size)
 
-    image_width, image = find_image_width(
+    width_or_height, image = find_image_dimension(
         thumbnail_size,
         show_func,
         move,
@@ -348,7 +348,7 @@ def abstract_padding(
     )
 
     if move:
-        move_cursor_down(image_width)
+        move_cursor_down(width_or_height)
 
     spaces = 0
 
@@ -363,7 +363,7 @@ def abstract_padding(
             check_quit(ans)
 
             if ans.code == ENTER:
-                return spaces, image_width
+                return spaces, width_or_height
 
             if spaces >= 0:
                 image.hide()
@@ -375,10 +375,10 @@ def abstract_padding(
             elif ans in MINUS and spaces > 0:
                 spaces -= 1
 
-            image = show_func(image_width + spaces, thumbnail_size)
+            image = show_func(width_or_height + spaces, thumbnail_size)
 
 
-def find_image_width(thumbnail_size, show_func, move, width_or_height):
+def find_image_dimension(thumbnail_size, show_func, move, width_or_height):
     image = None
     spaces = 0
     valid = True

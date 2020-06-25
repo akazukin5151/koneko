@@ -3,6 +3,7 @@ import sys
 import time
 from copy import copy
 from pathlib import Path
+from abc import ABC, abstractmethod
 
 from pixcat import Image
 from blessed import Terminal
@@ -295,14 +296,7 @@ def xpadding_assistant(thumbnail_size):
 
     Use q to exit the program, and press enter to go to the next assistant
     """
-    return abstract_padding(
-            thumbnail_size,
-            show_single_x,
-            config.xcoords_config()[0],  # Default
-            xpadding_assistant.__doc__,
-            'x',
-            'width',
-        )
+    return XPadding(thumbnail_size).start()
 
 def ypadding_assistant(thumbnail_size):
     """=== Image y spacing ===
@@ -315,72 +309,108 @@ def ypadding_assistant(thumbnail_size):
 
     Use q to exit the program, and press enter to go to the next assistant
     """
-    return abstract_padding(
-        thumbnail_size,
-        show_single_y,
-        config.xcoords_config()[1],  # Default
-        ypadding_assistant.__doc__,
-        'y',
-        'height',
-    )
+    return YPadding(thumbnail_size).start()
 
 
-def abstract_padding(
-        thumbnail_size: int,
-        show_func: 'func',
-        default_x: int,
-        doc: str,
-        dimension: str,
-        side_label: str,
-    ) -> 'IO[tuple[int, int]]':
+class AbstractPadding:
+    def __init__(self):
+        # Defined in child classes
+        self.doc: str
+        self.thumbnail_size: int
+        self.dimension: str
+        self.default_x: int
+        self.start_x: int
+        self.show_func: 'func'
+        self.side_label: str
 
-    print_doc(doc)
+        # Defined in start()
+        self.width_or_height: int
+        self.spaces: int
 
-    show_single_x(default_x, thumbnail_size)
-    # REFACTOR: the while loop in that function is similar to this one as well
-    width_or_height, image = find_image_dimension(
-        thumbnail_size,
-        show_func,
-        side_label,
-        default_x if dimension == 'x' else 0
-    )
+    @abstractmethod
+    def maybe_move(self):
+        raise NotImplementedError
 
-    if dimension == 'y':
-        move_cursor_down(width_or_height)
+    @abstractmethod
+    def show_func_args(self):
+        raise NotImplementedError
 
-    spaces = 0
-    valid = True
+    def start(self):
+        print_doc(self.doc)
 
-    with term.cbreak():
-        while True:
-            if valid:
-                maybe_hide(image)
+        show_single_x(self.default_x, self.thumbnail_size)
 
-                if dimension == 'y':
-                    image = show_func(width_or_height + spaces, thumbnail_size)
+        self.width_or_height, image = find_image_dimension(
+            self.thumbnail_size,
+            self.show_func,
+            self.side_label,
+            self.default_x if self.dimension == 'x' else 0
+        )
+
+        self.maybe_move()
+
+        self.spaces = 0
+        valid = True
+
+        with term.cbreak():
+            while True:
+                if valid:
+                    maybe_hide(image)
+
+                    image = self.show_func_args()
+
+                    maybe_move(self.dimension == 'y', self.spaces)
+                    write('\r' + ' ' * 20 + '\r')
+                    write(f'{self.dimension} spacing = {self.spaces}')
+
+                ans = term.inkey()
+                check_quit(ans)
+
+                if ans.code == ENTER:
+                    return self.spaces, self.width_or_height
+
+                if ans in PLUS:
+                    self.spaces += 1
+                    valid = True
+
+                elif ans in MINUS and self.spaces > 0:
+                    self.spaces -= 1
+                    valid = True
+
                 else:
-                    image = show_func(default_x + width_or_height + spaces, thumbnail_size)
+                    valid = False
 
-                maybe_move(dimension == 'y', spaces)
-                write('\r' + ' ' * 20 + '\r')
-                write(f'{dimension} spacing = {spaces}')
+class XPadding(AbstractPadding):
+    def __init__(self, thumbnail_size):
+        self.doc = xpadding_assistant.__doc__
+        self.thumbnail_size = thumbnail_size
+        self.dimension = 'x'
+        self.default_x = config.xcoords_config()[0]
+        self.start_x = self.default_x
+        self.show_func = show_single_x
+        self.side_label = 'width'
 
-            ans = term.inkey()
-            check_quit(ans)
+    def maybe_move(self, *a):
+        return True
 
-            if ans.code == ENTER:
-                return spaces, width_or_height
+    def show_func_args(self):
+        return self.show_func(self.default_x + self.width_or_height + self.spaces, self.thumbnail_size)
 
-            if ans in PLUS:
-                spaces += 1
-                valid = True
+class YPadding(AbstractPadding):
+    def __init__(self, thumbnail_size):
+        self.doc = ypadding_assistant.__doc__
+        self.thumbnail_size = thumbnail_size
+        self.dimension = 'y'
+        self.default_x = config.xcoords_config()[1]
+        self.start_x = 0
+        self.show_func = show_single_y
+        self.side_label = 'height'
 
-            elif ans in MINUS and spaces > 0:
-                spaces -= 1
-                valid = True
+    def maybe_move(self):
+        move_cursor_down(self.width_or_height)
 
-            else:
-                valid = False
+    def show_func_args(self):
+        return self.show_func(self.width_or_height + self.spaces, self.thumbnail_size)
 
 
 def maybe_hide(image):
@@ -393,34 +423,34 @@ def maybe_move(cond, spaces):
         move_cursor_up(spaces)
 
 
-def find_image_dimension(thumbnail_size, show_func, side_label, default_x):
+def find_image_dimension(thumbnail_size, show_func, side_label, start_x):
     image = None
-    spaces = default_x
+    spaces = start_x
     valid = True
 
     with term.cbreak():
         while True:
-            if spaces >= default_x and valid:
+            if spaces >= start_x and valid:
                 maybe_hide(image)
 
                 image = show_func(spaces, thumbnail_size)
 
                 maybe_move(side_label == 'height', spaces)
                 erase_line()
-                write(f'image {side_label} = {spaces - default_x}')
+                write(f'image {side_label} = {spaces - start_x}')
 
             ans = term.inkey()
             check_quit(ans)
 
             if ans.code == ENTER and image:
                 erase_line()
-                return spaces - default_x, image
+                return spaces - start_x, image
 
             if ans in PLUS:
                 spaces += 1
                 valid = True
 
-            elif ans in MINUS and spaces > default_x:
+            elif ans in MINUS and spaces > start_x:
                 spaces -= 1
                 valid = True
 

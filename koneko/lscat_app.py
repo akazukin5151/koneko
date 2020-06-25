@@ -47,6 +47,7 @@ def line_width(spacing, ncols):
     return sum(spacing) + ncols
 
 def print_doc(doc):
+    """Prints a given string in the bottom of the terminal"""
     os.system('clear')
     number_of_newlines = doc.count('\n')
     bottom = term.height - (number_of_newlines + 2)
@@ -69,37 +70,31 @@ class FakeData:
         return cls(KONEKODIR / 'testuser')
 
 
-def display_user_row(thumbnail_size, preview_xcoords, padding):
-    (copy(SAMPLE_IMAGE)
-        .thumbnail(thumbnail_size)
-        .show(align='left', x=padding, y=0))
-
-    for px in preview_xcoords:
-        (copy(SAMPLE_IMAGE)
-            .thumbnail(thumbnail_size)
-            .show(align='left', x=px, y=0))
-
-
 def print_info(message_xcoord):
     print(' ' * message_xcoord, '000', '\n',
           ' ' * message_xcoord, 'Example artist', sep='')
 
-def _show_single(x, y, thumbnail_size):
+def show_single(x, y, thumbnail_size):
     img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=y)
     return img
 
 def show_single_x(x, thumbnail_size):
-    return _show_single(x, 0, thumbnail_size)
+    return show_single(x, 0, thumbnail_size)
 
 def show_single_y(y, thumbnail_size):
     # Default usage of config module
-    return _show_single(config.xcoords_config()[1], y, thumbnail_size)
+    return show_single(config.xcoords_config()[1], y, thumbnail_size)
 
 def show_instant_sample(thumbnail_size, xpadding, image_width):
     xcoords = pure.xcoords(term.width, image_width, xpadding)
     for x in xcoords:
-        _show_single(x, 0, thumbnail_size)
+        show_single(x, 0, thumbnail_size)
+
+def display_user_row(thumbnail_size, preview_xcoords, padding):
+    show_single(padding, 0, thumbnail_size)
+    for px in preview_xcoords:
+        show_single_x(px, thumbnail_size)
 
 
 # Main functions that organise work

@@ -575,33 +575,28 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     Do you want to preview an existing cache dir? [y/N]
     To keep your chosen thumbnail size, image width and x spacing, enter 'n'.
     """
-    print_doc(gallery_print_spacing_assistant.__doc__)
+    print_doc(gallery_print_spacing_assistant.__doc__)  # Action before start
     ans = input()
 
+    # Setup variables
     if ans == 'y':
-        path = pick_dir()
-        data = FakeData(path)
-        lscat.show_instant(lscat.TrackDownloads, data)
+        _path = pick_dir()
+        _data = FakeData(_path)
+        lscat.show_instant(lscat.TrackDownloads, _data)
         ncols = config.ncols_config()  # Default fallback, on user choice
     else:
         show_instant_sample(size, image_width, xpadding)
         ncols = pure.ncols(term.width, image_width, xpadding)
 
-    print('\n')
-
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
     current_selection = 0
 
+    # Start
+    print('\n')
     with term.cbreak():
         while True:
-            move_cursor_up(2)
-            erase_line()
-            print_cols(spacings, ncols)
-            print('\n\nAdjusting the number of spaces between '
-                  f'{current_selection} and {current_selection+1}',
-                  flush=True)
-            move_cursor_up(1)
+            update_gallery_info(spacings, ncols, current_selection)
 
             ans = term.inkey()
             check_quit(ans)
@@ -625,6 +620,15 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
             elif ans.code == ENTER:
                 return spacings
 
+def update_gallery_info(spacings, ncols, current_selection):
+    move_cursor_up(2)
+    erase_line()
+    print_cols(spacings, ncols)
+    print('\n\nAdjusting the number of spaces between '
+          f'{current_selection} and {current_selection+1}',
+          flush=True)
+    move_cursor_up(1)
+
 
 def user_info_assistant(thumbnail_size, xpadding, image_width):
     """=== User print name xcoord ===
@@ -633,12 +637,15 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
 
     Use q to exit the program, and press enter to confirm the current position
     """
-    print_doc(user_info_assistant.__doc__)
-
+    # Setup variables
     spacing, _ = config.get_gen_users_settings()  # Default
     preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
 
+    # Start
+    print_doc(user_info_assistant.__doc__)
+
     display_user_row(thumbnail_size, preview_xcoords, xpadding)
+
     move_cursor_up(5)
 
     with term.cbreak():

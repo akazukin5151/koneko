@@ -332,7 +332,7 @@ def abstract_padding(
         default_x: int,
         doc: str,
         dimension: str,
-        width_or_height: str,
+        side_label: str,
         move: bool,
     ) -> 'IO[tuple[int, int]]':
 
@@ -344,7 +344,7 @@ def abstract_padding(
         thumbnail_size,
         show_func,
         move,
-        width_or_height
+        side_label
     )
 
     if move:
@@ -378,17 +378,17 @@ def abstract_padding(
             image = show_func(width_or_height + spaces, thumbnail_size)
 
 
-def find_image_dimension(thumbnail_size, show_func, move, width_or_height):
+def find_image_dimension(thumbnail_size, show_func, move, side_label):
     image = None
     spaces = 0
-    valid = True
 
+    # FIXME: on invalid input, an image will be displayed at x=0 but never moved.
     with term.cbreak():
         while True:
             if move:
                 move_cursor_up(spaces)
             erase_line()
-            write(f'image {width_or_height} = {spaces}')
+            write(f'image {side_label} = {spaces}')
 
             ans = term.inkey()
             check_quit(ans)
@@ -397,7 +397,7 @@ def find_image_dimension(thumbnail_size, show_func, move, width_or_height):
                 erase_line()
                 return spaces, image
 
-            if spaces > 0 and image:
+            if spaces > 0 and image:  # Why this condition?
                 image.hide()
                 move_cursor_up(1)
 

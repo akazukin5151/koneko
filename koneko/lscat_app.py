@@ -137,7 +137,7 @@ def display_path():
     path = input('Please paste in your path:\n')
     if not Path(path).is_dir():
         print('Invalid path!')
-        return
+        sys.exit(1)
 
     data = FakeData(path)
     lscat.show_instant(lscat.TrackDownloads, data, True)

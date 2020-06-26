@@ -21,33 +21,25 @@ ENTER = 343
 
 
 # Utility functions used in multiple places
-def write(string):
-    print(string, end='', flush=True)
+def write(value: str) -> 'IO':
+    print(value, end='', flush=True)
 
-def check_quit(ans):
+def check_quit(ans: str):
     if ans == 'q':
         sys.exit(0)
 
-def move_cursor_up(num):
+def move_cursor_up(num: int) -> 'IO':
     if num > 0:
         write(f'\033[{num}A')
 
-def move_cursor_down(num=1):
+def move_cursor_down(num=1) -> 'IO':
     if num > 0:
         write(f'\033[{num}B')
 
-def erase_line():
+def erase_line() -> 'IO':
     write('\033[K')
 
-def print_cols(spacings, ncols):
-    for (idx, space) in enumerate(spacings[:ncols]):
-        write(' ' * int(space))
-        write(idx + 1)
-
-def line_width(spacings, ncols):
-    return sum(spacings) + ncols
-
-def print_doc(doc):
+def print_doc(doc: str) -> 'IO':
     """Prints a given string in the bottom of the terminal"""
     os.system('clear')
     number_of_newlines = doc.count('\n')
@@ -57,6 +49,48 @@ def print_doc(doc):
 
 
 # More specialised but still small functions
+def line_width(spacings: 'list[int]', ncols: int) -> int:
+    return sum(spacings) + ncols
+
+def print_cols(spacings: 'list[int]', ncols: int) -> 'IO':
+    for (idx, space) in enumerate(spacings[:ncols]):
+        write(' ' * int(space))
+        write(idx + 1)
+
+def print_info(message_xcoord: int) -> 'IO':
+    print(' ' * message_xcoord, '000', '\n',
+          ' ' * message_xcoord, 'Example artist', sep='')
+
+
+def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
+    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
+    img.show(align='left', x=x, y=y)
+    return img
+
+def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
+    return show_single(x, 0, thumbnail_size)
+
+def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
+    # Default usage of config module
+    return show_single(config.xcoords_config()[1], y, thumbnail_size)
+
+def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
+    xcoords = pure.xcoords(term.width, image_width, xpadding)
+    for x in xcoords:
+        show_single(x, 0, thumbnail_size)
+
+def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
+    show_single(padding, 0, size)
+    for px in preview_xcoords:
+        show_single_x(px, size)
+
+
+def hide_if_exist(image: Image) -> 'IO':
+    if image:
+        image.hide()
+        move_cursor_up(1)
+
+
 class FakeData:
     def __init__(self, path):
         self.download_path = path
@@ -69,38 +103,6 @@ class FakeData:
     def user(cls):
         # It needs to have a .koneko file
         return cls(KONEKODIR / 'testuser')
-
-
-def print_info(message_xcoord):
-    print(' ' * message_xcoord, '000', '\n',
-          ' ' * message_xcoord, 'Example artist', sep='')
-
-def show_single(x, y, thumbnail_size):
-    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
-    img.show(align='left', x=x, y=y)
-    return img
-
-def show_single_x(x, thumbnail_size):
-    return show_single(x, 0, thumbnail_size)
-
-def show_single_y(y, thumbnail_size):
-    # Default usage of config module
-    return show_single(config.xcoords_config()[1], y, thumbnail_size)
-
-def show_instant_sample(thumbnail_size, xpadding, image_width):
-    xcoords = pure.xcoords(term.width, image_width, xpadding)
-    for x in xcoords:
-        show_single(x, 0, thumbnail_size)
-
-def display_user_row(thumbnail_size, preview_xcoords, padding):
-    show_single(padding, 0, thumbnail_size)
-    for px in preview_xcoords:
-        show_single_x(px, thumbnail_size)
-
-def hide_if_exist(image):
-    if image:
-        image.hide()
-        move_cursor_up(1)
 
 
 # Main functions that organise work
@@ -324,9 +326,9 @@ class AbstractImageAdjuster(ABC):
         self.show_func: 'func'
         self.side_label: str
         self.start_spaces: int
-        self.image: 'pixcat.Image'
 
         # Defined in start()
+        self.image: Image
         self.width_or_height: int
         self.spaces: int
         self.valid: bool
@@ -651,7 +653,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
     # Start
     print_doc(user_info_assistant.__doc__)
 
-    display_user_row(thumbnail_size, preview_xcoords, xpadding)
+    display_user_row(thumbnail_size, xpadding, preview_xcoords)
 
     move_cursor_up(5)
 

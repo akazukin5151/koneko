@@ -94,7 +94,9 @@ def dir_not_empty(data: 'Data') -> bool:
     if data.download_path.is_dir() and (_dir := os.listdir(data.download_path)):
 
         # Is a valid directory and it's not empty, but data has not been fetched yet
-        if not hasattr(data, 'all_names'):
+        try:
+            data.all_names
+        except (KeyError, AttributeError):
             return True
 
         # Exclude the .koneko file
@@ -131,4 +133,6 @@ def open_link_num(data, number) -> 'IO':
     # Update current_page_illusts, in case if you're in another page
     open_in_browser(data.image_id(number))
 
-
+def remove_dir_if_exist(data):
+    if data.download_path.is_dir():
+        os.system(f'rm -r {data.download_path}')

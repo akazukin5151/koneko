@@ -42,6 +42,7 @@ def test_dir_not_empty():
         def __init__(self):
             self.download_path = Path('testing/files/')
             self.first_img = "004_祝！！！.jpg"
+            self.all_names = ["004_祝！！！.jpg", '008_77803142_p0.png', '017_ミコニャン.jpg']
 
     # Assert current dir is not empty
     data = FakeData()

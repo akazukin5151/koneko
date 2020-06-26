@@ -89,12 +89,17 @@ def dir_not_empty(data: 'Data') -> bool:
         try:
             first_img = data.first_img
         except (KeyError, AttributeError):
+            # Is a valid directory and it's not empty, but data has not been fetched yet
             return True
 
         if '.koneko' in sorted(_dir)[0] and first_img in sorted(_dir)[1]:
             return True
-        if first_img in sorted(_dir)[0]:
-            return True
+
+        # Should not fail because try-except early returned
+        for name, _file in itertools.zip_longest(data.all_names, sorted(_dir), fillvalue=''):
+            if name not in _file:
+                return False
+        return True
 
     return False
 

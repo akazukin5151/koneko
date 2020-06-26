@@ -62,14 +62,26 @@ class AbstractUI(ABC):
         self._parse_and_download()
         self._prefetch_thread()
 
+    def verify_up_to_date(self):
+        if utils.dir_not_empty(self.data):
+            return True
+        # TODO: extract common code from function below (split that up first)
+        # No valid cached images, download all from scratch
+        if self.data.download_path.is_dir():
+            os.system(f'rm -r {self.data.download_path}')
+        download.init_download(self.data, self.tracker())
+
     def _parse_and_download(self) -> 'IO':
         """If download path not empty, immediately show.
         Regardless, proceed to parse & download
         """
+        # Before fetching, show the dir first. Can only check for 'is dir' and 'not empty'
+        # After fetching, double check all files in dir match the cache
         if utils.dir_not_empty(self.data):
             self.show_instant()
             api.myapi.await_login()
             self._parse_user_infos()
+            self.verify_up_to_date()
             self.print_page_info()
             return True
 

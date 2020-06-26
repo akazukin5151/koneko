@@ -44,8 +44,6 @@ def test_gallery():
 
     assert gdata.next_url == "https://app-api.pixiv.net/v1/user/illusts?user_id=2232374&filter=for_ios&type=illust&offset=30"
 
-    assert gdata.first_img == "みこっちゃん"
-
     assert gdata.url(0) == 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2020/05/14/06/45/24/81547984_p0_master1200.jpg'
 
     assert gdata.all_urls[:3] == ['https://i.pximg.net/c/540x540_10_webp/img-master/img/2020/05/14/06/45/24/81547984_p0_square1200.jpg', 'https://i.pximg.net/c/540x540_10_webp/img-master/img/2020/05/12/06/36/27/81501385_p0_square1200.jpg', 'https://i.pximg.net/c/540x540_10_webp/img-master/img/2020/05/10/23/10/38/81468125_p0_square1200.jpg']
@@ -97,4 +95,3 @@ def test_user():
 
     assert udata.splitpoint == 30
 
-    assert udata.first_img == "畳と桧"

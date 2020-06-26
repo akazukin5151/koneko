@@ -40,24 +40,29 @@ def test_verify_full_download():
 def test_dir_not_empty():
     class FakeData:
         def __init__(self):
-            self.download_path = Path('testing/files/')
+            self.download_path = Path('testing/files/empty_dir')
             self.first_img = "004_祝！！！.jpg"
+            self.all_names = ["004_祝！！！.jpg", '008_77803142_p0.png', '017_ミコニャン.jpg']
 
-    # Assert current dir is not empty
     data = FakeData()
-    assert utils.dir_not_empty(data)
 
     # Test dir exists but is empty
     # If mkdir throws because file exists, just delete it and re-run
-    # In normal situations this dir will be deleted in line 63
+    # In normal situations this dir will be deleted in line 69
     # However, if any code in between fails, it will not be deleted
     Path('testing/files/empty_dir').mkdir()
     data.download_path = Path('testing/files/empty_dir')
     assert utils.dir_not_empty(data) is False
 
-    # Test .koneko in dir and first image in dir
+    # Copy .koneko and only one image to that dir
     os.system('touch testing/files/empty_dir/.koneko')
     os.system('cp testing/files/004_祝！！！.jpg testing/files/empty_dir/')
+
+    assert utils.dir_not_empty(data) is False
+
+    # Copy all images to dir
+    for f in ('008_77803142_p0.png', '017_ミコニャン.jpg'):
+        os.system(f'cp testing/files/{f} testing/files/empty_dir/')
 
     assert utils.dir_not_empty(data)
 

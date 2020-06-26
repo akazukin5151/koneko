@@ -26,8 +26,6 @@ from pathlib import Path
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
-from pipey import Pipeable as P
-
 from koneko import api, pure, utils
 from koneko.data import UserData
 

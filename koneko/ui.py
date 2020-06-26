@@ -47,7 +47,7 @@ class AbstractUI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def action_before_prefetch(self) -> None:
+    def maybe_join_thread(self) -> None:
         """Run any procedure before prefetching (either in background or not)"""
         raise NotImplementedError
 
@@ -62,20 +62,28 @@ class AbstractUI(ABC):
         self._parse_and_download()
         self._prefetch_thread()
 
+    def verify_up_to_date(self):
+        if utils.dir_not_empty(self.data):
+            return True
+        utils.remove_dir_if_exist(self.data)
+        download.init_download(self.data, self.tracker())
+
     def _parse_and_download(self) -> 'IO':
         """If download path not empty, immediately show.
         Regardless, proceed to parse & download
+        Before fetching, show the dir first. Can only check for 'is dir' and 'not empty'
+        After fetching, double check all files in dir match the cache
         """
         if utils.dir_not_empty(self.data):
             self.show_instant()
             api.myapi.await_login()
             self._parse_user_infos()
+            self.verify_up_to_date()
             self.print_page_info()
             return True
 
         # No valid cached images, download all from scratch
-        if self.data.download_path.is_dir():
-            self.data.download_path.rmdir()
+        utils.remove_dir_if_exist(self.data)
 
         api.myapi.await_login()
         self._parse_user_infos()
@@ -95,7 +103,7 @@ class AbstractUI(ABC):
     def _prefetch_next_page(self) -> 'IO':
         # Wait for initial request to finish, so the data object is instantiated
         # Else next_url won't be set yet
-        self.action_before_prefetch()
+        self.maybe_join_thread()
         if not self.data.next_url:  # Last page
             return True
 
@@ -167,7 +175,7 @@ class AbstractGallery(AbstractUI, ABC):
         """Implements abstractmethod: Runs show_instant for galleries"""
         return lscat.show_instant(lscat.TrackDownloads, self.data, True)
 
-    def action_before_prefetch(self):
+    def maybe_join_thread(self):
         """Implements abstractmethod: No action needed"""
         return True
 
@@ -409,7 +417,7 @@ class AbstractUsers(AbstractUI, ABC):
         """Implements abstractmethod: Runs show_instant for user modes"""
         return lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
 
-    def action_before_prefetch(self):
+    def maybe_join_thread(self):
         """Implements abstractmethod: Wait for parse_thread to join (if any)"""
         with funcy.suppress(AttributeError):
             self.parse_thread.join()

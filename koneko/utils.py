@@ -83,18 +83,27 @@ def verify_full_download(filepath: Path) -> bool:
         return False
     return True
 
+def dir_up_to_date(data, _dir) -> bool:
+    # Should not fail because try-except early returned
+    for name, _file in itertools.zip_longest(data.all_names, sorted(_dir), fillvalue=''):
+        if name not in _file:
+            return False
+    return True
+
 def dir_not_empty(data: 'Data') -> bool:
-    # If it breaks, try len([x for x in os.listdir(path) if os.is_file(x)])
     if data.download_path.is_dir() and (_dir := os.listdir(data.download_path)):
+
+        # Is a valid directory and it's not empty, but data has not been fetched yet
         try:
-            first_img = data.first_img
+            data.all_names
         except (KeyError, AttributeError):
             return True
 
-        if '.koneko' in sorted(_dir)[0] and first_img in sorted(_dir)[1]:
-            return True
-        if first_img in sorted(_dir)[0]:
-            return True
+        # Exclude the .koneko file
+        if '.koneko' in sorted(_dir)[0]:
+            return dir_up_to_date(data, sorted(_dir)[1:])
+
+        return dir_up_to_date(data, _dir)
 
     return False
 
@@ -124,4 +133,6 @@ def open_link_num(data, number) -> 'IO':
     # Update current_page_illusts, in case if you're in another page
     open_in_browser(data.image_id(number))
 
-
+def remove_dir_if_exist(data):
+    if data.download_path.is_dir():
+        os.system(f'rm -r {data.download_path}')

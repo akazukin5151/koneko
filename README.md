@@ -107,7 +107,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ### Version 0.9
 
 * Interactive helper UI to assist configuring lscat numbers (`lscat_app.py`).
-    - [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time
+    - [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time (`lscat`)
+    - Display 'testgallery' and 'testuser' paths (for internal use)
+    - Browse the cache and display a dir
+    - Display any path (but all names must be left-padded with a three digit number)
     - [x] image_width
     - [x] image_height
     - [x] images_x_spacing
@@ -117,10 +120,19 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] gallery_print_spacing 
     - [x] users_print_name_xcoord 
     - [ ] image_mode_text_offset
+* Remove `users_page_spacing`: it's just `gallery_page_spacing` - 3
+* Rename `gallery_page_spacing` setting to `page_spacing`
 
 #### Fixed
 
+* Fixed a bug where downloading a single image crashes
+* Fixed a bug where some images or mode might not update outdated images
+    * `first_img` attribute no longer used
+
 #### Code maintenance
+
+* Rename `action_before_prefetch()` to `maybe_join_thread()`
+* Extract out messy condition to bool variables in `prompt.py`
 
 # Roadmap
 
@@ -129,14 +141,14 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-* Show frequently searched IDs/strings with an option to select them.
 * Show existing IDs in the cache and delete their directories.
-* Offline mode for browsing the existing cache (opening up lscat will do most of this, only thing missing is to show frequent or existing dirs)
+    * In lscat browse cache mode, add option to delete dir
+* Show frequently searched IDs/strings with an option to select them.
+* Offline mode for browsing the existing cache (lscat app does this, document this to users)
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
 
 ## Known bugs
-* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
 * Reloading then going back just redraws the current mode again, with possible instability
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
 * Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below

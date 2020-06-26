@@ -1,3 +1,30 @@
+"""lscat interactive app
+
+Usage:
+  lscat
+  lscat (1|c) [<action>]
+  lscat (2|g)
+  lscat (3|u)
+  lscat (4|b)
+  lscat (5|p) [<path>]
+
+Optional arguments (for specifying a mode):
+  1 c  Koneko configuration assistance
+  2 g  Display KONEKODIR / testgallery
+  3 u  Display KONEKODIR / testuser
+  4 b  Browse a cached dir to display
+  5 p  Display a specified path
+
+Possible configuration assistants:
+  1  Thumbnail size
+  2  x-padding
+  3  y-padding
+  4  Page spacing
+  5  Gallery print spacing
+  6  User mode print info x-position
+  a  All of the above
+"""
+
 import os
 import sys
 import time
@@ -6,6 +33,7 @@ from pathlib import Path
 from abc import ABC, abstractmethod
 
 from pixcat import Image
+from docopt import docopt
 from blessed import Terminal
 
 from koneko import KONEKODIR, pure, lscat, config
@@ -13,12 +41,17 @@ from koneko import KONEKODIR, pure, lscat, config
 
 # Globals
 term = Terminal()
-# Must make a copy before using this reference
-SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
+# Constants
+ENTER = 343
 PLUS = {'+', '='}
 MINUS = {'-', '_'}
-ENTER = 343
+# Must make a copy before using this reference
+SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
+
+# Pure
+def line_width(spacings: 'list[int]', ncols: int) -> int:
+    return sum(spacings) + ncols
 
 # Utility functions used in multiple places
 def write(value: str) -> 'IO':
@@ -49,9 +82,6 @@ def print_doc(doc: str) -> 'IO':
 
 
 # More specialised but still small functions
-def line_width(spacings: 'list[int]', ncols: int) -> int:
-    return sum(spacings) + ncols
-
 def print_cols(spacings: 'list[int]', ncols: int) -> 'IO':
     for (idx, space) in enumerate(spacings[:ncols]):
         write(' ' * int(space))
@@ -107,6 +137,28 @@ class FakeData:
 
 # Main functions that organise work
 def main():
+    if len(sys.argv) == 1:
+        _main()
+
+    args = docopt(__doc__)
+
+    if args['1'] or args['c']:
+        config_assistance(args['<action>'])
+
+    elif args['2'] or args['g']:
+        display_gallery()
+
+    elif args['3'] or args['u']:
+        display_user()
+
+    elif args['4'] or args['b']:
+        browse_cache()
+
+    elif args['5'] or args['p']:
+        display_path(args['<path>'])
+
+
+def _main():
     os.system('clear')
     print(*('Welcome to the lscat interactive script',
         '1. Launch koneko configuration assistance',
@@ -129,8 +181,9 @@ def main():
     func = case.get(ans, None)
     if func:
         func()
-    else:
+    elif ans != 'q':
         print('Invalid command! Exiting...')
+    # If it's q, it will quit without printing
 
 
 def display_gallery():
@@ -141,11 +194,12 @@ def display_user():
     data = FakeData.user()
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
-def display_path():
-    path = input('Please paste in your path:\n')
-    if not Path(path).is_dir():
-        print('Invalid path!')
-        sys.exit(1)
+def display_path(path=None):
+    if not path:
+        path = input('Please paste in your path:\n')
+        if not Path(path).is_dir():
+            print('Invalid path!')
+            sys.exit(1)
 
     data = FakeData(path)
     lscat.show_instant(lscat.TrackDownloads, data, True)
@@ -190,10 +244,7 @@ def pick_dir():
 
 
 
-def config_assistance():
-    """Some assistants return a new setting, which should be propagated
-    to other assistants.
-    """
+def ask_assistant():
     print(*('\n=== Configuration assistance ===',
         'Please select an action index',
         '1. Thumbnail size',
@@ -203,7 +254,16 @@ def config_assistance():
         '5. Gallery print spacing',
         '6. User mode print info x-position',
         'a. (Run all of the above)\n'), sep='\n')
-    ans = input()
+    return input()
+
+def config_assistance(action=None):
+    """Some assistants return a new setting, which should be propagated
+    to other assistants.
+    """
+    if not action:
+        ans = ask_assistant()
+    else:
+        ans = action
 
     if ans in {'1', 'a'}:
         size = thumbnail_size_assistant()
@@ -252,7 +312,7 @@ def config_assistance():
         print(f'page_spacing = {page_spacing}')
 
     if ans in {'5', 'a'}:
-        print(f'gallery_print_spacing =',
+        print('gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
     if ans in {'6', 'a'}:
@@ -617,14 +677,14 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
                 spacings[current_selection] -= 1
 
             # right arrow
-            elif (ans.code == 261 or ans in {'d', 'l'} and
-                    current_selection < len(spacings) - 1):
+            elif (ans.code == 261 or ans in {'d', 'l'}
+                    and current_selection < len(spacings) - 1):
                 current_selection += 1
 
             # left arrow
-            elif (ans.code == 260 or ans in {'a', 'h'} and
-                    current_selection > 0):
-                    current_selection -= 1
+            elif (ans.code == 260 or ans in {'a', 'h'}
+                    and current_selection > 0):
+                current_selection -= 1
 
             elif ans.code == ENTER:
                 return spacings

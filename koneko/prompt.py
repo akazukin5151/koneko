@@ -85,8 +85,15 @@ def gallery_like_prompt(gallery):
 
     with TERM.cbreak():
         while True:
+            two_digit_seq = len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit())
+            one_letter_two_digit_seq = (
+                len(keyseqs) == 3
+                and pure.all_satisfy(keyseqs[1:], m.isdigit())
+                and keyseqs[0] in sequenceable_keys
+            )
+
             # 1. Two digit sequence
-            if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
+            if two_digit_seq:
                 image_num = utils.seq_coords_to_int(keyseqs)
                 if image_num is not False:
                     return goto_image(gallery, image_num)
@@ -94,18 +101,13 @@ def gallery_like_prompt(gallery):
                 keyseqs = []
 
             # 1. One letter two digit sequence
-            elif (len(keyseqs) == 3 and
-                    pure.all_satisfy(keyseqs[1:], m.isdigit()) and
-                    keyseqs[0] in sequenceable_keys):
-
+            elif one_letter_two_digit_seq:
                 open_or_download(gallery, keyseqs)
 
                 if keyseqs[0] == 'i':
                     return goto_image(gallery, pure.concat_seqs_to_int(keyseqs, 1))
-
                 elif keyseqs[0].lower() == 'a':
                     return gallery.handle_prompt(keyseqs)
-
                 keyseqs = []
 
 
@@ -139,8 +141,10 @@ def image_prompt(image):
 
     with TERM.cbreak():
         while True:
+            two_digit_seq = len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit())
+
             # 1. Two digit sequence -- jump to post number
-            if len(keyseqs) == 2 and  pure.all_satisfy(keyseqs, m.isdigit()):
+            if two_digit_seq:
                 ui.jump_to_image(image.data, pure.concat_seqs_to_int(keyseqs))
                 keyseqs = []
 
@@ -174,8 +178,10 @@ def user_prompt(user):
 
     with TERM.cbreak():
         while True:
+            two_digit_seq = len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit())
+
             # 1. Two digit sequence -- view artist given number
-            if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
+            if two_digit_seq:
                 return user.go_artist_mode(pure.concat_seqs_to_int(keyseqs))
 
             # 2. Ask and wait for user input

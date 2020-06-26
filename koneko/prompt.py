@@ -141,8 +141,10 @@ def image_prompt(image):
 
     with TERM.cbreak():
         while True:
+            two_digit_seq = len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit())
+
             # 1. Two digit sequence -- jump to post number
-            if len(keyseqs) == 2 and  pure.all_satisfy(keyseqs, m.isdigit()):
+            if two_digit_seq:
                 ui.jump_to_image(image.data, pure.concat_seqs_to_int(keyseqs))
                 keyseqs = []
 
@@ -176,8 +178,10 @@ def user_prompt(user):
 
     with TERM.cbreak():
         while True:
+            two_digit_seq = len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit())
+
             # 1. Two digit sequence -- view artist given number
-            if len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit()):
+            if two_digit_seq:
                 return user.go_artist_mode(pure.concat_seqs_to_int(keyseqs))
 
             # 2. Ask and wait for user input

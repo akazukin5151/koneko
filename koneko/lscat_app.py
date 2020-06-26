@@ -13,12 +13,17 @@ from koneko import KONEKODIR, pure, lscat, config
 
 # Globals
 term = Terminal()
-# Must make a copy before using this reference
-SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
+# Constants
+ENTER = 343
 PLUS = {'+', '='}
 MINUS = {'-', '_'}
-ENTER = 343
+# Must make a copy before using this reference
+SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
+
+# Pure
+def line_width(spacings: 'list[int]', ncols: int) -> int:
+    return sum(spacings) + ncols
 
 # Utility functions used in multiple places
 def write(value: str) -> 'IO':
@@ -49,9 +54,6 @@ def print_doc(doc: str) -> 'IO':
 
 
 # More specialised but still small functions
-def line_width(spacings: 'list[int]', ncols: int) -> int:
-    return sum(spacings) + ncols
-
 def print_cols(spacings: 'list[int]', ncols: int) -> 'IO':
     for (idx, space) in enumerate(spacings[:ncols]):
         write(' ' * int(space))
@@ -129,8 +131,9 @@ def main():
     func = case.get(ans, None)
     if func:
         func()
-    else:
+    elif ans != 'q':
         print('Invalid command! Exiting...')
+    # If it's q, it will quit without printing
 
 
 def display_gallery():

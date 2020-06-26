@@ -164,10 +164,11 @@ def generate_users(path, print_info=True) -> 'IO':
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
-        message = ''.join([number, '\n', ' ' * message_xcoord, artist_name])
 
-        if print_info:  # Print the message (artist name)
-            print(' ' * message_xcoord, message)
+        if print_info:
+            print(' ' * message_xcoord, number, '\n',
+                  ' ' * message_xcoord, artist_name,
+                  sep='')
         print('\n' * page_spacing)  # Scroll to new 'page'
 
         with utils.cd(path):
@@ -223,16 +224,4 @@ def generate_previews(path, min_num) -> 'IO':
                 align='left', x=_xcoords[x], y=rowspaces[y]
             )
 
-if __name__ == '__main__':
-    from koneko import KONEKODIR
 
-    class FakeData:
-        def __init__(self):
-            # Either testuser or testgallery
-            self.download_path = KONEKODIR / 'testgallery'
-
-    data = FakeData()
-    # Use whichever mode you pasted into the test dir
-    # For Users, make sure it has a .koneko file
-    #show_instant(TrackDownloadsUsers, data)
-    show_instant(TrackDownloads, data)

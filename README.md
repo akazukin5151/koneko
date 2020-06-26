@@ -120,6 +120,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 #### Fixed
 
+* Fixed a bug where some images or mode might not update outdated images
+
 #### Code maintenance
 
 # Roadmap
@@ -136,7 +138,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * View recommended illusts (illust_recommended)
 
 ## Known bugs
-* illust follow mode seems to be not updating outdated images? Most reliable mitigation is to manually delete the folder
 * Reloading then going back just redraws the current mode again, with possible instability
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
 * Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below

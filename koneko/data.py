@@ -62,10 +62,6 @@ class GalleryData:
         """Get the image id for a specified specified post number"""
         return self.post_json(post_number)['id']
 
-    @property
-    def first_img(self) -> str:
-        return pure.post_titles_in_page(self.current_illusts)[0]
-
     def url(self, number: int) -> str:
         return pure.url_given_size(self.post_json(number), 'large')
 
@@ -180,8 +176,4 @@ class UserData:
     def splitpoint(self) -> int:
         """Number of artists. The number where artists stop and previews start"""
         return len(self.profile_pic_urls)
-
-    @property
-    def first_img(self) -> str:
-        return self.all_names[0]
 

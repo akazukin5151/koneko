@@ -255,7 +255,7 @@ def config_assistance():
         print(f'page_spacing = {page_spacing}')
 
     if ans in {'5', 'a'}:
-        print(f'gallery_print_spacing =',
+        print('gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
     if ans in {'6', 'a'}:
@@ -620,14 +620,14 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
                 spacings[current_selection] -= 1
 
             # right arrow
-            elif (ans.code == 261 or ans in {'d', 'l'} and
-                    current_selection < len(spacings) - 1):
+            elif (ans.code == 261 or ans in {'d', 'l'}
+                    and current_selection < len(spacings) - 1):
                 current_selection += 1
 
             # left arrow
-            elif (ans.code == 260 or ans in {'a', 'h'} and
-                    current_selection > 0):
-                    current_selection -= 1
+            elif (ans.code == 260 or ans in {'a', 'h'}
+                    and current_selection > 0):
+                current_selection -= 1
 
             elif ans.code == ENTER:
                 return spacings

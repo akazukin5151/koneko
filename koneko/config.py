@@ -12,7 +12,7 @@ from returns.result import safe
 from placeholder import m
 from pipey import Pipeable as P
 
-from koneko import pure, lscat
+from koneko import pure
 
 TERM = Terminal()
 

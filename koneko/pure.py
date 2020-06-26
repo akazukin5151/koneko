@@ -6,10 +6,8 @@ Most input data come from impure sources (user input or network request), but th
 
 import os
 import re
-from functools import partial
 from pathlib import Path
 
-import funcy
 from placeholder import _
 from pipey import Pipeable as P
 

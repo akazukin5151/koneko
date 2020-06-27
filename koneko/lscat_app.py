@@ -227,7 +227,7 @@ def pick_dir():
     while True:
         title = (
             'Select a directory to view\n'
-            'If you want to display this directory, enter "y"\n'
+            "Press 'y' to display the current directory\n"
             "Press 'b' to move up a directory\n"
             "Press 'd' to delete the current directory\n"
             "Press 'q' to exit"

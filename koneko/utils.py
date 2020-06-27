@@ -85,8 +85,12 @@ def verify_full_download(filepath: Path) -> bool:
     return True
 
 def dir_up_to_date(data, _dir) -> bool:
+    # O(1) time
+    if len(_dir) < len(data.all_names):
+        return False
+
     # Should not fail because try-except early returned
-    for name, _file in itertools.zip_longest(data.all_names, sorted(_dir), fillvalue=''):
+    for name, _file in zip(data.all_names, sorted(_dir)):
         if name not in _file:
             return False
     return True

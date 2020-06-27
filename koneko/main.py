@@ -137,9 +137,9 @@ class AbstractLoop(ABC):
                 self._prompt_url_id()
                 self._process_raw_answer()
 
-                if not self._validate_input():
-                    self._user_input = None
-                    continue
+            if not self._validate_input():
+                self._user_input = None
+                continue
 
             self._go_to_mode()
 

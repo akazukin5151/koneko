@@ -148,6 +148,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * View recommended illusts (illust_recommended)
 
 ## Known bugs
+
+* Passing an invalid command via cli will re-prompt the user, but ctrl+c traps the user in koneko with no way to quit.
 * Reloading then going back just redraws the current mode again, with possible instability
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
 * Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below

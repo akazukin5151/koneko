@@ -33,6 +33,7 @@ from pathlib import Path
 from shutil import rmtree
 from abc import ABC, abstractmethod
 
+from pick import Picker
 from pixcat import Image
 from docopt import docopt
 from blessed import Terminal
@@ -161,30 +162,32 @@ def main():
 
 def _main():
     os.system('clear')
-    print(*('Welcome to the lscat interactive script',
+    title = ('Welcome to the lscat interactive script\n'
+             'Please select an action')
+    actions = (
         '1. Launch koneko configuration assistance',
         '2. Display KONEKODIR / testgallery',
         '3. Display KONEKODIR / testuser',
         '4. Browse a cached dir to display',
-        '5. Display a specified path'), sep='\n')
-
-    ans = input('\nPlease select an action: ')
-    print('')
+        '5. Display a specified path',
+        'Quit'
+    )
+    picker = Picker(actions, title)
+    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
+    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+    _, ans = picker.start()
 
     case = {
-        '1': config_assistance,
-        '2': display_gallery,
-        '3': display_user,
-        '4': browse_cache,
-        '5': display_path
+        0: config_assistance,
+        1: display_gallery,
+        2: display_user,
+        3: browse_cache,
+        4: display_path,
     }
 
     func = case.get(ans, None)
     if func:
         func()
-    elif ans != 'q':
-        print('Invalid command! Exiting...')
-    # If it's q, it will quit without printing
 
 
 def display_gallery():
@@ -219,15 +222,23 @@ def pick_dir():
     path = KONEKODIR
 
     while True:
-        files = sorted(os.listdir(path))
-        for i, f in enumerate(files):
-            print(i, '--', f)
+        title = (
+            'Select a directory to view\n'
+            'If you want to display this directory, enter "y"\n'
+            "Enter 'b' to move up a directory\n"
+            "Enter 'd' to delete the current directory"
+        )
+        actions = sorted(os.listdir(path))
 
-        print('\nSelect a directory to view (enter its index)')
-        print('If you want to display this directory, enter "y"')
-        print("Enter 'b' to move up a directory")
-        print("Enter 'd' to delete the current directory")
-        ans = input()
+        picker = Picker(actions, title)
+        picker.register_custom_handler(ord('w'), lambda p: p.move_up())
+        picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+        picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
+        picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
+        picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
+        picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
+
+        _, ans = picker.start()
         check_quit(ans)
 
         if ans == 'y':
@@ -237,30 +248,40 @@ def pick_dir():
             path = path.parent
 
         elif ans == 'd':
-            confirm = input(f'Are you sure you want to delete {path}?\n')
+            print(f'Are you sure you want to delete {path}?')
+            confirm = input("Enter 'y' to confirm\n")
             if confirm == 'y':
                 rmtree(path)
                 path = path.parent
 
-        elif ans.isdigit():
-            path = path / files[int(ans)]
-
         else:
-            print('Invalid command!')
+            path = path / actions[ans]
 
 
 
-def ask_assistant():
-    print(*('\n=== Configuration assistance ===',
-        'Please select an action index',
+def ask_assistant() -> 'IO[str]':
+    title = ('=== Configuration assistance ===\n'
+             'Please select an action')
+
+    actions = (
         '1. Thumbnail size',
         '2. x-padding',
         '3. y-padding',
         '4. Page spacing',
         '5. Gallery print spacing',
         '6. User mode print info x-position',
-        'a. (Run all of the above)\n'), sep='\n')
-    return input()
+        'a. (Run all of the above)\n',
+        'Quit'
+    )
+
+    picker = Picker(actions, title)
+    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
+    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+    _, ans = picker.start()
+
+    if ans == 6:
+        return 'a'
+    return str(ans + 1)
 
 def config_assistance(action=None):
     """Some assistants return a new setting, which should be propagated

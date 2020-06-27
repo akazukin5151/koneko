@@ -257,6 +257,8 @@ def pick_dir():
 
         else:
             path = path / actions[ans]
+            if not path.is_dir():
+                path = path.parent
 
 
 

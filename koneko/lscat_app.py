@@ -232,12 +232,10 @@ def pick_dir():
             "Enter 'd' to delete the current directory"
         )
         actions = sorted(os.listdir(path))
-
         picker = ws_picker(actions, title)
-        picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
-        picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
-        picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
-        picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
+
+        for key in 'ybdq':
+            picker.register_custom_handler(ord(key), lambda p: (None, key))
 
         _, ans = picker.start()
         check_quit(ans)

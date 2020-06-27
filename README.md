@@ -149,6 +149,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Known bugs
 
+* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts.
 * Passing an invalid command via cli will re-prompt the user, but ctrl+c traps the user in koneko with no way to quit.
 * Reloading then going back just redraws the current mode again, with possible instability
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.

@@ -137,11 +137,11 @@ class AbstractLoop(ABC):
             if self._prompted and not self._user_input:
                 self._prompt_url_id()
                 self._process_raw_answer()
-                # TODO: the loop doesn't actually do anything because invalid inputs
-                # return to main. It should `continue` the while loop
+
                 if not self._validate_input():
-                    return False
-                os.system('clear')
+                    self._prompted = True
+                    self._user_input = None
+                    continue
 
             self._go_to_mode()
 
@@ -176,6 +176,7 @@ class ArtistModeLoop(AbstractLoop):
         self._raw_answer = input('Enter artist ID or url:\n')
 
     def _go_to_mode(self):
+        os.system('clear')
         self.mode = ui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
@@ -195,6 +196,7 @@ class ViewPostModeLoop(AbstractLoop):
         self._user_input = pure.process_artwork_url(self._raw_answer)
 
     def _go_to_mode(self):
+        os.system('clear')
         ui.view_post_mode(self._user_input)
         # After backing
         main()
@@ -217,6 +219,7 @@ class SearchUsersModeLoop(AbstractLoop):
         return True
 
     def _go_to_mode(self):
+        os.system('clear')
         self.mode = ui.SearchUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
@@ -233,6 +236,7 @@ class FollowingUserModeLoop(AbstractLoop):
         self._raw_answer = input('Enter your pixiv ID or url: ')
 
     def _go_to_mode(self):
+        os.system('clear')
         self.mode = ui.FollowingUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()

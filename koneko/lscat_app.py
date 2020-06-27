@@ -210,12 +210,10 @@ def browse_cache():
     path = pick_dir()
     data = FakeData(path)
 
-    ans = input('Does this directory have a .koneko file? [y/N] ')
-
-    if ans == 'n':
-        lscat.show_instant(lscat.TrackDownloads, data, True)
-    else:
+    if '.koneko' in os.listdir(path):
         lscat.show_instant(lscat.TrackDownloadsUsers, data)
+    else:
+        lscat.show_instant(lscat.TrackDownloads, data, True)
 
 def pick_dir():
     path = KONEKODIR

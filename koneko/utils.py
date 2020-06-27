@@ -6,6 +6,7 @@ import itertools
 import threading
 from math import ceil
 from pathlib import Path
+from shutil import rmtree
 from contextlib import contextmanager
 
 import funcy
@@ -135,4 +136,4 @@ def open_link_num(data, number) -> 'IO':
 
 def remove_dir_if_exist(data):
     if data.download_path.is_dir():
-        os.system(f'rm -r {data.download_path}')
+        rmtree(data.download_path)

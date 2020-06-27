@@ -30,6 +30,7 @@ import sys
 import time
 from copy import copy
 from pathlib import Path
+from shutil import rmtree
 from abc import ABC, abstractmethod
 
 from pixcat import Image
@@ -240,7 +241,7 @@ def pick_dir():
         elif ans == 'd':
             confirm = input(f'Are you sure you want to delete {path}?\n')
             if confirm == 'y':
-                os.system(f'rm -r {path}')
+                rmtree(path)
                 path = path.parent
 
         elif ans.isdigit():

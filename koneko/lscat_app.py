@@ -2,7 +2,7 @@
 
 Usage:
   lscat
-  lscat (1|c) [<action>]
+  lscat (1|c) [<actions>...]
   lscat (2|g)
   lscat (3|u)
   lscat (4|b)
@@ -145,7 +145,7 @@ def main():
     args = docopt(__doc__)
 
     if args['1'] or args['c']:
-        config_assistance(args['<action>'])
+        config_assistance(args['<actions>'])
 
     elif args['2'] or args['g']:
         display_gallery()
@@ -283,14 +283,15 @@ def ask_assistant() -> 'IO[list[int]]':
     return [x[1] + 1 for x in selected_actions]
 
 
-def config_assistance(action=None):
+def config_assistance(actions: 'Optional[list[int]]' = None):
     """Some assistants return a new setting, which should be propagated
     to other assistants.
     """
-    if not action:
+    if not actions:
         actions = ask_assistant()
     else:
-        actions = action
+        # Docopt intercepts additional arguments as str
+        actions = [int(x) for x in actions]
 
     if 1 in actions or 7 in actions:
         size = thumbnail_size_assistant()

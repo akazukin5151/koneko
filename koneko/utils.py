@@ -2,16 +2,30 @@
 
 import os
 import imghdr
+import logging
 import itertools
 import threading
 from math import ceil
 from pathlib import Path
 from shutil import rmtree
 from contextlib import contextmanager
+from logging.handlers import RotatingFileHandler
 
 import funcy
 
+from koneko import KONEKODIR
 from koneko.config import ncols_config
+
+
+def setup_history_log():
+    logger = logging.getLogger('history')
+    handler = RotatingFileHandler(KONEKODIR / '.history', maxBytes=1e6, backupCount=3)
+    formatter = logging.Formatter('%(message)s')
+
+    logger.setLevel(logging.INFO)  # Global, applies to all handlers
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
 
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':

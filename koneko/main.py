@@ -16,7 +16,7 @@ import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, config, prompt, screens
+from koneko import ui, api, cli, pure, utils, config, prompt, screens
 
 
 def handle_missing_pics() -> 'IO':
@@ -141,6 +141,7 @@ class AbstractLoop(ABC):
                 self._user_input = None
                 continue
 
+            self._save_history()
             self._go_to_mode()
 
     @abstractmethod
@@ -158,6 +159,10 @@ class AbstractLoop(ABC):
         except ValueError:
             print('Invalid image ID!')
             return False
+
+    def _save_history(self):
+        logger = utils.setup_history_log()
+        logger.info(self._user_input)
 
     @abstractmethod
     def _go_to_mode(self):

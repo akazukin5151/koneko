@@ -2,7 +2,7 @@
 
 Usage:
   lscat
-  lscat (1|c) [<actions>...]
+  lscat (1|c) [<actions> ...]
   lscat (2|g)
   lscat (3|u)
   lscat (4|b)
@@ -122,6 +122,11 @@ def hide_if_exist(image: Image) -> 'IO':
         image.hide()
         move_cursor_up(1)
 
+def ws_picker(actions, title, **kwargs):
+    picker = Picker(actions, title, **kwargs)
+    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
+    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+    return picker
 
 class FakeData:
     def __init__(self, path):
@@ -172,9 +177,7 @@ def _main():
         '5. Display a specified path',
         'Quit'
     )
-    picker = Picker(actions, title)
-    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
-    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+    picker = ws_picker(actions, title)
     _, ans = picker.start()
 
     case = {
@@ -230,9 +233,7 @@ def pick_dir():
         )
         actions = sorted(os.listdir(path))
 
-        picker = Picker(actions, title)
-        picker.register_custom_handler(ord('w'), lambda p: p.move_up())
-        picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+        picker = ws_picker(actions, title)
         picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
         picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
         picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
@@ -275,10 +276,7 @@ def ask_assistant() -> 'IO[list[int]]':
         'Quit'
     )
 
-    picker = Picker(actions, title, multiselect=True, min_selection_count=1)
-    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
-    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
-
+    picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
     selected_actions = picker.start()
     return [x[1] + 1 for x in selected_actions]
 

@@ -19,7 +19,7 @@ from koneko.config import ncols_config
 
 def setup_history_log():
     logger = logging.getLogger('history')
-    handler = RotatingFileHandler(KONEKODIR / '.history', maxBytes=1e6, backupCount=3)
+    handler = RotatingFileHandler(KONEKODIR / 'history', maxBytes=1e6, backupCount=3)
     formatter = logging.Formatter('%(message)s')
 
     logger.setLevel(logging.INFO)  # Global, applies to all handlers

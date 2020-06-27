@@ -259,9 +259,10 @@ def pick_dir():
 
 
 
-def ask_assistant() -> 'IO[str]':
+def ask_assistant() -> 'IO[list[int]]':
+    """Returns a collection of all the indices of actions"""
     title = ('=== Configuration assistance ===\n'
-             'Please select an action')
+             'Press SPACE to select an action & ENTER to confirm')
 
     actions = (
         '1. Thumbnail size',
@@ -274,48 +275,47 @@ def ask_assistant() -> 'IO[str]':
         'Quit'
     )
 
-    picker = Picker(actions, title)
+    picker = Picker(actions, title, multiselect=True, min_selection_count=1)
     picker.register_custom_handler(ord('w'), lambda p: p.move_up())
     picker.register_custom_handler(ord('s'), lambda p: p.move_down())
-    _, ans = picker.start()
 
-    if ans == 6:
-        return 'a'
-    return str(ans + 1)
+    selected_actions = picker.start()
+    return [x[1] + 1 for x in selected_actions]
+
 
 def config_assistance(action=None):
     """Some assistants return a new setting, which should be propagated
     to other assistants.
     """
     if not action:
-        ans = ask_assistant()
+        actions = ask_assistant()
     else:
-        ans = action
+        actions = action
 
-    if ans in {'1', 'a'}:
+    if 1 in actions or 7 in actions:
         size = thumbnail_size_assistant()
     else:
         size = config.thumbnail_size_config()  # Fallback
 
-    if ans in {'2', 'a'}:
+    if 2 in actions or 7 in actions:
         xpadding, image_width = xpadding_assistant(size)
     else:
         # Fallbacks
         _, xpadding = config.get_gen_users_settings()
         image_width, _ = config._width_padding('width', 'x', (0, 2))
 
-    if ans in {'3', 'a'}:
+    if 3 in actions or 7 in actions:
         ypadding, image_height = ypadding_assistant(size)
 
-    if ans in {'4', 'a'}:
+    if 4 in actions or 7 in actions:
         page_spacing = page_spacing_assistant(size)
 
-    if ans in {'5', 'a'}:
+    if 5 in actions or 7 in actions:
         gallery_print_spacing = gallery_print_spacing_assistant(
             size, xpadding, image_width
         )
 
-    if ans in {'6', 'a'}:
+    if 6 in actions or 7 in actions:
         user_info_xcoord = user_info_assistant(
             size,
             xpadding,
@@ -324,25 +324,25 @@ def config_assistance(action=None):
 
 
     print('\n\nYour recommended settings are:')
-    if ans in {'1', 'a'}:
+    if 1 in actions or 7 in actions:
         print(f'image_thumbnail_size = {size}')
 
-    if ans in {'2', 'a'}:
+    if 2 in actions or 7 in actions:
         print(f'image_width = {image_width}')
         print(f'images_x_spacing = {xpadding}')
 
-    if ans in {'3', 'a'}:
+    if 3 in actions or 7 in actions:
         print(f'image_height = {image_height}')
         print(f'images_y_spacing = {ypadding}')
 
-    if ans in {'4', 'a'}:
+    if 4 in actions or 7 in actions:
         print(f'page_spacing = {page_spacing}')
 
-    if ans in {'5', 'a'}:
+    if 5 in actions or 7 in actions:
         print('gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
-    if ans in {'6', 'a'}:
+    if 6 in actions or 7 in actions:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 
     input('\nEnter any key to quit\n')

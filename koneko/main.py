@@ -124,11 +124,11 @@ class AbstractLoop(ABC):
     wait for api thread to finish logging in
     activates the selected mode (needs to be overridden)
     """
-    def __init__(self, prompted: bool, user_input: str):
+    def __init__(self, prompted: bool, user_input: 'Optional[str]'):
         self._prompted = prompted
         self._user_input = user_input
         # Defined by classes that inherit this in _prompt_url_id()
-        self._url_or_id: str
+        self._raw_answer: str
         self.mode: 'ui'
 
     def start(self):
@@ -136,7 +136,9 @@ class AbstractLoop(ABC):
         while True:
             if self._prompted and not self._user_input:
                 self._prompt_url_id()
-                self._process_url_or_input()
+                self._process_raw_answer()
+                # TODO: the loop doesn't actually do anything because invalid inputs
+                # return to main. It should `continue` the while loop
                 if not self._validate_input():
                     return False
                 os.system('clear')
@@ -145,11 +147,12 @@ class AbstractLoop(ABC):
 
     @abstractmethod
     def _prompt_url_id(self) -> str:
-        """define self._url_or_id here"""
+        """Define self._raw_answer here"""
         raise NotImplementedError
 
-    def _process_url_or_input(self) -> str:
-        self._user_input = pure.process_user_url(self._url_or_id)
+    def _process_raw_answer(self) -> str:
+        """Process self._raw_answer here into self._user_input"""
+        self._user_input = pure.process_user_url(self._raw_answer)
 
     def _validate_input(self) -> 'Maybe[int]':
         try:
@@ -170,10 +173,9 @@ class ArtistModeLoop(AbstractLoop):
     before proceeding
     """
     def _prompt_url_id(self) -> str:
-        self._url_or_id = input('Enter artist ID or url:\n')
+        self._raw_answer = input('Enter artist ID or url:\n')
 
     def _go_to_mode(self):
-        #self.mode = ui.ArtistGallery(self._user_input)
         self.mode = ui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
@@ -186,11 +188,11 @@ class ViewPostModeLoop(AbstractLoop):
     before proceeding
     """
     def _prompt_url_id(self) -> str:
-        self._url_or_id = input('Enter pixiv post url or ID:\n')
+        self._raw_answer = input('Enter pixiv post url or ID:\n')
 
-    def _process_url_or_input(self) -> str:
+    def _process_raw_answer(self) -> str:
         """Overriding base class to account for 'illust_id' cases"""
-        self._user_input = pure.process_artwork_url(self._url_or_id)
+        self._user_input = pure.process_artwork_url(self._raw_answer)
 
     def _go_to_mode(self):
         ui.view_post_mode(self._user_input)
@@ -204,11 +206,11 @@ class SearchUsersModeLoop(AbstractLoop):
     before proceeding
     """
     def _prompt_url_id(self) -> str:
-        self._url_or_id = input('Enter search string:\n')
+        self._raw_answer = input('Enter search string:\n')
 
-    def _process_url_or_input(self) -> str:
+    def _process_raw_answer(self) -> str:
         """the 'url or id' name doesn't really apply; accepts all strings"""
-        self._user_input = self._url_or_id
+        self._user_input = self._raw_answer
 
     def _validate_input(self) -> bool:
         """Overriding base class: all inputs are valid"""
@@ -228,7 +230,7 @@ class FollowingUserModeLoop(AbstractLoop):
     skipped
     """
     def _prompt_url_id(self) -> str:
-        self._url_or_id = input('Enter your pixiv ID or url: ')
+        self._raw_answer = input('Enter your pixiv ID or url: ')
 
     def _go_to_mode(self):
         self.mode = ui.FollowingUsers(self._user_input)

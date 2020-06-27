@@ -144,7 +144,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Show existing IDs in the cache and delete their directories. Basics are already in lscat app browse cache, but add:
     * Better look and feel, such as labeling IDs and page numbers.
-    * Perhaps use [pick](https://github.com/wong2/pick) for selection
     * Launch from `koneko`, documentate this as an offline mode
 * Show frequently searched IDs/strings with an option to select them.
 * Go to related works from image view (illust_related)

@@ -228,8 +228,9 @@ def pick_dir():
         title = (
             'Select a directory to view\n'
             'If you want to display this directory, enter "y"\n'
-            "Enter 'b' to move up a directory\n"
-            "Enter 'd' to delete the current directory"
+            "Press 'b' to move up a directory\n"
+            "Press 'd' to delete the current directory\n"
+            "Press 'q' to exit"
         )
         actions = sorted(os.listdir(path))
 
@@ -246,7 +247,8 @@ def pick_dir():
             return path
 
         elif ans == 'b':
-            path = path.parent
+            if path != KONEKODIR:
+                path = path.parent
 
         elif ans == 'd':
             print(f'Are you sure you want to delete {path}?')

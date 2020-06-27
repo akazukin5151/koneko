@@ -227,6 +227,7 @@ def pick_dir():
         print('\nSelect a directory to view (enter its index)')
         print('If you want to display this directory, enter "y"')
         print("Enter 'b' to move up a directory")
+        print("Enter 'd' to delete the current directory")
         ans = input()
         check_quit(ans)
 
@@ -235,10 +236,16 @@ def pick_dir():
 
         elif ans == 'b':
             path = path.parent
-            continue
 
-        if ans.isdigit():
+        elif ans == 'd':
+            confirm = input(f'Are you sure you want to delete {path}?\n')
+            if confirm == 'y':
+                os.system(f'rm -r {path}')
+                path = path.parent
+
+        elif ans.isdigit():
             path = path / files[int(ans)]
+
         else:
             print('Invalid command!')
 

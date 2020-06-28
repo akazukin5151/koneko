@@ -41,6 +41,9 @@ def frequent_history_items(mode: str, n=5) -> 'dict[str, int]':
 
     return dict(Counter(items_in_mode).most_common(n))
 
+def display_frequent(counter: 'dict[str, int]'):
+    [print(f'{k} -- ({v})') for k,v in counter.items()]
+
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
     """Takes prompt input key seqs, find the selected image number.

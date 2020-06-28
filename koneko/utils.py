@@ -8,6 +8,7 @@ import threading
 from math import ceil
 from pathlib import Path
 from shutil import rmtree
+from collections import Counter
 from contextlib import contextmanager
 from logging.handlers import RotatingFileHandler
 
@@ -26,6 +27,21 @@ def setup_history_log():
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
+
+def frequent_history_items(mode: str, n=5) -> 'dict[str, int]':
+    with cd(KONEKODIR):
+        with open('history', 'r') as f:
+            history = f.read()
+
+    items = history.split('\n')[:-1]  # Ignore trailing \n
+
+    items_in_mode = []
+    for item in items:
+        modeinfo, msg = item.split(': ')
+        if modeinfo == mode:
+            items_in_mode.append(msg)
+
+    return dict(Counter(items_in_mode).most_common(n))
 
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':

@@ -169,6 +169,11 @@ class AbstractLoop(ABC):
         """Define self.mode here"""
         raise NotImplementedError
 
+    @abstractmethod
+    def __str__(self):
+        """Print a hard-coded string of the current mode number"""
+        raise NotImplementedError
+
 
 class ArtistModeLoop(AbstractLoop):
     """
@@ -184,6 +189,9 @@ class ArtistModeLoop(AbstractLoop):
         prompt.gallery_like_prompt(self.mode)
         # This is the entry mode, user goes back but there is nothing to catch it
         main()
+
+    def __str__(self):
+        return '1: '
 
 
 class ViewPostModeLoop(AbstractLoop):
@@ -203,6 +211,9 @@ class ViewPostModeLoop(AbstractLoop):
         ui.view_post_mode(self._user_input)
         # After backing
         main()
+
+    def __str__(self):
+        return '2: '
 
 
 class SearchUsersModeLoop(AbstractLoop):
@@ -227,6 +238,9 @@ class SearchUsersModeLoop(AbstractLoop):
         prompt.user_prompt(self.mode)
         main()
 
+    def __str__(self):
+        return '3: '
+
 
 class FollowingUserModeLoop(AbstractLoop):
     """
@@ -243,6 +257,9 @@ class FollowingUserModeLoop(AbstractLoop):
         self.mode = ui.FollowingUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
+
+    def __str__(self):
+        return '4: '
 
 def illust_follow_mode_loop():
     """Immediately goes to IllustFollow()"""

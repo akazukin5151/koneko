@@ -90,3 +90,9 @@ def test_dir_not_empty():
 
     data = FakeData()
     assert utils.dir_not_empty(data)
+
+
+def test_frequent_history_items():
+    utils.frequent_history_items('1')
+
+

@@ -30,7 +30,7 @@ def setup_history_log():
     logger.addHandler(handler)
     return logger
 
-def read_history():
+def read_history() -> 'list[str]':
     with cd(KONEKODIR):
         with open('history', 'r') as f:
             history = f.read()

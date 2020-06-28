@@ -154,12 +154,13 @@ class AbstractLoop(ABC):
         """Process self._raw_answer here into self._user_input"""
         self._user_input = pure.process_user_url(self._raw_answer)
 
-    def _validate_input(self) -> 'Maybe[int]':
+    def _validate_input(self) -> 'bool':
         try:
-            return int(self._user_input)
+            int(self._user_input)
         except ValueError:
             print('Invalid image ID!')
             return False
+        return True
 
     def _save_history(self):
         logger = utils.setup_history_log()

@@ -26,7 +26,7 @@ class GalleryData:
             ...
         next_url                (next JSON url)         self.next_url
     """
-    def __init__(self, page_num: int, main_path: str):
+    def __init__(self, page_num: int, main_path: 'Path'):
         self.page_num = page_num
         self.main_path = main_path
         self.all_pages_cache = {}
@@ -115,15 +115,15 @@ class ImageData:
 
 class UserData:
     """Stores data for user views (modes 3 and 4)"""
-    def __init__(self, page_num: int, main_path: str):
+    def __init__(self, page_num: int, main_path: 'Path'):
         self.page_num = page_num
         self.main_path = main_path
         self.offset = 0
+
         # Defined in update()
         self.next_url: str
         self.profile_pic_urls: 'list[str]'
         self.image_urls: 'list[str]'
-
         self.ids_cache, self.names_cache = {}, {}
 
     @property

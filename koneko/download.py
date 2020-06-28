@@ -23,6 +23,7 @@ but ui can call download_url()
 import os
 import itertools
 from pathlib import Path
+from shutil import rmtree
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
@@ -47,7 +48,7 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
     if data.page_num == 1:
         print('Cache is outdated, reloading...')
     if data.download_path.is_dir():
-        os.system(f'rm -r {data.download_path}')  # shutil.rmtree is better
+        rmtree(data.download_path)
 
     _async_download_rename(data.download_path, data.all_urls, data.all_names, tracker)
 

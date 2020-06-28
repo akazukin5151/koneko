@@ -2,15 +2,30 @@
 
 import os
 import imghdr
+import logging
 import itertools
 import threading
 from math import ceil
 from pathlib import Path
+from shutil import rmtree
 from contextlib import contextmanager
+from logging.handlers import RotatingFileHandler
 
 import funcy
 
+from koneko import KONEKODIR
 from koneko.config import ncols_config
+
+
+def setup_history_log():
+    logger = logging.getLogger('history')
+    handler = RotatingFileHandler(KONEKODIR / '.history', maxBytes=1e6, backupCount=3)
+    formatter = logging.Formatter('%(message)s')
+
+    logger.setLevel(logging.INFO)  # Global, applies to all handlers
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
 
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
@@ -84,8 +99,12 @@ def verify_full_download(filepath: Path) -> bool:
     return True
 
 def dir_up_to_date(data, _dir) -> bool:
+    # O(1) time
+    if len(_dir) < len(data.all_names):
+        return False
+
     # Should not fail because try-except early returned
-    for name, _file in itertools.zip_longest(data.all_names, sorted(_dir), fillvalue=''):
+    for name, _file in zip(data.all_names, sorted(_dir)):
         if name not in _file:
             return False
     return True
@@ -135,4 +154,4 @@ def open_link_num(data, number) -> 'IO':
 
 def remove_dir_if_exist(data):
     if data.download_path.is_dir():
-        os.system(f'rm -r {data.download_path}')
+        rmtree(data.download_path)

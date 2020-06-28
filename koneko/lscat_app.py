@@ -2,7 +2,7 @@
 
 Usage:
   lscat
-  lscat (1|c) [<action>]
+  lscat (1|c) [<actions> ...]
   lscat (2|g)
   lscat (3|u)
   lscat (4|b)
@@ -30,8 +30,10 @@ import sys
 import time
 from copy import copy
 from pathlib import Path
+from shutil import rmtree
 from abc import ABC, abstractmethod
 
+from pick import Picker
 from pixcat import Image
 from docopt import docopt
 from blessed import Terminal
@@ -120,6 +122,11 @@ def hide_if_exist(image: Image) -> 'IO':
         image.hide()
         move_cursor_up(1)
 
+def ws_picker(actions, title, **kwargs):
+    picker = Picker(actions, title, **kwargs)
+    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
+    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+    return picker
 
 class FakeData:
     def __init__(self, path):
@@ -143,7 +150,7 @@ def main():
     args = docopt(__doc__)
 
     if args['1'] or args['c']:
-        config_assistance(args['<action>'])
+        config_assistance(args['<actions>'])
 
     elif args['2'] or args['g']:
         display_gallery()
@@ -160,30 +167,30 @@ def main():
 
 def _main():
     os.system('clear')
-    print(*('Welcome to the lscat interactive script',
+    title = ('Welcome to the lscat interactive script\n'
+             'Please select an action')
+    actions = (
         '1. Launch koneko configuration assistance',
         '2. Display KONEKODIR / testgallery',
         '3. Display KONEKODIR / testuser',
         '4. Browse a cached dir to display',
-        '5. Display a specified path'), sep='\n')
-
-    ans = input('\nPlease select an action: ')
-    print('')
+        '5. Display a specified path',
+        'Quit'
+    )
+    picker = ws_picker(actions, title)
+    _, ans = picker.start()
 
     case = {
-        '1': config_assistance,
-        '2': display_gallery,
-        '3': display_user,
-        '4': browse_cache,
-        '5': display_path
+        0: config_assistance,
+        1: display_gallery,
+        2: display_user,
+        3: browse_cache,
+        4: display_path,
     }
 
     func = case.get(ans, None)
     if func:
         func()
-    elif ans != 'q':
-        print('Invalid command! Exiting...')
-    # If it's q, it will quit without printing
 
 
 def display_gallery():
@@ -209,86 +216,109 @@ def browse_cache():
     path = pick_dir()
     data = FakeData(path)
 
-    ans = input('Does this directory have a .koneko file? [y/N] ')
-
-    if ans == 'n':
-        lscat.show_instant(lscat.TrackDownloads, data, True)
-    else:
+    if '.koneko' in os.listdir(path):
         lscat.show_instant(lscat.TrackDownloadsUsers, data)
+    else:
+        lscat.show_instant(lscat.TrackDownloads, data, True)
 
 def pick_dir():
     path = KONEKODIR
 
     while True:
-        files = sorted(os.listdir(path))
-        for i, f in enumerate(files):
-            print(i, '--', f)
+        title = (
+            'Select a directory to view\n'
+            "Press 'y' to display the current directory\n"
+            "Press 'b' to move up a directory\n"
+            "Press 'd' to delete the current directory\n"
+            "Press 'q' to exit"
+        )
+        actions = sorted(os.listdir(path))
 
-        print('\nSelect a directory to view (enter its index)')
-        print('If you want to display this directory, enter "y"')
-        print("Enter 'b' to move up a directory")
-        ans = input()
+        picker = ws_picker(actions, title)
+        picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
+        picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
+        picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
+        picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
+
+        _, ans = picker.start()
         check_quit(ans)
 
         if ans == 'y':
             return path
 
         elif ans == 'b':
-            path = path.parent
-            continue
+            if path != KONEKODIR:
+                path = path.parent
 
-        if ans.isdigit():
-            path = path / files[int(ans)]
+        elif ans == 'd':
+            print(f'Are you sure you want to delete {path}?')
+            confirm = input("Enter 'y' to confirm\n")
+            if confirm == 'y':
+                rmtree(path)
+                path = path.parent
+
         else:
-            print('Invalid command!')
+            path = path / actions[ans]
+            if not path.is_dir():
+                path = path.parent
 
 
 
-def ask_assistant():
-    print(*('\n=== Configuration assistance ===',
-        'Please select an action index',
+def ask_assistant() -> 'IO[list[int]]':
+    """Returns a collection of all the indices of actions"""
+    title = ('=== Configuration assistance ===\n'
+             'Press SPACE to select an action & ENTER to confirm')
+
+    actions = (
         '1. Thumbnail size',
         '2. x-padding',
         '3. y-padding',
         '4. Page spacing',
         '5. Gallery print spacing',
         '6. User mode print info x-position',
-        'a. (Run all of the above)\n'), sep='\n')
-    return input()
+        'a. (Run all of the above)\n',
+        'Quit'
+    )
 
-def config_assistance(action=None):
+    picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
+    selected_actions = picker.start()
+    return [x[1] + 1 for x in selected_actions]
+
+
+def config_assistance(actions: 'Optional[list[int]]' = None):
     """Some assistants return a new setting, which should be propagated
     to other assistants.
     """
-    if not action:
-        ans = ask_assistant()
+    if not actions:
+        actions = ask_assistant()
     else:
-        ans = action
+        # Docopt intercepts additional arguments as str
+        actions = [int(x) for x in actions]
 
-    if ans in {'1', 'a'}:
+    if 1 in actions or 7 in actions:
         size = thumbnail_size_assistant()
     else:
         size = config.thumbnail_size_config()  # Fallback
 
-    if ans in {'2', 'a'}:
+    if 2 in actions or 7 in actions:
         xpadding, image_width = xpadding_assistant(size)
     else:
         # Fallbacks
         _, xpadding = config.get_gen_users_settings()
         image_width, _ = config._width_padding('width', 'x', (0, 2))
 
-    if ans in {'3', 'a'}:
+    if 3 in actions or 7 in actions:
         ypadding, image_height = ypadding_assistant(size)
 
-    if ans in {'4', 'a'}:
+    if 4 in actions or 7 in actions:
         page_spacing = page_spacing_assistant(size)
 
-    if ans in {'5', 'a'}:
+    if 5 in actions or 7 in actions:
         gallery_print_spacing = gallery_print_spacing_assistant(
             size, xpadding, image_width
         )
 
-    if ans in {'6', 'a'}:
+    if 6 in actions or 7 in actions:
         user_info_xcoord = user_info_assistant(
             size,
             xpadding,
@@ -297,25 +327,25 @@ def config_assistance(action=None):
 
 
     print('\n\nYour recommended settings are:')
-    if ans in {'1', 'a'}:
+    if 1 in actions or 7 in actions:
         print(f'image_thumbnail_size = {size}')
 
-    if ans in {'2', 'a'}:
+    if 2 in actions or 7 in actions:
         print(f'image_width = {image_width}')
         print(f'images_x_spacing = {xpadding}')
 
-    if ans in {'3', 'a'}:
+    if 3 in actions or 7 in actions:
         print(f'image_height = {image_height}')
         print(f'images_y_spacing = {ypadding}')
 
-    if ans in {'4', 'a'}:
+    if 4 in actions or 7 in actions:
         print(f'page_spacing = {page_spacing}')
 
-    if ans in {'5', 'a'}:
+    if 5 in actions or 7 in actions:
         print('gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
-    if ans in {'6', 'a'}:
+    if 6 in actions or 7 in actions:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 
     input('\nEnter any key to quit\n')

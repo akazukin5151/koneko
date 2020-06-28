@@ -108,7 +108,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Interactive helper UI to assist configuring lscat numbers (`lscat_app.py`).
     - [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time (`lscat`)
-    - Display 'testgallery' and 'testuser' paths (for internal use)
+    - Display 'testgallery' and 'testuser' paths (for internal and debugging use, just copy over the files)
     - Browse the cache and display a dir
     - Display any path (but all names must be left-padded with a three digit number)
     - [x] image_width
@@ -133,6 +133,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Rename `action_before_prefetch()` to `maybe_join_thread()`
 * Extract out messy condition to bool variables in `prompt.py`
+* Use `shutil.rmtree` instead of `rm` via `os.system`
 
 # Roadmap
 
@@ -141,14 +142,15 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-* Show existing IDs in the cache and delete their directories.
-    * In lscat browse cache mode, add option to delete dir
+* Launch from `koneko`, documentate this as an offline mode
 * Show frequently searched IDs/strings with an option to select them.
-* Offline mode for browsing the existing cache (lscat app does this, document this to users)
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
 
 ## Known bugs
+
+* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts.
+* Passing an invalid command via cli will re-prompt the user, but ctrl+c traps the user in koneko with no way to quit.
 * Reloading then going back just redraws the current mode again, with possible instability
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
 * Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below

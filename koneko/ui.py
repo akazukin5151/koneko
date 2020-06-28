@@ -3,6 +3,7 @@
 import os
 import sys
 import threading
+from shutil import rmtree
 from abc import ABC, abstractmethod
 
 import funcy
@@ -150,7 +151,7 @@ class AbstractUI(ABC):
         print('This will delete cached images and redownload them. Proceed?')
         ans = input(f'Directory to be deleted: {self.data.main_path}\n')
         if ans == 'y' or not ans:
-            os.system(f'rm -r {self.data.main_path}')  # shutil.rmtree is better
+            rmtree(self.data.main_path)
             # Will remove all data, but keep info on the main path
             self.start(self.data.main_path)
         prompt.user_prompt(self)

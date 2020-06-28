@@ -123,8 +123,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Remove `users_page_spacing`: it's just `gallery_page_spacing` - 3
 * Rename `gallery_page_spacing` setting to `page_spacing`
 * Show frequently searched IDs/strings with an option to select them with pick.
-    - [ ] On main screen:
-        - [ ] prompt for a mode or
+    - [x] On main screen:
+        - [x] prompt for a mode or
         - [x] select all.
     - [x] On prompt loop, allow '!freq' to launch pick that goes directly to the mode.
 

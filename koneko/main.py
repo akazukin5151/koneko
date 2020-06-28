@@ -162,7 +162,7 @@ class AbstractLoop(ABC):
 
     def _save_history(self):
         logger = utils.setup_history_log()
-        logger.info(self._user_input)
+        logger.info(str(self) + self._user_input)
 
     @abstractmethod
     def _go_to_mode(self):

@@ -92,8 +92,8 @@ def test_dir_not_empty():
     assert utils.dir_not_empty(data)
 
 
-def test_frequent_history_items():
-    counter = utils.frequent_history_mode('1')
-    utils.format_frequent(counter)
+#def test_frequent_history_items():
+#    counter = utils.frequent_history_mode('1')
+#    utils.format_frequent(counter)
 
 

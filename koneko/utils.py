@@ -14,6 +14,7 @@ from logging.handlers import RotatingFileHandler
 
 import funcy
 from pick import Picker
+from placeholder import m
 
 from koneko import KONEKODIR
 from koneko.config import ncols_config
@@ -40,10 +41,7 @@ def frequent_history(n=5) -> 'dict[str, int]':
     return dict(Counter(read_history()).most_common(n))
 
 def frequent_history_mode(mode: str, n=5) -> 'dict[str, int]':
-    items_in_mode = [item.split(': ')[1]
-                     for item in read_history()
-                     if item.split(': ')[0] == mode]
-
+    items_in_mode = filter(m.split(': ')[0] == mode, read_history())
     return dict(Counter(items_in_mode).most_common(n))
 
 def format_frequent(counter: 'dict[str, int]') -> 'list[str]':

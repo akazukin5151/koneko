@@ -139,11 +139,15 @@ class AbstractLoop(ABC):
                 self._process_raw_answer()
 
             if not self._validate_input():
+                print('Invalid image ID!')
                 self._user_input = None
                 continue
 
             self._save_history()
-            self._go_to_mode()
+            if self._user_input == '!freq':
+                frequent_mode(str(self)[0])
+            else:
+                self._go_to_mode()
 
     @abstractmethod
     def _prompt_url_id(self) -> str:
@@ -155,10 +159,12 @@ class AbstractLoop(ABC):
         self._user_input = pure.process_user_url(self._raw_answer)
 
     def _validate_input(self) -> 'bool':
+        if self._user_input == '!freq':
+            return True
+
         try:
             int(self._user_input)
         except ValueError:
-            print('Invalid image ID!')
             return False
         return True
 
@@ -271,11 +277,19 @@ def illust_follow_mode_loop():
     main()
 
 
+def frequent_mode(mode):
+    history = utils.frequent_history_mode(mode)
+    actions = utils.format_frequent(history)
+    _frequent(actions, history)
+
 def frequent():
-    title = ("Please pick an input"
-             "\n[mode]: [pixiv ID or searchstr] (frequency)")
     history = utils.frequent_history()
     actions = utils.format_frequent(history)
+    _frequent(actions, history)
+
+def _frequent(actions, history):
+    title = ("Please pick an input"
+             "\n[mode]: [pixiv ID or searchstr] (frequency)")
     picker = utils.ws_picker(actions, title)
 
     _, idx = picker.start()

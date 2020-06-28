@@ -16,7 +16,8 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         '2. Open pixiv post',
         '3. View following artists',
         '4. Search for artists',
-        '5. View illustrations of all following artists\n',
+        '5. View illustrations of all following artists',
+        'f. Frequent modes and user inputs\n'
         '?. Info',
         'm. Manual',
         'c. Clear koneko cache',

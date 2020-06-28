@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from logging.handlers import RotatingFileHandler
 
 import funcy
+from pick import Picker
 
 from koneko import KONEKODIR
 from koneko.config import ncols_config
@@ -28,21 +29,32 @@ def setup_history_log():
     logger.addHandler(handler)
     return logger
 
-def frequent_history_items(mode: str, n=5) -> 'dict[str, int]':
+def read_history():
     with cd(KONEKODIR):
         with open('history', 'r') as f:
             history = f.read()
 
-    items = history.split('\n')[:-1]  # Ignore trailing \n
+    return history.split('\n')[:-1]  # Ignore trailing \n
 
+def frequent_history(n=5) -> 'dict[str, int]':
+    return dict(Counter(read_history()).most_common(n))
+
+def frequent_history_mode(mode: str, n=5) -> 'dict[str, int]':
     items_in_mode = [item.split(': ')[1]
-                     for item in items
+                     for item in read_history()
                      if item.split(': ')[0] == mode]
 
     return dict(Counter(items_in_mode).most_common(n))
 
-def display_frequent(counter: 'dict[str, int]'):
-    [print(f'{k} -- ({v})') for k,v in counter.items()]
+def format_frequent(counter: 'dict[str, int]') -> 'list[str]':
+    return [f'{k} ({v})' for k,v in counter.items()]
+
+
+def ws_picker(actions, title, **kwargs):
+    picker = Picker(actions, title, **kwargs)
+    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
+    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+    return picker
 
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':

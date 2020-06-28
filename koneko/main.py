@@ -79,6 +79,7 @@ def main_loop(main_command, user_input, your_id: str):
         '2': ViewPostModeLoop(user_input).start,
         '4': SearchUsersModeLoop(user_input).start,
         '5': illust_follow_mode_loop,
+        'f': frequent,
         '?': screens.info_screen_loop,
         'm': screens.show_man_loop,
         'c': screens.clear_cache_loop,
@@ -268,6 +269,30 @@ def illust_follow_mode_loop():
         prompt.gallery_like_prompt(mode)
         # After backing
         main()
+
+
+def frequent():
+    title = ("Please pick an input"
+             "\n[mode]: [pixiv ID or searchstr] (frequency)")
+    history = utils.frequent_history()
+    actions = utils.format_frequent(history)
+    picker = utils.ws_picker(actions, title)
+
+    _, idx = picker.start()
+    ans = tuple(history)[idx]
+    mode, user_input = ans.split(': ')
+
+    case = {
+        '1': ArtistModeLoop(user_input).start,
+        '2': ViewPostModeLoop(user_input).start,
+        '3': FollowingUserModeLoop(user_input).start,
+        '4': SearchUsersModeLoop(user_input).start,
+        '5': illust_follow_mode_loop,
+    }
+    func = case.get(mode, None)
+    if func:
+        func()
+
 
 if __name__ == '__main__':
     main()

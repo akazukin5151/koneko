@@ -93,7 +93,7 @@ def test_dir_not_empty():
 
 
 def test_frequent_history_items():
-    counter = utils.frequent_history_items('1')
-    utils.display_frequent(counter)
+    counter = utils.frequent_history_mode('1')
+    utils.format_frequent(counter)
 
 

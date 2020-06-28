@@ -145,7 +145,7 @@ class AbstractLoop(ABC):
 
             self._save_history()
             if self._user_input == '!freq':
-                frequent_mode(str(self)[0])
+                frequent_mode(str(self))
             else:
                 self._go_to_mode()
 
@@ -170,7 +170,7 @@ class AbstractLoop(ABC):
 
     def _save_history(self):
         logger = utils.setup_history_log()
-        logger.info(str(self) + self._user_input)
+        logger.info(str(self) + ': ' + self._user_input)
 
     @abstractmethod
     def _go_to_mode(self):
@@ -179,7 +179,7 @@ class AbstractLoop(ABC):
 
     @abstractmethod
     def __str__(self):
-        """Print a hard-coded string of the current mode number"""
+        """Return a hard-coded string of the current mode number"""
         raise NotImplementedError
 
 
@@ -199,7 +199,7 @@ class ArtistModeLoop(AbstractLoop):
         main()
 
     def __str__(self):
-        return '1: '
+        return '1'
 
 
 class ViewPostModeLoop(AbstractLoop):
@@ -221,7 +221,7 @@ class ViewPostModeLoop(AbstractLoop):
         main()
 
     def __str__(self):
-        return '2: '
+        return '2'
 
 
 class SearchUsersModeLoop(AbstractLoop):
@@ -247,7 +247,7 @@ class SearchUsersModeLoop(AbstractLoop):
         main()
 
     def __str__(self):
-        return '3: '
+        return '3'
 
 
 class FollowingUserModeLoop(AbstractLoop):
@@ -267,7 +267,7 @@ class FollowingUserModeLoop(AbstractLoop):
         main()
 
     def __str__(self):
-        return '4: '
+        return '4'
 
 def illust_follow_mode_loop():
     """Immediately goes to IllustFollow()"""

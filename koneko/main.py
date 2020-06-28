@@ -144,6 +144,7 @@ class AbstractLoop(ABC):
                 continue
 
             self._save_history()
+
             if self._user_input == '!freq':
                 frequent_mode(str(self))
             else:
@@ -169,8 +170,9 @@ class AbstractLoop(ABC):
         return True
 
     def _save_history(self):
-        logger = utils.setup_history_log()
-        logger.info(str(self) + ': ' + self._user_input)
+        if self._user_input != '!freq':
+            logger = utils.setup_history_log()
+            logger.info(str(self) + ': ' + self._user_input)
 
     @abstractmethod
     def _go_to_mode(self):

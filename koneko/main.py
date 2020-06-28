@@ -146,7 +146,7 @@ class AbstractLoop(ABC):
             self._save_history()
 
             if self._user_input == '!freq':
-                frequent_mode(str(self))
+                frequent_modes([str(self)])
             else:
                 self._go_to_mode()
 
@@ -279,8 +279,8 @@ def illust_follow_mode_loop():
     main()
 
 
-def frequent_mode(mode):
-    history = utils.frequent_history_mode(mode)
+def frequent_modes(modes):
+    history = utils.frequent_history_modes(modes)
     actions = utils.format_frequent(history)
     _frequent(actions, history)
 
@@ -290,11 +290,19 @@ def frequent():
     _frequent(actions, history)
 
 def _frequent(actions, history):
-    title = ("Please pick an input"
-             "\n[mode]: [pixiv ID or searchstr] (frequency)")
+    title = (
+        "Please pick an input\n"
+        "[mode]: [pixiv ID or searchstr] (frequency)\n"
+        "Press 'f' to filter modes"
+    )
+
     picker = utils.ws_picker(actions, title)
+    picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
 
     _, idx = picker.start()
+    if idx == 'f':
+        return filter_freq()
+
     ans = tuple(history)[idx]
     mode, user_input = ans.split(': ')
 
@@ -303,11 +311,25 @@ def _frequent(actions, history):
         '2': ViewPostModeLoop(user_input).start,
         '3': FollowingUserModeLoop(user_input).start,
         '4': SearchUsersModeLoop(user_input).start,
-        '5': illust_follow_mode_loop,
     }
     func = case.get(mode, None)
     if func:
         func()
+
+def filter_freq():
+    title = "Use SPACE to select a mode to show and ENTER to confirm"
+    # Copied from screens
+    actions = (
+        '1. View artist illustrations',
+        '2. Open pixiv post',
+        '3. View following artists',
+        '4. Search for artists',
+    )
+    picker = utils.ws_picker(actions, title, multiselect=True, min_selection_count=1)
+    selected = picker.start()
+    modes = [str(x[1] + 1) for x in selected]
+
+    frequent_modes(modes)
 
 
 if __name__ == '__main__':

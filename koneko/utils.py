@@ -35,11 +35,9 @@ def frequent_history_items(mode: str, n=5) -> 'dict[str, int]':
 
     items = history.split('\n')[:-1]  # Ignore trailing \n
 
-    items_in_mode = []
-    for item in items:
-        modeinfo, msg = item.split(': ')
-        if modeinfo == mode:
-            items_in_mode.append(msg)
+    items_in_mode = [item.split(': ')[1]
+                     for item in items
+                     if item.split(': ')[0] == mode]
 
     return dict(Counter(items_in_mode).most_common(n))
 

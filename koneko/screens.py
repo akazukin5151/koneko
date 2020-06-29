@@ -17,7 +17,7 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         '3. View following artists',
         '4. Search for artists',
         '5. View illustrations of all following artists',
-        'f. Frequent modes and user inputs\n'
+        'f. Frequent modes and user inputs', '',
         '?. Info',
         'm. Manual',
         'c. Clear koneko cache',
@@ -37,7 +37,7 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         f'du -hs --apparent-size {KONEKODIR} | cut -f1',
         shell=True
     ).decode('utf-8').rstrip()
-    print(f'Current cache size: {cache_size}')
+    print(f'\nCurrent cache size: {cache_size}')
 
     command = input('Enter a command: ')
     return command

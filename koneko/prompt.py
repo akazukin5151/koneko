@@ -2,8 +2,9 @@
 
 import sys
 
-from blessed import Terminal
+import funcy
 from placeholder import m
+from blessed import Terminal
 
 from koneko import ui, pure, utils, colors, download
 
@@ -85,10 +86,10 @@ def gallery_like_prompt(gallery):
 
     with TERM.cbreak():
         while True:
-            two_digit_seq = len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit())
+            two_digit_seq = len(keyseqs) == 2 and funcy.all(m.isdigit(), keyseqs)
             one_letter_two_digit_seq = (
                 len(keyseqs) == 3
-                and pure.all_satisfy(keyseqs[1:], m.isdigit())
+                and funcy.all(m.isdigit(), keyseqs[1:])
                 and keyseqs[0] in sequenceable_keys
             )
 
@@ -141,7 +142,7 @@ def image_prompt(image):
 
     with TERM.cbreak():
         while True:
-            two_digit_seq = len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit())
+            two_digit_seq = len(keyseqs) == 2 and funcy.all(m.isdigit(), keyseqs)
 
             # 1. Two digit sequence -- jump to post number
             if two_digit_seq:
@@ -178,7 +179,7 @@ def user_prompt(user):
 
     with TERM.cbreak():
         while True:
-            two_digit_seq = len(keyseqs) == 2 and pure.all_satisfy(keyseqs, m.isdigit())
+            two_digit_seq = len(keyseqs) == 2 and funcy.all(m.isdigit(), keyseqs)
 
             # 1. Two digit sequence -- view artist given number
             if two_digit_seq:

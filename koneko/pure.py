@@ -196,11 +196,3 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
 
     return order
 
-
-def all_satisfy(iterable: 'iter[T]', predicate: 'func(i: T) -> bool') -> bool:
-    """Whether all items in an iterable satisfy a predicate function"""
-    for item in iterable:
-        if not predicate(item):
-            return False
-    return True
-

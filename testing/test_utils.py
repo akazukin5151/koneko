@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+from logging.handlers import RotatingFileHandler
 
 import pytest
 
@@ -90,6 +91,17 @@ def test_dir_not_empty():
 
     data = FakeData()
     assert utils.dir_not_empty(data)
+
+
+def test_setup_history_log(monkeypatch):
+    test_log = 'testing/history'
+    monkeypatch.setattr('koneko.utils.RotatingFileHandler',
+                        lambda *a, **k: RotatingFileHandler(test_log))
+    logger = utils.setup_history_log()
+    logger.info('test')
+    with open(test_log, 'r') as f:
+        assert f.read() == 'test\n'
+    os.system(f'rm {test_log}')
 
 
 #def test_frequent_history_items():

@@ -183,7 +183,6 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     images 30-119 are previews, 3 for each artist
     so the valid order is:
     0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
-    a, p,  p,  p,  a, p,  p,  p,  a, ...
     """
     order = [x + artists_count - 1 - floor(x/4) for x in range(total_pics)]
     order[0::4] = range(artists_count)

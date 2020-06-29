@@ -11,6 +11,9 @@ from koneko import ui, pure, utils, colors, download
 TERM = Terminal()
 
 
+def all_isdigit(keyseqs: 'list[str]') -> bool:
+    return funcy.all(m.isdigit(), keyseqs)
+
 def ask_quit():
     """Ask for quit confirmation, no need to press enter"""
     print('\nAre you sure you want to exit?')
@@ -86,10 +89,10 @@ def gallery_like_prompt(gallery):
 
     with TERM.cbreak():
         while True:
-            two_digit_seq = len(keyseqs) == 2 and funcy.all(m.isdigit(), keyseqs)
+            two_digit_seq = len(keyseqs) == 2 and all_isdigit(keyseqs)
             one_letter_two_digit_seq = (
                 len(keyseqs) == 3
-                and funcy.all(m.isdigit(), keyseqs[1:])
+                and all_isdigit(keyseqs)
                 and keyseqs[0] in sequenceable_keys
             )
 
@@ -142,7 +145,7 @@ def image_prompt(image):
 
     with TERM.cbreak():
         while True:
-            two_digit_seq = len(keyseqs) == 2 and funcy.all(m.isdigit(), keyseqs)
+            two_digit_seq = len(keyseqs) == 2 and all_isdigit(keyseqs)
 
             # 1. Two digit sequence -- jump to post number
             if two_digit_seq:
@@ -179,7 +182,7 @@ def user_prompt(user):
 
     with TERM.cbreak():
         while True:
-            two_digit_seq = len(keyseqs) == 2 and funcy.all(m.isdigit(), keyseqs)
+            two_digit_seq = len(keyseqs) == 2 and all_isdigit(keyseqs)
 
             # 1. Two digit sequence -- view artist given number
             if two_digit_seq:

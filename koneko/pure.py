@@ -9,12 +9,13 @@ import re
 from pathlib import Path
 
 from placeholder import _
-from pipey import Pipeable as P
+from funcy import curry
+from returns.pipeline import flow
 
 from koneko import colors as c
 
 
-Map = P(lambda iterable, func: list(map(func, iterable)))
+Map = curry(lambda func, iterable: list(map(func, iterable)))
 
 
 def split_backslash_last(string: str) -> str:
@@ -63,15 +64,18 @@ def post_title(current_page_illusts: 'Json', post_number: int) -> str:
 
 
 def medium_urls(current_page_illusts: 'Json') -> 'list[str]':
-    return current_page_illusts >> Map(url_given_size(_, size='square_medium'))
+    return flow(
+        current_page_illusts,
+        Map(url_given_size(_, size='square_medium')),
+    )
 
 
 def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
-    return (
-        current_page_illusts
-        >> P(len)
-        >> P(range)
-        >> Map(lambda r: post_title(current_page_illusts, r))
+    return flow(
+        current_page_illusts,
+        len,
+        range,
+        Map(lambda num: post_title(current_page_illusts, num)),
     )
 
 
@@ -122,12 +126,12 @@ def process_artwork_url(url_or_id: str) -> str:
 
 
 def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':
-    return (
-        urls
-        >> P(len)
-        >> P(range)
-        >> P(lambda r: map(prefix_filename, oldnames_with_ext, newnames, r))
-        >> P(list)
+    return flow(
+        urls,
+        len,
+        range,
+        lambda r: map(prefix_filename, oldnames_with_ext, newnames, r),
+        list
     )
 
 def full_img_details(url: str, png=False) -> (str, str, Path):

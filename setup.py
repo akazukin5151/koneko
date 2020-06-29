@@ -39,7 +39,6 @@ setup(
         'pick~=0.6',
         'funcy~=1.14',
         'returns~=0.14',
-        'pipey~=0.0.1a',
         'placeholder~=1.1',
     ],
     tests_require=['pytest~=5.4'],

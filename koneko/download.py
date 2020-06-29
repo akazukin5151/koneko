@@ -27,6 +27,8 @@ from shutil import rmtree
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
+from returns.pipeline import flow
+
 from koneko import api, pure, utils
 from koneko.data import UserData
 
@@ -58,12 +60,12 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
 
 # - Download functions for multiple images
 def _async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
-    oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
+    oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
     newnames_ext = pure.newnames_with_ext(urls, oldnames_ext, newnames)
     _async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext, tracker)
 
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
-    oldnames_ext = urls >> pure.Map(pure.split_backslash_last)
+    oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
     _async_filter_and_download(download_path, urls, oldnames_ext, oldnames_ext, tracker)
 
 @utils.spinner('')

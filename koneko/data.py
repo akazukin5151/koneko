@@ -5,6 +5,7 @@ there isn't much shared functionality, so there's nothing to extract to an abstr
 base class
 """
 from placeholder import _
+from returns.pipeline import flow
 
 from koneko import KONEKODIR, pure
 
@@ -134,14 +135,15 @@ class UserData:
         self.next_url = raw['next_url']
         page = raw['user_previews']
 
-        ids = page >> pure.Map(_['user']['id'])
+        ids = flow(page, pure.Map(_['user']['id']))
         self.ids_cache.update({self.page_num: ids})
 
-        names = page >> pure.Map(_['user']['name'])
+        names = flow(page, pure.Map(_['user']['name']))
         self.names_cache.update({self.page_num: names})
 
-        self.profile_pic_urls = (
-            page >> pure.Map(_['user']['profile_image_urls']['medium'])
+        self.profile_pic_urls = flow(
+            page,
+            pure.Map(_['user']['profile_image_urls']['medium']),
         )
 
         # [page[i]['illusts'][j]['image_urls']['square_medium']

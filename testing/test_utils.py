@@ -93,24 +93,42 @@ def test_dir_not_empty():
     assert utils.dir_not_empty(data)
 
 
-def test_setup_history_log_and_read(monkeypatch):
+def test_history(monkeypatch):
     test_log = 'testing/history'
     monkeypatch.setattr('koneko.utils.RotatingFileHandler',
                         lambda *a, **k: RotatingFileHandler(test_log))
+
+    # test setup_history_log()
     logger = utils.setup_history_log()
     logger.info('1: 1234')
     logger.info('2: 5678')
     with open(test_log, 'r') as f:
         assert f.read() == '1: 1234\n2: 5678\n'
 
+    # test read_history()
     monkeypatch.setattr('koneko.utils.KONEKODIR', 'testing')
     assert utils.read_history() == ['1: 1234', '2: 5678']
 
+    # test frequent_history()
+    assert utils.frequent_history() == {'1: 1234': 1, '2: 5678': 1}
+    assert utils.frequent_history(1) == {'1: 1234': 1}
+
+    # test frequent_history_modes()
+    assert (utils.frequent_history_modes(['1', '2'])
+            == utils.frequent_history()
+            == {'1: 1234': 1, '2: 5678': 1})
+    assert utils.frequent_history_modes(['1']) == {'1: 1234': 1}
+    assert utils.frequent_history_modes(['2']) == {'2: 5678': 1}
+    assert (utils.frequent_history_modes(['3'])
+            == utils.frequent_history_modes(['4'])
+            == utils.frequent_history_modes(['5'])
+            == dict())
+
+    # test format_frequent()
+    counter = utils.frequent_history()
+    assert utils.format_frequent(counter) == ['1: 1234 (1)', '2: 5678 (1)']
+
     os.system(f'rm {test_log}')
 
-
-#def test_frequent_history_items():
-#    counter = utils.frequent_history_mode('1')
-#    utils.format_frequent(counter)
 
 

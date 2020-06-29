@@ -86,7 +86,7 @@ def main_loop(main_command, user_input, your_id: str):
     }
 
     while True:
-        if not user_input:
+        if not user_input and main_command not in ('3', '5'):
             main_command = screens.begin_prompt(printmessage)
 
         # Simplify if-else chain with case-switch

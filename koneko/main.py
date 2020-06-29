@@ -226,6 +226,25 @@ class ViewPostModeLoop(AbstractLoop):
         return '2'
 
 
+class FollowingUserModeLoop(AbstractLoop):
+    """
+    Ask for pixiv ID or url and process it, wait for API to finish logging in
+    before proceeding
+    If user agrees to use the your_id saved in config, prompt_url_id() will be
+    skipped
+    """
+    def _prompt_url_id(self) -> str:
+        self._raw_answer = input('Enter your pixiv ID or url: ')
+
+    def _go_to_mode(self):
+        os.system('clear')
+        self.mode = ui.FollowingUsers(self._user_input)
+        prompt.user_prompt(self.mode)
+        main()
+
+    def __str__(self):
+        return '3'
+
 class SearchUsersModeLoop(AbstractLoop):
     """
     Ask for search string and process it, wait for API to finish logging in
@@ -249,27 +268,8 @@ class SearchUsersModeLoop(AbstractLoop):
         main()
 
     def __str__(self):
-        return '3'
-
-
-class FollowingUserModeLoop(AbstractLoop):
-    """
-    Ask for pixiv ID or url and process it, wait for API to finish logging in
-    before proceeding
-    If user agrees to use the your_id saved in config, prompt_url_id() will be
-    skipped
-    """
-    def _prompt_url_id(self) -> str:
-        self._raw_answer = input('Enter your pixiv ID or url: ')
-
-    def _go_to_mode(self):
-        os.system('clear')
-        self.mode = ui.FollowingUsers(self._user_input)
-        prompt.user_prompt(self.mode)
-        main()
-
-    def __str__(self):
         return '4'
+
 
 def illust_follow_mode_loop():
     """Immediately goes to IllustFollow()"""

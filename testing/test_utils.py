@@ -93,14 +93,19 @@ def test_dir_not_empty():
     assert utils.dir_not_empty(data)
 
 
-def test_setup_history_log(monkeypatch):
+def test_setup_history_log_and_read(monkeypatch):
     test_log = 'testing/history'
     monkeypatch.setattr('koneko.utils.RotatingFileHandler',
                         lambda *a, **k: RotatingFileHandler(test_log))
     logger = utils.setup_history_log()
-    logger.info('test')
+    logger.info('1: 1234')
+    logger.info('2: 5678')
     with open(test_log, 'r') as f:
-        assert f.read() == 'test\n'
+        assert f.read() == '1: 1234\n2: 5678\n'
+
+    monkeypatch.setattr('koneko.utils.KONEKODIR', 'testing')
+    assert utils.read_history() == ['1: 1234', '2: 5678']
+
     os.system(f'rm {test_log}')
 
 

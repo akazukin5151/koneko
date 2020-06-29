@@ -23,6 +23,7 @@ def set_argc_to_one(monkeypatch):
 
 
 def cli_core(monkeypatch, args: tuple, prompt: str):
+    monkeypatch.setattr('koneko.main.AbstractLoop._save_history', lambda x: True)
     monkeypatch.setattr('koneko.main.cli.process_cli_args', lambda: args)
     monkeypatch.setattr(prompt, raises_customexit)
     with pytest.raises(CustomExit):
@@ -30,11 +31,11 @@ def cli_core(monkeypatch, args: tuple, prompt: str):
 
 @pytest.mark.integration
 def test_mode1_cli(monkeypatch):
-    cli_core(monkeypatch, ('1', 2232374), 'koneko.main.prompt.gallery_like_prompt')
+    cli_core(monkeypatch, ('1', '2232374'), 'koneko.main.prompt.gallery_like_prompt')
 
 @pytest.mark.integration
 def test_mode2_cli(monkeypatch):
-    cli_core(monkeypatch, ('2', 78823485), 'koneko.main.prompt.image_prompt')
+    cli_core(monkeypatch, ('2', '78823485'), 'koneko.main.prompt.image_prompt')
 
 @pytest.mark.integration
 def test_mode3_cli(monkeypatch, send_enter):
@@ -51,6 +52,7 @@ def test_mode5_cli(monkeypatch):
 
 
 def input_core(monkeypatch, responses: iter, prompt: str):
+    monkeypatch.setattr('koneko.main.AbstractLoop._save_history', lambda x: True)
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
     monkeypatch.setattr(prompt, raises_customexit)
     with pytest.raises(CustomExit):

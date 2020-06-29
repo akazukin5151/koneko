@@ -184,18 +184,15 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
     a, p,  p,  p,  a, p,  p,  p,  a, ...
     """
-    artist = tuple(range(artists_count))
     prev = tuple(range(artists_count, total_pics))
-    order = []
-    a, p = 0, 0
+    order = [None] * total_pics
+    order[0::4] = range(artists_count)
 
-    for i in range(total_pics):
-        if i % 4 == 0:
-            order.append(artist[a])
-            a += 1
-        else:
-            order.append(prev[p])
-            p += 1
+    j = 0
+    for i in range(len(order)):
+        if order[i] is None:
+            order[i] = prev[j]
+            j += 1
 
     return order
 

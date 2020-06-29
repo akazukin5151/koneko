@@ -134,7 +134,7 @@ def dir_up_to_date(data, _dir) -> bool:
 
     # Should not fail because try-except early returned
     for name, _file in zip(data.all_names, sorted(_dir)):
-        if name not in _file:
+        if name.replace('/', '') not in _file:
             return False
     return True
 

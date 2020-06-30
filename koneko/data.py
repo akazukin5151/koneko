@@ -13,12 +13,32 @@ from koneko import KONEKODIR, pure
 
 
 class AbstractData(ABC):
+    @abstractmethod
+    def __init__(self):
+        # Defined in child classes, can be attribute or property
+        self.page_num: int
+        self.main_path: 'Path'
+        self.offset: int
+
+        self.next_url: str
+        self.download_path: 'Path'
+        self.all_urls: 'list[str]'
+        self.all_names: 'list[str]'
+
+    @abstractmethod
+    def update(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def artist_user_id(self):
+        raise NotImplementedError
+
     @property
     def urls_as_names(self) -> 'list[str]':
         return flow(self.all_urls, pure.Map(pure.split_backslash_last))
 
     @property
-    def newnames_with_ext(self):
+    def newnames_with_ext(self) -> 'list[str]':
         return pure.newnames_with_ext(self.all_urls, self.urls_as_names, self.all_names)
 
 

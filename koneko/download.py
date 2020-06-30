@@ -1,7 +1,6 @@
 """Download functions. See ../puml/download.puml. All of them download through
 _download_then_rename(), which downloads through api.myapi.protected_download().
 
-# NOTE: _async_filter_and_download() no longer exists, see commit bb49da3
 The _async_filter_and_download() branch is for downloading multiple images, and includes:
     - init_download()
         - _async_download_rename()
@@ -65,33 +64,38 @@ def _async_download_rename(data, tracker=None) -> 'IO':
     # Filter out already downloaded files
     downloaded_newnames = itertools.filterfalse(os.path.isfile, data.newnames_with_ext)
     downloaded_oldnames = itertools.filterfalse(os.path.isfile, data.urls_as_names)
+    _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
+
+def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
+    if not urls:
+        return True
+
+    class FakeData:
+        def __init__(self):
+            self.download_path = download_path
+            self.all_urls = urls
+
+    data = FakeData()
+
+    oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
+    downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_ext)
+    downloaded_newnames = itertools.cycle((None,))
+
+    _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
+
+@utils.spinner('')
+def async_download_spinner(download_path: Path, urls) -> 'IO':
+    """Batch download in background with spinner. For mode 2; multi-image posts"""
+    async_download_no_rename(download_path, urls)
+
+
+def _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker):
     helper = partial(_download_then_rename, tracker=tracker)
 
     os.makedirs(data.download_path, exist_ok=True)
     with utils.cd(data.download_path):
         with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
             executor.map(helper, data.all_urls, downloaded_oldnames, downloaded_newnames)
-
-def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
-    # This is repeated, add more attributes to ImageData
-    oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
-
-    if not urls:
-        return True
-
-    # Filter out already downloaded files
-    downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_ext)
-    helper = partial(_download_then_rename, tracker=tracker)
-
-    os.makedirs(download_path, exist_ok=True)
-    with utils.cd(download_path):
-        with ThreadPoolExecutor(max_workers=len(urls)) as executor:
-            executor.map(helper, urls, downloaded_oldnames)
-
-@utils.spinner('')
-def async_download_spinner(download_path: Path, urls) -> 'IO':
-    """Batch download in background with spinner. For mode 2; multi-image posts"""
-    async_download_no_rename(download_path, urls)
 
 
 def _download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':

@@ -71,8 +71,16 @@ class GalleryData:
         return pure.medium_urls(self.current_illusts)
 
     @property
+    def urls_as_names(self) -> 'list[str]':
+        return flow(self.all_urls, pure.Map(pure.split_backslash_last))
+
+    @property
     def all_names(self) -> 'list[str]':
         return pure.post_titles_in_page(self.current_illusts)
+
+    @property
+    def newnames_with_ext(self):
+        return pure.newnames_with_ext(self.all_urls, self.urls_as_names, self.all_names)
 
 
 class ImageData:
@@ -165,6 +173,10 @@ class UserData:
         return self.profile_pic_urls + self.image_urls
 
     @property
+    def urls_as_names(self) -> 'list[str]':
+        return flow(self.all_urls, pure.Map(pure.split_backslash_last))
+
+    @property
     def names(self) -> 'list[str]':
         return self.names_cache[self.page_num]
 
@@ -173,6 +185,10 @@ class UserData:
         preview_names_ext = map(pure.split_backslash_last, self.image_urls)
         preview_names = [x.split('.')[0] for x in preview_names_ext]
         return self.names + preview_names
+
+    @property
+    def newnames_with_ext(self):
+        return pure.newnames_with_ext(self.all_urls, self.urls_as_names, self.all_names)
 
     @property
     def splitpoint(self) -> int:

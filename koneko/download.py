@@ -52,17 +52,21 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
     if data.download_path.is_dir():
         rmtree(data.download_path)
 
-    _async_download_rename(data.download_path, data.all_urls, data.all_names, tracker)
+    _async_download_rename(data, tracker)
 
     if isinstance(data, UserData):
         save_number_of_artists(data)
 
 
 # - Download functions for multiple images
-def _async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
-    oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
-    newnames_ext = pure.newnames_with_ext(urls, oldnames_ext, newnames)
-    _async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext, tracker)
+def _async_download_rename(data, tracker=None) -> 'IO':
+    _async_filter_and_download(
+        data.download_path,
+        data.all_urls,
+        data.urls_as_names,
+        data.newnames_with_ext,
+        tracker
+    )
 
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))

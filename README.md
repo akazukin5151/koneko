@@ -135,6 +135,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * `first_img` attribute no longer used
 * If an invalid input is given in a loop prompt, it will ask for another, rather than going back to `main()`
 * Fixed giving invalid cli args crashing by re-prompting the user. However, leaving (including with ctrl+c) is impossible.
+* Fixed one-letter-two-digit-sequence not working
+* Fixed gallery -> image crashing
 
 #### Code maintenance
 

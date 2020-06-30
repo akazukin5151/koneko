@@ -21,6 +21,28 @@ with open('testing/files/mode3.json', 'r') as json_file:
     mode3 = json.load(json_file)
 
 
+
+def test_urls_as_names():
+    gdata = data.GalleryData(1, Path(f"{KONEKODIR}/2232374/"))
+    gdata.update(mode1)
+    assert gdata.urls_as_names == ['81547984_p0_square1200.jpg','81501385_p0_square1200.jpg','81468125_p0_square1200.jpg','81416496_p0_square1200.jpg','81368866_p0_square1200.jpg','81276257_p0_square1200.jpg','80923496_p0_square1200.jpg','80701898_p0_square1200.jpg','80017594_p0_square1200.jpg','79799236_p0_square1200.jpg','79658392_p0_square1200.jpg','79549991_p0_square1200.jpg','78823485_p0_square1200.jpg','78628383_p0_square1200.jpg','78403815_p0_square1200.jpg','78378594_p0_square1200.jpg','78201587_p0_square1200.jpg','77804404_p0_square1200.jpg','77565309_p0_square1200.jpg','77460464_p0_square1200.jpg','77347697_p0_square1200.jpg','77068750_p0_square1200.jpg','76695217_p0_square1200.jpg','76561671_p0_square1200.jpg','76138362_p0_square1200.jpg','75933779_p0_square1200.jpg','75810852_p0_square1200.jpg','75698678_p0_square1200.jpg','75579060_p0_square1200.jpg','75457783_p0_square1200.jpg']
+
+    udata = data.UserData(1, Path(f"{KONEKODIR}/following/2232374"))
+    udata.update(mode3)
+    assert udata.urls_as_names[:10] == ['14320305_16783de875f6e2bbb9d22a70befca4f2_170.jpg','13690256_d2a74f1a7527fc96da018ad17c0f9ed8_170.jpg','8614973_404eb78e066872d9b8a558360c752b01_170.png','16393889_c172be60e91a79ca65580f945a8b7860_170.jpg','999552_ca806e5e217f411d11c1b172180ffe26_170.jpg','no_profile.png','no_profile.png','7954023_170fa2e3007d8e7764f1d09e113c652c_170.jpg','16445257_404ce224320f5dac49b6715fafd3824d_170.jpg','3459330_6c425ecb3ba82c77a99e4fd74df42fec_170.jpg',]
+    assert udata.urls_as_names[-10:] == ['76547709_p0_square1200.jpg','79708221_p0_square1200.jpg','76623178_p0_square1200.jpg','74653820_p0_square1200.jpg','81542404_p0_square1200.jpg','80414334_p0_square1200.jpg','79663557_p0_square1200.jpg','79028150_p0_square1200.jpg','79027961_p0_square1200.jpg','79027291_p0_square1200.jpg']
+
+def test_newnames_with_ext():
+    gdata = data.GalleryData(1, Path(f"{KONEKODIR}/2232374/"))
+    gdata.update(mode1)
+    assert gdata.newnames_with_ext  == ['000_みこっちゃん.jpg','001_おりじなる.jpg','002_0510.jpg','003_5.3.jpg','004_おりじなる.jpg','005_ミコ誕オメ画！.jpg','006_5.2.jpg','007_5.1.jpg','008_310.jpg','009_Midnight Sun.jpg','010_222.jpg','011_バレンタイン.jpg','012_祝！！！.jpg','013_あけましておめでとうございます.jpg','014_ミコサンタ.jpg','015_C97告知.jpg','016_ミコバニー.jpg','017_たちかわ楽市2019仕様4人組.jpg','018_ハロミコ.jpg','019_夏服.jpg','020_御坂美琴写真集１０用.jpg','021_常盤台中学指定体操服改.jpg','022_ツイッターまとめ.jpg','023_スクミズミコクロ.jpg','024_ミズミコ.jpg','025_ミコニャン.jpg','026_とある画帖.jpg','027_御坂美琴写真集９.jpg','028_ジャンプ！.jpg','029_シャワミコ.jpg']
+
+    udata = data.UserData(1, Path(f"{KONEKODIR}/following/2232374"))
+    udata.update(mode3)
+    assert udata.newnames_with_ext[:10] == ['000_畳と桧.jpg','001_ざるつ.jpg','002_春夫.png','003_JAM.jpg','004_肋兵器.jpg','005_おてん!!!!!!!!.png','006_saber.png','007_sola7764.jpg','008_￦ANKE.jpg','009_ToY.jpg']
+    assert udata.newnames_with_ext[-10:] == ['107_76547709_p0_square1200.jpg','108_79708221_p0_square1200.jpg','109_76623178_p0_square1200.jpg','110_74653820_p0_square1200.jpg','111_81542404_p0_square1200.jpg','112_80414334_p0_square1200.jpg','113_79663557_p0_square1200.jpg','114_79028150_p0_square1200.jpg','115_79027961_p0_square1200.jpg','116_79027291_p0_square1200.jpg']
+
+
 def test_gallery():
     gdata = data.GalleryData(1, Path(f"{KONEKODIR}/2232374/"))
     assert gdata

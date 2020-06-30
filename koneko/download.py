@@ -25,6 +25,7 @@ import itertools
 from pathlib import Path
 from shutil import rmtree
 from functools import partial
+from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 
 from returns.pipeline import flow
@@ -61,7 +62,6 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
 
 # - Download functions for multiple images
 def _async_download_rename(data, tracker=None) -> 'IO':
-    # Filter out already downloaded files
     downloaded_newnames = itertools.filterfalse(os.path.isfile, data.newnames_with_ext)
     downloaded_oldnames = itertools.filterfalse(os.path.isfile, data.urls_as_names)
     _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
@@ -70,12 +70,8 @@ def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     if not urls:
         return True
 
-    class FakeData:
-        def __init__(self):
-            self.download_path = download_path
-            self.all_urls = urls
-
-    data = FakeData()
+    FakeData = namedtuple('data', ('download_path', 'all_urls'))
+    data = FakeData(download_path, urls)
 
     oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
     downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_ext)

@@ -9,8 +9,8 @@ from configparser import ConfigParser
 
 from blessed import Terminal
 from returns.result import safe
+from returns.pipeline import flow
 from placeholder import m
-from pipey import Pipeable as P
 
 from koneko import pure
 
@@ -110,9 +110,11 @@ def begin_config() -> ('config', str):
 
 def init_config(config_object, config_path) -> ('config', str):
     # Identical to `_ask_your_id(_ask_credentials(config_object))`
-    config_object, your_id = (config_object
-                              >> P(_ask_credentials)
-                              >> P(_ask_your_id))
+    config_object, your_id = flow(
+        config_object,
+        _ask_credentials,
+        _ask_your_id
+    )
 
     _write_config(config_object, config_path)
     _append_default_config(config_path)

@@ -8,10 +8,12 @@ import threading
 from math import ceil
 from pathlib import Path
 from shutil import rmtree
+from collections import Counter
 from contextlib import contextmanager
 from logging.handlers import RotatingFileHandler
 
 import funcy
+from pick import Picker
 
 from koneko import KONEKODIR
 from koneko.config import ncols_config
@@ -19,13 +21,40 @@ from koneko.config import ncols_config
 
 def setup_history_log():
     logger = logging.getLogger('history')
-    handler = RotatingFileHandler(KONEKODIR / '.history', maxBytes=1e6, backupCount=3)
+    handler = RotatingFileHandler(KONEKODIR / 'history', maxBytes=1e6, backupCount=3)
     formatter = logging.Formatter('%(message)s')
 
     logger.setLevel(logging.INFO)  # Global, applies to all handlers
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
+
+def read_history() -> 'list[str]':
+    with cd(KONEKODIR):
+        with open('history', 'r') as f:
+            history = f.read()
+
+    return history.split('\n')[:-1]  # Ignore trailing \n
+
+def frequent_history(n=5) -> 'dict[str, int]':
+    return dict(Counter(read_history()).most_common(n))
+
+def frequent_history_modes(modes: 'list[str]', n=5) -> 'dict[str, int]':
+    items_in_mode = filter(
+        lambda x: x.split(': ')[0] in modes,
+        read_history()
+    )
+    return dict(Counter(items_in_mode).most_common(n))
+
+def format_frequent(counter: 'dict[str, int]') -> 'list[str]':
+    return [f'{k} ({v})' for k,v in counter.items()]
+
+
+def ws_picker(actions, title, **kwargs):
+    picker = Picker(actions, title, **kwargs)
+    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
+    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+    return picker
 
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
@@ -105,7 +134,7 @@ def dir_up_to_date(data, _dir) -> bool:
 
     # Should not fail because try-except early returned
     for name, _file in zip(data.all_names, sorted(_dir)):
-        if name not in _file:
+        if name.replace('/', '') not in _file:
             return False
     return True
 

@@ -1,6 +1,8 @@
 """Export the colors for [h]elp screen keys. Functions are pure"""
-from pipey import Pipeable as P
+from funcy import curry
+from returns.pipeline import flow
 
+# Public constants
 RED = '\x1b[31m'
 MAGENTA = '\x1b[35m'
 BLUE = '\x1b[34m'
@@ -38,15 +40,19 @@ _tlc = ['a', 'o', 'd']
 _COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
                   'y', RED, '}', RESET])
 
-# Duplicated from pure because circular import
-_Map = P(lambda iterable, func: list(map(func, iterable)))
 
-# Public
-n, p, r, q, m, b, o_, d_, f = _letters >> _Map(_letter_with_brackets)
+# Duplicated from pure because circular import
+def _map(func, iterable):
+    return list(map(func, iterable))
+
+_Map = curry(_map)
+
+# Public constants
+n, p, r, q, m, b, o_, d_, f = flow(_letters, _Map(_letter_with_brackets))
 
 i = _letter_with_coords('i')
 
-a, o, d = _tlc >> _Map(_two_letter_with_coords)
+a, o, d = flow(_tlc, _Map(_two_letter_with_coords))
 
 # For galleries
 base1 = [

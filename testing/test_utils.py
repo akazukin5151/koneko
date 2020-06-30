@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+from logging.handlers import RotatingFileHandler
 
 import pytest
 
@@ -46,27 +47,26 @@ def test_dir_not_empty():
 
     data = FakeData()
 
-    # Test dir exists but is empty
-    # If mkdir throws because file exists, just delete it and re-run
-    # In normal situations this dir will be deleted in line 69
-    # However, if any code in between fails, it will not be deleted
-    Path('testing/files/empty_dir').mkdir()
-    data.download_path = Path('testing/files/empty_dir')
-    assert utils.dir_not_empty(data) is False
+    try:
+        # Test dir exists but is empty
+        Path('testing/files/empty_dir').mkdir()
+        data.download_path = Path('testing/files/empty_dir')
+        assert utils.dir_not_empty(data) is False
 
-    # Copy .koneko and only one image to that dir
-    os.system('touch testing/files/empty_dir/.koneko')
-    os.system('cp testing/files/004_祝！！！.jpg testing/files/empty_dir/')
+        # Copy .koneko and only one image to that dir
+        os.system('touch testing/files/empty_dir/.koneko')
+        os.system('cp testing/files/004_祝！！！.jpg testing/files/empty_dir/')
 
-    assert utils.dir_not_empty(data) is False
+        assert utils.dir_not_empty(data) is False
 
-    # Copy all images to dir
-    for f in ('008_77803142_p0.png', '017_ミコニャン.jpg'):
-        os.system(f'cp testing/files/{f} testing/files/empty_dir/')
+        # Copy all images to dir
+        for f in ('008_77803142_p0.png', '017_ミコニャン.jpg'):
+            os.system(f'cp testing/files/{f} testing/files/empty_dir/')
 
-    assert utils.dir_not_empty(data)
+        assert utils.dir_not_empty(data)
 
-    os.system('rm -r testing/files/empty_dir')
+    finally:
+        os.system('rm -r testing/files/empty_dir')
 
     # Test Throw some errors
     class FakeData:
@@ -90,3 +90,46 @@ def test_dir_not_empty():
 
     data = FakeData()
     assert utils.dir_not_empty(data)
+
+
+def test_history(monkeypatch):
+    test_log = 'testing/history'
+    monkeypatch.setattr('koneko.utils.RotatingFileHandler',
+                        lambda *a, **k: RotatingFileHandler(test_log))
+
+    # test setup_history_log()
+    logger = utils.setup_history_log()
+    logger.info('1: 1234')
+    logger.info('2: 5678')
+    with open(test_log, 'r') as f:
+        assert f.read() == '1: 1234\n2: 5678\n'
+
+    try:
+        # test read_history()
+        monkeypatch.setattr('koneko.utils.KONEKODIR', 'testing')
+        assert utils.read_history() == ['1: 1234', '2: 5678']
+
+        # test frequent_history()
+        assert utils.frequent_history() == {'1: 1234': 1, '2: 5678': 1}
+        assert utils.frequent_history(1) == {'1: 1234': 1}
+
+        # test frequent_history_modes()
+        assert (utils.frequent_history_modes(['1', '2'])
+                == utils.frequent_history()
+                == {'1: 1234': 1, '2: 5678': 1})
+        assert utils.frequent_history_modes(['1']) == {'1: 1234': 1}
+        assert utils.frequent_history_modes(['2']) == {'2: 5678': 1}
+        assert (utils.frequent_history_modes(['3'])
+                == utils.frequent_history_modes(['4'])
+                == utils.frequent_history_modes(['5'])
+                == dict())
+
+        # test format_frequent()
+        counter = utils.frequent_history()
+        assert utils.format_frequent(counter) == ['1: 1234 (1)', '2: 5678 (1)']
+
+    finally:
+        os.system(f'rm {test_log}')
+
+
+

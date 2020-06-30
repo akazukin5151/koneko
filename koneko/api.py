@@ -14,24 +14,20 @@ class APIHandler:
     def __init__(self):
         self.api_queue = queue.Queue()
         self.api_thread = threading.Thread(target=self._login)
-        self._started = False
-        self._awaited = False
         # To be set later (because singleton is instantiated before config)
         self.credentials: 'Dict'
         self.api: 'AppPixivAPI()'  # Object to login and request on
 
+    @funcy.once
     def start(self):
         """Start logging in. self.credentials must be available"""
-        if not self._started:
-            self._started = True
-            self.api_thread.start()
+        self.api_thread.start()
 
+    @funcy.once
     def await_login(self):
         """Wait for login to finish, then assign PixivAPI session to API"""
-        if not self._awaited:
-            self._awaited = True
-            self.api_thread.join()
-            self.api = self.api_queue.get()
+        self.api_thread.join()
+        self.api = self.api_queue.get()
 
     def _login(self):
         """Logins to pixiv in the background, using credentials from config file"""

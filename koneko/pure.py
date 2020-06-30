@@ -6,15 +6,17 @@ Most input data come from impure sources (user input or network request), but th
 
 import os
 import re
+from math import floor
 from pathlib import Path
 
 from placeholder import _
-from pipey import Pipeable as P
+from funcy import curry
+from returns.pipeline import flow
 
 from koneko import colors as c
 
 
-Map = P(lambda iterable, func: list(map(func, iterable)))
+Map = curry(lambda func, iterable: list(map(func, iterable)))
 
 
 def split_backslash_last(string: str) -> str:
@@ -63,15 +65,18 @@ def post_title(current_page_illusts: 'Json', post_number: int) -> str:
 
 
 def medium_urls(current_page_illusts: 'Json') -> 'list[str]':
-    return current_page_illusts >> Map(url_given_size(_, size='square_medium'))
+    return flow(
+        current_page_illusts,
+        Map(url_given_size(_, size='square_medium')),
+    )
 
 
 def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
-    return (
-        current_page_illusts
-        >> P(len)
-        >> P(range)
-        >> Map(lambda r: post_title(current_page_illusts, r))
+    return flow(
+        current_page_illusts,
+        len,
+        range,
+        Map(lambda num: post_title(current_page_illusts, num)),
     )
 
 
@@ -122,12 +127,12 @@ def process_artwork_url(url_or_id: str) -> str:
 
 
 def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':
-    return (
-        urls
-        >> P(len)
-        >> P(range)
-        >> P(lambda r: map(prefix_filename, oldnames_with_ext, newnames, r))
-        >> P(list)
+    return flow(
+        urls,
+        len,
+        range,
+        lambda r: map(prefix_filename, oldnames_with_ext, newnames, r),
+        list
     )
 
 def full_img_details(url: str, png=False) -> (str, str, Path):
@@ -178,28 +183,8 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     images 30-119 are previews, 3 for each artist
     so the valid order is:
     0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
-    a, p,  p,  p,  a, p,  p,  p,  a, ...
     """
-    artist = tuple(range(artists_count))
-    prev = tuple(range(artists_count, total_pics))
-    order = []
-    a, p = 0, 0
-
-    for i in range(total_pics):
-        if i % 4 == 0:
-            order.append(artist[a])
-            a += 1
-        else:
-            order.append(prev[p])
-            p += 1
-
+    order = [x + artists_count - 1 - floor(x/4) for x in range(total_pics)]
+    order[0::4] = range(artists_count)
     return order
-
-
-def all_satisfy(iterable: 'iter[T]', predicate: 'func(i: T) -> bool') -> bool:
-    """Whether all items in an iterable satisfy a predicate function"""
-    for item in iterable:
-        if not predicate(item):
-            return False
-    return True
 

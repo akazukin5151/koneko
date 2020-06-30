@@ -1,24 +1,15 @@
 # Hacking
 
 ## Pure and impure modules
-**Pure modules:**
-* cli *
-* colors
-* data *
-* pure *
 
-\* (technically user input is impure, but functions are referentially transparent)
+|          | Pure | Impure
+| -------- | ---- | ---
+| Frontend |      | <ul><li>main</li><li>prompt</li><li>ui</li><li>lscat_app</li></ul>
+| Backend  | <ul><li>cli</li><li>colors</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>config</li><li>download</li><li>lscat</li><li>screens</li><li>utils</li></ul>
 
-**Impure modules:**
-* api
-* config (but some functions will never fail)
-* download
-* lscat
-* main
-* prompt
-* screens
-* ui
-* utils
+* 'Pure' means functions are referentially transparent and globally pure (mutations may happen in local scope)
+* 'Frontend' means interacts with user (and catch and process user inputs)
+* 'Backend' means everything else
 
 ## UML diagrams
 

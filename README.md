@@ -122,18 +122,31 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] image_mode_text_offset
 * Remove `users_page_spacing`: it's just `gallery_page_spacing` - 3
 * Rename `gallery_page_spacing` setting to `page_spacing`
+* Show frequently searched IDs/strings with an option to select them with pick.
+    - [x] On main screen:
+        - [x] prompt for a mode or
+        - [x] select all.
+    - [x] On prompt loop, allow '!freq' to launch pick that goes directly to the mode.
 
 #### Fixed
 
 * Fixed a bug where downloading a single image crashes
 * Fixed a bug where some images or mode might not update outdated images
     * `first_img` attribute no longer used
+* If an invalid input is given in a loop prompt, it will ask for another, rather than going back to `main()`
+* Fixed giving invalid cli args crashing by re-prompting the user. However, leaving (including with ctrl+c) is impossible.
 
 #### Code maintenance
 
 * Rename `action_before_prefetch()` to `maybe_join_thread()`
 * Extract out messy condition to bool variables in `prompt.py`
 * Use `shutil.rmtree` instead of `rm` via `os.system`
+* Improved attribute and method names in Loop classes
+* Removed useless `prompted` boolean variable
+* Remove pipey dependency in favour of `flow` from `results`
+* Use `@funcy.once` instead of boolean guards in `api.py`
+* Simplified `generate_orders()` to 2 lines
+* Wrap some test in a try-finally block so resources are always restored
 
 # Roadmap
 
@@ -143,13 +156,12 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 * Launch from `koneko`, documentate this as an offline mode
-* Show frequently searched IDs/strings with an option to select them.
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
 
 ## Known bugs
 
-* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts.
+* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
 * Passing an invalid command via cli will re-prompt the user, but ctrl+c traps the user in koneko with no way to quit.
 * Reloading then going back just redraws the current mode again, with possible instability
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.

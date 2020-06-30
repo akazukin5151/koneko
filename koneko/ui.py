@@ -477,7 +477,8 @@ class FollowingUsers(AbstractUsers):
 
 def _display_medium_preview(gdata, idata, num: int) -> 'IO':
     os.system('clear')
-    lscat.icat(gdata.main_path / str(gdata.page_num) / idata.search_string(num))
+    image = sorted(os.listdir(gdata.download_path))[num]
+    lscat.icat(gdata.main_path / str(gdata.page_num) / image)
 
 def view_post_mode(image_id) -> 'IO':
     """Image mode, from main (start -> mode 2)

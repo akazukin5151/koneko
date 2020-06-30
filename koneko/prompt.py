@@ -92,7 +92,7 @@ def gallery_like_prompt(gallery):
             two_digit_seq = len(keyseqs) == 2 and all_isdigit(keyseqs)
             one_letter_two_digit_seq = (
                 len(keyseqs) == 3
-                and all_isdigit(keyseqs)
+                and all_isdigit(keyseqs[1:])
                 and keyseqs[0] in sequenceable_keys
             )
 

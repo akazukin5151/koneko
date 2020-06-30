@@ -13,6 +13,11 @@ def use_test_cfg(monkeypatch):
     monkeypatch.setattr('koneko.config.Path.expanduser',
                         lambda x: Path('testing/test_config.ini'))
 
+def write_print_setting(cfg, setting):
+    cfg.set('misc', 'print_info', setting)
+    with open('testing/test_config.ini', 'w') as f:
+        cfg.write(f)
+
 def test_check_print_info(monkeypatch, use_test_cfg):
     # print_info is on in example config
     assert config.check_print_info() is True
@@ -20,28 +25,22 @@ def test_check_print_info(monkeypatch, use_test_cfg):
     cfg = configparser.ConfigParser()
     cfg.read('testing/test_config.ini')
 
-    for setting in ('1', 'yes', 'true', 'on'):
-        cfg.set('misc', 'print_info', setting)
-        with open('testing/test_config.ini', 'w') as f:
-            cfg.write(f)
+    try:
+        for setting in ('1', 'yes', 'true', 'on'):
+            write_print_setting(cfg, setting)
+            assert config.check_print_info() is True
+
+        for setting in ('off', 'no', 'off'):
+            write_print_setting(cfg, setting)
+            assert config.check_print_info() is False
+
+        # Invalid boolean should default to True
+        write_print_setting(cfg, 'asdf')
         assert config.check_print_info() is True
 
-    for setting in ('off', 'no', 'off'):
-        cfg.set('misc', 'print_info', setting)
-        with open('testing/test_config.ini', 'w') as f:
-            cfg.write(f)
-        assert config.check_print_info() is False
-
-    # Invalid boolean should default to True
-    cfg.set('misc', 'print_info', 'asdf')
-    with open('testing/test_config.ini', 'w') as f:
-        cfg.write(f)
-    assert config.check_print_info() is True
-
-    # Restore default value
-    cfg.set('misc', 'print_info', 'on')
-    with open('testing/test_config.ini', 'w') as f:
-        cfg.write(f)
+    finally:
+        # Restore default value
+        write_print_setting(cfg, 'on')
 
 def test_get_settings(monkeypatch, use_test_cfg):
     assert config.get_settings('Credentials', 'username') == Success('koneko')

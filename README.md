@@ -133,12 +133,20 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed a bug where downloading a single image crashes
 * Fixed a bug where some images or mode might not update outdated images
     * `first_img` attribute no longer used
+* If an invalid input is given in a loop prompt, it will ask for another, rather than going back to `main()`
+* Fixed giving invalid cli args crashing by re-prompting the user. However, leaving (including with ctrl+c) is impossible.
 
 #### Code maintenance
 
 * Rename `action_before_prefetch()` to `maybe_join_thread()`
 * Extract out messy condition to bool variables in `prompt.py`
 * Use `shutil.rmtree` instead of `rm` via `os.system`
+* Improved attribute and method names in Loop classes
+* Removed useless `prompted` boolean variable
+* Remove pipey dependency in favour of `flow` from `results`
+* Use `@funcy.once` instead of boolean guards in `api.py`
+* Simplified `generate_orders()` to 2 lines
+* Wrap some test in a try-finally block so resources are always restored
 
 # Roadmap
 

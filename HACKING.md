@@ -10,6 +10,7 @@
 * 'Pure' means functions are referentially transparent and globally pure (mutations may happen in local scope)
 * 'Frontend' means interacts with user (and catch and process user inputs)
 * 'Backend' means everything else
+* (Ideally the) 'backend' does work, 'frontend' organises work (if otherwise, please open an issue or make a PR).
 
 ## UML diagrams
 

@@ -1,6 +1,7 @@
 """Download functions. See ../puml/download.puml. All of them download through
 _download_then_rename(), which downloads through api.myapi.protected_download().
 
+# NOTE: _async_filter_and_download() no longer exists, see commit bb49da3
 The _async_filter_and_download() branch is for downloading multiple images, and includes:
     - init_download()
         - _async_download_rename()

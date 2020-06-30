@@ -155,7 +155,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-* Launch from `koneko`, documentate this as an offline mode
+* Launch `lscat` from `koneko`, documentate this as an offline mode
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
 

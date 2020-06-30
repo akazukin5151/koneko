@@ -157,7 +157,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-* Launch `lscat` from `koneko`, documentate this as an offline mode
+* Offline mode
+    - [ ] Launch `lscat` from `koneko`
+    - [ ] If integrating frequents into offline, it needs to know what is cached and not
+    - [ ] Documentation (in general as well)
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
 

@@ -102,54 +102,6 @@ koneko 5 # Mode 5
 ```
 For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
-## Upcoming changelog (in dev branch)
-
-For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
-
-### Version 0.9
-
-* Interactive helper UI to assist configuring lscat numbers (`lscat_app.py`).
-    - [x] Open up lscat to be launched via a seperate command, so you don't need to login to pixiv every time (`lscat`)
-    - Display 'testgallery' and 'testuser' paths (for internal and debugging use, just copy over the files)
-    - Browse the cache and display a dir
-    - Display any path (but all names must be left-padded with a three digit number)
-    - [x] image_width
-    - [x] image_height
-    - [x] images_x_spacing
-    - [x] images_y_spacing 
-    - [x] image_thumbnail_size 
-    - [x] page_spacing 
-    - [x] gallery_print_spacing 
-    - [x] users_print_name_xcoord 
-* Remove `users_page_spacing`: it's just `gallery_page_spacing` - 3
-* Rename `gallery_page_spacing` setting to `page_spacing`
-* Show frequently searched IDs/strings with an option to select them with pick.
-    - [x] On main screen:
-        - [x] prompt for a mode or
-        - [x] select all.
-    - [x] On prompt loop, allow '!freq' to launch pick that goes directly to the mode.
-
-#### Fixed
-
-* Fixed a bug where downloading a single image crashes
-* Fixed a bug where some images or mode might not update outdated images
-    * `first_img` attribute no longer used
-* If an invalid input is given in a loop prompt, it will ask for another, rather than going back to `main()`
-* Fixed giving invalid cli args crashing by re-prompting the user. However, leaving (including with ctrl+c) is impossible.
-* Fixed one-letter-two-digit-sequence not working
-* Fixed gallery -> image crashing
-
-#### Code maintenance
-
-* Rename `action_before_prefetch()` to `maybe_join_thread()`
-* Extract out messy condition to bool variables in `prompt.py`
-* Use `shutil.rmtree` instead of `rm` via `os.system`
-* Improved attribute and method names in Loop classes
-* Removed useless `prompted` boolean variable
-* Remove pipey dependency in favour of `flow` from `results`
-* Use `@funcy.once` instead of boolean guards in `api.py`
-* Simplified `generate_orders()` to 2 lines
-* Wrap some test in a try-finally block so resources are always restored
 
 # Roadmap
 

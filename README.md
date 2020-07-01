@@ -59,7 +59,9 @@ See also: [manual installation](#manual-installation)
 
 0. Install [kitty](https://github.com/kovidgoyal/kitty)
 1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...):
-2. Run `koneko`
+2. Run `koneko` to login and save credentials
+3. Run `lscat 1 7` to help setup the recommended settings; copy to `~/.config/koneko/config.ini`. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
+4. See [usage](#usage) for how to use.
 
 ## Requirements
 

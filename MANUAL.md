@@ -1,6 +1,8 @@
 # Configuration
 
-**It is highly recommended to use the interactive configuration assistant.** After installing, type `lscat` and select the first option and go through all assistants. Just copy the suggested settings to your config in `~/.config/koneko/config.ini`. The below text are just for documentation, so don't worry if it is confusing -- it is always better to configure it interactively.
+## It is highly recommended to use the interactive configuration assistant!
+
+After installing, type `lscat` and select the first option and go through all assistants. Just copy the suggested settings to your config in `~/.config/koneko/config.ini`. The below text are just for documentation, so don't worry if it is confusing -- it is always better to configure it interactively.
 
 See [example config](example_config.ini) for reference.
 

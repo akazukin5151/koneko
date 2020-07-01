@@ -14,6 +14,7 @@ from logging.handlers import RotatingFileHandler
 
 import funcy
 from pick import Picker
+from placeholder import m
 
 from koneko import KONEKODIR
 from koneko.config import ncols_config
@@ -52,8 +53,8 @@ def format_frequent(counter: 'dict[str, int]') -> 'list[str]':
 
 def ws_picker(actions, title, **kwargs):
     picker = Picker(actions, title, **kwargs)
-    picker.register_custom_handler(ord('w'), lambda p: p.move_up())
-    picker.register_custom_handler(ord('s'), lambda p: p.move_down())
+    picker.register_custom_handler(ord('w'), m.move_up())
+    picker.register_custom_handler(ord('s'), m.move_down())
     return picker
 
 

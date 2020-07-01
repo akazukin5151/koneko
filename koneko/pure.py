@@ -10,13 +10,13 @@ from math import floor
 from pathlib import Path
 
 from placeholder import _
-from funcy import curry
+from funcy import curry, lmap
 from returns.pipeline import flow
 
 from koneko import colors as c
 
 
-Map = curry(lambda func, iterable: list(map(func, iterable)))
+Map = curry(lmap)
 
 
 def split_backslash_last(string: str) -> str:

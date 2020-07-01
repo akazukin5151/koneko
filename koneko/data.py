@@ -4,13 +4,45 @@ Despite GalleryData and UserData having lots of shared attributes/properties/met
 there isn't much shared functionality, so there's nothing to extract to an abstract
 base class
 """
+from abc import ABC, abstractmethod
+
 from placeholder import _
 from returns.pipeline import flow
 
 from koneko import KONEKODIR, pure
 
 
-class GalleryData:
+class AbstractData(ABC):
+    @abstractmethod
+    def __init__(self):
+        # Defined in child classes, can be attribute or property
+        self.page_num: int
+        self.main_path: 'Path'
+        self.offset: int
+
+        self.next_url: str
+        self.download_path: 'Path'
+        self.all_urls: 'list[str]'
+        self.all_names: 'list[str]'
+
+    @abstractmethod
+    def update(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def artist_user_id(self):
+        raise NotImplementedError
+
+    @property
+    def urls_as_names(self) -> 'list[str]':
+        return flow(self.all_urls, pure.Map(pure.split_backslash_last))
+
+    @property
+    def newnames_with_ext(self) -> 'list[str]':
+        return pure.newnames_with_ext(self.all_urls, self.urls_as_names, self.all_names)
+
+
+class GalleryData(AbstractData):
     """Stores data for gallery modes (mode 1 and 5)
     Structure of the JSON raw:
         illust                  (list of posts)         self.current_illusts
@@ -114,7 +146,7 @@ class ImageData:
         return f"{str(number_prefix).rjust(3, '0')}_*"
 
 
-class UserData:
+class UserData(AbstractData):
     """Stores data for user views (modes 3 and 4)"""
     def __init__(self, page_num: int, main_path: 'Path'):
         self.page_num = page_num

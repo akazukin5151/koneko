@@ -1,37 +1,44 @@
 # Configuration
 
+## It is highly recommended to use the interactive configuration assistant!
+
+After installing, type `lscat 1 7` and follow the instructions. Just copy the suggested settings to your config in `~/.config/koneko/config.ini`. The below text are just for documentation, so don't worry if it is confusing -- it is always better to configure it interactively.
+
 See [example config](example_config.ini) for reference.
 
 ### In general
 * Your config must be saved as `~/.config/koneko/config.ini` (exact path and name)
 * The credentials section will be automatically generated on first launch
-* Gallery means grid: artist illust mode (1) and illust follow mode (5)
-* Users (mode) means: following users mode (3) and search users mode (4)
+* 'Gallery' means grid: artist illust mode (1) and illust follow mode (5)
+* 'Users' (mode) means: following users mode (3) and search users mode (4)
+
+## Image configuration
+* `image_width`: width of the image, in terms of terminal blank spaces (default: `18`)
+* `image_height`: height of the image, in terms of terminal blank spaces (default: `8`)
+* `image_thumbnail_size`: size of the image for pixcat (I think it's in pixels) (default: `310`)
+* `images_x_spacing`: horizontal spacing between images (default: `2`)
+* `images_y_spacing`: vertical spacing between images in a page (default: `1`)
 
 ## Print spacing
-### number of blank spaces to print before printing numbers/words
+### Number of blank spaces in between numbers / in front of words
 
 * `gallery_print_spacing`: the spacing between column numbers (number of blank spaces between each number)
-    * Comma delimited, no spaces
+    * Integers must be comma delimited, no spaces
     * Number of values must be equal to the number of columns
-* `users_print_name_xcoord`: location of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
+    * Default: `9,17,17,17,17`
+* `users_print_name_xcoord`: x-position of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
+    * Default: `18`
 * The number(s) are the number of blank spaces (' ') to print
 * Both of them act on the x-axis
-* These settings are ignored if the `print_info` option is on
+* These settings are ignored if the `print_info` option is off
 
 ## Page spacing
 ### number of `\n` to print after every page, until all rows are out of view
-* `page_spacing`: for gallery modes (default: 23)
+* `page_spacing`: (see header) 
+* Default: `23`
 * The next row cannot be displayed without covering another row, so printing newlines will shift the terminal screen down, until the last row is out of view.
 * Find a value such that the completed four-picture row is completely out of view.
 * Acts on the y-axis
-
-## Image configuration
-* `image_width`: width of the image (default: 18)
-* `image_height`: height of the image (default: 8)
-* `image_thumbnail_size`: just a value for pixcat (default: 310)
-* `images_x_spacing`: horizontal spacing between images (default: 2)
-* `images_y_spacing`: vertical spacing between images in one page (default: 1)
 
 ## Misc
 * `print_info`: Turns off printing the column numbers for the gallery, and number+artist name for user modes.

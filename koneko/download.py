@@ -25,6 +25,7 @@ import itertools
 from pathlib import Path
 from shutil import rmtree
 from functools import partial
+from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 
 from returns.pipeline import flow
@@ -52,21 +53,31 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
     if data.download_path.is_dir():
         rmtree(data.download_path)
 
-    _async_download_rename(data.download_path, data.all_urls, data.all_names, tracker)
+    if data.all_urls:
+        _async_download_rename(data, tracker)
 
     if isinstance(data, UserData):
         save_number_of_artists(data)
 
 
 # - Download functions for multiple images
-def _async_download_rename(download_path, urls, newnames, tracker=None) -> 'IO':
-    oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
-    newnames_ext = pure.newnames_with_ext(urls, oldnames_ext, newnames)
-    _async_filter_and_download(download_path, urls, oldnames_ext, newnames_ext, tracker)
+def _async_download_rename(data, tracker=None) -> 'IO':
+    downloaded_newnames = itertools.filterfalse(os.path.isfile, data.newnames_with_ext)
+    downloaded_oldnames = itertools.filterfalse(os.path.isfile, data.urls_as_names)
+    _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
 
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
+    if not urls:
+        return True
+
+    FakeData = namedtuple('data', ('download_path', 'all_urls'))
+    data = FakeData(download_path, urls)
+
     oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
-    _async_filter_and_download(download_path, urls, oldnames_ext, oldnames_ext, tracker)
+    downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_ext)
+    downloaded_newnames = itertools.cycle((None,))
+
+    _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
 
 @utils.spinner('')
 def async_download_spinner(download_path: Path, urls) -> 'IO':
@@ -74,24 +85,13 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
     async_download_no_rename(download_path, urls)
 
 
-def _async_filter_and_download(download_path, urls, oldnames_with_ext, newnames_with_ext,
-                              tracker=None) -> 'IO':
-    """
-    Submit each url to the ThreadPoolExecutor to download and rename in background
-    """
-    # Nothing needs to be downloaded
-    if not urls:
-        return True
-
-    # Filter out already downloaded files
-    downloaded_newnames = itertools.filterfalse(os.path.isfile, newnames_with_ext)
-    downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_with_ext)
+def _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker):
     helper = partial(_download_then_rename, tracker=tracker)
 
-    os.makedirs(download_path, exist_ok=True)
-    with utils.cd(download_path):
-        with ThreadPoolExecutor(max_workers=len(urls)) as executor:
-            executor.map(helper, urls, downloaded_oldnames, downloaded_newnames)
+    os.makedirs(data.download_path, exist_ok=True)
+    with utils.cd(data.download_path):
+        with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
+            executor.map(helper, data.all_urls, downloaded_oldnames, downloaded_newnames)
 
 
 def _download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':

@@ -102,6 +102,11 @@ koneko 5 # Mode 5
 ```
 For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
+## Upcoming changelog (in dev branch)
+
+For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+
+### Version 0.10.0
 
 # Roadmap
 

@@ -121,7 +121,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] page_spacing 
     - [x] gallery_print_spacing 
     - [x] users_print_name_xcoord 
-    - [ ] image_mode_text_offset
 * Remove `users_page_spacing`: it's just `gallery_page_spacing` - 3
 * Rename `gallery_page_spacing` setting to `page_spacing`
 * Show frequently searched IDs/strings with an option to select them with pick.
@@ -154,6 +153,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 # Roadmap
 
+* `image_mode_text_offset` doesn't have a configuration assistant, or fix the cursor position again.
 * In-depth usage documentation?
 * Consistent public and private methods and attributes again
 

@@ -5,6 +5,7 @@ import imghdr
 import logging
 import itertools
 import threading
+from copy import copy
 from math import ceil
 from pathlib import Path
 from shutil import rmtree
@@ -14,10 +15,12 @@ from logging.handlers import RotatingFileHandler
 
 import funcy
 from pick import Picker
+from pixcat import Image
 from placeholder import m
+from blessed import Terminal
 
-from koneko import KONEKODIR
-from koneko.config import ncols_config
+from koneko import KONEKODIR, pure
+from koneko.config import ncols_config, xcoords_config
 
 
 def setup_history_log():
@@ -213,3 +216,81 @@ def ask_your_id(your_id):
 
     # If your_id not stored, or if ans is no, or if id provided, via cli
     return ''
+
+
+# For lscat_app
+term = Terminal()
+# Must make a copy before using this reference
+SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
+
+def write(value: str) -> 'IO':
+    print(value, end='', flush=True)
+
+def check_quit(ans: str):
+    if ans == 'q':
+        sys.exit(0)
+
+def move_cursor_up(num: int) -> 'IO':
+    if num > 0:
+        write(f'\033[{num}A')
+
+def move_cursor_down(num=1) -> 'IO':
+    if num > 0:
+        write(f'\033[{num}B')
+
+def erase_line() -> 'IO':
+    write('\033[K')
+
+def print_doc(doc: str) -> 'IO':
+    """Prints a given string in the bottom of the terminal"""
+    os.system('clear')
+    number_of_newlines = doc.count('\n')
+    bottom = term.height - (number_of_newlines + 2)
+    move_cursor_down(bottom)
+    print(doc)
+
+def print_cols(spacings: 'list[int]', ncols: int) -> 'IO':
+    for (idx, space) in enumerate(spacings[:ncols]):
+        write(' ' * int(space))
+        write(idx + 1)
+
+def print_info(message_xcoord: int) -> 'IO':
+    print(' ' * message_xcoord, '000', '\n',
+          ' ' * message_xcoord, 'Example artist', sep='')
+
+
+def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
+    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
+    img.show(align='left', x=x, y=y)
+    return img
+
+def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
+    return show_single(x, 0, thumbnail_size)
+
+def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
+    # Default usage of config module
+    return show_single(xcoords_config()[1], y, thumbnail_size)
+
+def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
+    xcoords = pure.xcoords(term.width, image_width, xpadding)
+    for x in xcoords:
+        show_single(x, 0, thumbnail_size)
+
+def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
+    show_single(padding, 0, size)
+    for px in preview_xcoords:
+        show_single_x(px, size)
+
+
+def hide_if_exist(image: Image) -> 'IO':
+    if image:
+        image.hide()
+        move_cursor_up(1)
+
+def update_user_info(spacing):
+    erase_line()         # Erase the first line
+    move_cursor_down()   # Go down and erase the second line
+    erase_line()
+    move_cursor_up(1)    # Go back up to the original position
+    print_info(spacing)  # Print info takes up 2 lines
+    move_cursor_up(2)    # so go back to the top

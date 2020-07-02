@@ -188,3 +188,7 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     order[0::4] = range(artists_count)
     return order
 
+# For lscat_app
+def line_width(spacings: 'list[int]', ncols: int) -> int:
+    return sum(spacings) + ncols
+

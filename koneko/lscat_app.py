@@ -51,77 +51,7 @@ MINUS = {'-', '_'}
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
 
-# Pure
-def line_width(spacings: 'list[int]', ncols: int) -> int:
-    return sum(spacings) + ncols
-
-# Utility functions used in multiple places
-def write(value: str) -> 'IO':
-    print(value, end='', flush=True)
-
-def check_quit(ans: str):
-    if ans == 'q':
-        sys.exit(0)
-
-def move_cursor_up(num: int) -> 'IO':
-    if num > 0:
-        write(f'\033[{num}A')
-
-def move_cursor_down(num=1) -> 'IO':
-    if num > 0:
-        write(f'\033[{num}B')
-
-def erase_line() -> 'IO':
-    write('\033[K')
-
-def print_doc(doc: str) -> 'IO':
-    """Prints a given string in the bottom of the terminal"""
-    os.system('clear')
-    number_of_newlines = doc.count('\n')
-    bottom = term.height - (number_of_newlines + 2)
-    move_cursor_down(bottom)
-    print(doc)
-
-
-# More specialised but still small functions
-def print_cols(spacings: 'list[int]', ncols: int) -> 'IO':
-    for (idx, space) in enumerate(spacings[:ncols]):
-        write(' ' * int(space))
-        write(idx + 1)
-
-def print_info(message_xcoord: int) -> 'IO':
-    print(' ' * message_xcoord, '000', '\n',
-          ' ' * message_xcoord, 'Example artist', sep='')
-
-
-def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
-    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
-    img.show(align='left', x=x, y=y)
-    return img
-
-def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
-    return show_single(x, 0, thumbnail_size)
-
-def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
-    # Default usage of config module
-    return show_single(config.xcoords_config()[1], y, thumbnail_size)
-
-def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
-    xcoords = pure.xcoords(term.width, image_width, xpadding)
-    for x in xcoords:
-        show_single(x, 0, thumbnail_size)
-
-def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
-    show_single(padding, 0, size)
-    for px in preview_xcoords:
-        show_single_x(px, size)
-
-
-def hide_if_exist(image: Image) -> 'IO':
-    if image:
-        image.hide()
-        move_cursor_up(1)
-
+# Turn into named tuple
 class FakeData:
     def __init__(self, path):
         self.download_path = path
@@ -242,7 +172,7 @@ def pick_dir_loop(path, basetitle, actions, modes):
         picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
 
         _, ans = picker.start()
-        check_quit(ans)
+        utils.check_quit(ans)
 
         if ans == 'y':
             return path
@@ -400,7 +330,7 @@ def thumbnail_size_assistant():
 
     Keep in mind this size will be used for a grid of images
     """
-    print_doc(thumbnail_size_assistant.__doc__)
+    utils.print_doc(thumbnail_size_assistant.__doc__)
 
     image = copy(SAMPLE_IMAGE)
 
@@ -410,7 +340,7 @@ def thumbnail_size_assistant():
             image.thumbnail(size).show(align='left', x=0, y=0)
 
             ans = term.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
             if ans in PLUS:
                 size += 20
@@ -493,12 +423,12 @@ class AbstractImageAdjuster(ABC):
         raise NotImplementedError
 
     def hide_show_print(self):
-        hide_if_exist(self.image)
+        utils.hide_if_exist(self.image)
 
         self.image = self.show_func_args()
 
         self.maybe_move_up()
-        write('\r' + ' ' * 20 + '\r')
+        utils.write('\r' + ' ' * 20 + '\r')
         self.write()
 
     def start(self):
@@ -513,7 +443,7 @@ class AbstractImageAdjuster(ABC):
                     self.hide_show_print()
 
                 ans = term.inkey()
-                check_quit(ans)
+                utils.check_quit(ans)
 
                 if ans.code == ENTER and self.image:
                     self.maybe_erase()
@@ -551,9 +481,9 @@ class AbstractPadding(AbstractImageAdjuster, ABC):
         return bool(self.valid)
 
     def start(self):
-        print_doc(self.doc)
+        utils.print_doc(self.doc)
 
-        show_single_x(self.default_x, self.thumbnail_size)
+        utils.show_single_x(self.default_x, self.thumbnail_size)
 
         self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
@@ -566,7 +496,7 @@ class XPadding(AbstractPadding):
         super().__init__()
         # Base
         self.thumbnail_size = thumbnail_size
-        self.show_func = show_single_x
+        self.show_func = utils.show_single_x
         self.side_label = 'width'
 
         # Padding ABC
@@ -575,7 +505,7 @@ class XPadding(AbstractPadding):
         self.find_dim_func = FindImageWidth
 
     def write(self):
-        write(f'x spacing = {self.spaces}')
+        utils.write(f'x spacing = {self.spaces}')
 
     def maybe_move_down(self, *a):
         return True
@@ -595,7 +525,7 @@ class YPadding(AbstractPadding):
         super().__init__()
         # Base
         self.thumbnail_size = thumbnail_size
-        self.show_func = show_single_y
+        self.show_func = utils.show_single_y
         self.side_label = 'height'
 
         # Padding ABC
@@ -604,13 +534,13 @@ class YPadding(AbstractPadding):
         self.find_dim_func = FindImageHeight
 
     def write(self):
-        write(f'y spacing = {self.spaces}')
+        utils.write(f'y spacing = {self.spaces}')
 
     def maybe_move_down(self):
-        move_cursor_down(self.width_or_height)
+        utils.move_cursor_down(self.width_or_height)
 
     def maybe_move_up(self):
-        move_cursor_up(self.spaces)
+        utils.move_cursor_up(self.spaces)
 
     def show_func_args(self):
         return self.show_func(
@@ -630,7 +560,7 @@ class FindImageDimension(AbstractImageAdjuster, ABC):
         self.image = None
 
     def write(self):
-        write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
+        utils.write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
 
     def maybe_move_down(self):
         return True
@@ -639,7 +569,7 @@ class FindImageDimension(AbstractImageAdjuster, ABC):
         return self.show_func(self.spaces, self.thumbnail_size)
 
     def maybe_erase(self):
-        erase_line()
+        utils.erase_line()
 
     def return_tup(self):
         return self.spaces - self.start_spaces, self.image
@@ -651,7 +581,7 @@ class FindImageDimension(AbstractImageAdjuster, ABC):
 class FindImageWidth(FindImageDimension):
     def __init__(self, thumbnail_size):
         self.thumbnail_size = thumbnail_size
-        self.show_func = show_single_x
+        self.show_func = utils.show_single_x
         self.side_label = 'width'
         self.start_spaces = config.xcoords_config()[0]
         super().__init__()
@@ -663,13 +593,13 @@ class FindImageWidth(FindImageDimension):
 class FindImageHeight(FindImageDimension):
     def __init__(self, thumbnail_size):
         self.thumbnail_size = thumbnail_size
-        self.show_func = show_single_y
+        self.show_func = utils.show_single_y
         self.side_label = 'height'
         self.start_spaces = 0
         super().__init__()
 
     def maybe_move_up(self):
-        move_cursor_up(self.spaces)
+        utils.move_cursor_up(self.spaces)
 
 
 
@@ -715,7 +645,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     Do you want to preview an existing cache dir? [y/N]
     To keep your chosen thumbnail size, image width and x spacing, enter 'n'.
     """
-    print_doc(gallery_print_spacing_assistant.__doc__)  # Action before start
+    utils.print_doc(gallery_print_spacing_assistant.__doc__)  # Action before start
     ans = input()
 
     # Setup variables
@@ -725,7 +655,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
         lscat.show_instant(lscat.TrackDownloads, _data)
         ncols = config.ncols_config()  # Default fallback, on user choice
     else:
-        show_instant_sample(size, image_width, xpadding)
+        utils.show_instant_sample(size, image_width, xpadding)
         ncols = pure.ncols(term.width, image_width, xpadding)
 
     # Just the default settings; len(first_list) == 5
@@ -739,9 +669,9 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
             update_gallery_info(spacings, ncols, current_selection)
 
             ans = term.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
-            if ans in PLUS and line_width(spacings, ncols) < term.width:
+            if ans in PLUS and pure.line_width(spacings, ncols) < term.width:
                 spacings[current_selection] += 1
 
             elif ans in MINUS and spacings[current_selection] > 0:
@@ -761,13 +691,13 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
                 return spacings
 
 def update_gallery_info(spacings, ncols, current_selection):
-    move_cursor_up(2)
-    erase_line()
-    print_cols(spacings, ncols)
+    utils.move_cursor_up(2)
+    utils.erase_line()
+    utils.print_cols(spacings, ncols)
     print('\n\nAdjusting the number of spaces between '
           f'{current_selection} and {current_selection+1}',
           flush=True)
-    move_cursor_up(1)
+    utils.move_cursor_up(1)
 
 
 def user_info_assistant(thumbnail_size, xpadding, image_width):
@@ -782,18 +712,18 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
     preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
 
     # Start
-    print_doc(user_info_assistant.__doc__)
+    utils.print_doc(user_info_assistant.__doc__)
 
-    display_user_row(thumbnail_size, xpadding, preview_xcoords)
+    utils.display_user_row(thumbnail_size, xpadding, preview_xcoords)
 
-    move_cursor_up(5)
+    utils.move_cursor_up(5)
 
     with term.cbreak():
         while True:
-            update_user_info(spacing)
+            utils.update_user_info(spacing)
 
             ans = term.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
             if ans in PLUS:
                 spacing += 1
@@ -806,10 +736,3 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
                 return spacing
 
 
-def update_user_info(spacing):
-    erase_line()         # Erase the first line
-    move_cursor_down()   # Go down and erase the second line
-    erase_line()
-    move_cursor_up(1)    # Go back up to the original position
-    print_info(spacing)  # Print info takes up 2 lines
-    move_cursor_up(2)    # so go back to the top

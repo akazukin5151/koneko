@@ -217,7 +217,8 @@ def browse_cache():
 
 def pick_dir():
     path = KONEKODIR
-    title = (
+    # base is immutable
+    basetitle = (
         'Select a directory to view\n'
         "Press 'y' to display the current directory\n"
         "Press 'b' to move up a directory\n"
@@ -225,7 +226,9 @@ def pick_dir():
         "Press 'f' to filter out modes\n"
         "Press 'q' to exit"
     )
-    actions = sorted(os.listdir(path))
+    title = basetitle
+    actions  = sorted(os.listdir(path))
+    modes = None
 
     while True:
         picker = utils.ws_picker(actions, title)
@@ -254,7 +257,13 @@ def pick_dir():
 
         elif ans == 'f':
             actions = sorted(os.listdir(path))
-            actions = sorted(filter_dir(utils.select_modes_filter(True)))
+            modes = utils.select_modes_filter(True)
+            if '6' in modes:  # Clear all filters
+                title = basetitle
+            else:
+                actions = sorted(filter_dir(modes))
+                title = f"Filtering {modes=}\n" + basetitle
+
             continue
 
         else:
@@ -263,6 +272,8 @@ def pick_dir():
                 path = path.parent
 
         actions = sorted(os.listdir(path))
+        if path == KONEKODIR and modes is not None:  # Filter active
+            actions = sorted(filter_dir(modes))
 
 
 def filter_dir(modes):

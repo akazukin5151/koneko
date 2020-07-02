@@ -57,7 +57,7 @@ def ws_picker(actions, title, **kwargs):
     picker.register_custom_handler(ord('s'), m.move_down())
     return picker
 
-def select_modes_filter(mode5=False):
+def select_modes_filter(more=False):
     title = "Use SPACE to select a mode to show and ENTER to confirm"
     # Copied from screens
     actions = [
@@ -67,8 +67,9 @@ def select_modes_filter(mode5=False):
         '4. Search for artists',
     ]
 
-    if mode5:
-        actions.append('5. View illustrations of all following artists')
+    if more:
+        actions.extend(('5. View illustrations of all following artists',
+                        'c. Clear all filters'))
 
     picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
     selected = picker.start()

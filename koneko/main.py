@@ -317,19 +317,7 @@ def _frequent(actions, history):
         func()
 
 def filter_freq():
-    title = "Use SPACE to select a mode to show and ENTER to confirm"
-    # Copied from screens
-    actions = (
-        '1. View artist illustrations',
-        '2. Open pixiv post',
-        '3. View following artists',
-        '4. Search for artists',
-    )
-    picker = utils.ws_picker(actions, title, multiselect=True, min_selection_count=1)
-    selected = picker.start()
-    modes = [str(x[1] + 1) for x in selected]
-
-    frequent_modes(modes)
+    frequent_modes(utils.select_modes_filter())
 
 
 if __name__ == '__main__':

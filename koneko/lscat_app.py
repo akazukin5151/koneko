@@ -217,20 +217,21 @@ def browse_cache():
 
 def pick_dir():
     path = KONEKODIR
+    title = (
+        'Select a directory to view\n'
+        "Press 'y' to display the current directory\n"
+        "Press 'b' to move up a directory\n"
+        "Press 'd' to delete the current directory\n"
+        "Press 'f' to filter out modes\n"
+        "Press 'q' to exit"
+    )
+    actions = sorted(os.listdir(path))
 
     while True:
-        title = (
-            'Select a directory to view\n'
-            "Press 'y' to display the current directory\n"
-            "Press 'b' to move up a directory\n"
-            "Press 'd' to delete the current directory\n"
-            "Press 'q' to exit"
-        )
-        actions = sorted(os.listdir(path))
-
         picker = utils.ws_picker(actions, title)
         picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
         picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
+        picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
         picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
         picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
 
@@ -251,10 +252,38 @@ def pick_dir():
                 rmtree(path)
                 path = path.parent
 
+        elif ans == 'f':
+            actions = sorted(os.listdir(path))
+            actions = sorted(filter_dir(utils.select_modes_filter(True)))
+
         else:
             path = path / actions[ans]
             if not path.is_dir():
                 path = path.parent
+
+def filter_dir(modes):
+    path = KONEKODIR
+    dirs = os.listdir(path)
+    allowed_names = set()
+
+    if '1' in modes:
+        allowed_names.add('testgallery')
+
+    if '3' in modes:
+        allowed_names.update(('following', 'testuser'))
+
+    if '4' in modes:
+        allowed_names.add('search')
+
+    if '5' in modes:
+        allowed_names.add('illustfollow')
+
+    if '1' in modes or '2' in modes:
+        predicate = lambda d: d.isdigit() or d in allowed_names
+    else:
+        predicate = lambda d: d in allowed_names
+
+    return [d for d in dirs if predicate(d)]
 
 
 

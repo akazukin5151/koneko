@@ -57,6 +57,23 @@ def ws_picker(actions, title, **kwargs):
     picker.register_custom_handler(ord('s'), m.move_down())
     return picker
 
+def select_modes_filter(mode5=False):
+    title = "Use SPACE to select a mode to show and ENTER to confirm"
+    # Copied from screens
+    actions = [
+        '1. View artist illustrations',
+        '2. Open pixiv post',
+        '3. View following artists',
+        '4. Search for artists',
+    ]
+
+    if mode5:
+        actions.append('5. View illustrations of all following artists')
+
+    picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
+    selected = picker.start()
+    return [str(x[1] + 1) for x in selected]
+
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
     """Takes prompt input key seqs, find the selected image number.

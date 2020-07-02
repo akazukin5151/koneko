@@ -31,6 +31,7 @@ import time
 from copy import copy
 from pathlib import Path
 from shutil import rmtree
+from collections import namedtuple
 from abc import ABC, abstractmethod
 
 from pick import Picker
@@ -50,21 +51,7 @@ MINUS = {'-', '_'}
 # Must make a copy before using this reference
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
-
-# Turn into named tuple
-class FakeData:
-    def __init__(self, path):
-        self.download_path = path
-
-    @classmethod
-    def gallery(cls):
-        return cls(KONEKODIR / 'testgallery')
-
-    @classmethod
-    def user(cls):
-        # It needs to have a .koneko file
-        return cls(KONEKODIR / 'testuser')
-
+FakeData = namedtuple('data', ('download_path',))
 
 # Main functions that organise work
 def main():
@@ -118,11 +105,11 @@ def _main():
 
 
 def display_gallery():
-    data = FakeData.gallery()
+    data = FakeData(KONEKODIR / 'testgallery')
     lscat.show_instant(lscat.TrackDownloads, data, True)
 
 def display_user():
-    data = FakeData.user()
+    data = FakeData(KONEKODIR / 'testuser')
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
 def display_path(path=None):

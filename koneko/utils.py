@@ -220,8 +220,6 @@ def ask_your_id(your_id):
 
 # For lscat_app
 term = Terminal()
-# Must make a copy before using this reference
-SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
 def write(value: str) -> 'IO':
     print(value, end='', flush=True)
@@ -260,6 +258,8 @@ def print_info(message_xcoord: int) -> 'IO':
 
 
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
+    # Must make a copy before using this reference
+    SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
     img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=y)
     return img

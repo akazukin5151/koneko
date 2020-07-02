@@ -30,19 +30,10 @@ def handle_missing_pics() -> 'IO':
 
     os.system('clear')
 
-def handle_cli() -> (str, str):
-    # no cli arguments, prompt user for mode selection
-    if len(sys.argv) <= 1:
-        return '', ''
-
-    main_command, user_input = cli.process_cli_args()
-    if main_command == 'vh':
-        sys.exit(0)
-    return main_command, user_input
-
 def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
-    main_command, user_input = handle_cli()
+    if not (args := cli.handle_vh()):
+        sys.exit(0)
 
     os.system('clear')
     credentials, your_id = config.begin_config()
@@ -54,15 +45,19 @@ def main():
     api.myapi.start()
     # After this part, the API is logging in in the background and we can proceed
 
+    # If command line args given, directly launch mode
+    if len(sys.argv) != 1:
+        cli.process_cli_args(args, your_id)
+
     try:
-        main_loop(main_command, user_input, your_id)
+        main_loop(args, your_id)
     except KeyboardInterrupt:
         # If ctrl+c pressed before a mode is selected, thread will never join
         # Get it to join first so that modes still work
         api.myapi.await_login()
         main()
 
-def main_loop(main_command, user_input, your_id: str):
+def main_loop(args, your_id: str):
     """
     Ask for mode selection, if no command line arguments supplied
     call the right function depending on the mode
@@ -74,6 +69,7 @@ def main_loop(main_command, user_input, your_id: str):
         For illust following mode, it's not required
     """
     printmessage = True
+    user_input = ''
     case = {
         '1': ArtistModeLoop(user_input).start,
         '2': ViewPostModeLoop(user_input).start,
@@ -86,8 +82,8 @@ def main_loop(main_command, user_input, your_id: str):
     }
 
     while True:
-        if not user_input and main_command not in ('3', '5'):
-            main_command = screens.begin_prompt(printmessage)
+        #if not user_input and main_command not in ('3', '5'):
+        main_command = screens.begin_prompt(printmessage)
 
         # Simplify if-else chain with case-switch
         func = case.get(main_command, None)
@@ -95,13 +91,8 @@ def main_loop(main_command, user_input, your_id: str):
             func()
 
         elif main_command == '3':
-            if your_id and not user_input:  # your_id stored in config file
-                ans = input('Do you want to use the Pixiv ID saved in your config?\n')
-                if ans in {'y', ''}:
-                    FollowingUserModeLoop(your_id).start()
-
-            # If your_id not stored, or if ans is no, or if id provided, via cli
-            FollowingUserModeLoop(user_input).start()
+            your_id = utils.ask_your_id(your_id)
+            FollowingUserModeLoop(your_id).start()
 
         elif main_command == 'q':
             answer = input('Are you sure you want to exit? [Y/n]:\n')

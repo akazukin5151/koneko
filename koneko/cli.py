@@ -2,7 +2,7 @@
 terminal!)
 
 Usage:
-  koneko       [<link> | <searchstr>] [-o | --offline]
+  koneko       [<link> | <searchstr>]
   koneko [1|a] <link_or_id>
   koneko [2|i] <link_or_id>
   koneko (3|f) <link_or_id>
@@ -53,7 +53,7 @@ def handle_vh():
     return args
 
 
-def process_cli_args(args, your_id) -> (str, str):
+def process_cli_args(args, your_id):
     # Yes it's a lie
     print('Logging in...')
     if (url_or_str := args['<link>']) or (url_or_str := args['<searchstr>']):
@@ -61,7 +61,7 @@ def process_cli_args(args, your_id) -> (str, str):
     return parse_mode_given(args)
 
 
-def parse_no_mode(url_or_str: str, your_id) -> (str, str):
+def parse_no_mode(url_or_str: str, your_id):
     if 'users' in url_or_str:
         return main.ArtistModeLoop(pure.process_user_url(url_or_str)).start()
 

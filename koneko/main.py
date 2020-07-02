@@ -124,16 +124,9 @@ class AbstractLoop(ABC):
 
             self._save_history()
 
+
             if self._user_input == '!freq':
                 frequent_modes([str(self)])
-
-            # Not implemented yet...
-            elif self._user_input == '__offline__':
-                actions = sorted(lscat_app.filter_dir([str(self)]))
-                path = lscat_app.pick_dir_loop(lscat_app.KONEKODIR, 'TODO', actions, [str(self)])
-                self._user_input = str(path).split('/')[-2]
-                self._go_to_mode()
-
             else:
                 self._go_to_mode()
 

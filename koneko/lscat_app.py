@@ -145,7 +145,7 @@ def pick_dir():
     )
     title = basetitle
     actions = sorted(os.listdir(path))
-    pick_dir_loop(path, basetitle, actions, None)
+    return pick_dir_loop(path, basetitle, actions, None)
 
 def pick_dir_loop(path, basetitle, actions, modes):
     title = basetitle

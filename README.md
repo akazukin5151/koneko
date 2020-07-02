@@ -119,8 +119,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Filter modes in koneko main should go back to main screen on 'q' key
 * Offline mode
     - [x] Restructure cli handling to be more modular like lscat_app
-    - [ ] Handle `--offline` arg
-    - [ ] If integrating frequents into offline, it needs to know what is cached and not
+    - [ ] Use `lscat_app` as a base for offline mode, rather than `koneko`.
     - [ ] Documentation
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)

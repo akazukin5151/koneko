@@ -225,9 +225,10 @@ def pick_dir():
         "Press 'f' to filter out modes\n"
         "Press 'q' to exit"
     )
-    actions = sorted(os.listdir(path))
 
     while True:
+        actions = sorted(os.listdir(path))
+
         picker = utils.ws_picker(actions, title)
         picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
         picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))

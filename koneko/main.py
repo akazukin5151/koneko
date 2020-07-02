@@ -46,17 +46,16 @@ def main():
     api.myapi.credentials = credentials
     api.myapi.start()  # API is now logging in in the background
 
-    # If command line args given, directly launch mode
-    if len(sys.argv) != 1:
-        cli.process_cli_args(args, your_id)
-
+    cli_args_given = len(sys.argv) != 1
     try:
-        main_loop(args, your_id)
+        if cli_args_given:
+            cli.process_cli_args(args, your_id)
+        else:
+            main_loop(args, your_id)
     except KeyboardInterrupt:
-        # If ctrl+c pressed before a mode is selected, thread will never join
-        # Get it to join first so that modes still work
-        api.myapi.await_login()
-        main()
+        os.system('clear')
+        main_loop(args, your_id)
+
 
 def main_loop(args, your_id: str):
     """Ask for a mode and launch it (mode might ask for more info), for no cli args"""

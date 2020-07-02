@@ -77,7 +77,6 @@ class AbstractUI(ABC):
         """
         if utils.dir_not_empty(self.data):
             self.show_instant()
-            api.myapi.await_login()
             self._parse_user_infos()
             self.verify_up_to_date()
             self.print_page_info()
@@ -86,7 +85,6 @@ class AbstractUI(ABC):
         # No valid cached images, download all from scratch
         utils.remove_dir_if_exist(self.data)
 
-        api.myapi.await_login()
         self._parse_user_infos()
         download.init_download(self.data, self.tracker())
         self.print_page_info()
@@ -492,7 +490,6 @@ def view_post_mode(image_id) -> 'IO':
     different for a standalone mode or coming from a gallery mode.
     """
     print('Fetching illust details...')
-    api.myapi.await_login()
     try:
         post_json = api.myapi.protected_illust_detail(image_id)['illust']
     except KeyError:

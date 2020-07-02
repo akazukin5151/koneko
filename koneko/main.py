@@ -20,6 +20,9 @@ from koneko import ui, api, cli, pure, utils, config, prompt, screens, lscat, ls
 
 
 def handle_missing_pics() -> 'IO':
+    if Path('~/.local/share/koneko').expanduser().exists():
+        return True
+
     print('Please wait, downloading welcome image (this will only occur once)...')
     baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
     basedir = Path('~/.local/share/koneko/pics').expanduser()
@@ -38,12 +41,10 @@ def main():
     os.system('clear')
     credentials, your_id = config.begin_config()
 
-    if not Path('~/.local/share/koneko').expanduser().exists():
-        handle_missing_pics()
+    handle_missing_pics()
 
     api.myapi.credentials = credentials
-    api.myapi.start()
-    # After this part, the API is logging in in the background and we can proceed
+    api.myapi.start()  # API is now logging in in the background
 
     # If command line args given, directly launch mode
     if len(sys.argv) != 1:

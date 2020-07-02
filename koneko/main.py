@@ -140,7 +140,7 @@ class AbstractLoop(ABC):
         self._user_input = pure.process_user_url(self._raw_answer)
 
     def _validate_input(self) -> 'bool':
-        if self._user_input in {'!freq', '__offline__'}:
+        if self._user_input == '!freq':
             return True
 
         try:

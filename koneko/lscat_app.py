@@ -225,10 +225,9 @@ def pick_dir():
         "Press 'f' to filter out modes\n"
         "Press 'q' to exit"
     )
+    actions = sorted(os.listdir(path))
 
     while True:
-        actions = sorted(os.listdir(path))
-
         picker = utils.ws_picker(actions, title)
         picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
         picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
@@ -256,11 +255,15 @@ def pick_dir():
         elif ans == 'f':
             actions = sorted(os.listdir(path))
             actions = sorted(filter_dir(utils.select_modes_filter(True)))
+            continue
 
         else:
             path = path / actions[ans]
             if not path.is_dir():
                 path = path.parent
+
+        actions = sorted(os.listdir(path))
+
 
 def filter_dir(modes):
     path = KONEKODIR

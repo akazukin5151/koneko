@@ -107,6 +107,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
 ### Version 0.10.0
+* Restructure cli handling to be more modular like lscat_app
 
 # Roadmap
 
@@ -118,9 +119,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 * Filter modes in koneko main should go back to main screen on 'q' key
-* Offline mode
-    - [x] Restructure cli handling to be more modular like lscat_app
-    - [ ] Use `lscat_app` as a base for offline mode, rather than `koneko`.
+* Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
+    - [ ] Handle moving around pages
     - [ ] Documentation
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)

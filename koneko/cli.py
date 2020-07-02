@@ -2,7 +2,7 @@
 terminal!)
 
 Usage:
-  koneko       [<link> | <searchstr>]
+  koneko       [<link> | <searchstr>] [-o | --offline]
   koneko [1|a] <link_or_id>
   koneko [2|i] <link_or_id>
   koneko (3|f) <link_or_id>
@@ -58,6 +58,9 @@ def process_cli_args() -> (str, str):
     elif args['--help'] or args['-h']:
         print(__doc__)  # Docopt should handle this anyway
         return 'vh', ''
+
+    #if args['-o'] or args['--offline']:
+        #return ('__offline__',)
 
     # Yes it's a lie
     print('Logging in...')

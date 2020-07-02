@@ -227,8 +227,11 @@ def pick_dir():
         "Press 'q' to exit"
     )
     title = basetitle
-    actions  = sorted(os.listdir(path))
-    modes = None
+    actions = sorted(os.listdir(path))
+    pick_dir_loop(path, basetitle, actions, None)
+
+def pick_dir_loop(path, basetitle, actions, modes):
+    title = basetitle
 
     while True:
         picker = utils.ws_picker(actions, title)

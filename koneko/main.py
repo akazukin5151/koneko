@@ -16,7 +16,7 @@ import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, utils, config, prompt, screens
+from koneko import ui, api, cli, pure, utils, config, prompt, screens, lscat, lscat_app
 
 
 def handle_missing_pics() -> 'IO':
@@ -147,6 +147,14 @@ class AbstractLoop(ABC):
 
             if self._user_input == '!freq':
                 frequent_modes([str(self)])
+
+            # Not implemented yet...
+            elif self._user_input == '__offline__':
+                actions = sorted(lscat_app.filter_dir([str(self)]))
+                path = lscat_app.pick_dir_loop(lscat_app.KONEKODIR, 'TODO', actions, [str(self)])
+                self._user_input = str(path).split('/')[-2]
+                self._go_to_mode()
+
             else:
                 self._go_to_mode()
 
@@ -160,7 +168,7 @@ class AbstractLoop(ABC):
         self._user_input = pure.process_user_url(self._raw_answer)
 
     def _validate_input(self) -> 'bool':
-        if self._user_input == '!freq':
+        if self._user_input in {'!freq', '__offline__'}:
             return True
 
         try:

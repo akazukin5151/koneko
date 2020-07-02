@@ -16,7 +16,7 @@ import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from koneko import ui, api, cli, pure, utils, config, prompt, screens, lscat, lscat_app
+from koneko import ui, api, cli, pure, utils, config, prompt, screens
 
 
 def handle_missing_pics() -> 'IO':

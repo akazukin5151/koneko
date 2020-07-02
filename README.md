@@ -116,6 +116,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
+* Filter modes in koneko main should go back to main screen on 'q' key
 * Offline mode
     - [ ] Launch `lscat` from `koneko`
     - [ ] If integrating frequents into offline, it needs to know what is cached and not

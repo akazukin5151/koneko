@@ -59,22 +59,12 @@ def main():
         main()
 
 def main_loop(args, your_id: str):
-    """
-    Ask for mode selection, if no command line arguments supplied
-    call the right function depending on the mode
-    user_input : str or int
-        For artist_illusts_mode, it is artist_user_id : int
-        For view_post_mode, it is image_id : int
-        For following users mode, it is your_id : int
-        For search users mode, it is search_string : str
-        For illust following mode, it's not required
-    """
+    """Ask for a mode and launch it (mode might ask for more info), for no cli args"""
     printmessage = True
-    user_input = ''
     case = {
-        '1': ArtistModeLoop(user_input).start,
-        '2': ViewPostModeLoop(user_input).start,
-        '4': SearchUsersModeLoop(user_input).start,
+        '1': ArtistModeLoop('').start,
+        '2': ViewPostModeLoop('').start,
+        '4': SearchUsersModeLoop('').start,
         '5': illust_follow_mode_loop,
         'f': frequent,
         '?': screens.info_screen_loop,
@@ -83,10 +73,8 @@ def main_loop(args, your_id: str):
     }
 
     while True:
-        #if not user_input and main_command not in ('3', '5'):
         main_command = screens.begin_prompt(printmessage)
 
-        # Simplify if-else chain with case-switch
         func = case.get(main_command, None)
         if func:
             func()

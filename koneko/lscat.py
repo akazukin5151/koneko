@@ -46,10 +46,7 @@ def show_instant(cls, data, gallerymode=False) -> 'IO':
 
     if gallerymode and config.check_print_info():
         number_of_cols = config.ncols_config()
-        spacings = config.get_settings('lscat', 'gallery_print_spacing').map(
-                      m.split(',')
-                  ).value_or((9, 17, 17, 17, 17))
-
+        spacings = config.gallery_print_spacing_config()
         utils.print_cols(spacings, number_of_cols)
         print('\n')
 

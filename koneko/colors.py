@@ -1,5 +1,5 @@
 """Export the colors for [h]elp screen keys. Functions are pure"""
-from funcy import curry
+from funcy import curry, lmap
 from returns.pipeline import flow
 
 # Public constants
@@ -42,10 +42,7 @@ _COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
 
 
 # Duplicated from pure because circular import
-def _map(func, iterable):
-    return list(map(func, iterable))
-
-_Map = curry(_map)
+_Map = curry(lmap)
 
 # Public constants
 n, p, r, q, m, b, o_, d_, f = flow(_letters, _Map(_letter_with_brackets))

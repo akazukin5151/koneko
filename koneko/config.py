@@ -9,14 +9,13 @@ Structure:
 """
 
 import os
-from getpass import getpass
 from pathlib import Path
+from getpass import getpass
 from configparser import ConfigParser
 
-from blessed import Terminal
+from placeholder import m
 from returns.result import safe
 from returns.pipeline import flow
-from placeholder import m
 
 from koneko import pure, TERM
 
@@ -30,9 +29,11 @@ def get_config_section(section: str) -> 'IOResult[config]':
     section = config_object[section]
     return section
 
+
 def get_settings(section: str, setting: str) -> 'IOResult[str]':
     cfgsection: 'Result[config]' = get_config_section(section)
     return cfgsection.map(m.get(setting, ''))
+
 
 @safe
 def unsafe_get_bool_config(section, setting: str, fallback: bool) -> 'IOResult[bool]':
@@ -49,12 +50,15 @@ def get_bool_config(section: str, setting: str, fallback: bool) -> bool:
     """Reads requested section and setting, returning the fallback on failure."""
     return unsafe_get_bool_config(section, setting, fallback).value_or(fallback)
 
+
 def check_image_preview() -> bool:
     return get_bool_config('experimental', 'image_mode_previews', False)
+
 
 def check_print_info() -> bool:
     """For a Failure (setting not found), return True by default"""
     return get_bool_config('misc', 'print_info', True)
+
 
 def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, int):
     settings = get_config_section('lscat')
@@ -63,29 +67,37 @@ def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, in
         settings.map(m.getint(f'images_{dimension}_spacing', fallback=fallbacks[1])).value_or(fallbacks[1])
     )
 
+
 def ncols_config() -> int:
     return pure.ncols(TERM.width, *_width_padding('width', 'x', (18, 2)))
+
 
 def nrows_config() -> int:
     return pure.nrows(TERM.height, *_width_padding('height', 'y', (8, 1)))
 
+
 def xcoords_config(offset=0) -> 'list[int]':
     return pure.xcoords(TERM.width, *_width_padding('width', 'x', (18, 2)), offset)
 
+
 def ycoords_config() -> 'list[int]':
     return pure.ycoords(TERM.height, *_width_padding('height', 'y', (8, 1)))
+
 
 def gallery_page_spacing_config() -> int:
     settings = get_config_section('lscat')
     return settings.map(m.getint('page_spacing', fallback=23)).value_or(23)
 
+
 def users_page_spacing_config() -> int:
     # Because user modes print two lines of info. The other 1 is an offset
     return gallery_page_spacing_config() - 3
 
+
 def thumbnail_size_config() -> int:
     settings = get_config_section('lscat')
     return settings.map(m.getint('image_thumbnail_size', fallback=310)).value_or(310)
+
 
 def get_gen_users_settings() -> (int, int):
     settings = get_config_section('lscat')
@@ -94,9 +106,11 @@ def get_gen_users_settings() -> (int, int):
         settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
     )
 
+
 def image_text_offset() -> int:
     settings = get_config_section('experimental')
     return settings.map(m.getint('image_mode_text_offset', fallback=4)).value_or(4)
+
 
 def gallery_print_spacing_config() -> 'tuple[int]':
     return get_settings('lscat', 'gallery_print_spacing').map(
@@ -132,12 +146,14 @@ def init_config(config_object, config_path) -> ('IO[config]', str):
     _append_default_config(config_path)
     return config_object['Credentials'], your_id
 
+
 def _ask_credentials(config_object) -> 'IO[config]':
     username = input('Please enter your username:\n')
     print('\nPlease enter your password:')
     password = getpass()
     config_object['Credentials'] = {'Username': username, 'Password': password}
     return config_object
+
 
 def _ask_your_id(config_object) -> ('IO[config]', str):
     print('\nDo you want to save your pixiv ID? It will be more convenient')
@@ -149,12 +165,14 @@ def _ask_your_id(config_object) -> ('IO[config]', str):
         return config_object, your_id
     return config_object, ''
 
+
 def _write_config(config_object, config_path) -> 'IO':
     os.system('clear')
     config_path.parent.mkdir(exist_ok=True)
     config_path.touch()
     with open(config_path, 'w') as c:
         config_object.write(c)
+
 
 def _append_default_config(config_path) -> 'IO':
     # Why not use python? Because it's functional, readable, and

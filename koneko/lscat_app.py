@@ -34,7 +34,6 @@ from shutil import rmtree
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
-from pick import Picker
 from pixcat import Image
 from docopt import docopt
 
@@ -111,9 +110,11 @@ def display_gallery():
     data = FakeData(KONEKODIR / 'testgallery')
     lscat.show_instant(lscat.TrackDownloads, data, True)
 
+
 def display_user():
     data = FakeData(KONEKODIR / 'testuser')
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
+
 
 def display_path(path=None):
     if not path:
@@ -135,6 +136,7 @@ def browse_cache():
     else:
         lscat.show_instant(lscat.TrackDownloads, data, True)
 
+
 def pick_dir():
     path = KONEKODIR
     # base is immutable
@@ -146,9 +148,9 @@ def pick_dir():
         "Press 'f' to filter out modes\n"
         "Press 'q' to exit"
     )
-    title = basetitle
     actions = sorted(os.listdir(path))
     return pick_dir_loop(path, basetitle, actions, None)
+
 
 def pick_dir_loop(path, basetitle, actions, modes):
     title = basetitle
@@ -197,7 +199,6 @@ def pick_dir_loop(path, basetitle, actions, modes):
         actions = sorted(os.listdir(path))
         if path == KONEKODIR and modes is not None:  # Filter active
             actions = sorted(utils.filter_dir(modes))
-
 
 
 def ask_assistant() -> 'IO[list[int]]':
@@ -331,6 +332,7 @@ def xpadding_assistant(thumbnail_size):
     """
     return XPadding(thumbnail_size).start()
 
+
 def ypadding_assistant(thumbnail_size):
     """=== Image y spacing ===
     1) Move the second image so that it is just to the bottom of the first image
@@ -456,6 +458,7 @@ class AbstractPadding(AbstractImageAdjuster, ABC):
 
         return super().start()
 
+
 class XPadding(AbstractPadding):
     def __init__(self, thumbnail_size):
         super().__init__()
@@ -567,7 +570,6 @@ class FindImageHeight(FindImageDimension):
         utils.move_cursor_up(self.spaces)
 
 
-
 def page_spacing_assistant(thumbnail_size):
     # This doesn't use print_doc() as a clean state is needed
     os.system('clear')
@@ -654,6 +656,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
 
             elif ans.code == ENTER:
                 return spacings
+
 
 def user_info_assistant(thumbnail_size, xpadding, image_width):
     """=== User print name xcoord ===

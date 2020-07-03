@@ -17,6 +17,7 @@ def _letter_with_brackets(letter: str) -> str:
     """
     return ''.join([RED, '[', MAGENTA, letter, RED, ']', RESET])
 
+
 def _letter_with_coords(letter: str) -> str:
     """letter is magenta, n is blue, [] is red
     >>> _letter_with_coords("i")
@@ -24,6 +25,7 @@ def _letter_with_coords(letter: str) -> str:
     """
     return ''.join([RED, '[', MAGENTA, letter, RED, ']',
                     BLUE_N, RESET])
+
 
 def _two_letter_with_coords(letter: str) -> str:
     """[] and {} is red, | is black, o and O is magenta, y and x is blue

@@ -33,12 +33,11 @@ Options:
   (-h | --help)     Show this help
   (-v | --version)  Show version number
 """
-import sys
+import sys  # Needed for tests
 
 from docopt import docopt
 
-from koneko import pure, utils, main, __version__
-
+from koneko import pure, main, __version__
 
 
 def handle_vh() -> 'Optional[dict]':
@@ -82,6 +81,7 @@ def parse_no_mode(url_or_str: str, your_id):
         return main.illust_follow_mode()
 
     return main.SearchUsersModeLoop(url_or_str).start()
+
 
 def parse_mode_given(args: 'dict') -> (str, str):
     url_or_id = args['<link_or_id>']

@@ -45,7 +45,6 @@ class APIHandler:
 
         self.api_queue.put(api)
 
-
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @utils.spinner('')
@@ -85,5 +84,6 @@ class APIHandler:
         """Protect api download function with funcy.retry so it doesn't crash"""
         self.await_login()
         self.api.download(url)
+
 
 myapi = APIHandler()

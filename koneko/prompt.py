@@ -8,10 +8,7 @@ Structure:
 
 import sys
 
-import funcy
-from placeholder import m
-
-from koneko import ui, pure, utils, colors, download, TERM
+from koneko import ui, pure, utils, download, TERM
 from koneko.pure import all_isdigit
 
 
@@ -36,11 +33,11 @@ def ask_wait_user_input(keyseqs: 'list[str]', view_name: str) -> str:
     return command
 
 
-def common(case: 'dict',
-           command: str,
-           keyseqs: 'list[str]',
-           allowed_keys: 'tuple[str]' = tuple()
-    ) -> 'list[str]':
+def common(
+    case: 'dict',
+    command: str,
+    keyseqs: 'list[str]',
+    allowed_keys: 'tuple[str]' = tuple()) -> 'list[str]':
     """Actions common to all prompts that do not break out of prompt.
     Returns keyseqs, modified if needed
     """
@@ -219,6 +216,7 @@ def open_or_download(gallery, keyseqs: 'list[str]'):
 
     elif letter == 'D':
         download.download_image_num(gallery.data, selected_image_num)
+
 
 def goto_image(gallery, image_num: int):
     if image_num is False:

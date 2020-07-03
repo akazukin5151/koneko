@@ -14,7 +14,6 @@ Functionalities:
 """
 
 import os
-import sys
 import imghdr
 import logging
 import itertools
@@ -48,6 +47,7 @@ def setup_history_log():
     logger.addHandler(handler)
     return logger
 
+
 def read_history() -> 'list[str]':
     with cd(KONEKODIR):
         with open('history', 'r') as f:
@@ -55,8 +55,10 @@ def read_history() -> 'list[str]':
 
     return history.split('\n')[:-1]  # Ignore trailing \n
 
+
 def frequent_history(n=5) -> 'dict[str, int]':
     return dict(Counter(read_history()).most_common(n))
+
 
 def frequent_history_modes(modes: 'list[str]', n=5) -> 'dict[str, int]':
     items_in_mode = filter(
@@ -65,8 +67,9 @@ def frequent_history_modes(modes: 'list[str]', n=5) -> 'dict[str, int]':
     )
     return dict(Counter(items_in_mode).most_common(n))
 
+
 def format_frequent(counter: 'dict[str, int]') -> 'list[str]':
-    return [f'{k} ({v})' for k,v in counter.items()]
+    return [f'{k} ({v})' for (k, v) in counter.items()]
 
 
 # pick module
@@ -75,6 +78,7 @@ def ws_picker(actions, title, **kwargs):
     picker.register_custom_handler(ord('w'), m.move_up())
     picker.register_custom_handler(ord('s'), m.move_down())
     return picker
+
 
 def select_modes_filter(more=False):
     title = "Use SPACE to select a mode to show and ENTER to confirm"
@@ -106,12 +110,14 @@ def cd(newdir: Path) -> 'IO':
     finally:
         os.chdir(old)
 
+
 def _spin(done: 'Event', message: str) -> None:
     for char in itertools.cycle('|/-\\'):  # Infinite loop
         print(message, char, flush=True, end='\r')
         if done.wait(0.1):
             break
     print(' ' * len(char), end='\r')  # clears the spinner
+
 
 @funcy.decorator
 def spinner(func: 'func[T]', message='') -> 'T':
@@ -125,6 +131,7 @@ def spinner(func: 'func[T]', message='') -> 'T':
         # On exception, stop the spinner
         done.set()
         spinner_thread.join()
+
 
 @funcy.decorator
 def catch_ctrl_c(func: 'func[T]') -> 'T':
@@ -142,6 +149,7 @@ def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
     """
     first_num, second_num = keyseqs[-2:]
     return find_number_map(int(first_num), int(second_num))
+
 
 def find_number_map(x: int, y: int) -> 'Optional[int]':
     """Translates 1-based-index coordinates into (0-) indexable number
@@ -165,12 +173,14 @@ def remove_dir_if_exist(data) -> 'Maybe[IO]':
     if data.download_path.is_dir():
         rmtree(data.download_path)
 
+
 def verify_full_download(filepath: Path) -> 'IO[bool]':
     verified = imghdr.what(filepath)
     if not verified:
         os.remove(filepath)
         return False
     return True
+
 
 def dir_up_to_date(data, _dir) -> bool:
     # O(1) time
@@ -182,6 +192,7 @@ def dir_up_to_date(data, _dir) -> bool:
         if name.replace('/', '') not in _file:
             return False
     return True
+
 
 def dir_not_empty(data: 'Data') -> bool:
     if data.download_path.is_dir() and (_dir := os.listdir(data.download_path)):
@@ -199,6 +210,7 @@ def dir_not_empty(data: 'Data') -> bool:
         return dir_up_to_date(data, _dir)
 
     return False
+
 
 def filter_dir(modes: 'list[str]') -> 'list[str]':
     """Given a list of modes to include, filter KONEKODIR to those modes"""
@@ -230,25 +242,31 @@ def filter_dir(modes: 'list[str]') -> 'list[str]':
 def write(value: str) -> 'IO':
     print(value, end='', flush=True)
 
+
 def move_cursor_up(num: int) -> 'IO':
     if num > 0:
         write(f'\033[{num}A')
+
 
 def move_cursor_down(num=1) -> 'IO':
     if num > 0:
         write(f'\033[{num}B')
 
+
 def erase_line() -> 'IO':
     write('\033[K')
+
 
 def print_cols(spacings: 'list[int]', ncols: int) -> 'IO':
     for (idx, space) in enumerate(spacings[:ncols]):
         write(' ' * int(space))
         write(idx + 1)
 
+
 def print_info(message_xcoord: int) -> 'IO':
     print(' ' * message_xcoord, '000', '\n',
           ' ' * message_xcoord, 'Example artist', sep='')
+
 
 def print_doc(doc: str) -> 'IO':
     """Prints a given string in the bottom of the terminal"""
@@ -257,6 +275,7 @@ def print_doc(doc: str) -> 'IO':
     bottom = TERM.height - (number_of_newlines + 2)
     move_cursor_down(bottom)
     print(doc)
+
 
 def print_multiple_imgs(illusts_json: 'Json') -> None:
     HASHTAG = f'{c.RED}#'
@@ -267,6 +286,7 @@ def print_multiple_imgs(illusts_json: 'Json') -> None:
          if (number := _json['page_count']) > 1]
     print('')
 
+
 def update_gallery_info(spacings, ncols, current_selection):
     move_cursor_up(2)
     erase_line()
@@ -276,6 +296,7 @@ def update_gallery_info(spacings, ncols, current_selection):
           flush=True)
     move_cursor_up(1)
 
+
 def update_user_info(spacing):
     erase_line()         # Erase the first line
     move_cursor_down()   # Go down and erase the second line
@@ -283,6 +304,7 @@ def update_user_info(spacing):
     move_cursor_up(1)    # Go back up to the original position
     print_info(spacing)  # Print info takes up 2 lines
     move_cursor_up(2)    # so go back to the top
+
 
 def image_help():
     print('')
@@ -296,6 +318,7 @@ def image_help():
         c.q, 'uit (with confirmation); ',
         'view ', c.m, 'anual\n'
     ]))
+
 
 def user_help():
     print('')
@@ -315,6 +338,7 @@ def open_in_browser(image_id) -> 'IO':
     os.system(f'xdg-open {link}')
     print(f'Opened {link} in browser!')
 
+
 def open_link_coords(data, first_num, second_num) -> 'IO':
     selected_image_num = find_number_map(int(first_num), int(second_num))
     # 0 is acceptable; 0 is falsy but not False
@@ -323,9 +347,11 @@ def open_link_coords(data, first_num, second_num) -> 'IO':
     else:
         open_link_num(data, selected_image_num)
 
+
 def open_link_num(data, number) -> 'IO':
     # Update current_page_illusts, in case if you're in another page
     open_in_browser(data.image_id(number))
+
 
 def handle_missing_pics() -> 'IO':
     basedir = Path('~/.local/share/koneko/pics').expanduser()
@@ -350,22 +376,27 @@ def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
     img.show(align='left', x=x, y=y)
     return img
 
+
 def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
     return show_single(x, 0, thumbnail_size)
+
 
 def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
     # Default usage of config module
     return show_single(xcoords_config()[1], y, thumbnail_size)
+
 
 def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
     xcoords = pure.xcoords(TERM.width, image_width, xpadding)
     for x in xcoords:
         show_single(x, 0, thumbnail_size)
 
+
 def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
     show_single(padding, 0, size)
     for px in preview_xcoords:
         show_single_x(px, size)
+
 
 def hide_if_exist(image: Image) -> 'IO':
     if image:

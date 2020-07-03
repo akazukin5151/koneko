@@ -42,6 +42,7 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
     command = input('Enter a command: ')
     return command
 
+
 @utils.catch_ctrl_c
 def show_man_loop() -> 'IO':
     os.system('clear')
@@ -60,6 +61,7 @@ def show_man_loop() -> 'IO':
             os.system('clear')
             break
 
+
 @utils.catch_ctrl_c
 def clear_cache_loop() -> 'IO':
     print('Do you want to remove all cached images?')
@@ -75,6 +77,7 @@ def clear_cache_loop() -> 'IO':
             print('Operation aborted!')
             os.system('clear')
             break
+
 
 @utils.catch_ctrl_c
 def info_screen_loop() -> 'IO':

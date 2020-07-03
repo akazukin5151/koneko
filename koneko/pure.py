@@ -1,6 +1,5 @@
 """Small functions that are pure and side effect free, mainly doing calculations"""
 
-import os
 import re
 from math import floor
 from pathlib import Path
@@ -9,8 +8,6 @@ import funcy
 from placeholder import _, m
 from funcy import curry, lmap
 from returns.pipeline import flow
-
-from koneko import colors as c
 
 
 Map = curry(lmap)
@@ -117,6 +114,7 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
         list
     )
 
+
 def full_img_details(url: str, png=False) -> (str, str, Path):
     # Example of an image that needs to be downloaded in png: 77803142
     url = change_url_to_full(url, png=png)
@@ -136,8 +134,10 @@ def concat_seqs_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
 def ncols(term_width: int, img_width: int, padding: int) -> int:
     return round(term_width / (img_width + padding))
 
+
 def nrows(term_height: int, img_height: int, padding: int) -> int:
     return term_height // (img_height + padding)
+
 
 def xcoords(term_width: int, img_width=18, padding=2, offset=0) -> 'list[int]':
     """Generates the x-coord for each column to pass into pixcat
@@ -149,6 +149,7 @@ def xcoords(term_width: int, img_width=18, padding=2, offset=0) -> 'list[int]':
     return [col % number_of_columns * img_width + padding + offset
             for col in range(number_of_columns)]
 
+
 def ycoords(term_height: int, img_height=8, padding=1) -> 'list[int]':
     """Generates the y-coord for each row to pass into pixcat
     If img_height == 8 and 27 > term_height >= 18, there will be two rows,
@@ -159,6 +160,7 @@ def ycoords(term_height: int, img_height=8, padding=1) -> 'list[int]':
     return [row * (img_height + padding)
             for row in range(number_of_rows)]
 
+
 def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     """Returns the order of images to be displayed
     images 0-29 are artist profile pics
@@ -166,13 +168,15 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     so the valid order is:
     0, 30, 31, 32, 1, 33, 34, 35, 2, 36, 37, 38, ...
     """
-    order = [x + artists_count - 1 - floor(x/4) for x in range(total_pics)]
+    order = [x + artists_count - 1 - floor(x / 4) for x in range(total_pics)]
     order[0::4] = range(artists_count)
     return order
+
 
 # For lscat_app
 def line_width(spacings: 'list[int]', ncols: int) -> int:
     return sum(spacings) + ncols
+
 
 # From prompt
 def all_isdigit(keyseqs: 'list[str]') -> bool:

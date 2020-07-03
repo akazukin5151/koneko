@@ -102,27 +102,34 @@ koneko 5 # Mode 5
 ```
 For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
+## Upcoming changelog (in dev branch)
+
+For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+
+### Version 0.10.0
+* Restructure cli handling to be more modular like lscat_app
 
 # Roadmap
 
 * `image_mode_text_offset` doesn't have a configuration assistant, or fix the cursor position again.
-* In-depth usage documentation?
 * Consistent public and private methods and attributes again
+* In-depth usage documentation?
 
 ## Features
 
-* Offline mode
-    - [ ] Launch `lscat` from `koneko`
-    - [ ] If integrating frequents into offline, it needs to know what is cached and not
-    - [ ] Documentation (in general as well)
+* Filter modes in koneko main should go back to main screen on 'q' key
+* Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
+    - [ ] Handle moving around pages
+    - [ ] Documentation
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
 
 ## Known bugs
 
-* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
-* Passing an invalid command via cli will re-prompt the user, but ctrl+c traps the user in koneko with no way to quit.
 * Reloading then going back just redraws the current mode again, with possible instability
+* Passing an invalid command via cli will re-prompt the user, but ctrl+c traps the user in koneko with no way to quit.
+* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
+* In the logs, urllib3 warns that `Connection pool is full, discarding connection: i.pximg.net`. See [customising pool behaviour](https://urllib3.readthedocs.io/en/latest/advanced-usage.html#customizing-pool-behavior) from urllib3.
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
 * Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below
 

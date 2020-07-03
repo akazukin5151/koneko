@@ -31,6 +31,7 @@ import time
 from copy import copy
 from pathlib import Path
 from shutil import rmtree
+from collections import namedtuple
 from abc import ABC, abstractmethod
 
 from pick import Picker
@@ -50,91 +51,7 @@ MINUS = {'-', '_'}
 # Must make a copy before using this reference
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
-
-# Pure
-def line_width(spacings: 'list[int]', ncols: int) -> int:
-    return sum(spacings) + ncols
-
-# Utility functions used in multiple places
-def write(value: str) -> 'IO':
-    print(value, end='', flush=True)
-
-def check_quit(ans: str):
-    if ans == 'q':
-        sys.exit(0)
-
-def move_cursor_up(num: int) -> 'IO':
-    if num > 0:
-        write(f'\033[{num}A')
-
-def move_cursor_down(num=1) -> 'IO':
-    if num > 0:
-        write(f'\033[{num}B')
-
-def erase_line() -> 'IO':
-    write('\033[K')
-
-def print_doc(doc: str) -> 'IO':
-    """Prints a given string in the bottom of the terminal"""
-    os.system('clear')
-    number_of_newlines = doc.count('\n')
-    bottom = term.height - (number_of_newlines + 2)
-    move_cursor_down(bottom)
-    print(doc)
-
-
-# More specialised but still small functions
-def print_cols(spacings: 'list[int]', ncols: int) -> 'IO':
-    for (idx, space) in enumerate(spacings[:ncols]):
-        write(' ' * int(space))
-        write(idx + 1)
-
-def print_info(message_xcoord: int) -> 'IO':
-    print(' ' * message_xcoord, '000', '\n',
-          ' ' * message_xcoord, 'Example artist', sep='')
-
-
-def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
-    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
-    img.show(align='left', x=x, y=y)
-    return img
-
-def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
-    return show_single(x, 0, thumbnail_size)
-
-def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
-    # Default usage of config module
-    return show_single(config.xcoords_config()[1], y, thumbnail_size)
-
-def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
-    xcoords = pure.xcoords(term.width, image_width, xpadding)
-    for x in xcoords:
-        show_single(x, 0, thumbnail_size)
-
-def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
-    show_single(padding, 0, size)
-    for px in preview_xcoords:
-        show_single_x(px, size)
-
-
-def hide_if_exist(image: Image) -> 'IO':
-    if image:
-        image.hide()
-        move_cursor_up(1)
-
-class FakeData:
-    def __init__(self, path):
-        self.download_path = path
-
-    @classmethod
-    def gallery(cls):
-        return cls(KONEKODIR / 'testgallery')
-
-    @classmethod
-    def user(cls):
-        # It needs to have a .koneko file
-        return cls(KONEKODIR / 'testuser')
-
+FakeData = namedtuple('data', ('download_path',))
 
 # Main functions that organise work
 def main():
@@ -188,11 +105,11 @@ def _main():
 
 
 def display_gallery():
-    data = FakeData.gallery()
+    data = FakeData(KONEKODIR / 'testgallery')
     lscat.show_instant(lscat.TrackDownloads, data, True)
 
 def display_user():
-    data = FakeData.user()
+    data = FakeData(KONEKODIR / 'testuser')
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
 def display_path(path=None):
@@ -217,25 +134,32 @@ def browse_cache():
 
 def pick_dir():
     path = KONEKODIR
+    # base is immutable
+    basetitle = (
+        'Select a directory to view\n'
+        "Press 'y' to display the current directory\n"
+        "Press 'b' to move up a directory\n"
+        "Press 'd' to delete the current directory\n"
+        "Press 'f' to filter out modes\n"
+        "Press 'q' to exit"
+    )
+    title = basetitle
+    actions = sorted(os.listdir(path))
+    return pick_dir_loop(path, basetitle, actions, None)
+
+def pick_dir_loop(path, basetitle, actions, modes):
+    title = basetitle
 
     while True:
-        title = (
-            'Select a directory to view\n'
-            "Press 'y' to display the current directory\n"
-            "Press 'b' to move up a directory\n"
-            "Press 'd' to delete the current directory\n"
-            "Press 'q' to exit"
-        )
-        actions = sorted(os.listdir(path))
-
         picker = utils.ws_picker(actions, title)
         picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
         picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
+        picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
         picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
         picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
 
         _, ans = picker.start()
-        check_quit(ans)
+        utils.check_quit(ans)
 
         if ans == 'y':
             return path
@@ -251,10 +175,50 @@ def pick_dir():
                 rmtree(path)
                 path = path.parent
 
+        elif ans == 'f':
+            actions = sorted(os.listdir(path))
+            modes = utils.select_modes_filter(True)
+            if '6' in modes:  # Clear all filters
+                title = basetitle
+            else:
+                actions = sorted(filter_dir(modes))
+                title = f"Filtering {modes=}\n" + basetitle
+
+            continue
+
         else:
             path = path / actions[ans]
             if not path.is_dir():
                 path = path.parent
+
+        actions = sorted(os.listdir(path))
+        if path == KONEKODIR and modes is not None:  # Filter active
+            actions = sorted(filter_dir(modes))
+
+
+def filter_dir(modes):
+    path = KONEKODIR
+    dirs = os.listdir(path)
+    allowed_names = set()
+
+    if '1' in modes:
+        allowed_names.add('testgallery')
+
+    if '3' in modes:
+        allowed_names.update(('following', 'testuser'))
+
+    if '4' in modes:
+        allowed_names.add('search')
+
+    if '5' in modes:
+        allowed_names.add('illustfollow')
+
+    if '1' in modes or '2' in modes:
+        predicate = lambda d: d.isdigit() or d in allowed_names
+    else:
+        predicate = lambda d: d in allowed_names
+
+    return [d for d in dirs if predicate(d)]
 
 
 
@@ -353,7 +317,7 @@ def thumbnail_size_assistant():
 
     Keep in mind this size will be used for a grid of images
     """
-    print_doc(thumbnail_size_assistant.__doc__)
+    utils.print_doc(thumbnail_size_assistant.__doc__)
 
     image = copy(SAMPLE_IMAGE)
 
@@ -363,7 +327,7 @@ def thumbnail_size_assistant():
             image.thumbnail(size).show(align='left', x=0, y=0)
 
             ans = term.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
             if ans in PLUS:
                 size += 20
@@ -446,12 +410,12 @@ class AbstractImageAdjuster(ABC):
         raise NotImplementedError
 
     def hide_show_print(self):
-        hide_if_exist(self.image)
+        utils.hide_if_exist(self.image)
 
         self.image = self.show_func_args()
 
         self.maybe_move_up()
-        write('\r' + ' ' * 20 + '\r')
+        utils.write('\r' + ' ' * 20 + '\r')
         self.write()
 
     def start(self):
@@ -466,7 +430,7 @@ class AbstractImageAdjuster(ABC):
                     self.hide_show_print()
 
                 ans = term.inkey()
-                check_quit(ans)
+                utils.check_quit(ans)
 
                 if ans.code == ENTER and self.image:
                     self.maybe_erase()
@@ -504,9 +468,9 @@ class AbstractPadding(AbstractImageAdjuster, ABC):
         return bool(self.valid)
 
     def start(self):
-        print_doc(self.doc)
+        utils.print_doc(self.doc)
 
-        show_single_x(self.default_x, self.thumbnail_size)
+        utils.show_single_x(self.default_x, self.thumbnail_size)
 
         self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
@@ -519,7 +483,7 @@ class XPadding(AbstractPadding):
         super().__init__()
         # Base
         self.thumbnail_size = thumbnail_size
-        self.show_func = show_single_x
+        self.show_func = utils.show_single_x
         self.side_label = 'width'
 
         # Padding ABC
@@ -528,7 +492,7 @@ class XPadding(AbstractPadding):
         self.find_dim_func = FindImageWidth
 
     def write(self):
-        write(f'x spacing = {self.spaces}')
+        utils.write(f'x spacing = {self.spaces}')
 
     def maybe_move_down(self, *a):
         return True
@@ -548,7 +512,7 @@ class YPadding(AbstractPadding):
         super().__init__()
         # Base
         self.thumbnail_size = thumbnail_size
-        self.show_func = show_single_y
+        self.show_func = utils.show_single_y
         self.side_label = 'height'
 
         # Padding ABC
@@ -557,13 +521,13 @@ class YPadding(AbstractPadding):
         self.find_dim_func = FindImageHeight
 
     def write(self):
-        write(f'y spacing = {self.spaces}')
+        utils.write(f'y spacing = {self.spaces}')
 
     def maybe_move_down(self):
-        move_cursor_down(self.width_or_height)
+        utils.move_cursor_down(self.width_or_height)
 
     def maybe_move_up(self):
-        move_cursor_up(self.spaces)
+        utils.move_cursor_up(self.spaces)
 
     def show_func_args(self):
         return self.show_func(
@@ -583,7 +547,7 @@ class FindImageDimension(AbstractImageAdjuster, ABC):
         self.image = None
 
     def write(self):
-        write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
+        utils.write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
 
     def maybe_move_down(self):
         return True
@@ -592,7 +556,7 @@ class FindImageDimension(AbstractImageAdjuster, ABC):
         return self.show_func(self.spaces, self.thumbnail_size)
 
     def maybe_erase(self):
-        erase_line()
+        utils.erase_line()
 
     def return_tup(self):
         return self.spaces - self.start_spaces, self.image
@@ -604,7 +568,7 @@ class FindImageDimension(AbstractImageAdjuster, ABC):
 class FindImageWidth(FindImageDimension):
     def __init__(self, thumbnail_size):
         self.thumbnail_size = thumbnail_size
-        self.show_func = show_single_x
+        self.show_func = utils.show_single_x
         self.side_label = 'width'
         self.start_spaces = config.xcoords_config()[0]
         super().__init__()
@@ -616,13 +580,13 @@ class FindImageWidth(FindImageDimension):
 class FindImageHeight(FindImageDimension):
     def __init__(self, thumbnail_size):
         self.thumbnail_size = thumbnail_size
-        self.show_func = show_single_y
+        self.show_func = utils.show_single_y
         self.side_label = 'height'
         self.start_spaces = 0
         super().__init__()
 
     def maybe_move_up(self):
-        move_cursor_up(self.spaces)
+        utils.move_cursor_up(self.spaces)
 
 
 
@@ -668,7 +632,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     Do you want to preview an existing cache dir? [y/N]
     To keep your chosen thumbnail size, image width and x spacing, enter 'n'.
     """
-    print_doc(gallery_print_spacing_assistant.__doc__)  # Action before start
+    utils.print_doc(gallery_print_spacing_assistant.__doc__)  # Action before start
     ans = input()
 
     # Setup variables
@@ -678,7 +642,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
         lscat.show_instant(lscat.TrackDownloads, _data)
         ncols = config.ncols_config()  # Default fallback, on user choice
     else:
-        show_instant_sample(size, image_width, xpadding)
+        utils.show_instant_sample(size, image_width, xpadding)
         ncols = pure.ncols(term.width, image_width, xpadding)
 
     # Just the default settings; len(first_list) == 5
@@ -689,12 +653,12 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     print('\n')
     with term.cbreak():
         while True:
-            update_gallery_info(spacings, ncols, current_selection)
+            utils.update_gallery_info(spacings, ncols, current_selection)
 
             ans = term.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
-            if ans in PLUS and line_width(spacings, ncols) < term.width:
+            if ans in PLUS and pure.line_width(spacings, ncols) < term.width:
                 spacings[current_selection] += 1
 
             elif ans in MINUS and spacings[current_selection] > 0:
@@ -713,16 +677,6 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
             elif ans.code == ENTER:
                 return spacings
 
-def update_gallery_info(spacings, ncols, current_selection):
-    move_cursor_up(2)
-    erase_line()
-    print_cols(spacings, ncols)
-    print('\n\nAdjusting the number of spaces between '
-          f'{current_selection} and {current_selection+1}',
-          flush=True)
-    move_cursor_up(1)
-
-
 def user_info_assistant(thumbnail_size, xpadding, image_width):
     """=== User print name xcoord ===
     Use +/= to move the text right, and -/_ to move it left
@@ -735,18 +689,18 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
     preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
 
     # Start
-    print_doc(user_info_assistant.__doc__)
+    utils.print_doc(user_info_assistant.__doc__)
 
-    display_user_row(thumbnail_size, xpadding, preview_xcoords)
+    utils.display_user_row(thumbnail_size, xpadding, preview_xcoords)
 
-    move_cursor_up(5)
+    utils.move_cursor_up(5)
 
     with term.cbreak():
         while True:
-            update_user_info(spacing)
+            utils.update_user_info(spacing)
 
             ans = term.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
             if ans in PLUS:
                 spacing += 1
@@ -759,10 +713,3 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
                 return spacing
 
 
-def update_user_info(spacing):
-    erase_line()         # Erase the first line
-    move_cursor_down()   # Go down and erase the second line
-    erase_line()
-    move_cursor_up(1)    # Go back up to the original position
-    print_info(spacing)  # Print info takes up 2 lines
-    move_cursor_up(2)    # so go back to the top

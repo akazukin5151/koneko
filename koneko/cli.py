@@ -33,67 +33,67 @@ Options:
   (-h | --help)     Show this help
   (-v | --version)  Show version number
 """
-# This is needed for testing
 import sys
 
 from docopt import docopt
 
-from koneko import pure, __version__
+from koneko import pure, utils, main, __version__
 
 
-def process_cli_args() -> (str, str):
-    """Use docopt to process cli args, returning:
-    main_command: string, 1-5
-        if user has specified a mode number
-    user_input: string
-        if user has entered further information required for the mode
-        eg, modes 1/5 requires artist user id; mode 2, requires image id
-    """
+
+def handle_vh() -> 'Optional[dict]':
+    """Intercepts args, determin whether to quit on help/version"""
     args = docopt(__doc__)
 
-    # Handle version or help
     if args['--version'] or args['-v']:
         print(__version__)
-        return 'vh', ''
+        return False
     elif args['--help'] or args['-h']:
         print(__doc__)  # Docopt should handle this anyway
-        return 'vh', ''
+        return False
+    return args
 
-    # Yes it's a lie
+
+def launch_mode(args, your_id):
     print('Logging in...')
 
-    if (url_or_str := args['<link>']) or (url_or_str := args['<searchstr>']):
-        return parse_no_mode(url_or_str)
+    if (url_or_str := args['<link>']):
+        return parse_no_mode(url_or_str, your_id)
+
+    elif (search := args['<searchstr>']):
+        return main.SearchUsersModeLoop(search).start()
+
     return parse_mode_given(args)
 
 
-def parse_no_mode(url_or_str: str) -> (str, str):
+def parse_no_mode(url_or_str: str, your_id):
     if 'users' in url_or_str:
-        return '1', pure.process_user_url(url_or_str)
+        return main.ArtistModeLoop(pure.process_user_url(url_or_str)).start()
 
     elif 'artworks' in url_or_str or 'illust_id' in url_or_str:
-        return '2', pure.process_artwork_url(url_or_str)
+        return main.ViewPostModeLoop(pure.process_artwork_url(url_or_str)).start()
 
     # Assume you won't search for '3' or 'f'
     elif url_or_str == '3' or url_or_str == 'f':
-        return '3', ''
+        return main.FollowingUserModeLoop(your_id).start(your_id)
 
     # Assume you won't search for '5' or 'n'
     elif url_or_str == '5' or url_or_str == 'n':
-        return '5', ''
+        return main.illust_follow_mode()
 
-    return '4', url_or_str
+    return main.SearchUsersModeLoop(url_or_str).start()
 
 def parse_mode_given(args: 'dict') -> (str, str):
     url_or_id = args['<link_or_id>']
 
     if args['1'] or args['a']:
-        return '1', pure.process_user_url(url_or_id)
+        return main.ArtistModeLoop(pure.process_user_url(url_or_id)).start()
 
     elif args['2'] or args['i']:
-        return '2', pure.process_artwork_url(url_or_id)
+        return main.ViewPostModeLoop(pure.process_artwork_url(url_or_id)).start()
 
     elif args['3'] or args['f']:
-        return '3', pure.process_user_url(url_or_id)
+        return main.FollowingUserModeLoop(pure.process_user_url(url_or_id)).start()
+
     # Mode 4 isn't needed here, because docopt catches <searchstr>
 

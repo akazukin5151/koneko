@@ -93,6 +93,12 @@ def _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, t
         with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
             executor.map(helper, data.all_urls, downloaded_oldnames, downloaded_newnames)
 
+    # Might multiprocessing be faster to bypass urllib's pool limit?
+    # 'Cannot pickle generator'
+    # essentially the entire lscat needs to be rewritten with multiprocessing in mind
+    #with Pool(len(data.all_urls)) as p:
+        #p.map(helper, (data.all_urls, downloaded_oldnames, downloaded_newnames))
+
 
 def _download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':
     """Actually downloads one pic given one url, rename if needed."""

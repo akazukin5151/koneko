@@ -1,8 +1,4 @@
-"""
-Collection of functions that are pure and side effect free
-Excluding printing, should not directly do any IO (file r/w, user input), including configs
-Most input data come from impure sources (user input or network request), but this is allowed here
-"""
+"""Small functions that are pure and side effect free, mainly doing calculations"""
 
 import os
 import re
@@ -40,16 +36,6 @@ def prefix_artist_name(name: str, number: int) -> str:
     number_prefix = str(number).rjust(2, '0')
     new_file_name = f"{number_prefix}\n{' ' * 19}{name}"
     return new_file_name
-
-
-def print_multiple_imgs(illusts_json: 'Json') -> None:
-    HASHTAG = f'{c.RED}#'
-    HAS = f'{c.RESET} has {c.BLUE}'
-    OF_PAGES = f'{c.RESET} pages'
-    _ = [print(f'{HASHTAG}{index}{HAS}{number}{OF_PAGES}', end=', ')
-         for (index, _json) in enumerate(illusts_json)
-         if (number := _json['page_count']) > 1]
-    print('')
 
 
 def url_given_size(post_json: 'Json', size: str) -> str:
@@ -108,22 +94,17 @@ def change_url_to_full(url: str, png=False) -> str:
 def process_user_url(url_or_id: str) -> str:
     if 'users' in url_or_id:
         if '\\' in url_or_id:
-            user_input = split_backslash_last(url_or_id).split('\\')[-1][1:]
-        else:
-            user_input = split_backslash_last(url_or_id)
-    else:
-        user_input = url_or_id
-    return user_input
+            return split_backslash_last(url_or_id).split('\\')[-1][1:]
+        return split_backslash_last(url_or_id)
+    return url_or_id
 
 
 def process_artwork_url(url_or_id: str) -> str:
     if 'artworks' in url_or_id:
-        user_input = split_backslash_last(url_or_id).split('\\')[0]
-    elif 'illust_id' in url_or_id:
-        user_input = re.findall(r'&illust_id.*', url_or_id)[0].split('=')[-1]
-    else:
-        user_input = url_or_id
-    return user_input
+        return split_backslash_last(url_or_id).split('\\')[0]
+    if 'illust_id' in url_or_id:
+        return re.findall(r'&illust_id.*', url_or_id)[0].split('=')[-1]
+    return url_or_id
 
 
 def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':
@@ -187,4 +168,8 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     order = [x + artists_count - 1 - floor(x/4) for x in range(total_pics)]
     order[0::4] = range(artists_count)
     return order
+
+# For lscat_app
+def line_width(spacings: 'list[int]', ncols: int) -> int:
+    return sum(spacings) + ncols
 

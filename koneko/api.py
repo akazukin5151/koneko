@@ -15,12 +15,13 @@ class APIHandler:
         self.api_queue = queue.Queue()
         self.api_thread = threading.Thread(target=self._login)
         # To be set later (because singleton is instantiated before config)
-        self.credentials: 'Dict'
+        self._credentials: 'Dict'
         self.api: 'AppPixivAPI()'  # Object to login and request on
 
     @funcy.once
-    def start(self):
+    def start(self, credentials):
         """Start logging in. self.credentials must be available"""
+        self._credentials = credentials
         self.api_thread.start()
 
     @funcy.once
@@ -33,7 +34,7 @@ class APIHandler:
         """Logins to pixiv in the background, using credentials from config file"""
         api = AppPixivAPI()
         try:
-            api.login(self.credentials['Username'], self.credentials['Password'])
+            api.login(self._credentials['Username'], self._credentials['Password'])
         except PixivError as e:
             print('Login failed! Please correct your credentials in '
                   '~/.config/koneko/config.ini')

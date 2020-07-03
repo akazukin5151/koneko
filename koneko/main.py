@@ -28,8 +28,7 @@ def main():
 
     utils.handle_missing_pics()
 
-    api.myapi.credentials = credentials
-    api.myapi.start()  # API is now logging in in the background
+    api.myapi.start(credentials)
 
     if len(sys.argv) != 1:
         func = cli.launch_mode

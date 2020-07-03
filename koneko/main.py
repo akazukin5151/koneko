@@ -49,7 +49,7 @@ def main():
     cli_args_given = len(sys.argv) != 1
     try:
         if cli_args_given:
-            cli.process_cli_args(args, your_id)
+            cli.launch_mode(args, your_id)
         else:
             main_loop(args, your_id)
     except KeyboardInterrupt:

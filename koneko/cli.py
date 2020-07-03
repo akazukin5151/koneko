@@ -41,7 +41,8 @@ from koneko import pure, utils, main, __version__
 
 
 
-def handle_vh():
+def handle_vh() -> 'Optional[dict]':
+    """Intercepts args, determin whether to quit on help/version"""
     args = docopt(__doc__)
 
     if args['--version'] or args['-v']:
@@ -53,11 +54,15 @@ def handle_vh():
     return args
 
 
-def process_cli_args(args, your_id):
-    # Yes it's a lie
+def launch_mode(args, your_id):
     print('Logging in...')
-    if (url_or_str := args['<link>']) or (url_or_str := args['<searchstr>']):
+
+    if (url_or_str := args['<link>']):
         return parse_no_mode(url_or_str, your_id)
+
+    elif (search := args['<searchstr>']):
+        return main.SearchUsersModeLoop(search).start()
+
     return parse_mode_given(args)
 
 

@@ -61,8 +61,10 @@ def main_loop(args, your_id: str):
         main_command = screens.begin_prompt(printmessage)
 
         func = case.get(main_command, None)
+
         if main_command == '3':
             func(your_id)
+
         elif func:
             func()
 

@@ -198,6 +198,31 @@ def dir_not_empty(data: 'Data') -> bool:
 
     return False
 
+def filter_dir(modes: 'list[str]') -> 'list[str]':
+    """Given a list of modes to include, filter KONEKODIR to those modes"""
+    path = KONEKODIR
+    dirs = os.listdir(path)
+    allowed_names = set()
+
+    if '1' in modes:
+        allowed_names.add('testgallery')
+
+    if '3' in modes:
+        allowed_names.update(('following', 'testuser'))
+
+    if '4' in modes:
+        allowed_names.add('search')
+
+    if '5' in modes:
+        allowed_names.add('illustfollow')
+
+    if '1' in modes or '2' in modes:
+        predicate = lambda d: d.isdigit() or d in allowed_names
+    else:
+        predicate = lambda d: d in allowed_names
+
+    return [d for d in dirs if predicate(d)]
+
 
 # Print related
 def write(value: str) -> 'IO':

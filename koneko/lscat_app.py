@@ -184,7 +184,7 @@ def pick_dir_loop(path, basetitle, actions, modes):
             if '6' in modes:  # Clear all filters
                 title = basetitle
             else:
-                actions = sorted(filter_dir(modes))
+                actions = sorted(utils.filter_dir(modes))
                 title = f"Filtering {modes=}\n" + basetitle
 
             continue
@@ -196,32 +196,7 @@ def pick_dir_loop(path, basetitle, actions, modes):
 
         actions = sorted(os.listdir(path))
         if path == KONEKODIR and modes is not None:  # Filter active
-            actions = sorted(filter_dir(modes))
-
-
-def filter_dir(modes):
-    path = KONEKODIR
-    dirs = os.listdir(path)
-    allowed_names = set()
-
-    if '1' in modes:
-        allowed_names.add('testgallery')
-
-    if '3' in modes:
-        allowed_names.update(('following', 'testuser'))
-
-    if '4' in modes:
-        allowed_names.add('search')
-
-    if '5' in modes:
-        allowed_names.add('illustfollow')
-
-    if '1' in modes or '2' in modes:
-        predicate = lambda d: d.isdigit() or d in allowed_names
-    else:
-        predicate = lambda d: d in allowed_names
-
-    return [d for d in dirs if predicate(d)]
+            actions = sorted(utils.filter_dir(modes))
 
 
 

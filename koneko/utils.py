@@ -1,6 +1,7 @@
 """Small functions that do IO (file read/write, user input, network request, configs)"""
 
 import os
+import sys
 import imghdr
 import logging
 import itertools
@@ -300,6 +301,15 @@ def hide_if_exist(image: Image) -> 'IO':
     if image:
         image.hide()
         move_cursor_up(1)
+
+def update_gallery_info(spacings, ncols, current_selection):
+    move_cursor_up(2)
+    erase_line()
+    print_cols(spacings, ncols)
+    print('\n\nAdjusting the number of spaces between '
+          f'{current_selection} and {current_selection+1}',
+          flush=True)
+    move_cursor_up(1)
 
 def update_user_info(spacing):
     erase_line()         # Erase the first line

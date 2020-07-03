@@ -112,7 +112,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 # Roadmap
 
 * `image_mode_text_offset` doesn't have a configuration assistant, or fix the cursor position again.
-* Move more things from `main.py` to `utils.py`
 * Consistent public and private methods and attributes again
 * In-depth usage documentation?
 

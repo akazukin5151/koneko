@@ -653,7 +653,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     print('\n')
     with term.cbreak():
         while True:
-            update_gallery_info(spacings, ncols, current_selection)
+            utils.update_gallery_info(spacings, ncols, current_selection)
 
             ans = term.inkey()
             utils.check_quit(ans)
@@ -676,16 +676,6 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
 
             elif ans.code == ENTER:
                 return spacings
-
-def update_gallery_info(spacings, ncols, current_selection):
-    utils.move_cursor_up(2)
-    utils.erase_line()
-    utils.print_cols(spacings, ncols)
-    print('\n\nAdjusting the number of spaces between '
-          f'{current_selection} and {current_selection+1}',
-          flush=True)
-    utils.move_cursor_up(1)
-
 
 def user_info_assistant(thumbnail_size, xpadding, image_width):
     """=== User print name xcoord ===

@@ -32,12 +32,13 @@ def main():
     api.myapi.credentials = credentials
     api.myapi.start()  # API is now logging in in the background
 
-    cli_args_given = len(sys.argv) != 1
+    if len(sys.argv) != 1:
+        func = cli.launch_mode
+    else:
+        func = main_loop
+
     try:
-        if cli_args_given:
-            cli.launch_mode(args, your_id)
-        else:
-            main_loop(args, your_id)
+        func(args, your_id)
     except KeyboardInterrupt:
         os.system('clear')
         main_loop(args, your_id)

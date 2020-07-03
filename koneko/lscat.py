@@ -97,12 +97,6 @@ class TrackDownloads(AbstractTracker):
         super().__init__()
 
 
-def read_invis(data) -> 'IO[int]':
-    with utils.cd(data.download_path):
-        with open('.koneko', 'r') as f:
-            return int(f.read())
-
-
 class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
     def __init__(self, data):
@@ -112,7 +106,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # If it fails, `fix` it by calling the read_invis() function
         # Either way, the Success() result is inside the Result[] monad, so unwrap() it
         safe_func: 'func[Result[int]]' = safe(lambda: data.splitpoint)
-        splitpoint: int = safe_func().fix(lambda x: read_invis(data)).unwrap()
+        splitpoint: int = safe_func().fix(lambda x: utils.read_invis(data)).unwrap()
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is

@@ -169,6 +169,12 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
 
 
 # File related
+def read_invis(data) -> 'IO[int]':
+    with cd(data.download_path):
+        with open('.koneko', 'r') as f:
+            return int(f.read())
+
+
 def remove_dir_if_exist(data) -> 'Maybe[IO]':
     if data.download_path.is_dir():
         rmtree(data.download_path)

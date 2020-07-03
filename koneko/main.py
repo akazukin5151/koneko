@@ -123,7 +123,6 @@ class AbstractLoop(ABC):
 
             self._save_history()
 
-
             if self._user_input == '!freq':
                 frequent_modes([str(self)])
             else:
@@ -147,7 +146,6 @@ class AbstractLoop(ABC):
         if self._user_input != '!freq':
             logger = utils.setup_history_log()
             logger.info(str(self) + ': ' + self._user_input)
-
 
 
 class ArtistModeLoop(AbstractLoop):
@@ -256,7 +254,6 @@ def illust_follow_mode():
     prompt.gallery_like_prompt(mode)
     # After backing
     main()
-
 
 
 def frequent_modes(modes):

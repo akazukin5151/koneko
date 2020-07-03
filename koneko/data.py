@@ -188,7 +188,6 @@ class UserData(AbstractData):
                            for post in page
                            for illust in post['illusts']]
 
-
     def artist_user_id(self, selected_user_num: int) -> str:
         return self.ids_cache[self.page_num][selected_user_num]
 

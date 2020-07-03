@@ -9,6 +9,7 @@ BLUE = '\x1b[34m'
 RESET = '\x1b[39m'
 BLUE_N = ''.join([RED, '[', BLUE, 'n', RED, ']', RESET])
 
+
 # Private
 def _letter_with_brackets(letter: str) -> str:
     """[] are red and a is magenta

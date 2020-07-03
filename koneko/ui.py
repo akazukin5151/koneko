@@ -164,7 +164,6 @@ class AbstractUI(ABC):
         prompt.user_prompt(self)
 
 
-
 class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
@@ -396,7 +395,6 @@ class IllustFollowGallery(AbstractGallery):
             'view ', colors.m, 'anual\n']))
 
 
-
 class AbstractUsers(AbstractUI, ABC):
     """
     User view commands (No need to press enter):
@@ -479,9 +477,9 @@ class FollowingUsers(AbstractUsers):
         super().__init__(KONEKODIR / 'following' / your_id)
 
     def _pixivrequest(self):
-        return api.myapi.following_user_request(self.your_id, self._publicity,
-                                                self.data.offset)
-
+        return api.myapi.following_user_request(
+            self.your_id, self._publicity, self.data.offset
+        )
 
 
 def _display_medium_preview(gdata, idata, num: int) -> 'IO':
@@ -612,7 +610,6 @@ class Image:
                 print('\n' * config.image_text_offset())
 
             i += 1
-
 
 
 def show_full_res(data):

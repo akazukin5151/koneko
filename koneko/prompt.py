@@ -37,7 +37,8 @@ def common(
     case: 'dict',
     command: str,
     keyseqs: 'list[str]',
-    allowed_keys: 'tuple[str]' = tuple()) -> 'list[str]':
+    allowed_keys: 'tuple[str]' = tuple()
+) -> 'list[str]':
     """Actions common to all prompts that do not break out of prompt.
     Returns keyseqs, modified if needed
     """
@@ -60,6 +61,7 @@ def common(
     elif not command.isdigit() or len(keyseqs) > 3:
         print('\nInvalid command! Press h to show help')
         return []
+
 
 # Core prompt functions
 # The three prompt functions all follow the same internal structure
@@ -113,7 +115,6 @@ def gallery_like_prompt(gallery):
                 elif keyseqs[0].lower() == 'a':
                     return gallery.handle_prompt(keyseqs)
                 keyseqs = []
-
 
             # 2. Wait for user input
             gallery_command = ask_wait_user_input(keyseqs, 'gallery')

@@ -50,6 +50,7 @@ SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 # Small 'functions'
 FakeData = namedtuple('data', ('download_path',))
 
+
 def check_quit(ans: str):
     if ans == 'q':
         sys.exit(0)
@@ -261,7 +262,6 @@ def config_assistance(actions: 'Optional[list[int]]' = None):
             xpadding,
             image_width
         )
-
 
     print('\n\nYour recommended settings are:')
     if 1 in actions or 7 in actions:

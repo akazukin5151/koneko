@@ -42,7 +42,7 @@ from koneko import pure, utils, main, __version__
 
 
 def handle_vh() -> 'Optional[dict]':
-    """Intercepts args, determin whether to quit on help/version"""
+    """Intercepts args, determine whether to quit on help/version"""
     args = docopt(__doc__)
 
     if args['--version'] or args['-v']:

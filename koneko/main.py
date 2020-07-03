@@ -4,11 +4,11 @@ terminal!)
 Entry point of package, start all the while loops here and launch the
 required mode.
 
-Capitalized tag definitions:
-    TODO: to-do, high priority
-    SPEED: speed things up, high priority
-    FEATURE: extra feature, low priority
-    BLOCKING: this is blocking the prompt but I'm stuck on how to proceed
+Structure:
+    - *the* main function
+    - main_loop()
+    - Loop
+    - Frequent
 """
 
 import os

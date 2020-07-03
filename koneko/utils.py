@@ -208,6 +208,20 @@ def remove_dir_if_exist(data):
         rmtree(data.download_path)
 
 # From main
+def handle_missing_pics() -> 'IO':
+    basedir = Path('~/.local/share/koneko/pics').expanduser()
+    if basedir.exists():
+        return True
+
+    print('Please wait, downloading welcome image (this will only occur once)...')
+    baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
+
+    basedir.mkdir(parents=True)
+    for pic in ('71471144_p0.png', '79494300_p0.png'):
+        os.system(f'curl -s {baseurl}{pic} -o {basedir}/{pic}')
+
+    os.system('clear')
+
 def ask_your_id(your_id):
     if your_id:  # your_id stored in config file
         ans = input('Do you want to use the Pixiv ID saved in your config?\n')

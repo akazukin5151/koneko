@@ -132,4 +132,5 @@ def test_history(monkeypatch):
         os.system(f'rm {test_log}')
 
 
-
+def test_handle_missing_pics():
+    utils.handle_missing_pics()

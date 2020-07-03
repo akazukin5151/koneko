@@ -19,20 +19,6 @@ from pathlib import Path
 from koneko import ui, api, cli, pure, utils, config, prompt, screens
 
 
-def handle_missing_pics() -> 'IO':
-    basedir = Path('~/.local/share/koneko/pics').expanduser()
-    if basedir.exists():
-        return True
-
-    print('Please wait, downloading welcome image (this will only occur once)...')
-    baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
-
-    basedir.mkdir(parents=True)
-    for pic in ('71471144_p0.png', '79494300_p0.png'):
-        os.system(f'curl -s {baseurl}{pic} -o {basedir}/{pic}')
-
-    os.system('clear')
-
 def main():
     """Read config file, start login, process any cli arguments, go to main loop"""
     if not (args := cli.handle_vh()):
@@ -41,7 +27,7 @@ def main():
     os.system('clear')
     credentials, your_id = config.begin_config()
 
-    handle_missing_pics()
+    utils.handle_missing_pics()
 
     api.myapi.credentials = credentials
     api.myapi.start()  # API is now logging in in the background

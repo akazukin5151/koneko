@@ -257,6 +257,30 @@ def update_user_info(spacing):
     print_info(spacing)  # Print info takes up 2 lines
     move_cursor_up(2)    # so go back to the top
 
+def image_help():
+    print('')
+    print(''.join([
+        c.b, 'ack; ',
+        c.n, 'ext image; ',
+        c.p, 'revious image; ',
+        c.d_, 'ownload image;',
+        c.o_, 'pen image in browser;\n',
+        'show image in', c.f, 'ull res; ',
+        c.q, 'uit (with confirmation); ',
+        'view ', c.m, 'anual\n'
+    ]))
+
+def user_help():
+    print('')
+    print(''.join([
+        'view ', c.BLUE_N, "th artist's illusts ",
+        c.n, 'ext page; ',
+        c.p, 'revious page; ',
+        c.r, 'eload and re-download all;\n',
+        c.q, 'uit (with confirmation);',
+        'view ', c.m, 'anual\n'
+    ]))
+
 
 # IO related
 def open_in_browser(image_id) -> 'IO':

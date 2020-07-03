@@ -133,7 +133,7 @@ def image_prompt(image):
         'n': image.next_image,
         'p': image.previous_image,
         'f': image.show_full_res,
-        'h': _image_help,
+        'h': utils.image_help,
         'q': ask_quit,
         'm': lambda: print(image.__doc__)
     }
@@ -170,7 +170,7 @@ def user_prompt(user):
     case = {
         'n': user.next_page,
         'p': user.previous_page,
-        'h': _user_help,
+        'h': utils.user_help,
         'q': ask_quit,
         'm': lambda: print(ui.AbstractUsers.__doc__)
     }
@@ -192,32 +192,6 @@ def user_prompt(user):
 
             # 4. Common
             keyseqs = common(case, user_prompt_command, keyseqs)
-
-
-# Basically ui functions that is called on the appropriate user input
-def _image_help():
-    print('')
-    print(''.join([
-        colors.b, 'ack; ',
-        colors.n, 'ext image; ',
-        colors.p, 'revious image; ',
-        colors.d_, 'ownload image;',
-        colors.o_, 'pen image in browser;\n',
-        'show image in', colors.f, 'ull res; ',
-        colors.q, 'uit (with confirmation); ',
-        'view ', colors.m, 'anual\n'
-    ]))
-
-def _user_help():
-    print('')
-    print(''.join([
-        'view ', colors.BLUE_N, "th artist's illusts ",
-        colors.n, 'ext page; ',
-        colors.p, 'revious page; ',
-        colors.r, 'eload and re-download all;\n',
-        colors.q, 'uit (with confirmation);',
-        'view ', colors.m, 'anual\n'
-    ]))
 
 
 def open_or_download(gallery, keyseqs: 'list[str]'):

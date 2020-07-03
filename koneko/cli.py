@@ -75,8 +75,7 @@ def parse_no_mode(url_or_str: str, your_id):
 
     # Assume you won't search for '3' or 'f'
     elif url_or_str == '3' or url_or_str == 'f':
-        your_id = utils.ask_your_id(your_id)
-        return main.FollowingUserModeLoop(your_id).start()
+        return main.FollowingUserModeLoop(your_id).start(your_id)
 
     # Assume you won't search for '5' or 'n'
     elif url_or_str == '5' or url_or_str == 'n':

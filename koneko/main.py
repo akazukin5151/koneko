@@ -64,8 +64,7 @@ def main_loop(args, your_id: str):
             func()
 
         elif main_command == '3':
-            your_id = utils.ask_your_id(your_id)
-            FollowingUserModeLoop(your_id).start()
+            FollowingUserModeLoop(your_id).start(your_id)
 
         elif main_command == 'q':
             answer = input('Are you sure you want to exit? [Y/n]:\n')
@@ -206,6 +205,11 @@ class FollowingUserModeLoop(AbstractLoop):
         self.mode = ui.FollowingUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
+
+    def start(self, your_id=None):
+        if your_id:
+            self._user_input = utils.ask_your_id(your_id)
+        super().start()
 
     def __str__(self):
         return '3'

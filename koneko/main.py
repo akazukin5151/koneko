@@ -50,7 +50,7 @@ def main_loop(args, your_id: str):
         '2': ViewPostModeLoop('').start,
         '3': FollowingUserModeLoop(your_id).start,
         '4': SearchUsersModeLoop('').start,
-        '5': illust_follow_mode_loop,
+        '5': illust_follow_mode,
         'f': frequent,
         '?': screens.info_screen_loop,
         'm': screens.show_man_loop,
@@ -249,7 +249,7 @@ class SearchUsersModeLoop(AbstractLoop):
         return '4'
 
 
-def illust_follow_mode_loop():
+def illust_follow_mode():
     """Immediately goes to ui.IllustFollowGallery()"""
     mode = ui.IllustFollowGallery()
     prompt.gallery_like_prompt(mode)

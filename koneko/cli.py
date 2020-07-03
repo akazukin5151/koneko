@@ -79,7 +79,7 @@ def parse_no_mode(url_or_str: str, your_id):
 
     # Assume you won't search for '5' or 'n'
     elif url_or_str == '5' or url_or_str == 'n':
-        return main.illust_follow_mode_loop()
+        return main.illust_follow_mode()
 
     return main.SearchUsersModeLoop(url_or_str).start()
 

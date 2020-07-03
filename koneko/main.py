@@ -151,10 +151,8 @@ class AbstractLoop(ABC):
 
 
 class ArtistModeLoop(AbstractLoop):
-    """
-    Ask for artist ID and process it, wait for API to finish logging in
-    before proceeding
-    """
+    """Ask for artist ID and process it, then go to mode 1"""
+
     def _prompt_url_id(self) -> str:
         """Implements abstractmethod: prompt for artist ID or url"""
         self._raw_answer = input('Enter artist ID or url:\n')
@@ -173,10 +171,8 @@ class ArtistModeLoop(AbstractLoop):
 
 
 class ViewPostModeLoop(AbstractLoop):
-    """
-    Ask for post ID and process it, wait for API to finish logging in
-    before proceeding
-    """
+    """Ask for post ID and process it, then go to mode 2"""
+
     def _prompt_url_id(self) -> str:
         """Implements abstractmethod: prompt for post url or ID"""
         self._raw_answer = input('Enter pixiv post url or ID:\n')
@@ -198,11 +194,10 @@ class ViewPostModeLoop(AbstractLoop):
 
 
 class FollowingUserModeLoop(AbstractLoop):
-    """
-    Ask for pixiv ID or url and process it, wait for API to finish logging in
-    before proceeding
-    If user agrees to use the your_id saved in config, prompt_url_id() will be
-    skipped
+    """If ID given via cli, immediately go to mode 3
+    Else, ask if the ID saved in the config should be used.
+    If yes, prompt_url_id() will be skipped
+    If not, ask for pixiv ID or url and process it.
     """
     def _prompt_url_id(self) -> str:
         """Implements abstractmethod: prompt for artist ID or url"""
@@ -228,10 +223,8 @@ class FollowingUserModeLoop(AbstractLoop):
         return '3'
 
 class SearchUsersModeLoop(AbstractLoop):
-    """
-    Ask for search string and process it, wait for API to finish logging in
-    before proceeding
-    """
+    """Ask for search string and go to mode 4"""
+
     def _prompt_url_id(self) -> str:
         """Implements abstractmethod: prompt for search string"""
         self._raw_answer = input('Enter search string:\n')

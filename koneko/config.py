@@ -1,5 +1,11 @@
 """Functions to read and write user configuration.
-The IOResult type is just to mark functions using IO; they don't return an IOResult container
+The IOResult type is just to mark functions using IO;
+they don't return an IOResult container
+
+Structure:
+    - Impure config file IO
+    - Safe config setting getters, will return default on failure
+    - Interactive config functions for first launch setup
 """
 
 import os
@@ -17,6 +23,7 @@ from koneko import pure
 TERM = Terminal()
 
 
+# Impure
 @safe
 def get_config_section(section: str) -> 'IOResult[config]':
     config_object = ConfigParser()
@@ -30,7 +37,7 @@ def get_settings(section: str, setting: str) -> 'IOResult[str]':
     return cfgsection.map(m.get(setting, ''))
 
 @safe
-def _get_bool_config(section: str, setting: str, fallback: bool) -> 'IOResult[bool]':
+def unsafe_get_bool_config(section, setting: str, fallback: bool) -> 'IOResult[bool]':
     """Returns either Success(True), Success(False) or Failure.
     Inner boolean represents the value
     Failure represents no key/setting/config found
@@ -38,19 +45,19 @@ def _get_bool_config(section: str, setting: str, fallback: bool) -> 'IOResult[bo
     section = get_config_section(section)
     return section.map(m.getboolean(setting, fallback=fallback)).value_or(fallback)
 
+
+# While not pure (as reading config is IO), they will always return a default on fail
 def get_bool_config(section: str, setting: str, fallback: bool) -> bool:
     """Reads requested section and setting, returning the fallback on failure."""
-    return _get_bool_config(section, setting, fallback).value_or(fallback)
+    return unsafe_get_bool_config(section, setting, fallback).value_or(fallback)
 
-def check_image_preview():
+def check_image_preview() -> bool:
     return get_bool_config('experimental', 'image_mode_previews', False)
 
-def check_print_info() -> 'bool':
+def check_print_info() -> bool:
     """For a Failure (setting not found), return True by default"""
     return get_bool_config('misc', 'print_info', True)
 
-
-# While not pure (because reading config is IO), they will never fail
 def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, int):
     settings = get_config_section('lscat')
     return (
@@ -105,7 +112,8 @@ def credentials_from_config(config_object, config_path) -> ('config', str):
     your_id = credentials.get('ID', '')
     return credentials, your_id
 
-def begin_config() -> ('config', str):
+# Technically frontend
+def begin_config() -> ('IO[config]', str):
     os.system('clear')
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
@@ -114,7 +122,7 @@ def begin_config() -> ('config', str):
     return init_config(config_object, config_path)
 
 
-def init_config(config_object, config_path) -> ('config', str):
+def init_config(config_object, config_path) -> ('IO[config]', str):
     # Identical to `_ask_your_id(_ask_credentials(config_object))`
     config_object, your_id = flow(
         config_object,
@@ -126,14 +134,14 @@ def init_config(config_object, config_path) -> ('config', str):
     _append_default_config(config_path)
     return config_object['Credentials'], your_id
 
-def _ask_credentials(config_object) -> 'config':
+def _ask_credentials(config_object) -> 'IO[config]':
     username = input('Please enter your username:\n')
     print('\nPlease enter your password:')
     password = getpass()
     config_object['Credentials'] = {'Username': username, 'Password': password}
     return config_object
 
-def _ask_your_id(config_object) -> ('config', str):
+def _ask_your_id(config_object) -> ('IO[config]', str):
     print('\nDo you want to save your pixiv ID? It will be more convenient')
     print('to view artists you are following')
     ans = input()

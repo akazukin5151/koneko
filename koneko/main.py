@@ -24,7 +24,6 @@ def main():
     if not (args := cli.handle_vh()):
         sys.exit(0)
 
-    os.system('clear')
     credentials, your_id = config.begin_config()
 
     utils.handle_missing_pics()

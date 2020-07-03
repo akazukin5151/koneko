@@ -101,6 +101,7 @@ def credentials_from_config(config_object, config_path) -> ('config', str):
     return credentials, your_id
 
 def begin_config() -> ('config', str):
+    os.system('clear')
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
     if config_path.exists():

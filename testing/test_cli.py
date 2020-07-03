@@ -1,12 +1,19 @@
 import pytest
+from unittest.mock import Mock, call
 
 from koneko import cli
 
-#def test_mode1_link_only(monkeypatch):
-#    monkeypatch.setattr('koneko.cli.sys.argv',
-#                        (['koneko', 'https://www.pixiv.net/en/users/2232374']))
-#    assert cli.process_cli_args() == ('1', '2232374')
-#
+def test_mode1_link_only(monkeypatch):
+    monkeypatch.setattr('koneko.cli.sys.argv',
+                        (['koneko', 'https://www.pixiv.net/en/users/2232374']))
+    mock = Mock()
+    monkeypatch.setattr('koneko.cli.main.ArtistModeLoop', mock)
+    args = cli.handle_vh()
+    assert cli.launch_mode(args, True)
+    assert mock.call_count == 1
+    assert mock.call_args_list == [call('2232374')]
+    assert mock.mock_calls == [call('2232374'), call().start()]
+
 #def test_mode1_mode_and_link(monkeypatch):
 #    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', '1', '2232374']))
 #    assert cli.process_cli_args() == ('1', '2232374')

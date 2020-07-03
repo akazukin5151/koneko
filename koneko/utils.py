@@ -30,7 +30,7 @@ from pick import Picker
 from pixcat import Image
 from placeholder import m
 
-from koneko import KONEKODIR, pure, TERM
+from koneko import pure, TERM, KONEKODIR
 from koneko import colors as c
 from koneko.config import ncols_config, xcoords_config
 

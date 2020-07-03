@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from placeholder import _
 from returns.pipeline import flow
 
-from koneko import KONEKODIR, pure
+from koneko import pure, KONEKODIR
 
 
 class AbstractData(ABC):

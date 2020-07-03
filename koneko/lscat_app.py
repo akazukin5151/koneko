@@ -38,7 +38,7 @@ from pick import Picker
 from pixcat import Image
 from docopt import docopt
 
-from koneko import KONEKODIR, pure, utils, lscat, config, TERM
+from koneko import pure, utils, lscat, config, TERM, KONEKODIR
 
 
 # Constants

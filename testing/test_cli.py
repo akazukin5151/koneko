@@ -70,19 +70,10 @@ def test_mode3_no_link(monkeypatch, mode):
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
 
-def test_mode4_string_only(monkeypatch):
+@pytest.mark.parametrize("args", (['4', 'searchstring'], ['searchstring']))
+def test_mode4(monkeypatch, args):
     mock = Mock()
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'searchstring']))
-    monkeypatch.setattr('koneko.cli.main.SearchUsersModeLoop', mock)
-
-    args = cli.handle_vh()
-    assert cli.launch_mode(args, True)
-    assert mock.call_args_list == [call('searchstring')]
-    assert mock.mock_calls == [call('searchstring'), call().start()]
-
-def test_mode4_mode_and_string(monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', '4', 'searchstring']))
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
     monkeypatch.setattr('koneko.cli.main.SearchUsersModeLoop', mock)
 
     args = cli.handle_vh()

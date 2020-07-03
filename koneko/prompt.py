@@ -6,10 +6,8 @@ import funcy
 from placeholder import m
 
 from koneko import ui, pure, utils, colors, download, TERM
+from koneko.pure import all_isdigit
 
-
-def all_isdigit(keyseqs: 'list[str]') -> bool:
-    return funcy.all(m.isdigit(), keyseqs)
 
 def ask_quit():
     """Ask for quit confirmation, no need to press enter"""

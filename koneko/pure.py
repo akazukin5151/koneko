@@ -5,7 +5,8 @@ import re
 from math import floor
 from pathlib import Path
 
-from placeholder import _
+import funcy
+from placeholder import _, m
 from funcy import curry, lmap
 from returns.pipeline import flow
 
@@ -173,3 +174,6 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
 def line_width(spacings: 'list[int]', ncols: int) -> int:
     return sum(spacings) + ncols
 
+# From prompt
+def all_isdigit(keyseqs: 'list[str]') -> bool:
+    return funcy.all(m.isdigit(), keyseqs)

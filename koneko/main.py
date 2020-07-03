@@ -267,7 +267,7 @@ def _frequent(actions, history):
 
     _, idx = picker.start()
     if idx == 'f':
-        return filter_freq()
+        return frequent_modes(utils.select_modes_filter())
 
     ans = tuple(history)[idx]
     mode, user_input = ans.split(': ')
@@ -281,9 +281,6 @@ def _frequent(actions, history):
     func = case.get(mode, None)
     if func:
         func()
-
-def filter_freq():
-    frequent_modes(utils.select_modes_filter())
 
 
 if __name__ == '__main__':

@@ -1,8 +1,4 @@
-"""
-Collection of functions that are pure and side effect free
-Excluding printing, should not directly do any IO (file r/w, user input), including configs
-Most input data come from impure sources (user input or network request), but this is allowed here
-"""
+"""Small functions that are pure and side effect free, mainly doing calculations"""
 
 import os
 import re

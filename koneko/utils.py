@@ -1,4 +1,16 @@
-"""Small functions that do IO (file read/write, user input, network request, configs)"""
+"""Small functions with side effects, arranged by functionality.
+If one functionality gets too long, move them into their own module.
+Functionalities:
+    - History and logging
+    - pick module
+    - Wrapping other functions
+    - Calculations
+    - File related
+    - Print related
+    - IO related
+    - Interacting with user (should be in frontend!)
+    - lscat related
+"""
 
 import os
 import sys

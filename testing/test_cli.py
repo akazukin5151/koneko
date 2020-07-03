@@ -50,15 +50,15 @@ from koneko import cli
 #    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'n']))
 #    assert cli.process_cli_args() == ('5', '')
 #
-#@pytest.mark.parametrize("arg", ('-v', '--version'))
-#def test_version(monkeypatch, arg):
-#    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
-#    assert cli.process_cli_args() == ('vh', '')
-#
-#@pytest.mark.parametrize("arg", ('-h', '--help'))
-#def test_help(monkeypatch, arg):
-#    monkeypatch.setattr('koneko.cli.docopt',
-#        lambda x: {'-h': True, '--help': True, '-v': False, '--version': False})
-#    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
-#    assert cli.process_cli_args() == ('vh', '')
-#
+@pytest.mark.parametrize("arg", ('-v', '--version'))
+def test_version(monkeypatch, arg):
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
+    assert cli.handle_vh() is False
+
+@pytest.mark.parametrize("arg", ('-h', '--help'))
+def test_help(monkeypatch, arg):
+    monkeypatch.setattr('koneko.cli.docopt',
+        lambda x: {'-h': True, '--help': True, '-v': False, '--version': False})
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
+    assert cli.handle_vh() is False
+

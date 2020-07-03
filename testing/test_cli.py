@@ -4,57 +4,57 @@ from unittest.mock import Mock, call
 from koneko import cli
 
 def test_mode1_link_only(monkeypatch):
+    mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv',
                         (['koneko', 'https://www.pixiv.net/en/users/2232374']))
-    mock = Mock()
     monkeypatch.setattr('koneko.cli.main.ArtistModeLoop', mock)
+
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
-    assert mock.call_count == 1
     assert mock.call_args_list == [call('2232374')]
     assert mock.mock_calls == [call('2232374'), call().start()]
 
 @pytest.mark.parametrize("mode", ('1', 'a'))
 def test_mode1_mode_and_link(monkeypatch, mode):
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '2232374']))
     mock = Mock()
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '2232374']))
     monkeypatch.setattr('koneko.cli.main.ArtistModeLoop', mock)
+
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
-    assert mock.call_count == 1
     assert mock.call_args_list == [call('2232374')]
     assert mock.mock_calls == [call('2232374'), call().start()]
 
 def test_mode2_link_only(monkeypatch):
+    mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv',
                         (['koneko', 'https://www.pixiv.net/en/artworks/78823485']))
-    mock = Mock()
     monkeypatch.setattr('koneko.cli.main.ViewPostModeLoop', mock)
+
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
-    assert mock.call_count == 1
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
 
 @pytest.mark.parametrize("mode", ('2', 'i'))
 def test_mode2_mode_and_link(monkeypatch, mode):
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '78823485']))
     mock = Mock()
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '78823485']))
     monkeypatch.setattr('koneko.cli.main.ViewPostModeLoop', mock)
+
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
-    assert mock.call_count == 1
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
 
 @pytest.mark.parametrize("mode", ('3', 'f'))
 def test_mode3_mode_and_link(monkeypatch, mode):
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '78823485']))
     mock = Mock()
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '78823485']))
     monkeypatch.setattr('koneko.cli.main.FollowingUserModeLoop', mock)
+
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
-    assert mock.call_count == 1
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
 
@@ -67,27 +67,26 @@ def test_mode3_no_link(monkeypatch, mode):
 
     args = cli.handle_vh()
     assert cli.launch_mode(args, '78823485')
-    assert mock.call_count == 1
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
 
 def test_mode4_string_only(monkeypatch):
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'searchstring']))
     mock = Mock()
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'searchstring']))
     monkeypatch.setattr('koneko.cli.main.SearchUsersModeLoop', mock)
+
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
-    assert mock.call_count == 1
     assert mock.call_args_list == [call('searchstring')]
     assert mock.mock_calls == [call('searchstring'), call().start()]
 
 def test_mode4_mode_and_string(monkeypatch):
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', '4', 'searchstring']))
     mock = Mock()
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', '4', 'searchstring']))
     monkeypatch.setattr('koneko.cli.main.SearchUsersModeLoop', mock)
+
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
-    assert mock.call_count == 1
     assert mock.call_args_list == [call('searchstring')]
     assert mock.mock_calls == [call('searchstring'), call().start()]
 

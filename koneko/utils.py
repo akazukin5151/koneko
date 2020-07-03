@@ -100,20 +100,13 @@ def select_modes_filter(more=False):
 # Wrapping other functions
 @contextmanager
 def cd(newdir: Path) -> 'IO':
-    """Change current script directory, do something, change back to old directory
-    See https://stackoverflow.com/questions/431684/how-do-i-change-the-working-directory-in-python/24176022#24176022
-
-    Parameters
-    ----------
-    newdir : str
-        New directory to cd into inside 'with'
-    """
-    prevdir = os.getcwd()
+    """Change current directory, do something, change back to old directory"""
+    old = os.getcwd()
     os.chdir(os.path.expanduser(newdir))
     try:
         yield
     finally:
-        os.chdir(prevdir)
+        os.chdir(old)
 
 def _spin(done: 'Event', message: str) -> None:
     for char in itertools.cycle('|/-\\'):  # Infinite loop
@@ -123,23 +116,23 @@ def _spin(done: 'Event', message: str) -> None:
     print(' ' * len(char), end='\r')  # clears the spinner
 
 @funcy.decorator
-def spinner(call: 'func[T]', message='') -> 'T':
+def spinner(func: 'func[T]', message='') -> 'T':
     """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
     done = threading.Event()
     spinner_thread = threading.Thread(target=_spin, args=(done, message))
     spinner_thread.start()
     try:
-        return call()  # Run the wrapped function
+        return func()  # Run the wrapped function
     finally:
         # On exception, stop the spinner
         done.set()
         spinner_thread.join()
 
 @funcy.decorator
-def catch_ctrl_c(call: 'func[T]') -> 'T':
+def catch_ctrl_c(func: 'func[T]') -> 'T':
     """See http://hackflow.com/blog/2013/11/03/painless-decorators/"""
     try:
-        return call()
+        return func()
     except KeyboardInterrupt:
         os.system('clear')
 
@@ -170,11 +163,11 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
 
 
 # File related
-def remove_dir_if_exist(data):
+def remove_dir_if_exist(data) -> 'Maybe[IO]':
     if data.download_path.is_dir():
         rmtree(data.download_path)
 
-def verify_full_download(filepath: Path) -> bool:
+def verify_full_download(filepath: Path) -> 'IO[bool]':
     verified = imghdr.what(filepath)
     if not verified:
         os.remove(filepath)

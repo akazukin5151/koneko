@@ -4,11 +4,8 @@ import sys
 
 import funcy
 from placeholder import m
-from blessed import Terminal
 
-from koneko import ui, pure, utils, colors, download
-
-TERM = Terminal()
+from koneko import ui, pure, utils, colors, download, TERM
 
 
 def all_isdigit(keyseqs: 'list[str]') -> bool:

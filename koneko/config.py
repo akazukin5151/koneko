@@ -18,9 +18,7 @@ from returns.result import safe
 from returns.pipeline import flow
 from placeholder import m
 
-from koneko import pure
-
-TERM = Terminal()
+from koneko import pure, TERM
 
 
 # Impure

@@ -37,13 +37,10 @@ from abc import ABC, abstractmethod
 from pick import Picker
 from pixcat import Image
 from docopt import docopt
-from blessed import Terminal
 
-from koneko import KONEKODIR, pure, utils, lscat, config
+from koneko import KONEKODIR, pure, utils, lscat, config, TERM
 
 
-# Globals
-term = Terminal()
 # Constants
 ENTER = 343
 PLUS = {'+', '='}
@@ -328,11 +325,11 @@ def thumbnail_size_assistant():
     image = copy(SAMPLE_IMAGE)
 
     size = 300  # starting size
-    with term.cbreak():
+    with TERM.cbreak():
         while True:
             image.thumbnail(size).show(align='left', x=0, y=0)
 
-            ans = term.inkey()
+            ans = TERM.inkey()
             check_quit(ans)
 
             if ans in PLUS:
@@ -430,12 +427,12 @@ class AbstractImageAdjuster(ABC):
         self.spaces = self.start_spaces
         self.valid = True
 
-        with term.cbreak():
+        with TERM.cbreak():
             while True:
                 if self.is_input_valid():
                     self.hide_show_print()
 
-                ans = term.inkey()
+                ans = TERM.inkey()
                 check_quit(ans)
 
                 if ans.code == ENTER and self.image:
@@ -613,7 +610,7 @@ def page_spacing_assistant(thumbnail_size):
 
     time.sleep(0.1)
 
-    for i in range(term.height + 5):
+    for i in range(TERM.height + 5):
         print(i)
         time.sleep(0.1)
 
@@ -649,7 +646,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
         ncols = config.ncols_config()  # Default fallback, on user choice
     else:
         utils.show_instant_sample(size, image_width, xpadding)
-        ncols = pure.ncols(term.width, image_width, xpadding)
+        ncols = pure.ncols(TERM.width, image_width, xpadding)
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
@@ -657,14 +654,14 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
 
     # Start
     print('\n')
-    with term.cbreak():
+    with TERM.cbreak():
         while True:
             utils.update_gallery_info(spacings, ncols, current_selection)
 
-            ans = term.inkey()
+            ans = TERM.inkey()
             check_quit(ans)
 
-            if ans in PLUS and pure.line_width(spacings, ncols) < term.width:
+            if ans in PLUS and pure.line_width(spacings, ncols) < TERM.width:
                 spacings[current_selection] += 1
 
             elif ans in MINUS and spacings[current_selection] > 0:
@@ -692,7 +689,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
     """
     # Setup variables
     spacing, _ = config.get_gen_users_settings()  # Default
-    preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
+    preview_xcoords = pure.xcoords(TERM.width, image_width, xpadding, 1)[-3:]
 
     # Start
     utils.print_doc(user_info_assistant.__doc__)
@@ -701,11 +698,11 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
 
     utils.move_cursor_up(5)
 
-    with term.cbreak():
+    with TERM.cbreak():
         while True:
             utils.update_user_info(spacing)
 
-            ans = term.inkey()
+            ans = TERM.inkey()
             check_quit(ans)
 
             if ans in PLUS:

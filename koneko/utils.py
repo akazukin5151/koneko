@@ -29,14 +29,11 @@ import funcy
 from pick import Picker
 from pixcat import Image
 from placeholder import m
-from blessed import Terminal
 
-from koneko import KONEKODIR, pure
+from koneko import KONEKODIR, pure, TERM
 from koneko import colors as c
 from koneko.config import ncols_config, xcoords_config
 
-
-term = Terminal()
 
 # History and logging
 def setup_history_log():
@@ -230,7 +227,7 @@ def print_doc(doc: str) -> 'IO':
     """Prints a given string in the bottom of the terminal"""
     os.system('clear')
     number_of_newlines = doc.count('\n')
-    bottom = term.height - (number_of_newlines + 2)
+    bottom = TERM.height - (number_of_newlines + 2)
     move_cursor_down(bottom)
     print(doc)
 
@@ -310,7 +307,7 @@ def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
     return show_single(xcoords_config()[1], y, thumbnail_size)
 
 def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
-    xcoords = pure.xcoords(term.width, image_width, xpadding)
+    xcoords = pure.xcoords(TERM.width, image_width, xpadding)
     for x in xcoords:
         show_single(x, 0, thumbnail_size)
 

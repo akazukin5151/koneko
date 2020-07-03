@@ -98,22 +98,17 @@ def change_url_to_full(url: str, png=False) -> str:
 def process_user_url(url_or_id: str) -> str:
     if 'users' in url_or_id:
         if '\\' in url_or_id:
-            user_input = split_backslash_last(url_or_id).split('\\')[-1][1:]
-        else:
-            user_input = split_backslash_last(url_or_id)
-    else:
-        user_input = url_or_id
-    return user_input
+            return split_backslash_last(url_or_id).split('\\')[-1][1:]
+        return split_backslash_last(url_or_id)
+    return url_or_id
 
 
 def process_artwork_url(url_or_id: str) -> str:
     if 'artworks' in url_or_id:
-        user_input = split_backslash_last(url_or_id).split('\\')[0]
-    elif 'illust_id' in url_or_id:
-        user_input = re.findall(r'&illust_id.*', url_or_id)[0].split('=')[-1]
-    else:
-        user_input = url_or_id
-    return user_input
+        return split_backslash_last(url_or_id).split('\\')[0]
+    if 'illust_id' in url_or_id:
+        return re.findall(r'&illust_id.*', url_or_id)[0].split('=')[-1]
+    return url_or_id
 
 
 def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[str]':

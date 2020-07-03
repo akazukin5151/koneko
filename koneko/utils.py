@@ -8,7 +8,6 @@ Functionalities:
     - File related
     - Print related
     - IO related
-    - Interacting with user (should be in frontend!)
     - lscat related
 """
 
@@ -293,22 +292,6 @@ def handle_missing_pics() -> 'IO':
         os.system(f'curl -s {baseurl}{pic} -o {basedir}/{pic}')
 
     os.system('clear')
-
-
-# Interacting with user (should be in frontend!)
-def check_quit(ans: str):
-    if ans == 'q':
-        sys.exit(0)
-
-def ask_your_id(your_id):
-    if your_id:  # your_id stored in config file
-        ans = input('Do you want to use the Pixiv ID saved in your config? [Y/n]\n')
-        if ans in {'y', ''}:
-            return your_id
-
-    # If your_id not stored, or if ans is no, or if id provided, via cli
-    return ''
-
 
 
 # Lscat related

@@ -72,7 +72,7 @@ def test_mode4(monkeypatch, args):
 def test_mode5(monkeypatch, mode):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode]))
-    monkeypatch.setattr('koneko.cli.main.illust_follow_mode_loop', mock)
+    monkeypatch.setattr('koneko.cli.main.illust_follow_mode', mock)
 
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)

@@ -1,14 +1,16 @@
 """Small functions with side effects, arranged by functionality.
 If one functionality gets too long, move them into their own module.
+TODO: move print and file related functions to their own modules, but what name to use?
+
 Functionalities:
-    - History and logging
-    - pick module
-    - Wrapping other functions
-    - Calculations
-    - File related
-    - Print related
-    - IO related
-    - lscat related
+    - History and logging (29 lines)
+    - pick module (23 lines)
+    - Wrapping other functions (37 lines)
+    - Calculations (22 lines)
+    - File related (63 lines)
+    - Print related (81 lines)
+    - IO related (30 lines)
+    - lscat related (28 lines)
 """
 
 import os

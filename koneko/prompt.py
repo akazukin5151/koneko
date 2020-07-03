@@ -1,4 +1,10 @@
-"""Prompt functions that intercept keyboard input and call the right method"""
+"""Prompt functions that intercept keyboard input and call the right method
+
+Structure:
+    - Common prompt code
+    - Core prompt loops
+    - Actions dispatcher
+"""
 
 import sys
 
@@ -9,6 +15,7 @@ from koneko import ui, pure, utils, colors, download, TERM
 from koneko.pure import all_isdigit
 
 
+# Common prompt code
 def ask_quit():
     """Ask for quit confirmation, no need to press enter"""
     print('\nAre you sure you want to exit?')
@@ -57,6 +64,7 @@ def common(case: 'dict',
         print('\nInvalid command! Press h to show help')
         return []
 
+# Core prompt functions
 # The three prompt functions all follow the same internal structure
 # inside the while loop:
 # 1. Handle multi char input (either 2-digits, or one-letter-2-digits)
@@ -194,6 +202,7 @@ def user_prompt(user):
             keyseqs = common(case, user_prompt_command, keyseqs)
 
 
+# Actions dispatcher
 def open_or_download(gallery, keyseqs: 'list[str]'):
     letter = keyseqs[0]
     first_num, second_num = keyseqs[-2:]

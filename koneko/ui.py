@@ -8,9 +8,18 @@ from abc import ABC, abstractmethod
 
 import funcy
 
-from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
-                    prompt, download)
-
+from koneko import (
+    api,
+    data,
+    pure,
+    lscat,
+    utils,
+    colors,
+    config,
+    prompt,
+    download,
+    KONEKODIR
+)
 
 
 class AbstractUI(ABC):

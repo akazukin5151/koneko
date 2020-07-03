@@ -14,7 +14,7 @@ Tips:
 (As in, what I think I need help on and what you might want to focus on, not what will only be accepted. All PRs will be considered, regardless if it's important or not)
 
 1. Speed: if it's slower than going to pixiv then half of its purpose is gone
-    * The bottleneck is network IO and downloading images from pixiv
+    * The bottleneck is network IO and downloading images from pixiv. Other than that, the next bottleneck is pixcat. It creates a new temporary image (converted to png) every time, but the core mechanic is just printing escape codes. I suspect it can be made faster.
 2. Reliable rendering: There's no point in browsing a media-heavy site if the terminal is text-only and can't render the images well
     * While it's working perfectly for my use case, it should work well for other reasonable cases (different terminal sizes, number+name for the gallery)
 

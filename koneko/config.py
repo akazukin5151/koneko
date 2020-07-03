@@ -93,6 +93,11 @@ def image_text_offset() -> int:
     settings = get_config_section('experimental')
     return settings.map(m.getint('image_mode_text_offset', fallback=4)).value_or(4)
 
+def gallery_print_spacing_config() -> 'tuple[int]':
+    return get_settings('lscat', 'gallery_print_spacing').map(
+        m.split(',')
+    ).value_or((9, 17, 17, 17, 17))
+
 
 
 def credentials_from_config(config_object, config_path) -> ('config', str):

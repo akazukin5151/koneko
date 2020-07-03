@@ -28,7 +28,7 @@ def main():
 
     utils.handle_missing_pics()
 
-    #api.myapi.start(credentials)
+    api.myapi.start(credentials)
 
     if len(sys.argv) != 1:
         func = cli.launch_mode
@@ -217,7 +217,7 @@ class FollowingUserModeLoop(AbstractLoop):
         or enter a custom ID
         """
         if your_id:
-            self._user_input = utils.ask_your_id(your_id)
+            self._user_input = ask_your_id(your_id)
         super().start()
 
     def __str__(self):
@@ -296,6 +296,14 @@ def _frequent(actions, history):
     if func:
         func()
 
+def ask_your_id(your_id):
+    if your_id:  # your_id stored in config file
+        ans = input('Do you want to use the Pixiv ID saved in your config? [Y/n]\n')
+        if ans in {'y', ''}:
+            return your_id
+
+    # If your_id not stored, or if ans is no, or if id provided, via cli
+    return ''
 
 if __name__ == '__main__':
     main()

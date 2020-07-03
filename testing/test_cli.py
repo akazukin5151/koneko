@@ -37,7 +37,7 @@ def test_mode3_mode_and_input(monkeypatch, args):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
     monkeypatch.setattr('koneko.cli.main.FollowingUserModeLoop', mock)
-    monkeypatch.setattr('koneko.utils.ask_your_id', lambda x: '78823485')
+    monkeypatch.setattr('koneko.main.ask_your_id', lambda x: '78823485')
 
     args = cli.handle_vh()
     assert cli.launch_mode(args, '78823485')
@@ -49,7 +49,7 @@ def test_mode3_no_input(monkeypatch, args):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
     monkeypatch.setattr('koneko.cli.main.FollowingUserModeLoop', mock)
-    monkeypatch.setattr('koneko.utils.ask_your_id', lambda x: '78823485')
+    monkeypatch.setattr('koneko.main.ask_your_id', lambda x: '78823485')
 
     args = cli.handle_vh()
     assert cli.launch_mode(args, '78823485')

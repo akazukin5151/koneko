@@ -51,7 +51,13 @@ MINUS = {'-', '_'}
 # Must make a copy before using this reference
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
+# Small 'functions'
 FakeData = namedtuple('data', ('download_path',))
+
+def check_quit(ans: str):
+    if ans == 'q':
+        sys.exit(0)
+
 
 # Main functions that organise work
 def main():
@@ -159,7 +165,7 @@ def pick_dir_loop(path, basetitle, actions, modes):
         picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
 
         _, ans = picker.start()
-        utils.check_quit(ans)
+        check_quit(ans)
 
         if ans == 'y':
             return path
@@ -327,7 +333,7 @@ def thumbnail_size_assistant():
             image.thumbnail(size).show(align='left', x=0, y=0)
 
             ans = term.inkey()
-            utils.check_quit(ans)
+            check_quit(ans)
 
             if ans in PLUS:
                 size += 20
@@ -430,7 +436,7 @@ class AbstractImageAdjuster(ABC):
                     self.hide_show_print()
 
                 ans = term.inkey()
-                utils.check_quit(ans)
+                check_quit(ans)
 
                 if ans.code == ENTER and self.image:
                     self.maybe_erase()
@@ -656,7 +662,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
             utils.update_gallery_info(spacings, ncols, current_selection)
 
             ans = term.inkey()
-            utils.check_quit(ans)
+            check_quit(ans)
 
             if ans in PLUS and pure.line_width(spacings, ncols) < term.width:
                 spacings[current_selection] += 1
@@ -700,7 +706,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
             utils.update_user_info(spacing)
 
             ans = term.inkey()
-            utils.check_quit(ans)
+            check_quit(ans)
 
             if ans in PLUS:
                 spacing += 1

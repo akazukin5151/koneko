@@ -21,6 +21,7 @@ from placeholder import m
 from blessed import Terminal
 
 from koneko import KONEKODIR, pure
+from koneko import colors as c
 from koneko.config import ncols_config, xcoords_config
 
 
@@ -185,6 +186,15 @@ def catch_ctrl_c(call: 'func[T]') -> 'T':
         return call()
     except KeyboardInterrupt:
         os.system('clear')
+
+def print_multiple_imgs(illusts_json: 'Json') -> None:
+    HASHTAG = f'{c.RED}#'
+    HAS = f'{c.RESET} has {c.BLUE}'
+    OF_PAGES = f'{c.RESET} pages'
+    _ = [print(f'{HASHTAG}{index}{HAS}{number}{OF_PAGES}', end=', ')
+         for (index, _json) in enumerate(illusts_json)
+         if (number := _json['page_count']) > 1]
+    print('')
 
 # From ui
 def open_in_browser(image_id) -> 'IO':

@@ -32,8 +32,8 @@ def test_mode2(monkeypatch, args):
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
 
-@pytest.mark.parametrize("args", (['3', '78823485'], ['f', '78823485'], ['3'], ['f']))
-def test_mode3(monkeypatch, args):
+@pytest.mark.parametrize("args", (['3', '78823485'], ['f', '78823485']))
+def test_mode3_mode_and_input(monkeypatch, args):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
     monkeypatch.setattr('koneko.cli.main.FollowingUserModeLoop', mock)
@@ -43,6 +43,18 @@ def test_mode3(monkeypatch, args):
     assert cli.launch_mode(args, '78823485')
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
+
+@pytest.mark.parametrize("args", (['3'], ['f']))
+def test_mode3_no_input(monkeypatch, args):
+    mock = Mock()
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
+    monkeypatch.setattr('koneko.cli.main.FollowingUserModeLoop', mock)
+    monkeypatch.setattr('koneko.utils.ask_your_id', lambda x: '78823485')
+
+    args = cli.handle_vh()
+    assert cli.launch_mode(args, '78823485')
+    assert mock.call_args_list == [call('78823485')]
+    assert mock.mock_calls == [call('78823485'), call().start('78823485')]
 
 
 @pytest.mark.parametrize("args", (['4', 'searchstring'], ['searchstring']))

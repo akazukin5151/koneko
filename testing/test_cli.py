@@ -3,10 +3,14 @@ from unittest.mock import Mock, call
 
 from koneko import cli
 
-def test_mode1_link_only(monkeypatch):
+
+@pytest.mark.parametrize("args", (
+    ['1', '2232374'],
+    ['a', '2232374'],
+    ['https://www.pixiv.net/en/users/2232374']))
+def test_mode1(monkeypatch, args):
     mock = Mock()
-    monkeypatch.setattr('koneko.cli.sys.argv',
-                        (['koneko', 'https://www.pixiv.net/en/users/2232374']))
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
     monkeypatch.setattr('koneko.cli.main.ArtistModeLoop', mock)
 
     args = cli.handle_vh()
@@ -14,21 +18,13 @@ def test_mode1_link_only(monkeypatch):
     assert mock.call_args_list == [call('2232374')]
     assert mock.mock_calls == [call('2232374'), call().start()]
 
-@pytest.mark.parametrize("mode", ('1', 'a'))
-def test_mode1_mode_and_link(monkeypatch, mode):
+@pytest.mark.parametrize("args", (
+    ['2', '78823485'],
+    ['i', '78823485'],
+    ['https://www.pixiv.net/en/artworks/78823485']))
+def test_mode2(monkeypatch, args):
     mock = Mock()
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '2232374']))
-    monkeypatch.setattr('koneko.cli.main.ArtistModeLoop', mock)
-
-    args = cli.handle_vh()
-    assert cli.launch_mode(args, True)
-    assert mock.call_args_list == [call('2232374')]
-    assert mock.mock_calls == [call('2232374'), call().start()]
-
-def test_mode2_link_only(monkeypatch):
-    mock = Mock()
-    monkeypatch.setattr('koneko.cli.sys.argv',
-                        (['koneko', 'https://www.pixiv.net/en/artworks/78823485']))
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
     monkeypatch.setattr('koneko.cli.main.ViewPostModeLoop', mock)
 
     args = cli.handle_vh()
@@ -36,32 +32,10 @@ def test_mode2_link_only(monkeypatch):
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
 
-@pytest.mark.parametrize("mode", ('2', 'i'))
-def test_mode2_mode_and_link(monkeypatch, mode):
+@pytest.mark.parametrize("args", (['3', '78823485'], ['f', '78823485'], ['3'], ['f']))
+def test_mode3(monkeypatch, args):
     mock = Mock()
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '78823485']))
-    monkeypatch.setattr('koneko.cli.main.ViewPostModeLoop', mock)
-
-    args = cli.handle_vh()
-    assert cli.launch_mode(args, True)
-    assert mock.call_args_list == [call('78823485')]
-    assert mock.mock_calls == [call('78823485'), call().start()]
-
-@pytest.mark.parametrize("mode", ('3', 'f'))
-def test_mode3_mode_and_link(monkeypatch, mode):
-    mock = Mock()
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode, '78823485']))
-    monkeypatch.setattr('koneko.cli.main.FollowingUserModeLoop', mock)
-
-    args = cli.handle_vh()
-    assert cli.launch_mode(args, True)
-    assert mock.call_args_list == [call('78823485')]
-    assert mock.mock_calls == [call('78823485'), call().start()]
-
-@pytest.mark.parametrize("mode", ('3', 'f'))
-def test_mode3_no_link(monkeypatch, mode):
-    mock = Mock()
-    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode]))
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
     monkeypatch.setattr('koneko.cli.main.FollowingUserModeLoop', mock)
     monkeypatch.setattr('koneko.utils.ask_your_id', lambda x: '78823485')
 
@@ -69,6 +43,7 @@ def test_mode3_no_link(monkeypatch, mode):
     assert cli.launch_mode(args, '78823485')
     assert mock.call_args_list == [call('78823485')]
     assert mock.mock_calls == [call('78823485'), call().start()]
+
 
 @pytest.mark.parametrize("args", (['4', 'searchstring'], ['searchstring']))
 def test_mode4(monkeypatch, args):
@@ -82,7 +57,7 @@ def test_mode4(monkeypatch, args):
     assert mock.mock_calls == [call('searchstring'), call().start()]
 
 @pytest.mark.parametrize("mode", ('5', 'n'))
-def test_mode5_no_link(monkeypatch, mode):
+def test_mode5(monkeypatch, mode):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode]))
     monkeypatch.setattr('koneko.cli.main.illust_follow_mode_loop', mock)

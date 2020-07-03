@@ -235,7 +235,7 @@ def handle_missing_pics() -> 'IO':
 
 def ask_your_id(your_id):
     if your_id:  # your_id stored in config file
-        ans = input('Do you want to use the Pixiv ID saved in your config?\n')
+        ans = input('Do you want to use the Pixiv ID saved in your config? [Y/n]\n')
         if ans in {'y', ''}:
             return your_id
 

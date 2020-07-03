@@ -28,7 +28,7 @@ def main():
 
     utils.handle_missing_pics()
 
-    api.myapi.start(credentials)
+    #api.myapi.start(credentials)
 
     if len(sys.argv) != 1:
         func = cli.launch_mode
@@ -48,6 +48,7 @@ def main_loop(args, your_id: str):
     case = {
         '1': ArtistModeLoop('').start,
         '2': ViewPostModeLoop('').start,
+        '3': FollowingUserModeLoop(your_id).start,
         '4': SearchUsersModeLoop('').start,
         '5': illust_follow_mode_loop,
         'f': frequent,
@@ -60,11 +61,10 @@ def main_loop(args, your_id: str):
         main_command = screens.begin_prompt(printmessage)
 
         func = case.get(main_command, None)
-        if func:
+        if main_command == '3':
+            func(your_id)
+        elif func:
             func()
-
-        elif main_command == '3':
-            FollowingUserModeLoop(your_id).start(your_id)
 
         elif main_command == 'q':
             answer = input('Are you sure you want to exit? [Y/n]:\n')

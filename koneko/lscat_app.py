@@ -57,6 +57,10 @@ def check_quit(ans: str):
         sys.exit(0)
 
 
+def try_filter_dir(modes):
+    return sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
+
+
 # Main functions that organise work
 def main():
     if len(sys.argv) == 1:
@@ -204,7 +208,7 @@ def handle_filter(path, basetitle):
         return basetitle, actions, modes
 
     title = f"Filtering {modes=}\n" + basetitle
-    actions = sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
+    actions = try_filter_dir(modes)
     return title, actions, modes
 
 
@@ -219,7 +223,7 @@ def handle_cd(path, actions, ans, modes):
 
 def actions_from_dir(path, modes):
     if path == KONEKODIR and modes is not None:  # Filter active
-        return sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
+        return try_filter_dir(modes)
     return files.filter_history(path)
 
 

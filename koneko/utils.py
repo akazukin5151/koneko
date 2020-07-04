@@ -92,7 +92,6 @@ def pick_dirs_picker(actions, title):
     picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
     return picker
 
-#FIXME: crashes if no dirs after filter
 def select_modes_filter(more=False):
     title = "Use SPACE to select a mode to show and ENTER to confirm"
     # Copied from screens

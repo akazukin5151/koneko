@@ -46,6 +46,7 @@ PLUS = {'+', '='}
 MINUS = {'-', '_'}
 # Must make a copy before using this reference
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
+EMPTY_WARNING = "**No directories match the filter! Press 'f' to re-filter**"
 
 # Small 'functions'
 FakeData = namedtuple('data', ('download_path',))
@@ -162,7 +163,7 @@ def pick_dir_loop(path, basetitle, actions, modes):
         check_quit(ans)
 
         if ans == 'y':
-            return path
+            return path  # TODO: prevent return if path is not valid
 
         elif ans == 'b':
             path = handle_back(path)
@@ -175,7 +176,7 @@ def pick_dir_loop(path, basetitle, actions, modes):
             continue
 
         else:
-            path = handle_cd(path, actions, ans)
+            path, modes = handle_cd(path, actions, ans, modes)
 
         actions = actions_from_dir(path, modes)
 
@@ -203,14 +204,19 @@ def handle_filter(path, basetitle):
 
     title = f"Filtering {modes=}\n" + basetitle
     actions = sorted(utils.filter_dir(modes))
+    if not actions:
+        actions = [EMPTY_WARNING]
     return title, actions, modes
 
 
-def handle_cd(path, actions, ans):
+def handle_cd(path, actions, ans, modes):
+    if actions[ans] == EMPTY_WARNING:
+        return path, None
+
     path = path / actions[ans]
     if not path.is_dir():
-        return path.parent
-    return path
+        return path.parent, modes
+    return path, modes
 
 
 def actions_from_dir(path, modes):

@@ -197,25 +197,23 @@ def handle_delete(path):
 
 
 def handle_filter(path, basetitle):
-    actions = utils.filter_history(path)
     modes = utils.select_modes_filter(True)
-    if '6' in modes:  # Clear all filters
+    if '6' in modes:
+        # Clear all filters
+        actions = utils.filter_history(path)
         return basetitle, actions, modes
 
     title = f"Filtering {modes=}\n" + basetitle
-    actions = sorted(utils.filter_dir(modes))
-    if not actions:
-        actions = [EMPTY_WARNING]
+    actions = sorted(utils.filter_dir(modes)) or [EMPTY_WARNING]
     return title, actions, modes
 
 
 def handle_cd(path, actions, ans, modes):
-    if actions[ans] == EMPTY_WARNING:
+    selected_dir = actions[ans]
+    if selected_dir == EMPTY_WARNING:
         return path, None
-
-    path = path / actions[ans]
-    if not path.is_dir():
-        return path.parent, modes
+    elif (newpath := path / selected_dir).is_dir():
+        return newpath, modes
     return path, modes
 
 

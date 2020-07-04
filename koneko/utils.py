@@ -29,7 +29,9 @@ from logging.handlers import RotatingFileHandler
 import funcy
 from pick import Picker
 from pixcat import Image
-from placeholder import m
+from placeholder import _, m
+from funcy import curry, lfilter
+from returns.pipeline import flow
 
 from koneko import pure, TERM, KONEKODIR
 from koneko import colors as c
@@ -189,6 +191,15 @@ def read_invis(data) -> 'IO[int]':
 def remove_dir_if_exist(data) -> 'Maybe[IO]':
     if data.download_path.is_dir():
         rmtree(data.download_path)
+
+
+def filter_history(path):
+    return flow(
+        path,
+        os.listdir,
+        sorted,
+        curry(lfilter)(_ != 'history')
+    )
 
 
 def verify_full_download(filepath: Path) -> 'IO[bool]':

@@ -35,10 +35,7 @@ from collections import namedtuple
 from abc import ABC, abstractmethod
 
 from pixcat import Image
-from placeholder import _
 from docopt import docopt
-from funcy import curry, lfilter
-from returns.pipeline import flow
 
 from koneko import pure, utils, lscat, config, TERM, KONEKODIR
 
@@ -141,14 +138,6 @@ def browse_cache():
         lscat.show_instant(lscat.TrackDownloads, data, True)
 
 
-def filter_history(path):
-    return flow(
-        path,
-        os.listdir,
-        sorted,
-        curry(lfilter)(_ != 'history')
-    )
-
 def pick_dir():
     path = KONEKODIR
     # base is immutable
@@ -160,7 +149,7 @@ def pick_dir():
         "Press 'f' to filter out modes\n"
         "Press 'q' to exit"
     )
-    actions = filter_history(path)
+    actions = utils.filter_history(path)
     return pick_dir_loop(path, basetitle, actions, None)
 
 
@@ -207,7 +196,7 @@ def handle_delete(path):
 
 
 def handle_filter(path, basetitle):
-    actions = filter_history(path)
+    actions = utils.filter_history(path)
     modes = utils.select_modes_filter(True)
     if '6' in modes:  # Clear all filters
         return basetitle, actions, modes
@@ -227,7 +216,7 @@ def handle_cd(path, actions, ans):
 def actions_from_dir(path, modes):
     if path == KONEKODIR and modes is not None:  # Filter active
         return sorted(utils.filter_dir(modes))
-    return filter_history(path)
+    return utils.filter_history(path)
 
 
 def ask_assistant() -> 'IO[list[int]]':

@@ -313,42 +313,13 @@ def config_assistance(actions: 'Optional[list[int]]' = None):
     user_info_xcoord = maybe_print_xcoord(actions, size, xpadding, image_width)
 
     print('\n\nYour recommended settings are:')
-    maybe_print_size(actions, size)
-    maybe_print_width_xpadding(actions, image_width, xpadding)
-    maybe_print_height_ypadding(actions, image_height, ypadding)
-    maybe_print_page_spacing(actions, page_spacing)
-    maybe_print_print_spacing(actions, gallery_print_spacing)
-    maybe_print_user_info(actions, user_info_xcoord)
+    utils.maybe_print_size(actions, size)
+    utils.maybe_print_width_xpadding(actions, image_width, xpadding)
+    utils.maybe_print_height_ypadding(actions, image_height, ypadding)
+    utils.maybe_print_page_spacing(actions, page_spacing)
+    utils.maybe_print_print_spacing(actions, gallery_print_spacing)
+    utils.maybe_print_user_info(actions, user_info_xcoord)
     input('\nEnter any key to quit\n')
-
-
-def maybe_print_size(actions, size):
-    if 1 in actions or 7 in actions:
-        print(f'image_thumbnail_size = {size}')
-
-def maybe_print_width_xpadding(actions, image_width, xpadding):
-    if 2 in actions or 7 in actions:
-        print(f'image_width = {image_width}')
-        print(f'images_x_spacing = {xpadding}')
-
-def maybe_print_height_ypadding(actions, image_height, ypadding):
-    if 3 in actions or 7 in actions:
-        print(f'image_height = {image_height}')
-        print(f'images_y_spacing = {ypadding}')
-
-def maybe_print_page_spacing(actions, page_spacing):
-    if 4 in actions or 7 in actions:
-        print(f'page_spacing = {page_spacing}')
-
-def maybe_print_print_spacing(actions, gallery_print_spacing):
-    if 5 in actions or 7 in actions:
-        print('gallery_print_spacing =',
-              ','.join((str(x) for x in gallery_print_spacing)))
-
-def maybe_print_user_info(actions, user_info_xcoord):
-    if 6 in actions or 7 in actions:
-        print(f'users_print_name_xcoord = {user_info_xcoord}')
-
 
 
 def thumbnail_size_assistant():

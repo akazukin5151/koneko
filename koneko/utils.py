@@ -2,12 +2,12 @@
 If one functionality gets too long, move them into their own module.
 
 Functionalities:
-    - History and logging (29 lines)
-    - pick module (23 lines)
-    - Wrapping other functions (37 lines)
-    - Calculations (22 lines)
-    - IO related (30 lines)
-    - lscat related (28 lines)
+    - History and logging (33 lines)
+    - pick module (34 lines)
+    - Wrapping other functions (40 lines)
+    - Calculations (23 lines)
+    - IO related (33 lines)
+    - lscat related (33 lines)
 """
 
 import os

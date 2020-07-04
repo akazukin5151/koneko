@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from koneko import ui, utils, files, download
+from koneko import ui, utils, download
 
 
 class FakeData:

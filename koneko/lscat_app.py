@@ -37,7 +37,7 @@ from abc import ABC, abstractmethod
 from pixcat import Image
 from docopt import docopt
 
-from koneko import pure, utils, lscat, config, printer, TERM, KONEKODIR
+from koneko import pure, utils, files, lscat, config, printer, TERM, KONEKODIR
 
 
 # Constants
@@ -150,7 +150,7 @@ def pick_dir():
         "Press 'f' to filter out modes\n"
         "Press 'q' to exit"
     )
-    actions = utils.filter_history(path)
+    actions = files.filter_history(path)
     return pick_dir_loop(path, basetitle, actions, None)
 
 
@@ -200,11 +200,11 @@ def handle_filter(path, basetitle):
     modes = utils.select_modes_filter(True)
     if '6' in modes:
         # Clear all filters
-        actions = utils.filter_history(path)
+        actions = files.filter_history(path)
         return basetitle, actions, modes
 
     title = f"Filtering {modes=}\n" + basetitle
-    actions = sorted(utils.filter_dir(modes)) or [EMPTY_WARNING]
+    actions = sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
     return title, actions, modes
 
 
@@ -219,8 +219,8 @@ def handle_cd(path, actions, ans, modes):
 
 def actions_from_dir(path, modes):
     if path == KONEKODIR and modes is not None:  # Filter active
-        return sorted(utils.filter_dir(modes)) or [EMPTY_WARNING]
-    return utils.filter_history(path)
+        return sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
+    return files.filter_history(path)
 
 
 def ask_assistant() -> 'IO[list[int]]':

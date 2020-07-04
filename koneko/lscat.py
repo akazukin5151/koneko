@@ -23,7 +23,7 @@ from abc import ABC
 from pixcat import Image
 from returns.result import safe
 
-from koneko import pure, utils, config, printer
+from koneko import pure, utils, files, config, printer
 
 
 def icat(path: str) -> 'IO':
@@ -106,7 +106,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # If it fails, `fix` it by calling the read_invis() function
         # Either way, the Success() result is inside the Result[] monad, so unwrap() it
         safe_func: 'func[Result[int]]' = safe(lambda: data.splitpoint)
-        splitpoint: int = safe_func().fix(lambda x: utils.read_invis(data)).unwrap()
+        splitpoint: int = safe_func().fix(lambda x: files.read_invis(data)).unwrap()
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is

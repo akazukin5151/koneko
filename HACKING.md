@@ -45,3 +45,17 @@
 ### Functions in download.py
 
 ![download UML](http://plantuml.com:80/plantuml/png/ZLDR3eCW4Fpd55x07g7fJGYLRRiDB0RNDYOUlhLLAGAcNuQPVS3CUEfOUUwj4OnieDBkISOfVMW78Tpv3WrNICXo8HPGTGCrAoezaB9G8CdjyrsBHE1ZzeA6mKj5EjczDl8DQ3DwvNflSfXyWCSBGZeChRg2R9ppkYkGr5iXUgpg2Q_7uqQQw3GN7GjAYIoyQSffKDBsxzOCi_PcbOrUNB0k3vSq287O6HsAnA-1LLswPzRck7mAHTRmk2oudKB9m92ew3NHpXBnqpidhlNEjYo-d_UkCRdMdD2TYazCJq1w-gzV)
+
+
+## Dependencies
+
+There are two dependencies that aren't necessary: returns and placeholder (both on the right edge). Code can always be rewritten to remove those two dependencies. That said, they don't introduce their own dependency tree, so only a total of three dependencies are added. Compared to the core dependencies (pixivpy, pixcat, and blessed), that's insignificant.
+
+![dep tree](dependencies.png)
+
+```sh
+$ pipdeptree -v
+2.0.0b1
+$ pipdeptree --graph-output png -p koneko > dependencies.png
+```
+

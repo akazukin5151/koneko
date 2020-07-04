@@ -244,69 +244,111 @@ def ask_assistant() -> 'IO[list[int]]':
     return [x[1] + 1 for x in selected_actions]
 
 
-def config_assistance(actions: 'Optional[list[int]]' = None):
-    """Some assistants return a new setting, which should be propagated
-    to other assistants.
-    """
+def maybe_ask_assistant(actions):
     if not actions:
-        actions = ask_assistant()
-    else:
-        # Docopt intercepts additional arguments as str
-        actions = [int(x) for x in actions]
+        return ask_assistant()
+    # Docopt intercepts additional arguments as str
+    return [int(x) for x in actions]
 
+
+def maybe_thumbnail_size(actions):
     if 1 in actions or 7 in actions:
-        size = thumbnail_size_assistant()
-    else:
-        size = config.thumbnail_size_config()  # Fallback
+        return thumbnail_size_assistant()
+    return config.thumbnail_size_config()
 
+
+def maybe_xpadding_img_width(actions, size):
     if 2 in actions or 7 in actions:
-        xpadding, image_width = xpadding_assistant(size)
-    else:
-        # Fallbacks
-        _, xpadding = config.get_gen_users_settings()
-        image_width, _ = config._width_padding('width', 'x', (0, 2))
+        return xpadding_assistant(size)
+    return (
+        config.get_gen_users_settings()[1],
+        config._width_padding('width', 'x', (0, 2))[0]
+    )
 
+
+def maybe_ypadding_img_height(actions, size):
     if 3 in actions or 7 in actions:
-        ypadding, image_height = ypadding_assistant(size)
+        return ypadding_assistant(size)
+    return None, None
 
+
+def maybe_page_spacing(actions, size):
     if 4 in actions or 7 in actions:
-        page_spacing = page_spacing_assistant(size)
+        return page_spacing_assistant(size)
+    return None, None
 
+
+def maybe_print_spacing(actions, size, xpadding, image_width):
     if 5 in actions or 7 in actions:
-        gallery_print_spacing = gallery_print_spacing_assistant(
+        return gallery_print_spacing_assistant(
             size, xpadding, image_width
         )
 
+
+def maybe_print_xcoord(actions, size, xpadding, image_width):
     if 6 in actions or 7 in actions:
-        user_info_xcoord = user_info_assistant(
+        return user_info_assistant(
             size,
             xpadding,
             image_width
         )
 
+
+def config_assistance(actions: 'Optional[list[int]]' = None):
+    """Some assistants return a new setting, which should be propagated
+    to other assistants.
+    """
+    actions = maybe_ask_assistant(actions)
+
+    size = maybe_thumbnail_size(actions)
+
+    xpadding, image_width = maybe_xpadding_img_width(actions, size)
+
+    ypadding, image_height = maybe_ypadding_img_height(actions, size)
+
+    page_spacing = maybe_page_spacing(actions, size)
+
+    gallery_print_spacing = maybe_print_spacing(actions, size, xpadding, image_width)
+
+    user_info_xcoord = maybe_print_xcoord(actions, size, xpadding, image_width)
+
     print('\n\nYour recommended settings are:')
+    maybe_print_size(actions, size)
+    maybe_print_width_xpadding(actions, image_width, xpadding)
+    maybe_print_height_ypadding(actions, image_height, ypadding)
+    maybe_print_page_spacing(actions, page_spacing)
+    maybe_print_print_spacing(actions, gallery_print_spacing)
+    maybe_print_user_info(actions, user_info_xcoord)
+    input('\nEnter any key to quit\n')
+
+
+def maybe_print_size(actions, size):
     if 1 in actions or 7 in actions:
         print(f'image_thumbnail_size = {size}')
 
+def maybe_print_width_xpadding(actions, image_width, xpadding):
     if 2 in actions or 7 in actions:
         print(f'image_width = {image_width}')
         print(f'images_x_spacing = {xpadding}')
 
+def maybe_print_height_ypadding(actions, image_height, ypadding):
     if 3 in actions or 7 in actions:
         print(f'image_height = {image_height}')
         print(f'images_y_spacing = {ypadding}')
 
+def maybe_print_page_spacing(actions, page_spacing):
     if 4 in actions or 7 in actions:
         print(f'page_spacing = {page_spacing}')
 
+def maybe_print_print_spacing(actions, gallery_print_spacing):
     if 5 in actions or 7 in actions:
         print('gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
+def maybe_print_user_info(actions, user_info_xcoord):
     if 6 in actions or 7 in actions:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 
-    input('\nEnter any key to quit\n')
 
 
 def thumbnail_size_assistant():

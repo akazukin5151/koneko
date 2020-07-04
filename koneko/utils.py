@@ -79,7 +79,18 @@ def ws_picker(actions, title, **kwargs):
     picker.register_custom_handler(ord('s'), m.move_down())
     return picker
 
+def pick_dirs_picker(actions, title):
+    picker = Picker(actions, title)
+    picker.register_custom_handler(ord('w'), m.move_up())
+    picker.register_custom_handler(ord('s'), m.move_down())
+    picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
+    picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
+    picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
+    picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
+    picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
+    return picker
 
+#FIXME: crashes if no dirs after filter
 def select_modes_filter(more=False):
     title = "Use SPACE to select a mode to show and ENTER to confirm"
     # Copied from screens

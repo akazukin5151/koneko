@@ -152,18 +152,13 @@ def pick_dir():
     actions = sorted(os.listdir(path))
     return pick_dir_loop(path, basetitle, actions, None)
 
+# TODO: remove history file from actions
 
 def pick_dir_loop(path, basetitle, actions, modes):
     title = basetitle
 
     while True:
-        picker = utils.ws_picker(actions, title)
-        picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
-        picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
-        picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
-        picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
-        picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
-
+        picker = utils.pick_dirs_picker(actions, title)
         _, ans = picker.start()
         check_quit(ans)
 
@@ -171,35 +166,58 @@ def pick_dir_loop(path, basetitle, actions, modes):
             return path
 
         elif ans == 'b':
-            if path != KONEKODIR:
-                path = path.parent
+            path = handle_back(path)
 
         elif ans == 'd':
-            print(f'Are you sure you want to delete {path}?')
-            confirm = input("Enter 'y' to confirm\n")
-            if confirm == 'y':
-                rmtree(path)
-                path = path.parent
+            path = handle_delete(path)
 
         elif ans == 'f':
-            actions = sorted(os.listdir(path))
-            modes = utils.select_modes_filter(True)
-            if '6' in modes:  # Clear all filters
-                title = basetitle
-            else:
-                actions = sorted(utils.filter_dir(modes))
-                title = f"Filtering {modes=}\n" + basetitle
-
+            title, actions, modes = handle_filter(path, basetitle)
             continue
 
         else:
-            path = path / actions[ans]
-            if not path.is_dir():
-                path = path.parent
+            path = handle_cd(path, actions, ans)
 
-        actions = sorted(os.listdir(path))
-        if path == KONEKODIR and modes is not None:  # Filter active
-            actions = sorted(utils.filter_dir(modes))
+        actions = actions_from_dir(path, modes)
+
+
+def handle_back(path):
+    if path != KONEKODIR:
+        return path.parent
+    return path
+
+
+def handle_delete(path):
+    print(f'Are you sure you want to delete {path}?')
+    confirm = input("Enter 'y' to confirm\n")
+    if confirm == 'y':
+        rmtree(path)
+        return path.parent
+    return path
+
+
+def handle_filter(path, basetitle):
+    actions = sorted(os.listdir(path))
+    modes = utils.select_modes_filter(True)
+    if '6' in modes:  # Clear all filters
+        return basetitle, actions, modes
+
+    title = f"Filtering {modes=}\n" + basetitle
+    actions = sorted(utils.filter_dir(modes))
+    return title, actions, modes
+
+
+def handle_cd(path, actions, ans):
+    path = path / actions[ans]
+    if not path.is_dir():
+        return path.parent
+    return path
+
+
+def actions_from_dir(path, modes):
+    if path == KONEKODIR and modes is not None:  # Filter active
+        return sorted(utils.filter_dir(modes))
+    return sorted(os.listdir(path))
 
 
 def ask_assistant() -> 'IO[list[int]]':

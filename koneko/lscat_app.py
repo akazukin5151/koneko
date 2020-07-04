@@ -211,7 +211,7 @@ def handle_filter(path, basetitle):
 def handle_cd(path, actions, ans, modes):
     selected_dir = actions[ans]
     if selected_dir == EMPTY_WARNING:
-        return path, None
+        return KONEKODIR, None
     elif (newpath := path / selected_dir).is_dir():
         return newpath, modes
     return path, modes
@@ -219,7 +219,7 @@ def handle_cd(path, actions, ans, modes):
 
 def actions_from_dir(path, modes):
     if path == KONEKODIR and modes is not None:  # Filter active
-        return sorted(utils.filter_dir(modes))
+        return sorted(utils.filter_dir(modes)) or [EMPTY_WARNING]
     return utils.filter_history(path)
 
 

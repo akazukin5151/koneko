@@ -37,7 +37,7 @@ from abc import ABC, abstractmethod
 from pixcat import Image
 from docopt import docopt
 
-from koneko import pure, utils, lscat, config, TERM, KONEKODIR
+from koneko import pure, utils, lscat, config, printer, TERM, KONEKODIR
 
 
 # Constants
@@ -313,12 +313,12 @@ def config_assistance(actions: 'Optional[list[int]]' = None):
     user_info_xcoord = maybe_print_xcoord(actions, size, xpadding, image_width)
 
     print('\n\nYour recommended settings are:')
-    utils.maybe_print_size(actions, size)
-    utils.maybe_print_width_xpadding(actions, image_width, xpadding)
-    utils.maybe_print_height_ypadding(actions, image_height, ypadding)
-    utils.maybe_print_page_spacing(actions, page_spacing)
-    utils.maybe_print_print_spacing(actions, gallery_print_spacing)
-    utils.maybe_print_user_info(actions, user_info_xcoord)
+    printer.maybe_print_size(actions, size)
+    printer.maybe_print_width_xpadding(actions, image_width, xpadding)
+    printer.maybe_print_height_ypadding(actions, image_height, ypadding)
+    printer.maybe_print_page_spacing(actions, page_spacing)
+    printer.maybe_print_print_spacing(actions, gallery_print_spacing)
+    printer.maybe_print_user_info(actions, user_info_xcoord)
     input('\nEnter any key to quit\n')
 
 
@@ -330,7 +330,7 @@ def thumbnail_size_assistant():
 
     Keep in mind this size will be used for a grid of images
     """
-    utils.print_doc(thumbnail_size_assistant.__doc__)
+    printer.print_doc(thumbnail_size_assistant.__doc__)
 
     image = copy(SAMPLE_IMAGE)
 
@@ -429,7 +429,7 @@ class AbstractImageAdjuster(ABC):
         self.image = self.show_func_args()
 
         self.maybe_move_up()
-        utils.write('\r' + ' ' * 20 + '\r')
+        printer.write('\r' + ' ' * 20 + '\r')
         self.write()
 
     def start(self):
@@ -482,7 +482,7 @@ class AbstractPadding(AbstractImageAdjuster, ABC):
         return bool(self.valid)
 
     def start(self):
-        utils.print_doc(self.doc)
+        printer.print_doc(self.doc)
 
         utils.show_single_x(self.default_x, self.thumbnail_size)
 
@@ -507,7 +507,7 @@ class XPadding(AbstractPadding):
         self.find_dim_func = FindImageWidth
 
     def write(self):
-        utils.write(f'x spacing = {self.spaces}')
+        printer.write(f'x spacing = {self.spaces}')
 
     def maybe_move_down(self, *a):
         return True
@@ -536,13 +536,13 @@ class YPadding(AbstractPadding):
         self.find_dim_func = FindImageHeight
 
     def write(self):
-        utils.write(f'y spacing = {self.spaces}')
+        printer.write(f'y spacing = {self.spaces}')
 
     def maybe_move_down(self):
-        utils.move_cursor_down(self.width_or_height)
+        printer.move_cursor_down(self.width_or_height)
 
     def maybe_move_up(self):
-        utils.move_cursor_up(self.spaces)
+        printer.move_cursor_up(self.spaces)
 
     def show_func_args(self):
         return self.show_func(
@@ -562,7 +562,7 @@ class FindImageDimension(AbstractImageAdjuster, ABC):
         self.image = None
 
     def write(self):
-        utils.write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
+        printer.write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
 
     def maybe_move_down(self):
         return True
@@ -571,7 +571,7 @@ class FindImageDimension(AbstractImageAdjuster, ABC):
         return self.show_func(self.spaces, self.thumbnail_size)
 
     def maybe_erase(self):
-        utils.erase_line()
+        printer.erase_line()
 
     def return_tup(self):
         return self.spaces - self.start_spaces, self.image
@@ -601,7 +601,7 @@ class FindImageHeight(FindImageDimension):
         super().__init__()
 
     def maybe_move_up(self):
-        utils.move_cursor_up(self.spaces)
+        printer.move_cursor_up(self.spaces)
 
 
 def page_spacing_assistant(thumbnail_size):
@@ -646,7 +646,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     Do you want to preview an existing cache dir? [y/N]
     To keep your chosen thumbnail size, image width and x spacing, enter 'n'.
     """
-    utils.print_doc(gallery_print_spacing_assistant.__doc__)  # Action before start
+    printer.print_doc(gallery_print_spacing_assistant.__doc__)  # Action before start
     ans = input()
 
     # Setup variables
@@ -667,7 +667,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
     print('\n')
     with TERM.cbreak():
         while True:
-            utils.update_gallery_info(spacings, ncols, current_selection)
+            printer.update_gallery_info(spacings, ncols, current_selection)
 
             ans = TERM.inkey()
             check_quit(ans)
@@ -704,15 +704,15 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
     preview_xcoords = pure.xcoords(TERM.width, image_width, xpadding, 1)[-3:]
 
     # Start
-    utils.print_doc(user_info_assistant.__doc__)
+    printer.print_doc(user_info_assistant.__doc__)
 
     utils.display_user_row(thumbnail_size, xpadding, preview_xcoords)
 
-    utils.move_cursor_up(5)
+    printer.move_cursor_up(5)
 
     with TERM.cbreak():
         while True:
-            utils.update_user_info(spacing)
+            printer.update_user_info(spacing)
 
             ans = TERM.inkey()
             check_quit(ans)

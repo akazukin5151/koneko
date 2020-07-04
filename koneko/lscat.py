@@ -23,7 +23,7 @@ from abc import ABC
 from pixcat import Image
 from returns.result import safe
 
-from koneko import pure, utils, config
+from koneko import pure, utils, config, printer
 
 
 def icat(path: str) -> 'IO':
@@ -47,7 +47,7 @@ def show_instant(cls, data, gallerymode=False) -> 'IO':
     if gallerymode and config.check_print_info():
         number_of_cols = config.ncols_config()
         spacings = config.gallery_print_spacing_config()
-        utils.print_cols(spacings, number_of_cols)
+        printer.print_cols(spacings, number_of_cols)
         print('\n')
 
 

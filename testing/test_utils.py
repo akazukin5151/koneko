@@ -136,10 +136,5 @@ def test_history(monkeypatch):
         os.system(f'rm {test_log}')
 
 
-def test_print_multiple_imgs(capsys):
-    assert utils.print_multiple_imgs(page_illusts) is None
-    captured = capsys.readouterr()
-    assert captured.out == "\x1b[31m#14\x1b[39m has \x1b[34m8\x1b[39m pages, \x1b[31m#25\x1b[39m has \x1b[34m50\x1b[39m pages, \n"
-
 def test_handle_missing_pics():
     utils.handle_missing_pics()

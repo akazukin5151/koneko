@@ -17,6 +17,7 @@ from koneko import (
     colors,
     config,
     prompt,
+    printer,
     download,
     KONEKODIR
 )
@@ -190,7 +191,7 @@ class AbstractGallery(AbstractUI, ABC):
         """Implements abstractmethod: Indicate which posts are multi-image and
         current page number
         """
-        utils.print_multiple_imgs(self.data.current_illusts)
+        printer.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.page_num}')
 
     # Unique for Galleries

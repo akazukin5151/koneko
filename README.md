@@ -107,10 +107,34 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
 ### Version 0.10.0
-* Restructure cli handling to be more modular like lscat_app
+
+#### Features
+* `lscat` app browse cache can now filter modes
+
+#### Bug fixes
+* `lscat` app browse cache:
+    * Hide the history file
+    * Fixed crash if filter hides all directories
+
+#### Code maintenance
+* Simplified code:
+    * Restructure cli handling to be more modular like lscat_app
+        * Launch functions directly from cli.py
+    * main loop
+    * Split up lscat_app.pick_dir_loop()
+    * Await login before fetching by default, removing all manual awaits
+    * Pass credentials into api.start() instead of exposing attribute to the public
+    * Mode 3: Move your_id prompt to inside start() method
+    * Instantiate blessed.Terminal() in __init__.py
+    * Parametrize all cli tests
+    * Split up lscat_app.config_assistance()
+* **Moved a lot of functions to more appropriate modules**
+    * Move print-related functions from utils.py to printer.py
+    * Move file-related functions from utils.py to files.py
 
 # Roadmap
 
+* Make sure the diagrams in HACKING.md is up-to-date
 * `image_mode_text_offset` doesn't have a configuration assistant, or fix the cursor position again.
 * Consistent public and private methods and attributes again
 * In-depth usage documentation?

@@ -43,6 +43,7 @@ def save_number_of_artists(data) -> 'IO':
         with open('.koneko', 'w') as f:
             f.write(str(data.splitpoint))
 
+
 def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
     """Download the illustrations of one page  and rename them."""
     if utils.dir_not_empty(data):
@@ -66,6 +67,7 @@ def _async_download_rename(data, tracker=None) -> 'IO':
     downloaded_oldnames = itertools.filterfalse(os.path.isfile, data.urls_as_names)
     _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
 
+
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     if not urls:
         return True
@@ -78,6 +80,7 @@ def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     downloaded_newnames = itertools.cycle((None,))
 
     _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
+
 
 @utils.spinner('')
 def async_download_spinner(download_path: Path, urls) -> 'IO':
@@ -128,6 +131,7 @@ def download_url(download_path: Path, url, filename: str) -> 'IO':
         with utils.cd(download_path):
             _download_then_rename(url, filename)
 
+
 def download_url_verified(url, png=False) -> 'IO':
     # Returned url might be different if png is True
     url, filename, filepath = pure.full_img_details(url, png=png)
@@ -141,9 +145,11 @@ def download_url_verified(url, png=False) -> 'IO':
     else:
         print(f'Image downloaded at {filepath}')
 
+
 # Download full res from ui, on user demand (from prompt)
 def download_image_num(data, number) -> 'IO':
     download_url_verified(data.url(number))
+
 
 def download_image_coords(data, first_num, second_num) -> 'IO':
     selected_image_num = utils.find_number_map(int(first_num), int(second_num))

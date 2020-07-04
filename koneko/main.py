@@ -4,17 +4,16 @@ terminal!)
 Entry point of package, start all the while loops here and launch the
 required mode.
 
-Capitalized tag definitions:
-    TODO: to-do, high priority
-    SPEED: speed things up, high priority
-    FEATURE: extra feature, low priority
-    BLOCKING: this is blocking the prompt but I'm stuck on how to proceed
+Structure:
+    - *the* main function
+    - main_loop()
+    - Loop
+    - Frequent
 """
 
 import os
 import sys
 from abc import ABC, abstractmethod
-from pathlib import Path
 
 from koneko import ui, api, cli, pure, utils, config, prompt, screens
 
@@ -80,7 +79,6 @@ def main_loop(args, your_id: str):
             print('\nInvalid command!')
 
 
-
 #- Loop classes
 class AbstractLoop(ABC):
     """Ask for details relevant to mode then go to mode
@@ -125,7 +123,6 @@ class AbstractLoop(ABC):
 
             self._save_history()
 
-
             if self._user_input == '!freq':
                 frequent_modes([str(self)])
             else:
@@ -149,7 +146,6 @@ class AbstractLoop(ABC):
         if self._user_input != '!freq':
             logger = utils.setup_history_log()
             logger.info(str(self) + ': ' + self._user_input)
-
 
 
 class ArtistModeLoop(AbstractLoop):
@@ -224,6 +220,7 @@ class FollowingUserModeLoop(AbstractLoop):
         """Implements abstractmethod: return string of mode number"""
         return '3'
 
+
 class SearchUsersModeLoop(AbstractLoop):
     """Ask for search string and go to mode 4"""
 
@@ -264,10 +261,12 @@ def frequent_modes(modes):
     actions = utils.format_frequent(history)
     _frequent(actions, history)
 
+
 def frequent():
     history = utils.frequent_history()
     actions = utils.format_frequent(history)
     _frequent(actions, history)
+
 
 def _frequent(actions, history):
     title = (
@@ -296,6 +295,7 @@ def _frequent(actions, history):
     if func:
         func()
 
+
 def ask_your_id(your_id):
     if your_id:  # your_id stored in config file
         ans = input('Do you want to use the Pixiv ID saved in your config? [Y/n]\n')
@@ -304,6 +304,7 @@ def ask_your_id(your_id):
 
     # If your_id not stored, or if ans is no, or if id provided, via cli
     return ''
+
 
 if __name__ == '__main__':
     main()

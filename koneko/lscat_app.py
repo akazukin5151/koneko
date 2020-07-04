@@ -34,25 +34,23 @@ from shutil import rmtree
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
-from pick import Picker
 from pixcat import Image
 from docopt import docopt
-from blessed import Terminal
 
-from koneko import KONEKODIR, pure, utils, lscat, config
+from koneko import pure, utils, lscat, config, TERM, KONEKODIR
 
 
-# Globals
-term = Terminal()
 # Constants
 ENTER = 343
 PLUS = {'+', '='}
 MINUS = {'-', '_'}
 # Must make a copy before using this reference
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
+EMPTY_WARNING = "**No directories match the filter! Press 'f' to re-filter**"
 
 # Small 'functions'
 FakeData = namedtuple('data', ('download_path',))
+
 
 def check_quit(ans: str):
     if ans == 'q':
@@ -114,9 +112,11 @@ def display_gallery():
     data = FakeData(KONEKODIR / 'testgallery')
     lscat.show_instant(lscat.TrackDownloads, data, True)
 
+
 def display_user():
     data = FakeData(KONEKODIR / 'testuser')
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
+
 
 def display_path(path=None):
     if not path:
@@ -138,6 +138,7 @@ def browse_cache():
     else:
         lscat.show_instant(lscat.TrackDownloads, data, True)
 
+
 def pick_dir():
     path = KONEKODIR
     # base is immutable
@@ -149,83 +150,77 @@ def pick_dir():
         "Press 'f' to filter out modes\n"
         "Press 'q' to exit"
     )
-    title = basetitle
-    actions = sorted(os.listdir(path))
+    actions = utils.filter_history(path)
     return pick_dir_loop(path, basetitle, actions, None)
+
 
 def pick_dir_loop(path, basetitle, actions, modes):
     title = basetitle
 
     while True:
-        picker = utils.ws_picker(actions, title)
-        picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
-        picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
-        picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
-        picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
-        picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
-
+        picker = utils.pick_dirs_picker(actions, title)
         _, ans = picker.start()
         check_quit(ans)
 
         if ans == 'y':
-            return path
+            return path  # TODO: prevent return if path is not valid
 
         elif ans == 'b':
-            if path != KONEKODIR:
-                path = path.parent
+            path = handle_back(path)
 
         elif ans == 'd':
-            print(f'Are you sure you want to delete {path}?')
-            confirm = input("Enter 'y' to confirm\n")
-            if confirm == 'y':
-                rmtree(path)
-                path = path.parent
+            path = handle_delete(path)
 
         elif ans == 'f':
-            actions = sorted(os.listdir(path))
-            modes = utils.select_modes_filter(True)
-            if '6' in modes:  # Clear all filters
-                title = basetitle
-            else:
-                actions = sorted(filter_dir(modes))
-                title = f"Filtering {modes=}\n" + basetitle
-
+            title, actions, modes = handle_filter(path, basetitle)
             continue
 
         else:
-            path = path / actions[ans]
-            if not path.is_dir():
-                path = path.parent
+            path, modes = handle_cd(path, actions, ans, modes)
 
-        actions = sorted(os.listdir(path))
-        if path == KONEKODIR and modes is not None:  # Filter active
-            actions = sorted(filter_dir(modes))
+        actions = actions_from_dir(path, modes)
 
 
-def filter_dir(modes):
-    path = KONEKODIR
-    dirs = os.listdir(path)
-    allowed_names = set()
+def handle_back(path):
+    if path != KONEKODIR:
+        return path.parent
+    return path
 
-    if '1' in modes:
-        allowed_names.add('testgallery')
 
-    if '3' in modes:
-        allowed_names.update(('following', 'testuser'))
+def handle_delete(path):
+    print(f'Are you sure you want to delete {path}?')
+    confirm = input("Enter 'y' to confirm\n")
+    if confirm == 'y':
+        rmtree(path)
+        return path.parent
+    return path
 
-    if '4' in modes:
-        allowed_names.add('search')
 
-    if '5' in modes:
-        allowed_names.add('illustfollow')
+def handle_filter(path, basetitle):
+    modes = utils.select_modes_filter(True)
+    if '6' in modes:
+        # Clear all filters
+        actions = utils.filter_history(path)
+        return basetitle, actions, modes
 
-    if '1' in modes or '2' in modes:
-        predicate = lambda d: d.isdigit() or d in allowed_names
-    else:
-        predicate = lambda d: d in allowed_names
+    title = f"Filtering {modes=}\n" + basetitle
+    actions = sorted(utils.filter_dir(modes)) or [EMPTY_WARNING]
+    return title, actions, modes
 
-    return [d for d in dirs if predicate(d)]
 
+def handle_cd(path, actions, ans, modes):
+    selected_dir = actions[ans]
+    if selected_dir == EMPTY_WARNING:
+        return KONEKODIR, None
+    elif (newpath := path / selected_dir).is_dir():
+        return newpath, modes
+    return path, modes
+
+
+def actions_from_dir(path, modes):
+    if path == KONEKODIR and modes is not None:  # Filter active
+        return sorted(utils.filter_dir(modes)) or [EMPTY_WARNING]
+    return utils.filter_history(path)
 
 
 def ask_assistant() -> 'IO[list[int]]':
@@ -249,69 +244,81 @@ def ask_assistant() -> 'IO[list[int]]':
     return [x[1] + 1 for x in selected_actions]
 
 
-def config_assistance(actions: 'Optional[list[int]]' = None):
-    """Some assistants return a new setting, which should be propagated
-    to other assistants.
-    """
+def maybe_ask_assistant(actions):
     if not actions:
-        actions = ask_assistant()
-    else:
-        # Docopt intercepts additional arguments as str
-        actions = [int(x) for x in actions]
+        return ask_assistant()
+    # Docopt intercepts additional arguments as str
+    return [int(x) for x in actions]
 
+
+def maybe_thumbnail_size(actions):
     if 1 in actions or 7 in actions:
-        size = thumbnail_size_assistant()
-    else:
-        size = config.thumbnail_size_config()  # Fallback
+        return thumbnail_size_assistant()
+    return config.thumbnail_size_config()
 
+
+def maybe_xpadding_img_width(actions, size):
     if 2 in actions or 7 in actions:
-        xpadding, image_width = xpadding_assistant(size)
-    else:
-        # Fallbacks
-        _, xpadding = config.get_gen_users_settings()
-        image_width, _ = config._width_padding('width', 'x', (0, 2))
+        return xpadding_assistant(size)
+    return (
+        config.get_gen_users_settings()[1],
+        config._width_padding('width', 'x', (0, 2))[0]
+    )
 
+
+def maybe_ypadding_img_height(actions, size):
     if 3 in actions or 7 in actions:
-        ypadding, image_height = ypadding_assistant(size)
+        return ypadding_assistant(size)
+    return None, None
 
+
+def maybe_page_spacing(actions, size):
     if 4 in actions or 7 in actions:
-        page_spacing = page_spacing_assistant(size)
+        return page_spacing_assistant(size)
+    return None, None
 
+
+def maybe_print_spacing(actions, size, xpadding, image_width):
     if 5 in actions or 7 in actions:
-        gallery_print_spacing = gallery_print_spacing_assistant(
+        return gallery_print_spacing_assistant(
             size, xpadding, image_width
         )
 
+
+def maybe_print_xcoord(actions, size, xpadding, image_width):
     if 6 in actions or 7 in actions:
-        user_info_xcoord = user_info_assistant(
+        return user_info_assistant(
             size,
             xpadding,
             image_width
         )
 
 
+def config_assistance(actions: 'Optional[list[int]]' = None):
+    """Some assistants return a new setting, which should be propagated
+    to other assistants.
+    """
+    actions = maybe_ask_assistant(actions)
+
+    size = maybe_thumbnail_size(actions)
+
+    xpadding, image_width = maybe_xpadding_img_width(actions, size)
+
+    ypadding, image_height = maybe_ypadding_img_height(actions, size)
+
+    page_spacing = maybe_page_spacing(actions, size)
+
+    gallery_print_spacing = maybe_print_spacing(actions, size, xpadding, image_width)
+
+    user_info_xcoord = maybe_print_xcoord(actions, size, xpadding, image_width)
+
     print('\n\nYour recommended settings are:')
-    if 1 in actions or 7 in actions:
-        print(f'image_thumbnail_size = {size}')
-
-    if 2 in actions or 7 in actions:
-        print(f'image_width = {image_width}')
-        print(f'images_x_spacing = {xpadding}')
-
-    if 3 in actions or 7 in actions:
-        print(f'image_height = {image_height}')
-        print(f'images_y_spacing = {ypadding}')
-
-    if 4 in actions or 7 in actions:
-        print(f'page_spacing = {page_spacing}')
-
-    if 5 in actions or 7 in actions:
-        print('gallery_print_spacing =',
-              ','.join((str(x) for x in gallery_print_spacing)))
-
-    if 6 in actions or 7 in actions:
-        print(f'users_print_name_xcoord = {user_info_xcoord}')
-
+    utils.maybe_print_size(actions, size)
+    utils.maybe_print_width_xpadding(actions, image_width, xpadding)
+    utils.maybe_print_height_ypadding(actions, image_height, ypadding)
+    utils.maybe_print_page_spacing(actions, page_spacing)
+    utils.maybe_print_print_spacing(actions, gallery_print_spacing)
+    utils.maybe_print_user_info(actions, user_info_xcoord)
     input('\nEnter any key to quit\n')
 
 
@@ -328,11 +335,11 @@ def thumbnail_size_assistant():
     image = copy(SAMPLE_IMAGE)
 
     size = 300  # starting size
-    with term.cbreak():
+    with TERM.cbreak():
         while True:
             image.thumbnail(size).show(align='left', x=0, y=0)
 
-            ans = term.inkey()
+            ans = TERM.inkey()
             check_quit(ans)
 
             if ans in PLUS:
@@ -358,6 +365,7 @@ def xpadding_assistant(thumbnail_size):
     Use q to exit the program, and press enter to go to the next assistant
     """
     return XPadding(thumbnail_size).start()
+
 
 def ypadding_assistant(thumbnail_size):
     """=== Image y spacing ===
@@ -430,12 +438,12 @@ class AbstractImageAdjuster(ABC):
         self.spaces = self.start_spaces
         self.valid = True
 
-        with term.cbreak():
+        with TERM.cbreak():
             while True:
                 if self.is_input_valid():
                     self.hide_show_print()
 
-                ans = term.inkey()
+                ans = TERM.inkey()
                 check_quit(ans)
 
                 if ans.code == ENTER and self.image:
@@ -483,6 +491,7 @@ class AbstractPadding(AbstractImageAdjuster, ABC):
         ).start()
 
         return super().start()
+
 
 class XPadding(AbstractPadding):
     def __init__(self, thumbnail_size):
@@ -595,7 +604,6 @@ class FindImageHeight(FindImageDimension):
         utils.move_cursor_up(self.spaces)
 
 
-
 def page_spacing_assistant(thumbnail_size):
     # This doesn't use print_doc() as a clean state is needed
     os.system('clear')
@@ -613,7 +621,7 @@ def page_spacing_assistant(thumbnail_size):
 
     time.sleep(0.1)
 
-    for i in range(term.height + 5):
+    for i in range(TERM.height + 5):
         print(i)
         time.sleep(0.1)
 
@@ -649,7 +657,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
         ncols = config.ncols_config()  # Default fallback, on user choice
     else:
         utils.show_instant_sample(size, image_width, xpadding)
-        ncols = pure.ncols(term.width, image_width, xpadding)
+        ncols = pure.ncols(TERM.width, image_width, xpadding)
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
@@ -657,14 +665,14 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
 
     # Start
     print('\n')
-    with term.cbreak():
+    with TERM.cbreak():
         while True:
             utils.update_gallery_info(spacings, ncols, current_selection)
 
-            ans = term.inkey()
+            ans = TERM.inkey()
             check_quit(ans)
 
-            if ans in PLUS and pure.line_width(spacings, ncols) < term.width:
+            if ans in PLUS and pure.line_width(spacings, ncols) < TERM.width:
                 spacings[current_selection] += 1
 
             elif ans in MINUS and spacings[current_selection] > 0:
@@ -683,6 +691,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
             elif ans.code == ENTER:
                 return spacings
 
+
 def user_info_assistant(thumbnail_size, xpadding, image_width):
     """=== User print name xcoord ===
     Use +/= to move the text right, and -/_ to move it left
@@ -692,7 +701,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
     """
     # Setup variables
     spacing, _ = config.get_gen_users_settings()  # Default
-    preview_xcoords = pure.xcoords(term.width, image_width, xpadding, 1)[-3:]
+    preview_xcoords = pure.xcoords(TERM.width, image_width, xpadding, 1)[-3:]
 
     # Start
     utils.print_doc(user_info_assistant.__doc__)
@@ -701,11 +710,11 @@ def user_info_assistant(thumbnail_size, xpadding, image_width):
 
     utils.move_cursor_up(5)
 
-    with term.cbreak():
+    with TERM.cbreak():
         while True:
             utils.update_user_info(spacing)
 
-            ans = term.inkey()
+            ans = TERM.inkey()
             check_quit(ans)
 
             if ans in PLUS:

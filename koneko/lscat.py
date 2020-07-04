@@ -21,7 +21,6 @@ import threading
 from abc import ABC
 
 from pixcat import Image
-from placeholder import m
 from returns.result import safe
 
 from koneko import pure, utils, config
@@ -35,6 +34,7 @@ def icat(path: str) -> 'IO':
     """
     #os.system(f'kitty +kitten icat --silent {args}')
     Image(path).show()
+
 
 def show_instant(cls, data, gallerymode=False) -> 'IO':
     tracker = cls(data)
@@ -88,6 +88,7 @@ class AbstractTracker(ABC):
             if self._downloaded and self.orders:
                 self._inspect()
 
+
 class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
     def __init__(self, data):
@@ -95,10 +96,6 @@ class TrackDownloads(AbstractTracker):
         self.generator = generate_page(data.download_path)
         super().__init__()
 
-def read_invis(data) -> 'IO[int]':
-    with utils.cd(data.download_path):
-        with open('.koneko', 'r') as f:
-            return int(f.read())
 
 class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
@@ -109,7 +106,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # If it fails, `fix` it by calling the read_invis() function
         # Either way, the Success() result is inside the Result[] monad, so unwrap() it
         safe_func: 'func[Result[int]]' = safe(lambda: data.splitpoint)
-        splitpoint: int = safe_func().fix(lambda x: read_invis(data)).unwrap()
+        splitpoint: int = safe_func().fix(lambda x: utils.read_invis(data)).unwrap()
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is
@@ -118,6 +115,7 @@ class TrackDownloadsUsers(AbstractTracker):
 
         self.generator = generate_users(data.download_path, print_info)
         super().__init__()
+
 
 def generate_page(path) -> 'IO':
     """Given number, calculate its coordinates and display it, then yield"""
@@ -145,6 +143,7 @@ def generate_page(path) -> 'IO':
             Image(image).thumbnail(thumbnail_size).show(
                 align='left', x=left_shifts[x], y=rowspaces[(y % number_of_rows)]
             )
+
 
 def generate_users(path, print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
@@ -193,6 +192,7 @@ class TrackDownloadsImage(AbstractTracker):
             self._numlist.append(int(new.split('_')[1].replace('p', '')))
 
         self._inspect()
+
 
 def generate_previews(path, min_num) -> 'IO':
     """Experimental"""

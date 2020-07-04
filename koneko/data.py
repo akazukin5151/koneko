@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from placeholder import _
 from returns.pipeline import flow
 
-from koneko import KONEKODIR, pure
+from koneko import pure, KONEKODIR
 
 
 class AbstractData(ABC):
@@ -187,7 +187,6 @@ class UserData(AbstractData):
         self.image_urls = [illust['image_urls']['square_medium']
                            for post in page
                            for illust in post['illusts']]
-
 
     def artist_user_id(self, selected_user_num: int) -> str:
         return self.ids_cache[self.page_num][selected_user_num]

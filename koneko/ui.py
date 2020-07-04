@@ -8,9 +8,18 @@ from abc import ABC, abstractmethod
 
 import funcy
 
-from koneko import (KONEKODIR, api, data, pure, lscat, utils, colors, config,
-                    prompt, download)
-
+from koneko import (
+    api,
+    data,
+    pure,
+    lscat,
+    utils,
+    colors,
+    config,
+    prompt,
+    download,
+    KONEKODIR
+)
 
 
 class AbstractUI(ABC):
@@ -155,7 +164,6 @@ class AbstractUI(ABC):
         prompt.user_prompt(self)
 
 
-
 class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
@@ -296,9 +304,10 @@ class ArtistGallery(AbstractGallery):
         """Implements abstractmethod"""
         print('')
         print(''.join(
-            colors.base1 + ['view '] + colors.base2 +
-            ['view ', colors.m, 'anual; ',
-              colors.b, 'ack\n']))
+            colors.base1 + ['view '] + colors.base2
+            + ['view ', colors.m, 'anual; ',
+               colors.b, 'ack\n']))
+
 
 class IllustFollowGallery(AbstractGallery):
     """
@@ -386,7 +395,6 @@ class IllustFollowGallery(AbstractGallery):
             'view ', colors.m, 'anual\n']))
 
 
-
 class AbstractUsers(AbstractUI, ABC):
     """
     User view commands (No need to press enter):
@@ -453,6 +461,7 @@ class SearchUsers(AbstractUsers):
     def _pixivrequest(self):
         return api.myapi.search_user_request(self.user, self.data.offset)
 
+
 class FollowingUsers(AbstractUsers):
     """
     Inherits from AbstractUsers class, define self._input as the user's pixiv ID
@@ -468,15 +477,16 @@ class FollowingUsers(AbstractUsers):
         super().__init__(KONEKODIR / 'following' / your_id)
 
     def _pixivrequest(self):
-        return api.myapi.following_user_request(self.your_id, self._publicity,
-                                                self.data.offset)
-
+        return api.myapi.following_user_request(
+            self.your_id, self._publicity, self.data.offset
+        )
 
 
 def _display_medium_preview(gdata, idata, num: int) -> 'IO':
     os.system('clear')
     image = sorted(os.listdir(gdata.download_path))[num]
     lscat.icat(gdata.main_path / str(gdata.page_num) / image)
+
 
 def view_post_mode(image_id) -> 'IO':
     """Image mode, from main (start -> mode 2)
@@ -602,7 +612,6 @@ class Image:
             i += 1
 
 
-
 def show_full_res(data):
     # FIXME: some images that need to be downloaded in png won't work
     # Can use verified function above
@@ -610,6 +619,7 @@ def show_full_res(data):
     filename = pure.split_backslash_last(large_url)
     download.download_url(data.download_path, large_url, filename)
     lscat.icat(data.download_path / filename)
+
 
 def next_image(data):
     if not data.page_urls:
@@ -623,6 +633,7 @@ def next_image(data):
     data.page_num += 1
     jump_to_image(data, data.page_num + 1)
 
+
 def previous_image(data):
     if not data.page_urls:
         print('This is the only page in the post!')
@@ -634,6 +645,7 @@ def previous_image(data):
     data.page_num -= 1
     jump_to_image(data, data.page_num + 1)
 
+
 def jump_to_image(data, selected_image_num: int):
     if selected_image_num <= 0 or selected_image_num > len(data.page_urls):
         print('Invalid number!')
@@ -642,6 +654,7 @@ def jump_to_image(data, selected_image_num: int):
     # Internally 0-based, but externally 1-based
     data.page_num = selected_image_num - 1
     _jump(data)
+
 
 def _jump(data):
     """Downloads next image if not downloaded, display it, prefetch next"""
@@ -655,6 +668,7 @@ def _jump(data):
     lscat.icat(data.filepath)
 
     print(f'Page {data.page_num+1}/{data.number_of_pages}')
+
 
 def _prefetch_next_image(data):
     with funcy.suppress(IndexError):

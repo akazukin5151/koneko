@@ -10,12 +10,13 @@ from koneko import utils
 
 
 class APIHandler:
-    """Handles all the API interactions in the program"""
+    """Singleton that handles all the API interactions in the program"""
     def __init__(self):
         self.api_queue = queue.Queue()
         self.api_thread = threading.Thread(target=self._login)
-        # To be set later (because singleton is instantiated before config)
+        # Set in self.start() (because singleton is instantiated before config)
         self._credentials: 'Dict'
+        # Set in self.await_login()
         self.api: 'AppPixivAPI()'  # Object to login and request on
 
     @funcy.once
@@ -43,7 +44,6 @@ class APIHandler:
             return
 
         self.api_queue.put(api)
-
 
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
@@ -84,5 +84,6 @@ class APIHandler:
         """Protect api download function with funcy.retry so it doesn't crash"""
         self.await_login()
         self.api.download(url)
+
 
 myapi = APIHandler()

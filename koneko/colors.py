@@ -1,5 +1,5 @@
 """Export the colors for [h]elp screen keys. Functions are pure"""
-from funcy import curry
+from funcy import curry, lmap
 from returns.pipeline import flow
 
 # Public constants
@@ -9,6 +9,7 @@ BLUE = '\x1b[34m'
 RESET = '\x1b[39m'
 BLUE_N = ''.join([RED, '[', BLUE, 'n', RED, ']', RESET])
 
+
 # Private
 def _letter_with_brackets(letter: str) -> str:
     """[] are red and a is magenta
@@ -17,6 +18,7 @@ def _letter_with_brackets(letter: str) -> str:
     """
     return ''.join([RED, '[', MAGENTA, letter, RED, ']', RESET])
 
+
 def _letter_with_coords(letter: str) -> str:
     """letter is magenta, n is blue, [] is red
     >>> _letter_with_coords("i")
@@ -24,6 +26,7 @@ def _letter_with_coords(letter: str) -> str:
     """
     return ''.join([RED, '[', MAGENTA, letter, RED, ']',
                     BLUE_N, RESET])
+
 
 def _two_letter_with_coords(letter: str) -> str:
     """[] and {} is red, | is black, o and O is magenta, y and x is blue
@@ -42,10 +45,7 @@ _COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
 
 
 # Duplicated from pure because circular import
-def _map(func, iterable):
-    return list(map(func, iterable))
-
-_Map = curry(_map)
+_Map = curry(lmap)
 
 # Public constants
 n, p, r, q, m, b, o_, d_, f = flow(_letters, _Map(_letter_with_brackets))

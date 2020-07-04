@@ -1,19 +1,18 @@
-"""Prompt functions that intercept keyboard input and call the right method"""
+"""Prompt functions that intercept keyboard input and call the right method
+
+Structure:
+    - Common prompt code
+    - Core prompt loops
+    - Actions dispatcher
+"""
 
 import sys
 
-import funcy
-from placeholder import m
-from blessed import Terminal
-
-from koneko import ui, pure, utils, colors, download
-
-TERM = Terminal()
+from koneko import ui, pure, utils, download, TERM
+from koneko.pure import all_isdigit
 
 
-def all_isdigit(keyseqs: 'list[str]') -> bool:
-    return funcy.all(m.isdigit(), keyseqs)
-
+# Common prompt code
 def ask_quit():
     """Ask for quit confirmation, no need to press enter"""
     print('\nAre you sure you want to exit?')
@@ -34,11 +33,12 @@ def ask_wait_user_input(keyseqs: 'list[str]', view_name: str) -> str:
     return command
 
 
-def common(case: 'dict',
-           command: str,
-           keyseqs: 'list[str]',
-           allowed_keys: 'tuple[str]' = tuple()
-    ) -> 'list[str]':
+def common(
+    case: 'dict',
+    command: str,
+    keyseqs: 'list[str]',
+    allowed_keys: 'tuple[str]' = tuple()
+) -> 'list[str]':
     """Actions common to all prompts that do not break out of prompt.
     Returns keyseqs, modified if needed
     """
@@ -62,6 +62,8 @@ def common(case: 'dict',
         print('\nInvalid command! Press h to show help')
         return []
 
+
+# Core prompt functions
 # The three prompt functions all follow the same internal structure
 # inside the while loop:
 # 1. Handle multi char input (either 2-digits, or one-letter-2-digits)
@@ -114,7 +116,6 @@ def gallery_like_prompt(gallery):
                     return gallery.handle_prompt(keyseqs)
                 keyseqs = []
 
-
             # 2. Wait for user input
             gallery_command = ask_wait_user_input(keyseqs, 'gallery')
 
@@ -138,7 +139,7 @@ def image_prompt(image):
         'n': image.next_image,
         'p': image.previous_image,
         'f': image.show_full_res,
-        'h': _image_help,
+        'h': utils.image_help,
         'q': ask_quit,
         'm': lambda: print(image.__doc__)
     }
@@ -175,7 +176,7 @@ def user_prompt(user):
     case = {
         'n': user.next_page,
         'p': user.previous_page,
-        'h': _user_help,
+        'h': utils.user_help,
         'q': ask_quit,
         'm': lambda: print(ui.AbstractUsers.__doc__)
     }
@@ -199,32 +200,7 @@ def user_prompt(user):
             keyseqs = common(case, user_prompt_command, keyseqs)
 
 
-# Basically ui functions that is called on the appropriate user input
-def _image_help():
-    print('')
-    print(''.join([
-        colors.b, 'ack; ',
-        colors.n, 'ext image; ',
-        colors.p, 'revious image; ',
-        colors.d_, 'ownload image;',
-        colors.o_, 'pen image in browser;\n',
-        'show image in', colors.f, 'ull res; ',
-        colors.q, 'uit (with confirmation); ',
-        'view ', colors.m, 'anual\n'
-    ]))
-
-def _user_help():
-    print('')
-    print(''.join([
-        'view ', colors.BLUE_N, "th artist's illusts ",
-        colors.n, 'ext page; ',
-        colors.p, 'revious page; ',
-        colors.r, 'eload and re-download all;\n',
-        colors.q, 'uit (with confirmation);',
-        'view ', colors.m, 'anual\n'
-    ]))
-
-
+# Actions dispatcher
 def open_or_download(gallery, keyseqs: 'list[str]'):
     letter = keyseqs[0]
     first_num, second_num = keyseqs[-2:]
@@ -241,6 +217,7 @@ def open_or_download(gallery, keyseqs: 'list[str]'):
 
     elif letter == 'D':
         download.download_image_num(gallery.data, selected_image_num)
+
 
 def goto_image(gallery, image_num: int):
     if image_num is False:

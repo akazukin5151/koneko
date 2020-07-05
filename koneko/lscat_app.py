@@ -43,11 +43,6 @@ EMPTY_WARNING = "**No directories match the filter! Press 'f' to re-filter**"
 FakeData = namedtuple('data', ('download_path',))
 
 
-def check_quit(ans: str):
-    if ans == 'q':
-        sys.exit(0)
-
-
 def try_filter_dir(modes):
     return sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
 
@@ -155,7 +150,7 @@ def pick_dir_loop(path, basetitle, actions, modes):
     while True:
         picker = utils.pick_dirs_picker(actions, title)
         _, ans = picker.start()
-        check_quit(ans)
+        assistants.check_quit(ans)
 
         if ans == 'y':
             return path  # TODO: prevent return if path is not valid

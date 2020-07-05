@@ -18,6 +18,11 @@ MINUS = {'-', '_'}
 SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
 
 
+def check_quit(ans: str):
+    if ans == 'q':
+        sys.exit(0)
+
+
 def thumbnail_size_assistant():
     """=== Thumbnail size ===
     This will display an image whose thumbnail size can be varied

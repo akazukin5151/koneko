@@ -6,6 +6,13 @@ import pytest
 from koneko import files
 
 
+def test_find_mode2_dirs(tmp_path, monkeypatch):
+    monkeypatch.setattr('koneko.files.KONEKODIR', tmp_path)
+    (tmp_path / '1234' / 'individual').mkdir(parents=True)
+    (tmp_path / '5678' / '1').mkdir(parents=True)
+    assert files.find_mode2_dirs() == ['1234']
+
+
 def test_verify_full_download():
     assert files.verify_full_download("testing/files/008_77803142_p0.png") is True
     assert files.verify_full_download("testing/files/not_an_image.txt") is False

@@ -10,6 +10,12 @@ from returns.pipeline import flow
 from koneko import utils, KONEKODIR
 
 
+def find_mode2_dirs():
+    return [f for f in os.listdir(KONEKODIR)
+            if f.isdigit()
+            and 'individual' in os.listdir(KONEKODIR / f)]
+
+
 def read_invis(data) -> 'IO[int]':
     with utils.cd(data.download_path):
         with open('.koneko', 'r') as f:

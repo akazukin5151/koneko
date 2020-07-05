@@ -14,6 +14,35 @@
 
 \* Config has impure IO functions, safe functions that will return defaults on failure, and interactive functions
 
+
+## Cache directory structure
+
+```sh
+$ cd ~/.local/share/koneko
+$ tree -d
+.
+├── cache                     # ├── KONEKODIR
+│   ├── 2232374               # │   ├── Artist pixiv ID                             ├── Mode 1 and 2
+│   │   ├── 1                 # │   │   ├── Page 1                                  │   ├── Mode 1
+│   │   ├── 2                 # │   │   ├── Page 2                                  │   ├── Mode 1
+│   │   └── individual        # │   │   └── Posts with a single image               │   └── Mode 2
+│   │       └── 76695217      # │   │       └── ID of posts with multiple images    │       └── Mode 2
+│   ├── following             # │   ├── Following users mode                        ├── Mode 3
+│   │   └── *your_id*         # │   │   └── Your pixiv ID                           │
+│   │       ├── 1             # │   │       ├── Page 1                              │
+│   │       └── 2             # │   │       └── Page 2                              │
+│   ├── illustfollow          # │   ├── Illust follow mode                          ├── Mode 5
+│   │   ├── 1                 # │   │   ├── Page 1                                  │
+│   │   └── 2                 # │   │   └── Page 2                                  │
+│   ├── search                # │   ├── Search users mode                           ├── Mode 4
+│   │   └── gomzi             # │   │   └── Search string
+│   │       └── 1             # │   │       └── Page 1
+│   ├── testgallery           # │   ├── (Internal/debugging use)
+│   └── testuser              # │   └── (Internal/debugging use)
+└── pics                      # └── Images for main and info screen
+```
+
+
 ## UML diagrams
 
 ### Flowchart of modes and their connections:

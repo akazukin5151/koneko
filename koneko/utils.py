@@ -172,8 +172,7 @@ def handle_missing_pics() -> 'IO':
 # Lscat related
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
     # Must make a copy before using this reference
-    SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
-    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
+    img = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png').thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=y)
     return img
 

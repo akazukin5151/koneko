@@ -44,6 +44,7 @@ def url_given_size(post_json: 'Json', size: str) -> str:
     return post_json['image_urls'][size]
 
 
+@funcy.autocurry
 def post_title(current_page_illusts: 'Json', post_number: int) -> str:
     return current_page_illusts[post_number]['title']
 
@@ -60,7 +61,7 @@ def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
         current_page_illusts,
         len,
         range,
-        Map(lambda num: post_title(current_page_illusts, num)),
+        Map(post_title(current_page_illusts))
     )
 
 

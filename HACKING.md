@@ -27,16 +27,22 @@ $ tree -d
 │   │   ├── 2                 # │   │   ├── Page 2                                  │   ├── Mode 1
 │   │   └── individual        # │   │   └── Posts with a single image               │   └── Mode 2
 │   │       └── 76695217      # │   │       └── ID of posts with multiple images    │       └── Mode 2
+
 │   ├── following             # │   ├── Following users mode                        ├── Mode 3
 │   │   └── *your_id*         # │   │   └── Your pixiv ID                           │
 │   │       ├── 1             # │   │       ├── Page 1                              │
+│   │       │   └── .koneko   # │   │       │   └── Stores number of artists info   │
 │   │       └── 2             # │   │       └── Page 2                              │
+│   │           └── .koneko   # │   │           └── Stores number of artists info   │
+
 │   ├── illustfollow          # │   ├── Illust follow mode                          ├── Mode 5
 │   │   ├── 1                 # │   │   ├── Page 1                                  │
 │   │   └── 2                 # │   │   └── Page 2                                  │
+
 │   ├── search                # │   ├── Search users mode                           ├── Mode 4
 │   │   └── gomzi             # │   │   └── Search string
 │   │       └── 1             # │   │       └── Page 1
+
 │   ├── testgallery           # │   ├── (Internal/debugging use)
 │   └── testuser              # │   └── (Internal/debugging use)
 └── pics                      # └── Images for main and info screen

@@ -28,12 +28,11 @@ Possible configuration assistants:
 import os
 import sys
 from pathlib import Path
-from shutil import rmtree
 from collections import namedtuple
 
 from docopt import docopt
 
-from koneko import utils, files, lscat, config, picker, printer, assistants, KONEKODIR
+from koneko import lscat, config, picker, printer, assistants, KONEKODIR
 
 
 # Small 'functions'

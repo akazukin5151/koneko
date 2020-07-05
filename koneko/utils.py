@@ -21,7 +21,6 @@ from contextlib import contextmanager
 from logging.handlers import RotatingFileHandler
 
 import funcy
-from pick import Picker
 from pixcat import Image
 from placeholder import m
 

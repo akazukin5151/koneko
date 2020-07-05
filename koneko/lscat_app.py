@@ -63,19 +63,7 @@ def main():
 
 
 def _main():
-    os.system('clear')
-    title = ('Welcome to the lscat interactive script\n'
-             'Please select an action')
-    actions = (
-        '1. Launch koneko configuration assistance',
-        '2. Display KONEKODIR / testgallery',
-        '3. Display KONEKODIR / testuser',
-        '4. Browse a cached dir to display',
-        '5. Display a specified path',
-        'Quit'
-    )
-    mypicker = picker.ws_picker(actions, title)
-    _, ans = mypicker.start()
+    ans = picker.lscat_app_main()
 
     case = {
         0: config_assistance,

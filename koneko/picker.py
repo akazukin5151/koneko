@@ -1,3 +1,4 @@
+import os
 from shutil import rmtree
 
 from pick import Picker
@@ -27,6 +28,23 @@ def _pick_dirs_picker(actions, title):
     picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
     picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
     return picker
+
+
+def lscat_app_main():
+    os.system('clear')
+    title = ('Welcome to the lscat interactive script\n'
+             'Please select an action')
+    actions = (
+        '1. Launch koneko configuration assistance',
+        '2. Display KONEKODIR / testgallery',
+        '3. Display KONEKODIR / testuser',
+        '4. Browse a cached dir to display',
+        '5. Display a specified path',
+        'Quit'
+    )
+    mypicker = ws_picker(actions, title)
+    _, ans = mypicker.start()
+    return ans
 
 
 def _multiselect_picker(actions, title, to_str=True) -> 'IO[list[int]]':

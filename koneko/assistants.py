@@ -15,8 +15,10 @@ from koneko import pure, utils, lscat, lscat_app, config, printer, TERM, KONEKOD
 ENTER = 343
 PLUS = {'+', '='}
 MINUS = {'-', '_'}
-# Must make a copy before using this reference
-SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
+
+
+def copy_image():
+    return copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
 
 
 def check_quit(ans: str):
@@ -34,7 +36,7 @@ def thumbnail_size_assistant():
     """
     printer.print_doc(thumbnail_size_assistant.__doc__)
 
-    image = copy(SAMPLE_IMAGE)
+    image = copy_image()
 
     size = 300  # starting size
     with TERM.cbreak():
@@ -319,7 +321,7 @@ def page_spacing_assistant(thumbnail_size):
     input('\nEnter any key to continue\n')
     os.system('clear')
 
-    copy(SAMPLE_IMAGE).thumbnail(thumbnail_size).show(align='left')
+    copy_image().thumbnail(thumbnail_size).show(align='left')
 
     time.sleep(0.1)
 

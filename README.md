@@ -112,7 +112,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * `lscat` app browse cache can now filter modes
 
 #### Bug fixes
-* `lscat` app browse cache:
+* Browse cache (in `lscat` app and main):
     * Hide the history file
     * Fixed crash if filter hides all directories
     * Fixed mode 2 filter showing mode 1 dirs

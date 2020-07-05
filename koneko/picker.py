@@ -47,6 +47,20 @@ def lscat_app_main():
     return ans
 
 
+def frequent_modes_picker(actions):
+    title = (
+        "Please pick an input\n"
+        "[mode]: [pixiv ID or searchstr] (frequency)\n"
+        "Press 'f' to filter modes"
+    )
+
+    mypicker = ws_picker(actions, title)
+    mypicker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
+
+    _, idx = mypicker.start()
+    return idx
+
+
 def _multiselect_picker(actions, title, to_str=True) -> 'IO[list[int]]':
     """Returns a list of all the indices of actions"""
     picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)

@@ -269,16 +269,7 @@ def frequent():
 
 
 def _frequent(actions, history):
-    title = (
-        "Please pick an input\n"
-        "[mode]: [pixiv ID or searchstr] (frequency)\n"
-        "Press 'f' to filter modes"
-    )
-
-    mypicker = picker.ws_picker(actions, title)
-    mypicker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
-
-    _, idx = mypicker.start()
+    idx = picker.frequent_modes_picker(actions)
     if idx == 'f':
         return frequent_modes(picker.select_modes_filter())
 

@@ -35,8 +35,8 @@ def test_cd():
     assert os.getcwd() == current_dir
 
 
-def test_history(monkeypatch):
-    test_log = 'testing/history'
+def test_history(monkeypatch, tmp_path):
+    test_log = tmp_path / 'history'
     monkeypatch.setattr('koneko.utils.RotatingFileHandler',
                         lambda *a, **k: RotatingFileHandler(test_log))
 
@@ -47,32 +47,28 @@ def test_history(monkeypatch):
     with open(test_log, 'r') as f:
         assert f.read() == '1: 1234\n2: 5678\n'
 
-    try:
-        # test read_history()
-        monkeypatch.setattr('koneko.utils.KONEKODIR', 'testing')
-        assert utils.read_history() == ['1: 1234', '2: 5678']
+    # test read_history()
+    monkeypatch.setattr('koneko.utils.KONEKODIR', tmp_path)
+    assert utils.read_history() == ['1: 1234', '2: 5678']
 
-        # test frequent_history()
-        assert utils.frequent_history() == {'1: 1234': 1, '2: 5678': 1}
-        assert utils.frequent_history(1) == {'1: 1234': 1}
+    # test frequent_history()
+    assert utils.frequent_history() == {'1: 1234': 1, '2: 5678': 1}
+    assert utils.frequent_history(1) == {'1: 1234': 1}
 
-        # test frequent_history_modes()
-        assert (utils.frequent_history_modes(['1', '2'])
-                == utils.frequent_history()
-                == {'1: 1234': 1, '2: 5678': 1})
-        assert utils.frequent_history_modes(['1']) == {'1: 1234': 1}
-        assert utils.frequent_history_modes(['2']) == {'2: 5678': 1}
-        assert (utils.frequent_history_modes(['3'])
-                == utils.frequent_history_modes(['4'])
-                == utils.frequent_history_modes(['5'])
-                == dict())
+    # test frequent_history_modes()
+    assert (utils.frequent_history_modes(['1', '2'])
+            == utils.frequent_history()
+            == {'1: 1234': 1, '2: 5678': 1})
+    assert utils.frequent_history_modes(['1']) == {'1: 1234': 1}
+    assert utils.frequent_history_modes(['2']) == {'2: 5678': 1}
+    assert (utils.frequent_history_modes(['3'])
+            == utils.frequent_history_modes(['4'])
+            == utils.frequent_history_modes(['5'])
+            == dict())
 
-        # test format_frequent()
-        counter = utils.frequent_history()
-        assert utils.format_frequent(counter) == ['1: 1234 (1)', '2: 5678 (1)']
-
-    finally:
-        os.system(f'rm {test_log}')
+    # test format_frequent()
+    counter = utils.frequent_history()
+    assert utils.format_frequent(counter) == ['1: 1234 (1)', '2: 5678 (1)']
 
 
 def test_handle_missing_pics():

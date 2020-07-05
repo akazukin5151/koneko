@@ -72,8 +72,7 @@ def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':
         list_of_pages = post_json['meta_pages']
         return [url_given_size(list_of_pages[i], size)
                 for i in range(number_of_pages)]
-    else:
-        return [url_given_size(post_json, size)]
+    return [url_given_size(post_json, size)]
 
 
 def change_url_to_full(url: str, png=False) -> str:

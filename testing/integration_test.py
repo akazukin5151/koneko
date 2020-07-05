@@ -7,7 +7,7 @@ And internet connection
 """
 import pytest
 
-from koneko import main, utils, config
+from koneko import main, utils
 
 
 class CustomExit(SystemExit):

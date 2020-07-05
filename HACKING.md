@@ -5,12 +5,14 @@
 |          | Pure | Impure
 | -------- | ---- | ---
 | Frontend |      | <ul><li>main</li><li>prompt</li><li>ui</li><li>lscat_app</li><li>screens</li></ul>
-| Backend  | <ul><li>colors</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>cli</li><li>config</li><li>files</li><li>download</li><li>lscat</li><li>printer</li><li>utils</li></ul>
+| Backend  | <ul><li>colors</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>cli</li><li>config \*</li><li>files</li><li>download</li><li>lscat</li><li>printer</li><li>utils</li></ul>
 
 * 'Pure' means functions are referentially transparent and globally pure (mutations may happen in local scope)
 * 'Frontend' means interacts with user (and catch and process user inputs)
 * 'Backend' means everything else
 * (Ideally the) 'backend' does work, 'frontend' organises work (if otherwise, please open an issue or make a PR).
+
+\* Config has impure IO functions, safe functions that will return defaults on failure, and interactive functions
 
 ## UML diagrams
 

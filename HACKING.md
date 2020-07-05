@@ -19,7 +19,7 @@
 
 ```sh
 $ cd ~/.local/share/koneko
-$ tree -d
+$ tree -d  # (Edited)
 .
 ├── cache                     # ├── KONEKODIR
 │   ├── 2232374               # │   ├── Artist pixiv ID                             ├── Mode 1 and 2

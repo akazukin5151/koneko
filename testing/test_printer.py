@@ -10,6 +10,7 @@ from page_json import page_json  # isort:skip
 
 page_illusts = page_json["illusts"]
 
+
 def test_print_multiple_imgs(capsys):
     printer.print_multiple_imgs(page_illusts)
     captured = capsys.readouterr()

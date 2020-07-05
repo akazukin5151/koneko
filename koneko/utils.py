@@ -3,7 +3,6 @@ If one functionality gets too long, move them into their own module.
 
 Functionalities:
     - History and logging (33 lines)
-    - pick module (34 lines)
     - Wrapping other functions (40 lines)
     - Calculations (23 lines)
     - IO related (33 lines)
@@ -64,71 +63,6 @@ def frequent_history_modes(modes: 'list[str]', n=5) -> 'dict[str, int]':
 
 def format_frequent(counter: 'dict[str, int]') -> 'list[str]':
     return [f'{k} ({v})' for (k, v) in counter.items()]
-
-
-# pick module
-def ws_picker(actions, title, **kwargs):
-    picker = Picker(actions, title, **kwargs)
-    picker.register_custom_handler(ord('w'), m.move_up())
-    picker.register_custom_handler(ord('s'), m.move_down())
-    return picker
-
-
-def pick_dirs_picker(actions, title):
-    picker = Picker(actions, title)
-    picker.register_custom_handler(ord('w'), m.move_up())
-    picker.register_custom_handler(ord('s'), m.move_down())
-    picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
-    picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
-    picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
-    picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
-    picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
-    return picker
-
-
-def multiselect_picker(actions, title, to_str=True) -> 'IO[list[int]]':
-    """Returns a list of all the indices of actions"""
-    picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
-    selected = picker.start()
-    if to_str:
-        return [str(x[1] + 1) for x in selected]
-    return [x[1] + 1 for x in selected]
-
-
-def select_modes_filter(more=False):
-    title = "Use SPACE to select a mode to show and ENTER to confirm"
-    # Copied from screens
-    actions = [
-        '1. View artist illustrations',
-        '2. Open pixiv post',
-        '3. View following artists',
-        '4. Search for artists',
-    ]
-
-    if more:
-        actions.extend(('5. View illustrations of all following artists',
-                        'c. Clear all filters'))
-
-    multiselect_picker(actions, title, to_str=True)
-
-
-def ask_assistant() -> 'IO[list[int]]':
-    """Ask for which koneko config assistant (lscat app)"""
-    title = ('=== Configuration assistance ===\n'
-             'Press SPACE to select an action & ENTER to confirm')
-
-    actions = (
-        '1. Thumbnail size',
-        '2. x-padding',
-        '3. y-padding',
-        '4. Page spacing',
-        '5. Gallery print spacing',
-        '6. User mode print info x-position',
-        'a. (Run all of the above)\n',
-        'Quit'
-    )
-
-    return multiselect_picker(actions, title, to_str=False)
 
 
 # Wrapping other functions

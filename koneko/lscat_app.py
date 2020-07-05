@@ -33,18 +33,11 @@ from collections import namedtuple
 
 from docopt import docopt
 
-from koneko import utils, files, lscat, config, printer, assistants, KONEKODIR
+from koneko import utils, files, lscat, config, picker, printer, assistants, KONEKODIR
 
-
-# Constants
-EMPTY_WARNING = "**No directories match the filter! Press 'f' to re-filter**"
 
 # Small 'functions'
 FakeData = namedtuple('data', ('download_path',))
-
-
-def try_filter_dir(modes):
-    return sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
 
 
 # Main functions that organise work
@@ -82,8 +75,8 @@ def _main():
         '5. Display a specified path',
         'Quit'
     )
-    picker = utils.ws_picker(actions, title)
-    _, ans = picker.start()
+    mypicker = picker.ws_picker(actions, title)
+    _, ans = mypicker.start()
 
     case = {
         0: config_assistance,
@@ -120,97 +113,13 @@ def display_path(path=None):
 
 
 def browse_cache():
-    path = pick_dir()
+    path = picker.pick_dir()
     data = FakeData(path)
 
     if '.koneko' in os.listdir(path):
         lscat.show_instant(lscat.TrackDownloadsUsers, data)
     else:
         lscat.show_instant(lscat.TrackDownloads, data, True)
-
-
-def pick_dir():
-    path = KONEKODIR
-    # base is immutable
-    basetitle = (
-        'Select a directory to view\n'
-        "Press 'y' to display the current directory\n"
-        "Press 'b' to move up a directory\n"
-        "Press 'd' to delete the current directory\n"
-        "Press 'f' to filter out modes\n"
-        "Press 'q' to exit"
-    )
-    actions = files.filter_history(path)
-    return pick_dir_loop(path, basetitle, actions, None)
-
-
-def pick_dir_loop(path, basetitle, actions, modes):
-    title = basetitle
-
-    while True:
-        picker = utils.pick_dirs_picker(actions, title)
-        _, ans = picker.start()
-        assistants.check_quit(ans)
-
-        if ans == 'y':
-            return path  # TODO: prevent return if path is not valid
-
-        elif ans == 'b':
-            path = handle_back(path)
-
-        elif ans == 'd':
-            path = handle_delete(path)
-
-        elif ans == 'f':
-            title, actions, modes = handle_filter(path, basetitle)
-            continue
-
-        else:
-            path, modes = handle_cd(path, actions, ans, modes)
-
-        actions = actions_from_dir(path, modes)
-
-
-def handle_back(path):
-    if path != KONEKODIR:
-        return path.parent
-    return path
-
-
-def handle_delete(path):
-    print(f'Are you sure you want to delete {path}?')
-    confirm = input("Enter 'y' to confirm\n")
-    if confirm == 'y':
-        rmtree(path)
-        return path.parent
-    return path
-
-
-def handle_filter(path, basetitle):
-    modes = utils.select_modes_filter(True)
-    if '6' in modes:
-        # Clear all filters
-        actions = files.filter_history(path)
-        return basetitle, actions, modes
-
-    title = f"Filtering {modes=}\n" + basetitle
-    actions = try_filter_dir(modes)
-    return title, actions, modes
-
-
-def handle_cd(path, actions, ans, modes):
-    selected_dir = actions[ans]
-    if selected_dir == EMPTY_WARNING:
-        return KONEKODIR, None
-    elif (newpath := path / selected_dir).is_dir():
-        return newpath, modes
-    return path, modes
-
-
-def actions_from_dir(path, modes):
-    if path == KONEKODIR and modes is not None:  # Filter active
-        return try_filter_dir(modes)
-    return files.filter_history(path)
 
 
 def config_assistance(actions: 'Optional[list[int]]' = None):
@@ -243,7 +152,7 @@ def config_assistance(actions: 'Optional[list[int]]' = None):
 
 def maybe_ask_assistant(actions):
     if not actions:
-        return utils.ask_assistant()
+        return picker.ask_assistant()
     # Docopt intercepts additional arguments as str
     return [int(x) for x in actions]
 

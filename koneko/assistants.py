@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 from pixcat import Image
 
-from koneko import pure, utils, lscat, config, printer, TERM, KONEKODIR
+from koneko import pure, utils, lscat, lscat_app, config, printer, TERM, KONEKODIR
 
 
 # Constants
@@ -353,8 +353,8 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
 
     # Setup variables
     if ans == 'y':
-        _path = pick_dir()
-        _data = FakeData(_path)
+        _path = picker.pick_dir()
+        _data = lscat_app.FakeData(_path)
         lscat.show_instant(lscat.TrackDownloads, _data)
         ncols = config.ncols_config()  # Default fallback, on user choice
     else:

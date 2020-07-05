@@ -15,7 +15,7 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
-from koneko import ui, api, cli, pure, utils, config, prompt, screens
+from koneko import ui, api, cli, pure, utils, config, prompt, screens, picker
 
 
 def main():
@@ -275,12 +275,12 @@ def _frequent(actions, history):
         "Press 'f' to filter modes"
     )
 
-    picker = utils.ws_picker(actions, title)
-    picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
+    mypicker = picker.ws_picker(actions, title)
+    mypicker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
 
-    _, idx = picker.start()
+    _, idx = mypicker.start()
     if idx == 'f':
-        return frequent_modes(utils.select_modes_filter())
+        return frequent_modes(picker.select_modes_filter())
 
     ans = tuple(history)[idx]
     mode, user_input = ans.split(': ')

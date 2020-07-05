@@ -7,7 +7,7 @@ from koneko import pure
 sys.path.append('testing')
 
 # Imports the current_page (dict) stored in disk
-from page_json import *  # isort:skip
+from page_json import page_json  # isort:skip
 
 page_illusts = page_json["illusts"]
 

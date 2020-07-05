@@ -73,6 +73,7 @@ def ws_picker(actions, title, **kwargs):
     picker.register_custom_handler(ord('s'), m.move_down())
     return picker
 
+
 def pick_dirs_picker(actions, title):
     picker = Picker(actions, title)
     picker.register_custom_handler(ord('w'), m.move_up())
@@ -83,6 +84,15 @@ def pick_dirs_picker(actions, title):
     picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
     picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
     return picker
+
+
+def multiselect_picker(actions, title, to_str=True):
+    picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
+    selected = picker.start()
+    if to_str:
+        return [str(x[1] + 1) for x in selected]
+    return [x[1] + 1 for x in selected]
+
 
 def select_modes_filter(more=False):
     title = "Use SPACE to select a mode to show and ENTER to confirm"
@@ -98,9 +108,7 @@ def select_modes_filter(more=False):
         actions.extend(('5. View illustrations of all following artists',
                         'c. Clear all filters'))
 
-    picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
-    selected = picker.start()
-    return [str(x[1] + 1) for x in selected]
+    multiselect_picker(actions, title, to_str=True)
 
 
 # Wrapping other functions

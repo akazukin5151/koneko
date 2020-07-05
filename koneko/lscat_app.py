@@ -243,9 +243,7 @@ def ask_assistant() -> 'IO[list[int]]':
         'Quit'
     )
 
-    picker = utils.ws_picker(actions, title, multiselect=True, min_selection_count=1)
-    selected_actions = picker.start()
-    return [x[1] + 1 for x in selected_actions]
+    return utils.multiselect_picker(actions, title, to_str=False)
 
 
 def maybe_ask_assistant(actions):

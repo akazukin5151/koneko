@@ -19,7 +19,7 @@
 
 ```sh
 $ cd ~/.local/share/koneko
-$ tree -d  # (Edited)
+$ tree -d  # (Edited: .koneko and history are files not directories)
 .
 ├── cache                     # ├── KONEKODIR
 │   ├── 2232374               # │   ├── Artist pixiv ID                             ├── Mode 1 and 2
@@ -42,6 +42,8 @@ $ tree -d  # (Edited)
 │   ├── search                # │   ├── Search users mode                           ├── Mode 4
 │   │   └── gomzi             # │   │   └── Search string
 │   │       └── 1             # │   │       └── Page 1
+
+│   ├── history               # │   ├── History file, for frequent "mode"
 
 │   ├── testgallery           # │   ├── (Internal/debugging use)
 │   └── testuser              # │   └── (Internal/debugging use)

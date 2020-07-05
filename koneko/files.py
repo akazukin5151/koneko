@@ -82,6 +82,11 @@ def filter_dir(modes: 'list[str]') -> 'list[str]':
 
     if '1' in modes:
         allowed_names.add('testgallery')
+        predicate = lambda d: d.isdigit() or d in allowed_names
+
+    if '2' in modes:
+        mode2_dirs = find_mode2_dirs()
+        predicate = lambda d: d in mode2_dirs or d in allowed_names
 
     if '3' in modes:
         allowed_names.update(('following', 'testuser'))
@@ -92,9 +97,7 @@ def filter_dir(modes: 'list[str]') -> 'list[str]':
     if '5' in modes:
         allowed_names.add('illustfollow')
 
-    if '1' in modes or '2' in modes:
-        predicate = lambda d: d.isdigit() or d in allowed_names
-    else:
+    if '1' not in modes and '2' not in modes:
         predicate = lambda d: d in allowed_names
 
     return [d for d in dirs if predicate(d)]

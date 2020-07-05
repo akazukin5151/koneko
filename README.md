@@ -55,7 +55,7 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 
 
 # Installation
-See also: [manual installation](#manual-installation)
+See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
 0. Install [kitty](https://github.com/kovidgoyal/kitty)
 1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...):
@@ -176,19 +176,12 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 * Submit a pull request
 
 Tips: 
+* See [HACKING.md](HACKING.md) to understand the code.
 * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
 * If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.
 
 See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## Conda environment
-
-See [CONTRIBUTING.md](CONTRIBUTING.md#conda-environment)
-
-## Manual installation
-
-See [CONTRIBUTING.md](CONTRIBUTING.md#manual-installation)
 
 ## Unit tests
 Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don't be surprised if it fails

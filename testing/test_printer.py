@@ -131,14 +131,15 @@ def test_maybe_print_user_info(capsys, correct, incorrect):
     assert captured.out == ''
 
 
-def test_print_doc(capsys):
+def test_print_doc(capsys, monkeypatch):
+    monkeypatch.setattr('koneko.Terminal.height', 50)
     printer.print_doc('hi')
     captured = capsys.readouterr()
-    assert captured.out == '\x1b[31Bhi\n'
+    assert captured.out == '\x1b[48Bhi\n'
 
     printer.print_doc('hi\n\n')
     captured = capsys.readouterr()
-    assert captured.out == '\x1b[29Bhi\n\n\n'
+    assert captured.out == '\x1b[46Bhi\n\n\n'
 
 
 def test_update_gallery_info(capsys):

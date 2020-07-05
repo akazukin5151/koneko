@@ -227,28 +227,9 @@ def actions_from_dir(path, modes):
     return files.filter_history(path)
 
 
-def ask_assistant() -> 'IO[list[int]]':
-    """Returns a collection of all the indices of actions"""
-    title = ('=== Configuration assistance ===\n'
-             'Press SPACE to select an action & ENTER to confirm')
-
-    actions = (
-        '1. Thumbnail size',
-        '2. x-padding',
-        '3. y-padding',
-        '4. Page spacing',
-        '5. Gallery print spacing',
-        '6. User mode print info x-position',
-        'a. (Run all of the above)\n',
-        'Quit'
-    )
-
-    return utils.multiselect_picker(actions, title, to_str=False)
-
-
 def maybe_ask_assistant(actions):
     if not actions:
-        return ask_assistant()
+        return utils.ask_assistant()
     # Docopt intercepts additional arguments as str
     return [int(x) for x in actions]
 

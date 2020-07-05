@@ -86,7 +86,8 @@ def pick_dirs_picker(actions, title):
     return picker
 
 
-def multiselect_picker(actions, title, to_str=True):
+def multiselect_picker(actions, title, to_str=True) -> 'IO[list[int]]':
+    """Returns a list of all the indices of actions"""
     picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
     selected = picker.start()
     if to_str:
@@ -109,6 +110,25 @@ def select_modes_filter(more=False):
                         'c. Clear all filters'))
 
     multiselect_picker(actions, title, to_str=True)
+
+
+def ask_assistant() -> 'IO[list[int]]':
+    """Ask for which koneko config assistant (lscat app)"""
+    title = ('=== Configuration assistance ===\n'
+             'Press SPACE to select an action & ENTER to confirm')
+
+    actions = (
+        '1. Thumbnail size',
+        '2. x-padding',
+        '3. y-padding',
+        '4. Page spacing',
+        '5. Gallery print spacing',
+        '6. User mode print info x-position',
+        'a. (Run all of the above)\n',
+        'Quit'
+    )
+
+    return multiselect_picker(actions, title, to_str=False)
 
 
 # Wrapping other functions

@@ -115,6 +115,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * `lscat` app browse cache:
     * Hide the history file
     * Fixed crash if filter hides all directories
+    * Fixed mode 2 filter showing mode 1 dirs
 
 #### Code maintenance
 * Simplified code:
@@ -144,6 +145,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Filter modes in koneko main should go back to main screen on 'q' key
 * Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
     - [ ] Handle moving around pages
+    - [ ] Mode 2 dirs in lscat_app should do something (currently does nothing)
     - [ ] Documentation
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)

@@ -84,7 +84,7 @@ def select_modes_filter(more=False):
         actions.extend(('5. View illustrations of all following artists',
                         'c. Clear all filters'))
 
-    _multiselect_picker(actions, title, to_str=True)
+    return _multiselect_picker(actions, title, to_str=True)
 
 
 def ask_assistant() -> 'IO[list[int]]':

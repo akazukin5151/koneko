@@ -8,6 +8,7 @@ from koneko.picker import EMPTY_WARNING
 
 
 
+@pytest.mark.integration
 def test_ws_picker_w(monkeypatch):
     class FakePick(Picker):
         def run_loop(self):
@@ -26,6 +27,7 @@ def test_ws_picker_w(monkeypatch):
     assert mypicker.start() == ('2', 1)
 
 
+@pytest.mark.integration
 def test_ws_picker_s(monkeypatch):
     class FakePick(Picker):
         def run_loop(self):
@@ -44,6 +46,7 @@ def test_ws_picker_s(monkeypatch):
     assert mypicker.start() == ('2', 1)
 
 
+@pytest.mark.integration
 @pytest.mark.parametrize('letter', 'ybfdq')
 def test_pick_dirs_picker(monkeypatch, letter):
     class FakePick(Picker):

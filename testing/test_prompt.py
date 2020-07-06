@@ -1,6 +1,5 @@
 import sys
 from abc import ABC, abstractmethod
-from contextlib import contextmanager
 
 import pytest
 from blessed.keyboard import Keystroke
@@ -8,17 +7,6 @@ from blessed.keyboard import Keystroke
 from koneko import prompt
 from conftest import CustomExit, raises_customexit
 
-
-@contextmanager
-def fakecbreak():
-    try:
-        yield
-    finally:
-        pass
-
-@pytest.fixture
-def patch_cbreak(monkeypatch):
-    monkeypatch.setattr('koneko.prompt.TERM.cbreak', fakecbreak)
 
 @pytest.fixture
 def customexit_to_quit(monkeypatch):

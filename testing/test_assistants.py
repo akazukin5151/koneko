@@ -1,7 +1,6 @@
 """Doesn't do anything too advanced (can't figure out multi-key sequences yet), so just returns defaults"""
 
 from unittest.mock import Mock
-from contextlib import contextmanager
 
 import pytest
 
@@ -13,19 +12,6 @@ def disable_pixcat(monkeypatch):
     # pixcat.Image now won't bother us with AttributeErrors and do nothing
     # Specific to this module, so can't extract to conftest
     monkeypatch.setattr("koneko.assistants.Image", lambda *a, **k: Mock())
-
-
-@contextmanager
-def fakecbreak():
-    try:
-        yield
-    finally:
-        pass
-
-
-@pytest.fixture
-def patch_cbreak(monkeypatch):
-    monkeypatch.setattr('koneko.TERM.cbreak', fakecbreak)
 
 
 @pytest.fixture

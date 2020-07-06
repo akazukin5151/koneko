@@ -1,9 +1,27 @@
 import pytest
+from contextlib import contextmanager
 
 
 @pytest.fixture()
 def send_enter(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda x: "")
+
+@contextmanager
+def fakecbreak():
+    try:
+        yield
+    finally:
+        pass
+
+
+@pytest.fixture
+def patch_cbreak(monkeypatch):
+    monkeypatch.setattr('koneko.TERM.cbreak', fakecbreak)
+
+
+@pytest.fixture
+def patch_cbreak(monkeypatch):
+    monkeypatch.setattr('koneko.TERM.cbreak', fakecbreak)
 
 
 class CustomExit(SystemExit):

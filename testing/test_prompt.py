@@ -6,13 +6,8 @@ import pytest
 from blessed.keyboard import Keystroke
 
 from koneko import prompt
+from conftest import CustomExit, raises_customexit
 
-
-class CustomExit(Exception):
-    pass
-
-def raises_customexit(*a, **k):
-    raise CustomExit()
 
 @contextmanager
 def fakecbreak():

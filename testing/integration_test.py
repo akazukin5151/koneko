@@ -5,21 +5,20 @@ Assume that you have valid working credentials and config stored
 in ~/.config/koneko/config.ini
 And internet connection
 """
+import sys
 import pytest
 
 from koneko import main, utils
 
+# Lmao python
+sys.path.append('testing')
 
-class CustomExit(SystemExit):
-    pass
+from conftest import CustomExit, raises_customexit
 
-def raises_customexit(*a, **k):
-    raise CustomExit()
 
 @pytest.fixture
 def set_argc_to_one(monkeypatch):
     monkeypatch.setattr('koneko.main.sys.argv', [1])
-
 
 
 def cli_core(monkeypatch, args: tuple, prompt: str):

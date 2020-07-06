@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 from unittest.mock import Mock, call
 
+from conftest import CustomExit, raises_customexit
 from koneko import lscat_app, lscat, KONEKODIR
 from koneko.lscat_app import FakeData
 
@@ -77,12 +78,6 @@ def test_browse_cache_invis(monkeypatch, tmp_path, argv):
             FakeData(tmp_path)
         )
     ]
-
-
-# TODO move common to conftest
-class CustomExit(SystemExit): pass
-
-def raises_customexit(*a, **k): raise CustomExit()
 
 
 def test_display_path_cli_invalid_quits(monkeypatch):

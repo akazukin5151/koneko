@@ -6,6 +6,16 @@ def send_enter(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda x: "")
 
 
+class CustomExit(SystemExit):
+    """Replaces all expected instances of an exit,
+    to ensure that code exits only where this exception is mocked into
+    """
+
+def raises_customexit(*args, **kwargs):
+    """As lambdas don't allow raise statements, this is a function"""
+    raise CustomExit()
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--inte", action="store_true", default=False, help="run integration tests"

@@ -93,7 +93,7 @@ def test_filter_dir_1(monkeypatch, tmp_path):
     (tmp_path / 'testgallery').touch()
     (tmp_path / 'notanumber').touch()
 
-    assert files.filter_dir(['1']) == ['testgallery', '1234']
+    assert set(files.filter_dir(['1'])) == {'testgallery', '1234'}
 
 
 def test_filter_dir_2(monkeypatch, tmp_path):

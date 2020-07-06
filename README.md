@@ -55,7 +55,7 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 
 
 # Installation
-See also: [manual installation](#manual-installation)
+See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
 0. Install [kitty](https://github.com/kovidgoyal/kitty)
 1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...):
@@ -107,10 +107,35 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
 ### Version 0.10.0
-* Restructure cli handling to be more modular like lscat_app
+
+#### Features
+* `lscat` app browse cache can now filter modes
+
+#### Bug fixes
+* Browse cache (in `lscat` app and main):
+    * Hide the history file
+    * Fixed crash if filter hides all directories
+    * Fixed mode 2 filter showing mode 1 dirs
+
+#### Code maintenance
+* Simplified code:
+    * Restructure cli handling to be more modular like lscat_app
+        * Launch functions directly from cli.py
+    * main loop
+    * Split up lscat_app.pick_dir_loop()
+    * Await login before fetching by default, removing all manual awaits
+    * Pass credentials into api.start() instead of exposing attribute to the public
+    * Mode 3: Move your_id prompt to inside start() method
+    * Instantiate blessed.Terminal() in __init__.py
+    * Parametrize all cli tests
+    * Split up lscat_app.config_assistance()
+* **Moved a lot of functions to more appropriate modules**
+    * Move print-related functions from utils.py to printer.py
+    * Move file-related functions from utils.py to files.py
 
 # Roadmap
 
+* Make sure the diagrams in HACKING.md is up-to-date
 * `image_mode_text_offset` doesn't have a configuration assistant, or fix the cursor position again.
 * Consistent public and private methods and attributes again
 * In-depth usage documentation?
@@ -120,6 +145,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Filter modes in koneko main should go back to main screen on 'q' key
 * Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
     - [ ] Handle moving around pages
+    - [ ] Mode 2 dirs in lscat_app should do something (currently does nothing)
     - [ ] Documentation
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
@@ -152,19 +178,12 @@ You can also use versions less than v0.5.1, which retains legacy support for the
 * Submit a pull request
 
 Tips: 
+* See [HACKING.md](HACKING.md) to understand the code.
 * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
 * If you want to, you can create an issue first. Ask any questions by opening a new issue.
 * If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.
 
 See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## Conda environment
-
-See [CONTRIBUTING.md](CONTRIBUTING.md#conda-environment)
-
-## Manual installation
-
-See [CONTRIBUTING.md](CONTRIBUTING.md#manual-installation)
 
 ## Unit tests
 Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don't be surprised if it fails

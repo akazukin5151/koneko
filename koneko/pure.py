@@ -44,6 +44,7 @@ def url_given_size(post_json: 'Json', size: str) -> str:
     return post_json['image_urls'][size]
 
 
+@funcy.autocurry
 def post_title(current_page_illusts: 'Json', post_number: int) -> str:
     return current_page_illusts[post_number]['title']
 
@@ -60,7 +61,7 @@ def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
         current_page_illusts,
         len,
         range,
-        Map(lambda num: post_title(current_page_illusts, num)),
+        Map(post_title(current_page_illusts))
     )
 
 
@@ -71,8 +72,7 @@ def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':
         list_of_pages = post_json['meta_pages']
         return [url_given_size(list_of_pages[i], size)
                 for i in range(number_of_pages)]
-    else:
-        return [url_given_size(post_json, size)]
+    return [url_given_size(post_json, size)]
 
 
 def change_url_to_full(url: str, png=False) -> str:

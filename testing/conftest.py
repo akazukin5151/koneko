@@ -1,9 +1,37 @@
 import pytest
+from contextlib import contextmanager
 
 
 @pytest.fixture()
 def send_enter(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda x: "")
+
+@contextmanager
+def fakecbreak():
+    try:
+        yield
+    finally:
+        pass
+
+
+@pytest.fixture
+def patch_cbreak(monkeypatch):
+    monkeypatch.setattr('koneko.TERM.cbreak', fakecbreak)
+
+
+@pytest.fixture
+def patch_cbreak(monkeypatch):
+    monkeypatch.setattr('koneko.TERM.cbreak', fakecbreak)
+
+
+class CustomExit(SystemExit):
+    """Replaces all expected instances of an exit,
+    to ensure that code exits only where this exception is mocked into
+    """
+
+def raises_customexit(*args, **kwargs):
+    """As lambdas don't allow raise statements, this is a function"""
+    raise CustomExit()
 
 
 def pytest_addoption(parser):

@@ -14,9 +14,11 @@ from koneko import (
     pure,
     lscat,
     utils,
+    files,
     colors,
     config,
     prompt,
+    printer,
     download,
     KONEKODIR
 )
@@ -73,9 +75,9 @@ class AbstractUI(ABC):
         self._prefetch_thread()
 
     def verify_up_to_date(self):
-        if utils.dir_not_empty(self.data):
+        if files.dir_not_empty(self.data):
             return True
-        utils.remove_dir_if_exist(self.data)
+        files.remove_dir_if_exist(self.data)
         download.init_download(self.data, self.tracker())
 
     def _parse_and_download(self) -> 'IO':
@@ -84,7 +86,7 @@ class AbstractUI(ABC):
         Before fetching, show the dir first. Can only check for 'is dir' and 'not empty'
         After fetching, double check all files in dir match the cache
         """
-        if utils.dir_not_empty(self.data):
+        if files.dir_not_empty(self.data):
             self.show_instant()
             self._parse_user_infos()
             self.verify_up_to_date()
@@ -92,7 +94,7 @@ class AbstractUI(ABC):
             return True
 
         # No valid cached images, download all from scratch
-        utils.remove_dir_if_exist(self.data)
+        files.remove_dir_if_exist(self.data)
 
         self._parse_user_infos()
         download.init_download(self.data, self.tracker())
@@ -147,7 +149,7 @@ class AbstractUI(ABC):
         print('This is the first page!')
 
     def _show_page(self) -> 'IO':
-        if not utils.dir_not_empty(self.data):
+        if not files.dir_not_empty(self.data):
             print('This is the last page!')
             self.data.page_num -= 1
             return False
@@ -190,7 +192,7 @@ class AbstractGallery(AbstractUI, ABC):
         """Implements abstractmethod: Indicate which posts are multi-image and
         current page number
         """
-        utils.print_multiple_imgs(self.data.current_illusts)
+        printer.print_multiple_imgs(self.data.current_illusts)
         print(f'Page {self.data.page_num}')
 
     # Unique for Galleries

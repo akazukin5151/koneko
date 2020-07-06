@@ -4,13 +4,52 @@
 
 |          | Pure | Impure
 | -------- | ---- | ---
-| Frontend |      | <ul><li>main</li><li>prompt</li><li>ui</li><li>lscat_app</li></ul>
-| Backend  | <ul><li>colors</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>cli</li><li>config</li><li>download</li><li>lscat</li><li>screens</li><li>utils</li></ul>
+| Frontend |      | <ul><li>assistants</li><li>main</li><li>prompt</li><li>ui</li><li>lscat_app</li><li>screens</li></ul>
+| Backend  | <ul><li>colors</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>cli</li><li>config \*</li><li>files</li><li>download</li><li>lscat</li><li>picker</li><li>printer</li><li>utils</li></ul>
 
 * 'Pure' means functions are referentially transparent and globally pure (mutations may happen in local scope)
 * 'Frontend' means interacts with user (and catch and process user inputs)
 * 'Backend' means everything else
 * (Ideally the) 'backend' does work, 'frontend' organises work (if otherwise, please open an issue or make a PR).
+
+\* Config has impure IO functions, safe functions that will return defaults on failure, and interactive functions
+
+
+## Cache directory structure
+
+```sh
+$ cd ~/.local/share/koneko
+$ tree -d  # (Edited: .koneko and history are files not directories)
+.
+├── cache                     # ├── KONEKODIR
+│   ├── 2232374               # │   ├── Artist pixiv ID                             ├── Mode 1 and 2
+│   │   ├── 1                 # │   │   ├── Page 1                                  │   ├── Mode 1
+│   │   ├── 2                 # │   │   ├── Page 2                                  │   ├── Mode 1
+│   │   └── individual        # │   │   └── Posts with a single image               │   └── Mode 2
+│   │       └── 76695217      # │   │       └── ID of posts with multiple images    │       └── Mode 2
+
+│   ├── following             # │   ├── Following users mode                        ├── Mode 3
+│   │   └── *your_id*         # │   │   └── Your pixiv ID                           │
+│   │       ├── 1             # │   │       ├── Page 1                              │
+│   │       │   └── .koneko   # │   │       │   └── Stores number of artists info   │
+│   │       └── 2             # │   │       └── Page 2                              │
+│   │           └── .koneko   # │   │           └── Stores number of artists info   │
+
+│   ├── illustfollow          # │   ├── Illust follow mode                          ├── Mode 5
+│   │   ├── 1                 # │   │   ├── Page 1                                  │
+│   │   └── 2                 # │   │   └── Page 2                                  │
+
+│   ├── search                # │   ├── Search users mode                           ├── Mode 4
+│   │   └── gomzi             # │   │   └── Search string
+│   │       └── 1             # │   │       └── Page 1
+
+│   ├── history               # │   ├── History file, for frequent "mode"
+
+│   ├── testgallery           # │   ├── (Internal/debugging use)
+│   └── testuser              # │   └── (Internal/debugging use)
+└── pics                      # └── Images for main and info screen
+```
+
 
 ## UML diagrams
 
@@ -45,3 +84,17 @@
 ### Functions in download.py
 
 ![download UML](http://plantuml.com:80/plantuml/png/ZLDR3eCW4Fpd55x07g7fJGYLRRiDB0RNDYOUlhLLAGAcNuQPVS3CUEfOUUwj4OnieDBkISOfVMW78Tpv3WrNICXo8HPGTGCrAoezaB9G8CdjyrsBHE1ZzeA6mKj5EjczDl8DQ3DwvNflSfXyWCSBGZeChRg2R9ppkYkGr5iXUgpg2Q_7uqQQw3GN7GjAYIoyQSffKDBsxzOCi_PcbOrUNB0k3vSq287O6HsAnA-1LLswPzRck7mAHTRmk2oudKB9m92ew3NHpXBnqpidhlNEjYo-d_UkCRdMdD2TYazCJq1w-gzV)
+
+
+## Dependencies
+
+There are two dependencies that aren't necessary: returns and placeholder (both on the right edge). Code can always be rewritten to remove those two dependencies. That said, they don't introduce their own dependency tree, so only a total of three dependencies are added. Compared to the core dependencies (pixivpy, pixcat, and blessed), that's insignificant.
+
+![dep tree](dependencies.png)
+
+```sh
+$ pipdeptree -v
+2.0.0b1
+$ pipdeptree --graph-output png -p koneko > dependencies.png
+```
+

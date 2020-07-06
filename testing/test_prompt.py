@@ -1,29 +1,12 @@
 import sys
 from abc import ABC, abstractmethod
-from contextlib import contextmanager
 
 import pytest
 from blessed.keyboard import Keystroke
 
 from koneko import prompt
+from conftest import CustomExit, raises_customexit
 
-
-class CustomExit(Exception):
-    pass
-
-def raises_customexit(*a, **k):
-    raise CustomExit()
-
-@contextmanager
-def fakecbreak():
-    try:
-        yield
-    finally:
-        pass
-
-@pytest.fixture
-def patch_cbreak(monkeypatch):
-    monkeypatch.setattr('koneko.prompt.TERM.cbreak', fakecbreak)
 
 @pytest.fixture
 def customexit_to_quit(monkeypatch):
@@ -39,7 +22,8 @@ def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit):
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     assert not prompt.ask_quit()
 
-def test_ask_quit_enter_and_letter_quits(monkeypatch, patch_cbreak, customexit_to_quit):
+@pytest.mark.parametrize('letter', ['y', 'q', '', 'h'])
+def test_ask_quit_enter_and_letter_quits(monkeypatch, patch_cbreak, customexit_to_quit, letter):
     class FakeInKeyCode:
         def __init__(self):
             self.code = 343
@@ -49,12 +33,10 @@ def test_ask_quit_enter_and_letter_quits(monkeypatch, patch_cbreak, customexit_t
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()
 
-    responses = ['y', 'q', '', 'h']
-    for letter in responses:
-        fake_inkey.__call__ = lambda x: letter
-        monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-        with pytest.raises(CustomExit):
-            assert prompt.ask_quit()
+    fake_inkey.__call__ = lambda x: letter
+    monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
+    with pytest.raises(CustomExit):
+        assert prompt.ask_quit()
 
 
 class FakeInKey(ABC):
@@ -78,17 +60,17 @@ class FakeGallery:
     def __init__(self):          self.data = None
 
 
-def test_gallery_like_prompt(monkeypatch, patch_cbreak):
+@pytest.mark.parametrize('letter', ['n', 'h', 'b', 'r'])
+def test_gallery_like_prompt(monkeypatch, patch_cbreak, letter):
     fakegallery = FakeGallery()
-    for letter in (u'n', u'h', u'b', u'r'):
-        class FakeInKeyNew(FakeInKey):
-            def __call__(self):
-                return Keystroke(ucs=letter, code=1, name=letter)
+    class FakeInKeyNew(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=letter, code=1, name=letter)
 
-        fake_inkey = FakeInKeyNew()
-        monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-        with pytest.raises(CustomExit):
-            assert prompt.gallery_like_prompt(fakegallery)
+    fake_inkey = FakeInKeyNew()
+    monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
+    with pytest.raises(CustomExit):
+        assert prompt.gallery_like_prompt(fakegallery)
 
 def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
     class FakeInKeyPrev(FakeInKey):
@@ -161,18 +143,18 @@ class FakeImage:
     def show_full_res(self):  raise CustomExit()
     def leave(self, *a):      raise CustomExit()
 
-def test_image_prompt(monkeypatch, patch_cbreak):
+@pytest.mark.parametrize('letter', (u'a', u'b', u'q', u'o', u'd', u'n', u'p', u'f'))
+def test_image_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     fakeimage = FakeImage()
-    for letter in (u'a', u'b', u'q', u'o', u'd', u'n', u'p', u'f'):
-        class FakeInKeyNew(FakeInKey):
-            def __call__(self):
-                return Keystroke(ucs=letter, code=1, name=letter)
+    class FakeInKeyNew(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=letter, code=1, name=letter)
 
-        fake_inkey = FakeInKeyNew()
-        monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-        with pytest.raises(CustomExit):
-            assert prompt.image_prompt(fakeimage)
+    fake_inkey = FakeInKeyNew()
+    monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
+    with pytest.raises(CustomExit):
+        assert prompt.image_prompt(fakeimage)
 
 def test_image_prompt_seq(monkeypatch, patch_cbreak):
     class FakeInKey1(FakeInKey):
@@ -199,19 +181,19 @@ class FakeUser:
     def reload(self):             raise CustomExit()
     def go_artist_mode(self, *a): raise CustomExit()
 
-def test_user_prompt(monkeypatch, patch_cbreak):
+@pytest.mark.parametrize('letter', (u'n', u'r', u'p', u'q'))
+def test_user_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     monkeypatch.setattr('koneko.ui.AbstractUsers.previous_page', raises_customexit)
     fakeuser = FakeUser()
-    for letter in (u'n', u'r', u'p', u'q'):
-        class FakeInKeyNew(FakeInKey):
-            def __call__(self):
-                return Keystroke(ucs=letter, code=1, name=letter)
+    class FakeInKeyNew(FakeInKey):
+        def __call__(self):
+            return Keystroke(ucs=letter, code=1, name=letter)
 
-        fake_inkey = FakeInKeyNew()
-        monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
-        with pytest.raises(CustomExit):
-            assert prompt.user_prompt(fakeuser)
+    fake_inkey = FakeInKeyNew()
+    monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
+    with pytest.raises(CustomExit):
+        assert prompt.user_prompt(fakeuser)
 
 def test_user_prompt_seq(monkeypatch, patch_cbreak):
     class FakeInKey1(FakeInKey):

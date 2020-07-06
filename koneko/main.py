@@ -15,7 +15,7 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
-from koneko import ui, api, cli, pure, utils, config, prompt, screens
+from koneko import ui, api, cli, pure, utils, config, prompt, screens, picker
 
 
 def main():
@@ -269,18 +269,9 @@ def frequent():
 
 
 def _frequent(actions, history):
-    title = (
-        "Please pick an input\n"
-        "[mode]: [pixiv ID or searchstr] (frequency)\n"
-        "Press 'f' to filter modes"
-    )
-
-    picker = utils.ws_picker(actions, title)
-    picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
-
-    _, idx = picker.start()
+    idx = picker.frequent_modes_picker(actions)
     if idx == 'f':
-        return frequent_modes(utils.select_modes_filter())
+        return frequent_modes(picker.select_modes_filter())
 
     ans = tuple(history)[idx]
     mode, user_input = ans.split(': ')

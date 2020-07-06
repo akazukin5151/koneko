@@ -30,8 +30,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 from returns.pipeline import flow
 
-from koneko import api, pure, utils
 from koneko.data import UserData
+from koneko import api, pure, utils, files
 
 
 # - Wrappers around download functions, for downloading multi-images
@@ -46,7 +46,7 @@ def save_number_of_artists(data) -> 'IO':
 
 def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
     """Download the illustrations of one page  and rename them."""
-    if utils.dir_not_empty(data):
+    if files.dir_not_empty(data):
         return True
 
     if data.page_num == 1:
@@ -139,7 +139,7 @@ def download_url_verified(url, png=False) -> 'IO':
 
     download_url(download_path, url, filename)
 
-    verified = utils.verify_full_download(filepath)
+    verified = files.verify_full_download(filepath)
     if not verified:
         download_url_verified(url, png=True)
     else:

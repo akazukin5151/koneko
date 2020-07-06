@@ -8,7 +8,7 @@ Structure:
 
 import sys
 
-from koneko import ui, pure, utils, download, TERM
+from koneko import ui, pure, utils, printer, download, TERM
 from koneko.pure import all_isdigit
 
 
@@ -139,7 +139,7 @@ def image_prompt(image):
         'n': image.next_image,
         'p': image.previous_image,
         'f': image.show_full_res,
-        'h': utils.image_help,
+        'h': printer.image_help,
         'q': ask_quit,
         'm': lambda: print(image.__doc__)
     }
@@ -176,7 +176,7 @@ def user_prompt(user):
     case = {
         'n': user.next_page,
         'p': user.previous_page,
-        'h': utils.user_help,
+        'h': printer.user_help,
         'q': ask_quit,
         'm': lambda: print(ui.AbstractUsers.__doc__)
     }

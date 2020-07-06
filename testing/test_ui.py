@@ -21,16 +21,16 @@ def test_open_link_coords(monkeypatch):
 def test_download_image_coords(monkeypatch):
     # Should belong to test_download.py now
     monkeypatch.setattr('koneko.api.myapi.protected_download', lambda x: True)
-    monkeypatch.setattr('koneko.utils.verify_full_download', lambda x: True)
+    monkeypatch.setattr('koneko.files.verify_full_download', lambda x: True)
     monkeypatch.setattr('koneko.download.download_url', lambda *a, **k: True)
     download.download_image_coords(data, 1, 2)
     # Try if not verified first, then true
     responses = iter([False, True])
-    monkeypatch.setattr('koneko.utils.verify_full_download', lambda x: next(responses))
+    monkeypatch.setattr('koneko.files.verify_full_download', lambda x: next(responses))
     download.download_image_coords(data, 1, 2)
 
 def test_previous_page_gallery(monkeypatch):
-    monkeypatch.setattr('koneko.utils.dir_not_empty', lambda x: True)
+    monkeypatch.setattr('koneko.files.dir_not_empty', lambda x: True)
 
     class FakeGallery:
         def __init__(self):
@@ -50,7 +50,7 @@ def test_previous_page_gallery(monkeypatch):
     ui.AbstractGallery.previous_page(gallery)
 
 def test_previous_page_users(monkeypatch):
-    monkeypatch.setattr('koneko.utils.dir_not_empty', lambda *a: True)
+    monkeypatch.setattr('koneko.files.dir_not_empty', lambda *a: True)
 
     class FakeGallery:
         def __init__(self):
@@ -70,7 +70,7 @@ def test_previous_page_users(monkeypatch):
     assert gallery.data.offset == 30
 
     gallery.data.offset = 60
-    monkeypatch.setattr('koneko.utils.dir_not_empty', lambda *a: False)
+    monkeypatch.setattr('koneko.files.dir_not_empty', lambda *a: False)
     assert not ui.AbstractUsers.previous_page(gallery)
     assert gallery.data.offset == 60
 

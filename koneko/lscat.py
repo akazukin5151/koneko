@@ -23,7 +23,7 @@ from abc import ABC
 from pixcat import Image
 from returns.result import safe
 
-from koneko import pure, utils, config
+from koneko import pure, utils, files, config, printer
 
 
 def icat(path: str) -> 'IO':
@@ -47,7 +47,7 @@ def show_instant(cls, data, gallerymode=False) -> 'IO':
     if gallerymode and config.check_print_info():
         number_of_cols = config.ncols_config()
         spacings = config.gallery_print_spacing_config()
-        utils.print_cols(spacings, number_of_cols)
+        printer.print_cols(spacings, number_of_cols)
         print('\n')
 
 
@@ -106,7 +106,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # If it fails, `fix` it by calling the read_invis() function
         # Either way, the Success() result is inside the Result[] monad, so unwrap() it
         safe_func: 'func[Result[int]]' = safe(lambda: data.splitpoint)
-        splitpoint: int = safe_func().fix(lambda x: utils.read_invis(data)).unwrap()
+        splitpoint: int = safe_func().fix(lambda x: files.read_invis(data)).unwrap()
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is

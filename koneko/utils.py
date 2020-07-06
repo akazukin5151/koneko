@@ -1,40 +1,30 @@
 """Small functions with side effects, arranged by functionality.
 If one functionality gets too long, move them into their own module.
-TODO: move print and file related functions to their own modules, but what name to use?
 
 Functionalities:
-    - History and logging (29 lines)
-    - pick module (23 lines)
-    - Wrapping other functions (37 lines)
-    - Calculations (22 lines)
-    - File related (63 lines)
-    - Print related (81 lines)
-    - IO related (30 lines)
-    - lscat related (28 lines)
+    - History and logging (33 lines)
+    - Wrapping other functions (40 lines)
+    - Calculations (23 lines)
+    - IO related (33 lines)
+    - lscat related (33 lines)
 """
 
 import os
-import imghdr
 import logging
 import itertools
 import threading
 from copy import copy
 from math import ceil
 from pathlib import Path
-from shutil import rmtree
 from collections import Counter
 from contextlib import contextmanager
 from logging.handlers import RotatingFileHandler
 
 import funcy
-from pick import Picker
 from pixcat import Image
-from placeholder import _, m
-from funcy import curry, lfilter
-from returns.pipeline import flow
+from placeholder import m
 
-from koneko import pure, TERM, KONEKODIR
-from koneko import colors as c
+from koneko import pure, printer, TERM, KONEKODIR
 from koneko.config import ncols_config, xcoords_config
 
 
@@ -72,43 +62,6 @@ def frequent_history_modes(modes: 'list[str]', n=5) -> 'dict[str, int]':
 
 def format_frequent(counter: 'dict[str, int]') -> 'list[str]':
     return [f'{k} ({v})' for (k, v) in counter.items()]
-
-
-# pick module
-def ws_picker(actions, title, **kwargs):
-    picker = Picker(actions, title, **kwargs)
-    picker.register_custom_handler(ord('w'), m.move_up())
-    picker.register_custom_handler(ord('s'), m.move_down())
-    return picker
-
-def pick_dirs_picker(actions, title):
-    picker = Picker(actions, title)
-    picker.register_custom_handler(ord('w'), m.move_up())
-    picker.register_custom_handler(ord('s'), m.move_down())
-    picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
-    picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
-    picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
-    picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
-    picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
-    return picker
-
-def select_modes_filter(more=False):
-    title = "Use SPACE to select a mode to show and ENTER to confirm"
-    # Copied from screens
-    actions = [
-        '1. View artist illustrations',
-        '2. Open pixiv post',
-        '3. View following artists',
-        '4. Search for artists',
-    ]
-
-    if more:
-        actions.extend(('5. View illustrations of all following artists',
-                        'c. Clear all filters'))
-
-    picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
-    selected = picker.start()
-    return [str(x[1] + 1) for x in selected]
 
 
 # Wrapping other functions
@@ -180,217 +133,6 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
         return ((x - 1) % ncols) + (ncols * (y - 1))
 
 
-# File related
-def read_invis(data) -> 'IO[int]':
-    with cd(data.download_path):
-        with open('.koneko', 'r') as f:
-            return int(f.read())
-
-
-def remove_dir_if_exist(data) -> 'Maybe[IO]':
-    if data.download_path.is_dir():
-        rmtree(data.download_path)
-
-
-def filter_history(path):
-    return flow(
-        path,
-        os.listdir,
-        sorted,
-        curry(lfilter)(_ != 'history')
-    )
-
-
-def verify_full_download(filepath: Path) -> 'IO[bool]':
-    verified = imghdr.what(filepath)
-    if not verified:
-        os.remove(filepath)
-        return False
-    return True
-
-
-def dir_up_to_date(data, _dir) -> bool:
-    # O(1) time
-    if len(_dir) < len(data.all_names):
-        return False
-
-    # Should not fail because try-except early returned
-    for name, _file in zip(data.all_names, sorted(_dir)):
-        if name.replace('/', '') not in _file:
-            return False
-    return True
-
-
-def dir_not_empty(data: 'Data') -> bool:
-    if data.download_path.is_dir() and (_dir := os.listdir(data.download_path)):
-
-        # Is a valid directory and it's not empty, but data has not been fetched yet
-        try:
-            data.all_names
-        except (KeyError, AttributeError):
-            return True
-
-        # Exclude the .koneko file
-        if '.koneko' in sorted(_dir)[0]:
-            return dir_up_to_date(data, sorted(_dir)[1:])
-
-        return dir_up_to_date(data, _dir)
-
-    return False
-
-
-def filter_dir(modes: 'list[str]') -> 'list[str]':
-    """Given a list of modes to include, filter KONEKODIR to those modes"""
-    path = KONEKODIR
-    dirs = os.listdir(path)
-    allowed_names = set()
-
-    if '1' in modes:
-        allowed_names.add('testgallery')
-
-    if '3' in modes:
-        allowed_names.update(('following', 'testuser'))
-
-    if '4' in modes:
-        allowed_names.add('search')
-
-    if '5' in modes:
-        allowed_names.add('illustfollow')
-
-    if '1' in modes or '2' in modes:
-        predicate = lambda d: d.isdigit() or d in allowed_names
-    else:
-        predicate = lambda d: d in allowed_names
-
-    return [d for d in dirs if predicate(d)]
-
-
-# Print related
-def write(value: str) -> 'IO':
-    print(value, end='', flush=True)
-
-
-def move_cursor_up(num: int) -> 'IO':
-    if num > 0:
-        write(f'\033[{num}A')
-
-
-def move_cursor_down(num=1) -> 'IO':
-    if num > 0:
-        write(f'\033[{num}B')
-
-
-def erase_line() -> 'IO':
-    write('\033[K')
-
-
-def print_cols(spacings: 'list[int]', ncols: int) -> 'IO':
-    for (idx, space) in enumerate(spacings[:ncols]):
-        write(' ' * int(space))
-        write(idx + 1)
-
-
-def print_info(message_xcoord: int) -> 'IO':
-    print(' ' * message_xcoord, '000', '\n',
-          ' ' * message_xcoord, 'Example artist', sep='')
-
-def maybe_print_size(actions, size):
-    if 1 in actions or 7 in actions:
-        print(f'image_thumbnail_size = {size}')
-
-
-def maybe_print_width_xpadding(actions, image_width, xpadding):
-    if 2 in actions or 7 in actions:
-        print(f'image_width = {image_width}')
-        print(f'images_x_spacing = {xpadding}')
-
-
-def maybe_print_height_ypadding(actions, image_height, ypadding):
-    if 3 in actions or 7 in actions:
-        print(f'image_height = {image_height}')
-        print(f'images_y_spacing = {ypadding}')
-
-
-def maybe_print_page_spacing(actions, page_spacing):
-    if 4 in actions or 7 in actions:
-        print(f'page_spacing = {page_spacing}')
-
-
-def maybe_print_print_spacing(actions, gallery_print_spacing):
-    if 5 in actions or 7 in actions:
-        print('gallery_print_spacing =',
-              ','.join((str(x) for x in gallery_print_spacing)))
-
-
-def maybe_print_user_info(actions, user_info_xcoord):
-    if 6 in actions or 7 in actions:
-        print(f'users_print_name_xcoord = {user_info_xcoord}')
-
-
-def print_doc(doc: str) -> 'IO':
-    """Prints a given string in the bottom of the terminal"""
-    os.system('clear')
-    number_of_newlines = doc.count('\n')
-    bottom = TERM.height - (number_of_newlines + 2)
-    move_cursor_down(bottom)
-    print(doc)
-
-
-def print_multiple_imgs(illusts_json: 'Json') -> None:
-    HASHTAG = f'{c.RED}#'
-    HAS = f'{c.RESET} has {c.BLUE}'
-    OF_PAGES = f'{c.RESET} pages'
-    _ = [print(f'{HASHTAG}{index}{HAS}{number}{OF_PAGES}', end=', ')
-         for (index, _json) in enumerate(illusts_json)
-         if (number := _json['page_count']) > 1]
-    print('')
-
-
-def update_gallery_info(spacings, ncols, current_selection):
-    move_cursor_up(2)
-    erase_line()
-    print_cols(spacings, ncols)
-    print('\n\nAdjusting the number of spaces between '
-          f'{current_selection} and {current_selection+1}',
-          flush=True)
-    move_cursor_up(1)
-
-
-def update_user_info(spacing):
-    erase_line()         # Erase the first line
-    move_cursor_down()   # Go down and erase the second line
-    erase_line()
-    move_cursor_up(1)    # Go back up to the original position
-    print_info(spacing)  # Print info takes up 2 lines
-    move_cursor_up(2)    # so go back to the top
-
-
-def image_help():
-    print('')
-    print(''.join([
-        c.b, 'ack; ',
-        c.n, 'ext image; ',
-        c.p, 'revious image; ',
-        c.d_, 'ownload image;',
-        c.o_, 'pen image in browser;\n',
-        'show image in', c.f, 'ull res; ',
-        c.q, 'uit (with confirmation); ',
-        'view ', c.m, 'anual\n'
-    ]))
-
-
-def user_help():
-    print('')
-    print(''.join([
-        'view ', c.BLUE_N, "th artist's illusts ",
-        c.n, 'ext page; ',
-        c.p, 'revious page; ',
-        c.r, 'eload and re-download all;\n',
-        c.q, 'uit (with confirmation);',
-        'view ', c.m, 'anual\n'
-    ]))
-
-
 # IO related
 def open_in_browser(image_id) -> 'IO':
     link = f'https://www.pixiv.net/artworks/{image_id}'
@@ -430,8 +172,7 @@ def handle_missing_pics() -> 'IO':
 # Lscat related
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
     # Must make a copy before using this reference
-    SAMPLE_IMAGE = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png')
-    img = copy(SAMPLE_IMAGE).thumbnail(thumbnail_size)
+    img = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png').thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=y)
     return img
 
@@ -460,5 +201,5 @@ def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
 def hide_if_exist(image: Image) -> 'IO':
     if image:
         image.hide()
-        move_cursor_up(1)
+        printer.move_cursor_up(1)
 

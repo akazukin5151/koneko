@@ -7,7 +7,7 @@ from koneko import pure
 sys.path.append('testing')
 
 # Imports the current_page (dict) stored in disk
-from page_json import *  # isort:skip
+from page_json import page_json  # isort:skip
 
 page_illusts = page_json["illusts"]
 
@@ -32,6 +32,7 @@ def test_generate_filepath():
 def test_prefix_filename():
     assert pure.prefix_filename("old.jpg", "new", 2) == "002_new.jpg"
     assert pure.prefix_filename("old.jpg", "new", 10) == "010_new.jpg"
+
 
 def test_prefix_artist_name():
     assert pure.prefix_artist_name("name1", 2) == f"02\n{' ' * 19}name1"

@@ -5,26 +5,25 @@ Assume that you have valid working credentials and config stored
 in ~/.config/koneko/config.ini
 And internet connection
 """
+import sys
 import pytest
 
-from koneko import main, utils, config
+from koneko import main, utils
 
+# Lmao python
+sys.path.append('testing')
 
-class CustomExit(SystemExit):
-    pass
+from conftest import CustomExit, raises_customexit
 
-def raises_customexit(*a, **k):
-    raise CustomExit()
 
 @pytest.fixture
 def set_argc_to_one(monkeypatch):
     monkeypatch.setattr('koneko.main.sys.argv', [1])
 
 
-
 def cli_core(monkeypatch, args: tuple, prompt: str):
     monkeypatch.setattr('koneko.main.AbstractLoop._save_history', lambda x: True)
-    monkeypatch.setattr('koneko.main.cli.process_cli_args', lambda: args)
+    monkeypatch.setattr('koneko.main.sys.argv', [None, *args])
     monkeypatch.setattr(prompt, raises_customexit)
     with pytest.raises(CustomExit):
         main.main()
@@ -39,7 +38,7 @@ def test_mode2_cli(monkeypatch):
 
 @pytest.mark.integration
 def test_mode3_cli(monkeypatch, send_enter):
-    cli_core(monkeypatch, ('3', ''), 'koneko.main.prompt.user_prompt')
+    cli_core(monkeypatch, ('3',), 'koneko.main.prompt.user_prompt')
 
 @pytest.mark.integration
 def test_mode4_cli(monkeypatch):
@@ -47,7 +46,7 @@ def test_mode4_cli(monkeypatch):
 
 @pytest.mark.integration
 def test_mode5_cli(monkeypatch):
-    cli_core(monkeypatch, ('5', ''), 'koneko.main.prompt.gallery_like_prompt')
+    cli_core(monkeypatch, ('5',), 'koneko.main.prompt.gallery_like_prompt')
 
 
 

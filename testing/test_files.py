@@ -113,7 +113,7 @@ def test_filter_dir_3(monkeypatch, tmp_path):
     (tmp_path / 'testuser').touch()
     (tmp_path / 'following').touch()
 
-    assert files.filter_dir(['3']) == ['following', 'testuser']
+    assert set(files.filter_dir(['3'])) == {'following', 'testuser'}
 
 
 def test_filter_dir_4(monkeypatch, tmp_path):

@@ -37,48 +37,45 @@ def test_filter_history(tmp_path):
     assert files.filter_history(tmp_path) == []
 
 
-def test_dir_not_empty(tmp_path):
+def data_faker(tmp_path):
     FakeData = namedtuple('data', ('download_path', 'first_img', 'all_names'))
     data = FakeData(
         tmp_path, "004_祝！！！.jpg",
         ["004_祝！！！.jpg", '008_77803142_p0.png', '017_ミコニャン.jpg']
     )
+    return data
 
-    # Test dir exists but is empty
+def test_dir_not_empty_dir_exists_but_empty(tmp_path):
+    """Test dir exists but is empty"""
+    data = data_faker(tmp_path)
     tmp_path.mkdir(exist_ok=True)
     assert files.dir_not_empty(data) is False
 
+def test_dir_not_empty_incomplete_dir(tmp_path):
+    data = data_faker(tmp_path)
     # Copy .koneko and only one image to that dir
     (tmp_path / '.koneko').touch()
     os.system(f'cp testing/files/004_祝！！！.jpg {tmp_path}')
 
     assert files.dir_not_empty(data) is False
 
+def test_dir_not_empty_all_images_present(tmp_path):
+    data = data_faker(tmp_path)
     # Copy all images to dir
-    for f in ('008_77803142_p0.png', '017_ミコニャン.jpg'):
+    for f in data.all_names:
         os.system(f'cp testing/files/{f} {tmp_path}')
 
     assert files.dir_not_empty(data)
 
-    # Test Throw some errors
+@pytest.mark.parametrize('error', (KeyError, AttributeError))
+def test_dir_not_empty_errors_return_true(tmp_path, error):
     class FakeData:
         def __init__(self):
             self.download_path = Path('testing/files/')
 
         @property
         def first_img(self):
-            raise KeyError
-
-    data = FakeData()
-    assert files.dir_not_empty(data)
-
-    class FakeData:
-        def __init__(self):
-            self.download_path = Path('testing/files/')
-
-        @property
-        def first_img(self):
-            raise AttributeError
+            raise error
 
     data = FakeData()
     assert files.dir_not_empty(data)

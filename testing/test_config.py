@@ -9,54 +9,87 @@ from koneko import config
 
 
 @pytest.fixture
-def use_test_cfg(monkeypatch):
+def use_test_cfg_path(monkeypatch, tmp_path):
     monkeypatch.setattr('koneko.config.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
+                        lambda x: Path(tmp_path / 'test_config.ini'))
 
-def write_print_setting(cfg, setting):
+
+def setup_test_config(path):
+    default = """[Credentials]
+    username = koneko
+    password = mypassword
+    id = 1234
+
+    [lscat]
+    image_width = 18
+    image_height = 8
+    image_thumbnail_size = 310
+    images_x_spacing = 2
+    images_y_spacing = 1
+    gallery_print_spacing = 9,17,17,17,17
+    users_print_name_xcoord = 18
+    gallery_page_spacing = 23
+    users_page_spacing = 20
+
+    [misc]
+    print_info = on
+
+    [experimental]
+    image_mode_previews = off
+    """
+    config_object = configparser.ConfigParser()
+    config_object.read_string(default)
+
+    config_path = (path / 'test_config.ini')
+    config_path.touch()
+    with open(config_path, 'w') as c:
+        config_object.write(c)
+    return config_object
+
+
+def write_print_setting(cfg, setting, tmp_path):
     cfg.set('misc', 'print_info', setting)
-    with open('testing/test_config.ini', 'w') as f:
+    with open(tmp_path / 'test_config.ini', 'w') as f:
         cfg.write(f)
 
-def test_check_print_info(monkeypatch, use_test_cfg):
-    # print_info is on in example config
+
+def test_check_print_info_default(tmp_path):
+    setup_test_config(tmp_path)
     assert config.check_print_info() is True
 
-    cfg = configparser.ConfigParser()
-    cfg.read('testing/test_config.ini')
 
-    try:
-        for setting in ('1', 'yes', 'true', 'on'):
-            write_print_setting(cfg, setting)
-            assert config.check_print_info() is True
+@pytest.mark.parametrize('setting', ('1', 'yes', 'true', 'on'))
+def test_check_print_info_true(tmp_path, setting, use_test_cfg_path):
+    cfg = setup_test_config(tmp_path)
+    write_print_setting(cfg, setting, tmp_path)
+    assert config.check_print_info() is True
 
-        for setting in ('off', 'no', 'off'):
-            write_print_setting(cfg, setting)
-            assert config.check_print_info() is False
 
-        # Invalid boolean should default to True
-        write_print_setting(cfg, 'asdf')
-        assert config.check_print_info() is True
+@pytest.mark.parametrize('setting', ('off', 'no', 'off'))
+def test_check_print_info_false(tmp_path, setting, use_test_cfg_path):
+    cfg = setup_test_config(tmp_path)
+    write_print_setting(cfg, setting, tmp_path)
+    assert config.check_print_info() is False
 
-    finally:
-        # Restore default value
-        write_print_setting(cfg, 'on')
 
-def test_get_settings(monkeypatch, use_test_cfg):
+def test_check_print_info_invalid_true(tmp_path, use_test_cfg_path):
+    cfg = setup_test_config(tmp_path)
+    write_print_setting(cfg, 'not_a_boolean', tmp_path)
+    assert config.check_print_info() is True
+
+
+def test_get_settings_default(tmp_path, use_test_cfg_path):
+    setup_test_config(tmp_path)
     assert config.get_settings('Credentials', 'username') == Success('koneko')
     assert config.get_settings('Credentials', 'password') == Success('mypassword')
     assert config.get_settings('Credentials', 'ID') == Success('1234')
     assert config.get_settings('experimental', 'image_mode_previews') == Success('off')
     assert config.get_settings('misc', 'print_info') == Success('on')
 
-    # If config doesn't exist
-    test_cfg_path = Path('testing/files/test_config.ini')
-    if test_cfg_path.exists():
-        os.system(f'rm {test_cfg_path}')
 
-    monkeypatch.setattr('koneko.config.Path.expanduser', lambda x: test_cfg_path)
-
+def test_get_settings_nonexistent(use_test_cfg_path):
     assert isinstance(config.get_settings('wewr', 'asda').failure(), KeyError)
+
 
 def test_config(monkeypatch):
     # If config exists

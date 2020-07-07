@@ -1,50 +1,10 @@
-import os
 import configparser
-from pathlib import Path
 
 import pytest
 from returns.result import Success
 
 from koneko import config
-
-
-@pytest.fixture
-def use_test_cfg_path(monkeypatch, tmp_path):
-    monkeypatch.setattr('koneko.config.Path.expanduser',
-                        lambda x: Path(tmp_path / 'test_config.ini'))
-
-
-def setup_test_config(path):
-    default = """[Credentials]
-    username = koneko
-    password = mypassword
-    id = 1234
-
-    [lscat]
-    image_width = 18
-    image_height = 8
-    image_thumbnail_size = 310
-    images_x_spacing = 2
-    images_y_spacing = 1
-    gallery_print_spacing = 9,17,17,17,17
-    users_print_name_xcoord = 18
-    gallery_page_spacing = 23
-    users_page_spacing = 20
-
-    [misc]
-    print_info = on
-
-    [experimental]
-    image_mode_previews = off
-    """
-    config_object = configparser.ConfigParser()
-    config_object.read_string(default)
-
-    config_path = (path / 'test_config.ini')
-    config_path.touch()
-    with open(config_path, 'w') as c:
-        config_object.write(c)
-    return config_object
+from conftest import setup_test_config
 
 
 def write_print_setting(cfg, setting, tmp_path):

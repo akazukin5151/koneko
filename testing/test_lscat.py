@@ -7,6 +7,7 @@ from unittest.mock import Mock
 import pytest
 
 from koneko import lscat, pure
+from conftest import setup_test_config
 
 # Lmao python
 sys.path.append('testing')
@@ -19,7 +20,7 @@ def test_icat():
         # Github doesn't connect to terminal
         pass
 
-def test_show_instant(monkeypatch):
+def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
     showed = []
 
     class FakeTracker:
@@ -34,9 +35,7 @@ def test_show_instant(monkeypatch):
             self.download_path = Path('testing/files/')
 
     # This config has print_info = True
-    # Can't use shared fixture because pathlib is used in FakeData
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
+    setup_test_config(tmp_path)
 
     fakedata = FakeData()
     lscat.show_instant(FakeTracker, fakedata, True)
@@ -107,15 +106,13 @@ def test_TrackDownloadsUser(monkeypatch):
     assert correct_order == sent_img
 
 
-def test_TrackDownloadsUser2(monkeypatch):
+def test_TrackDownloadsUser2(monkeypatch, tmp_path, use_test_cfg_path):
     """Test with .koneko file"""
     class FakeData:
         def __init__(self):
             self.download_path = Path('testing/files/user')
 
-    # Can't use shared fixture because pathlib is used in FakeData
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
+    setup_test_config(tmp_path)
 
     data = FakeData()
     data.download_path.mkdir()

@@ -91,30 +91,24 @@ def test_get_settings_nonexistent(use_test_cfg_path):
     assert isinstance(config.get_settings('wewr', 'asda').failure(), KeyError)
 
 
-def test_config(monkeypatch):
-    # If config exists
-    example_path = Path('testing/test_config.ini')
-    monkeypatch.setattr('koneko.config.Path.expanduser', lambda x: example_path)
-
+def test_being_config_exists(monkeypatch, tmp_path, use_test_cfg_path):
+    setup_test_config(tmp_path)
     creds, your_id = config.begin_config()
     assert your_id == '1234'
     assert type(creds) is configparser.SectionProxy
 
 
-    # If config doesn't exist
-    test_cfg_path = Path('testing/files/test_config.ini')
-    if test_cfg_path.exists():
-        os.system(f'rm {test_cfg_path}')
-
-    monkeypatch.setattr('koneko.config.Path.expanduser', lambda x: test_cfg_path)
-
+def test_being_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path):
+    """Config path does not exist, user saves their ID"""
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'y', 'myid'])
     monkeypatch.setattr('builtins.input', lambda x='': next(responses))
     monkeypatch.setattr('koneko.config.getpass', lambda: 'mypassword')
     # fix for macOS
-    monkeypatch.setattr('koneko.config.os.system',
-                        lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
+    monkeypatch.setattr(
+        'koneko.config.os.system',
+        lambda x: f'tail example_config.ini -n +9 >> {tmp_path / "test_config.ini"}'
+    )
 
     creds, your_id = config.begin_config()
     assert your_id == 'myid'
@@ -123,20 +117,18 @@ def test_config(monkeypatch):
     assert config.get_settings('Credentials', 'username') == Success('myusername')
     assert config.get_settings('Credentials', 'password') == Success('mypassword')
 
-def test_config2(monkeypatch):
+
+def test_being_config_nonexistant_no_id(monkeypatch, tmp_path, use_test_cfg_path):
     """Config path does not exist, user does not save their ID"""
-    test_cfg_path = Path('testing/files/test_config.ini')
-    os.system(f'rm {test_cfg_path}')
-
-    monkeypatch.setattr('koneko.config.Path.expanduser', lambda x: test_cfg_path)
-
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'n'])
     monkeypatch.setattr('builtins.input', lambda x='': next(responses))
     monkeypatch.setattr('koneko.config.getpass', lambda: 'mypassword')
     # fix for macOS
-    monkeypatch.setattr('koneko.config.os.system',
-                        lambda x: f'tail example_config.ini -n +9 >> {test_cfg_path}')
+    monkeypatch.setattr(
+        'koneko.config.os.system',
+        lambda x: f'tail example_config.ini -n +9 >> {tmp_path / "test_config.ini"}'
+    )
 
     creds, your_id = config.begin_config()
     assert your_id == ''

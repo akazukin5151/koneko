@@ -38,17 +38,14 @@ def test_filter_history(tmp_path):
 
 
 def test_dir_not_empty(tmp_path):
-    class FakeData:
-        def __init__(self):
-            self.download_path = tmp_path
-            self.first_img = "004_祝！！！.jpg"
-            self.all_names = ["004_祝！！！.jpg", '008_77803142_p0.png', '017_ミコニャン.jpg']
-
-    data = FakeData()
+    FakeData = namedtuple('data', ('download_path', 'first_img', 'all_names'))
+    data = FakeData(
+        tmp_path, "004_祝！！！.jpg",
+        ["004_祝！！！.jpg", '008_77803142_p0.png', '017_ミコニャン.jpg']
+    )
 
     # Test dir exists but is empty
     tmp_path.mkdir(exist_ok=True)
-    data.download_path = tmp_path
     assert files.dir_not_empty(data) is False
 
     # Copy .koneko and only one image to that dir

@@ -6,6 +6,7 @@ in ~/.config/koneko/config.ini
 And internet connection
 """
 import sys
+
 import pytest
 
 from koneko import main, utils

@@ -4,9 +4,9 @@ import pytest
 
 from pick import Picker, KEYS_UP, KEYS_ENTER
 
-from conftest import CustomExit, raises_customexit
 from koneko import picker, KONEKODIR
 from koneko.picker import EMPTY_WARNING
+from conftest import CustomExit, raises_customexit
 
 
 

@@ -1,10 +1,11 @@
-import pytest
 from pathlib import Path
 from unittest.mock import Mock, call
 
-from conftest import CustomExit, raises_customexit
-from koneko import lscat_app, lscat, KONEKODIR
+import pytest
+
 from koneko.lscat_app import FakeData
+from koneko import lscat_app, lscat, KONEKODIR
+from conftest import CustomExit, raises_customexit
 
 
 @pytest.mark.parametrize('argv', (['2'], []))

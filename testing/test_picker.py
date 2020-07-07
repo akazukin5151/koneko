@@ -9,11 +9,15 @@ from koneko.picker import EMPTY_WARNING
 from conftest import CustomExit, raises_customexit
 
 
+@pytest.fixture
+def patch_filter_history(monkeypatch):
+    monkeypatch.setattr('koneko.files.filter_history', lambda x: ['actions'])
 
-def test_ws_picker_w(monkeypatch):
+@pytest.mark.parametrize('letter', ('w', 's'))
+def test_ws_picker(monkeypatch, letter):
     class FakePick(Picker):
         def run_loop(self):
-            c = ord('w')
+            c = ord(letter)
 
             if c in self.custom_handlers:
                 ret = self.custom_handlers[c](self)
@@ -24,28 +28,7 @@ def test_ws_picker_w(monkeypatch):
     fakepicker = FakePick
     monkeypatch.setattr('koneko.picker.Picker', fakepicker)
     mypicker = picker.ws_picker(['1', '2'], 'title')
-    mypicker.register_custom_handler(ord('w'), lambda x: x.move_up())
-    try:
-        assert mypicker.start() == ('2', 1)
-    except curses.error:
-        pass  # Github actions doesn't have a terminal
-
-
-def test_ws_picker_s(monkeypatch):
-    class FakePick(Picker):
-        def run_loop(self):
-            c = ord('s')
-
-            if c in self.custom_handlers:
-                ret = self.custom_handlers[c](self)
-                if ret:
-                    return ret
-                return self.get_selected()
-
-    fakepicker = FakePick
-    monkeypatch.setattr('koneko.picker.Picker', fakepicker)
-    mypicker = picker.ws_picker(['1', '2'], 'title')
-    mypicker.register_custom_handler(ord('s'), lambda x: x.move_down())
+    mypicker.register_custom_handler(ord(letter), lambda x: x.move_up())
     try:
         assert mypicker.start() == ('2', 1)
     except curses.error:
@@ -101,24 +84,21 @@ def test_ask_assistant(monkeypatch):
     assert picker.ask_assistant() == [2, 3]
 
 
-def test_pick_dir_y(monkeypatch):
+def test_pick_dir_y(monkeypatch, patch_filter_history):
     # Just to test the branch is reachable
-    monkeypatch.setattr('koneko.files.filter_history', lambda x: ['actions'])
     monkeypatch.setattr('koneko.picker.Picker.start', lambda x: (None, 'y'))
     assert picker.pick_dir() == KONEKODIR
 
 
-def test_pick_dir_b(monkeypatch):
+def test_pick_dir_b(monkeypatch, patch_filter_history):
     # Just to test the branch is reachable
-    monkeypatch.setattr('koneko.files.filter_history', lambda x: ['actions'])
     monkeypatch.setattr('koneko.picker.Picker.start', lambda x: (None, 'b'))
     monkeypatch.setattr('koneko.picker.actions_from_dir', raises_customexit)
     with pytest.raises(CustomExit):
         picker.pick_dir()
 
-def test_pick_dir_d(monkeypatch):
+def test_pick_dir_d(monkeypatch, patch_filter_history):
     # Just to test the branch is reachable
-    monkeypatch.setattr('koneko.files.filter_history', lambda x: ['actions'])
     monkeypatch.setattr('koneko.picker.Picker.start', lambda x: (None, 'd'))
     monkeypatch.setattr('koneko.picker.actions_from_dir', raises_customexit)
     monkeypatch.setattr('builtins.input', lambda x: 'n')
@@ -126,9 +106,8 @@ def test_pick_dir_d(monkeypatch):
         picker.pick_dir()
 
 
-def test_pick_dir_f(monkeypatch):
+def test_pick_dir_f(monkeypatch, patch_filter_history):
     # Just to test the branch is reachable
-    monkeypatch.setattr('koneko.files.filter_history', lambda x: ['actions'])
     monkeypatch.setattr('koneko.picker.Picker.start', lambda x: (None, 'f'))
     monkeypatch.setattr('koneko.picker.handle_filter', raises_customexit)
     with pytest.raises(CustomExit):

@@ -116,6 +116,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * Hide the history file
     * Fixed crash if filter hides all directories
     * Fixed mode 2 filter showing mode 1 dirs
+    * Fixed filter mode 2 not filtering mode 1 (dirs with numbers will still be shown, but the mode 1 pages won't be, only the `individual` dir)
 
 #### Code maintenance
 * Simplified code:
@@ -132,6 +133,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * **Moved a lot of functions to more appropriate modules**
     * Move print-related functions from utils.py to printer.py
     * Move file-related functions from utils.py to files.py
+    * Move functions with while loops from lscat_app to assistants.py
+    * Move picker-related functions into picker.py (eg lscat app main picker, frequents mode picker, browse cache picker)
+* Document cache tree dir structure in `HACKING.md`
+* Added and improved tests with parametrization
 
 # Roadmap
 

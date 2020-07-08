@@ -3,13 +3,18 @@ import sys
 import random
 from pathlib import Path
 from unittest.mock import Mock
+from collections import namedtuple
 
 import pytest
 
 from koneko import lscat, pure
+from conftest import setup_test_config
 
 # Lmao python
 sys.path.append('testing')
+
+
+FakeData = namedtuple('data', ('download_path',))
 
 
 def test_icat():
@@ -19,7 +24,8 @@ def test_icat():
         # Github doesn't connect to terminal
         pass
 
-def test_show_instant(monkeypatch):
+
+def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
     showed = []
 
     class FakeTracker:
@@ -29,16 +35,12 @@ def test_show_instant(monkeypatch):
         def update(self, new):
             showed.append(new)
 
-    class FakeData:
-        def __init__(self):
-            self.download_path = Path('testing/files/')
+    FakeData = namedtuple('data', ('download_path',))
 
     # This config has print_info = True
-    # Can't use shared fixture because pathlib is used in FakeData
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
+    setup_test_config(tmp_path)
 
-    fakedata = FakeData()
+    fakedata = FakeData(Path('testing/files/'))
     lscat.show_instant(FakeTracker, fakedata, True)
     # First one works for me, but second one works for github
     assert set(showed) == {
@@ -107,17 +109,11 @@ def test_TrackDownloadsUser(monkeypatch):
     assert correct_order == sent_img
 
 
-def test_TrackDownloadsUser2(monkeypatch):
+def test_TrackDownloadsUser2(monkeypatch, tmp_path, use_test_cfg_path):
     """Test with .koneko file"""
-    class FakeData:
-        def __init__(self):
-            self.download_path = Path('testing/files/user')
+    setup_test_config(tmp_path)
 
-    # Can't use shared fixture because pathlib is used in FakeData
-    monkeypatch.setattr('koneko.utils.Path.expanduser',
-                        lambda x: Path('testing/test_config.ini'))
-
-    data = FakeData()
+    data = FakeData(Path('testing/files/user'))
     data.download_path.mkdir()
     pics = ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png')
     for pic in pics:

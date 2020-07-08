@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import Mock, call
+
+import pytest
 
 from koneko import cli
 

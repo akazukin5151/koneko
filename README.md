@@ -136,7 +136,12 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * Move functions with while loops from lscat_app to assistants.py
     * Move picker-related functions into picker.py (eg lscat app main picker, frequents mode picker, browse cache picker)
 * Document cache tree dir structure in `HACKING.md`
-* Added and improved tests with parametrization
+* Unit tests
+    * Added and improved tests with parametrization
+    * Split up some large test functions
+    * Use more fixtures
+    * Tests no longer use test_config.ini file; removed it
+    * Use namedtuples to replace some 'faker' classes
 
 # Roadmap
 

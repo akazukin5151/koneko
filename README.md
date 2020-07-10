@@ -106,7 +106,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.10.0
+### Version 0.9.1
 
 #### Features
 * `lscat` app browse cache can now filter modes

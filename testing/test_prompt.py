@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import namedtuple
 
 import pytest
 from blessed.keyboard import Keystroke
@@ -13,21 +14,14 @@ def customexit_to_quit(monkeypatch):
 
 
 def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit):
-    class FakeInKey:
-        def __init__(self):
-            self.code = True
-
-    fake_inkey = FakeInKey  # Doesn't call the class yet
+    # Does not call the 'class'
+    fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(True,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     assert not prompt.ask_quit()
 
 @pytest.mark.parametrize('letter', ['y', 'q', '', 'h'])
 def test_ask_quit_enter_and_letter_quits(monkeypatch, patch_cbreak, customexit_to_quit, letter):
-    class FakeInKeyCode:
-        def __init__(self):
-            self.code = 343
-
-    fake_inkey = FakeInKeyCode
+    fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()

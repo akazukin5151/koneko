@@ -2,7 +2,7 @@ import curses
 
 import pytest
 
-from pick import Picker, KEYS_UP, KEYS_ENTER
+from pick import Picker
 
 from koneko import picker, KONEKODIR
 from koneko.picker import EMPTY_WARNING

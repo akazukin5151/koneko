@@ -106,42 +106,7 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.9.1
-
-#### Features
-* `lscat` app browse cache can now filter modes
-
-#### Bug fixes
-* Browse cache (in `lscat` app and main):
-    * Hide the history file
-    * Fixed crash if filter hides all directories
-    * Fixed mode 2 filter showing mode 1 dirs
-    * Fixed filter mode 2 not filtering mode 1 (dirs with numbers will still be shown, but the mode 1 pages won't be, only the `individual` dir)
-
-#### Code maintenance
-* Simplified code:
-    * Restructure cli handling to be more modular like lscat_app
-        * Launch functions directly from cli.py
-    * main loop
-    * Split up lscat_app.pick_dir_loop()
-    * Await login before fetching by default, removing all manual awaits
-    * Pass credentials into api.start() instead of exposing attribute to the public
-    * Mode 3: Move your_id prompt to inside start() method
-    * Instantiate blessed.Terminal() in __init__.py
-    * Parametrize all cli tests
-    * Split up lscat_app.config_assistance()
-* **Moved a lot of functions to more appropriate modules**
-    * Move print-related functions from utils.py to printer.py
-    * Move file-related functions from utils.py to files.py
-    * Move functions with while loops from lscat_app to assistants.py
-    * Move picker-related functions into picker.py (eg lscat app main picker, frequents mode picker, browse cache picker)
-* Document cache tree dir structure in `HACKING.md`
-* Unit tests
-    * Added and improved tests with parametrization
-    * Split up some large test functions
-    * Use more fixtures
-    * Tests no longer use test_config.ini file; removed it
-    * Use namedtuples to replace some 'faker' classes
+### Version 0.9.2
 
 # Roadmap
 

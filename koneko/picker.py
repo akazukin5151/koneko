@@ -118,7 +118,7 @@ def pick_dir() -> 'path':
         "Press 'q' to exit"
     )
     actions = files.filter_history(path)
-    return _pick_dir_loop(path, basetitle, actions, None)
+    return _pick_dir_loop(path, basetitle, actions, [])
 
 
 def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
@@ -178,14 +178,14 @@ def handle_filter(path: 'path', basetitle: str) -> (str, 'list[str]', 'list[str]
 def handle_cd(path: 'path', actions, ans, modes: 'list[str]') -> ('path', 'list[str]'):
     selected_dir = actions[ans]
     if selected_dir == EMPTY_WARNING:
-        return KONEKODIR, None
+        return KONEKODIR, []
     elif (newpath := path / selected_dir).is_dir():
         return newpath, modes
     return path, modes
 
 
 def actions_from_dir(path: 'path', modes: 'list[str]') -> 'list[str]':
-    if path == KONEKODIR and modes is not None:  # Filter active
+    if path == KONEKODIR and modes:  # Filter active
         return try_filter_dir(modes)
     if '2' in modes and '1' not in modes and 'individual' not in str(path):
         return ['individual']

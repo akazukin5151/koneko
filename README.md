@@ -108,6 +108,9 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ### Version 0.9.2
 
+#### Bug fixes
+* Fixed mode 2 exclusive filter showing mode 1 page dirs
+
 # Roadmap
 
 * Make sure the diagrams in HACKING.md is up-to-date

@@ -86,6 +86,11 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 ![download UML](http://plantuml.com:80/plantuml/png/ZLDR3eCW4Fpd55x07g7fJGYLRRiDB0RNDYOUlhLLAGAcNuQPVS3CUEfOUUwj4OnieDBkISOfVMW78Tpv3WrNICXo8HPGTGCrAoezaB9G8CdjyrsBHE1ZzeA6mKj5EjczDl8DQ3DwvNflSfXyWCSBGZeChRg2R9ppkYkGr5iXUgpg2Q_7uqQQw3GN7GjAYIoyQSffKDBsxzOCi_PcbOrUNB0k3vSq287O6HsAnA-1LLswPzRck7mAHTRmk2oudKB9m92ew3NHpXBnqpidhlNEjYo-d_UkCRdMdD2TYazCJq1w-gzV)
 
 
+### AbstractImageAdjuster classes in assistants.py
+
+![ImageAdjuster UML](http://plantuml.com:80/plantuml/png/vLL1JiCm4Bpd5JbI5V82LBK28RWWn8LoifnusooAdM2lMw3qxwHDavROBZqWSI2tU3RnpEoiFJR4DLbPH15F3McUKPmLt9XuidkzatmE4_5Y3O6EBo_F9kUn1Z4OZLPHN3z9yWYl5kkbc1DfJ2s1IP8jDenNxL_NCULMfefZmGn-W8kRl5oocLMP1q81hE0f51vi8u2PYcTW-eHIoFa2IwixGliFDLIbfhD1VrtoznIOB1V0R7KK5kLIXGf0SmCks6baNC-DYsiWgnKZtyve6AhA4blm0iKEJvAhKifIxQMsIhU-r5NhO6SVk12evjwUticg00cAzgrqZ1vwfBe2mhJxExICcu9xMDQSWiawI80eCtSDPjmMnDuSP8PAC86oYLhjJcFAj7NZY0FU1FTZsy_gzvnvqnN8b3SiZJ7eakjSw6iFANx-Hue3XzddXQqk-lCGEVFHb4r_m5i_dNcxgTbiDxx6Me31UbfF6xcWaOUUUORGVygSC9fTDZhAJoWe__M41C-IVKnSAhU0yvp-YClH0BaDZdmzxnLlhJsbi14UHMDGOdDJVm40)
+
+
 ## Dependencies
 
 There are two dependencies that aren't necessary: returns and placeholder (both on the right edge). Code can always be rewritten to remove those two dependencies. That said, they don't introduce their own dependency tree, so only a total of three dependencies are added. Compared to the core dependencies (pixivpy, pixcat, and blessed), that's insignificant.

@@ -142,17 +142,17 @@ def test_handle_filter(monkeypatch, tmp_path, number):
             == (f"Filtering modes=['{number}']\ntitle", ['dirs'], [number]))
 
 def test_handle_cd_empty():
-    assert picker.handle_cd(None, [EMPTY_WARNING], 0, []) == (KONEKODIR, [])
+    assert picker.handle_cd(None, EMPTY_WARNING, []) == (KONEKODIR, [])
 
 
 def test_handle_cd_path_not_dir(tmp_path):
-    assert picker.handle_cd(tmp_path, ['dir'], 0, ['modes']) == (tmp_path, ['modes'])
+    assert picker.handle_cd(tmp_path, 'dir', ['modes']) == (tmp_path, ['modes'])
 
 
 def test_handle_cd_path_is_dir(tmp_path):
     realpath = tmp_path / '1234'
     realpath.mkdir()
-    assert picker.handle_cd(tmp_path, ['1234'], 0, ['modes']) == (realpath, ['modes'])
+    assert picker.handle_cd(tmp_path, '1234', ['modes']) == (realpath, ['modes'])
 
 
 def test_actions_from_dir_filter_inactive(monkeypatch):

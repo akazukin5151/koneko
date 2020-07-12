@@ -143,7 +143,7 @@ def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
             continue
 
         else:
-            path, modes = handle_cd(path, actions, ans, modes)
+            path, modes = handle_cd(path, actions[ans], modes)
 
         actions = actions_from_dir(path, modes)
 
@@ -175,8 +175,7 @@ def handle_filter(path: 'path', basetitle: str) -> (str, 'list[str]', 'list[str]
     return title, actions, modes
 
 
-def handle_cd(path: 'path', actions, ans, modes: 'list[str]') -> ('path', 'list[str]'):
-    selected_dir = actions[ans]
+def handle_cd(path, selected_dir: 'path', modes: 'list[str]') -> ('path', 'list[str]'):
     if selected_dir == EMPTY_WARNING:
         return KONEKODIR, []
     elif (newpath := path / selected_dir).is_dir():

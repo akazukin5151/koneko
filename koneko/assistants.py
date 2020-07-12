@@ -17,7 +17,7 @@ PLUS = {'+', '='}
 MINUS = {'-', '_'}
 
 
-def copy_image():
+def copy_image() -> Image:
     return copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
 
 
@@ -26,7 +26,7 @@ def check_quit(ans: str):
         sys.exit(0)
 
 
-def thumbnail_size_assistant():
+def thumbnail_size_assistant() -> 'IO[int]':
     """=== Thumbnail size ===
     This will display an image whose thumbnail size can be varied
     Use +/= to increase the size, and -/_ to decrease it
@@ -57,7 +57,7 @@ def thumbnail_size_assistant():
                 return size
 
 
-def xpadding_assistant(thumbnail_size):
+def xpadding_assistant(thumbnail_size: int) -> 'IO[int]':
     """=== Image x spacing ===
     1) Move the second image so that it is just to the right of the first image
        Use +/= to move it to the right, and -/_ to move it to the left.
@@ -71,7 +71,7 @@ def xpadding_assistant(thumbnail_size):
     return _XPadding(thumbnail_size).start()
 
 
-def ypadding_assistant(thumbnail_size):
+def ypadding_assistant(thumbnail_size: int) -> 'IO[int]':
     """=== Image y spacing ===
     1) Move the second image so that it is just to the bottom of the first image
        Use +/= to move it downwards, and -/_ to move it upwards.
@@ -100,34 +100,34 @@ class _AbstractImageAdjuster(ABC):
         self.valid: bool
 
     @abstractmethod
-    def write(self):
+    def write(self) -> 'IO':
         raise NotImplementedError
 
     @abstractmethod
-    def maybe_move_up(self):
+    def maybe_move_up(self) -> 'IO':
         raise NotImplementedError
 
     @abstractmethod
-    def maybe_move_down(self):
+    def maybe_move_down(self) -> 'IO':
         raise NotImplementedError
 
     @abstractmethod
-    def show_func_args(self):
+    def show_func_args(self) -> Image:
         raise NotImplementedError
 
     @abstractmethod
-    def maybe_erase(self):
+    def maybe_erase(self) -> 'IO':
         raise NotImplementedError
 
     @abstractmethod
-    def return_tup(self):
+    def return_tup(self) -> (int, int):
         raise NotImplementedError
 
     @abstractmethod
-    def is_input_valid(self):
+    def is_input_valid(self) -> bool:
         raise NotImplementedError
 
-    def hide_show_print(self):
+    def hide_show_print(self) -> 'IO':
         utils.hide_if_exist(self.image)
 
         self.image = self.show_func_args()
@@ -136,7 +136,7 @@ class _AbstractImageAdjuster(ABC):
         printer.write('\r' + ' ' * 20 + '\r')
         self.write()
 
-    def start(self):
+    def start(self) -> (int, int):
         self.maybe_move_down()
 
         self.spaces = self.start_spaces
@@ -176,16 +176,16 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
         self.default_x: int
         self.find_dim_func: 'func'
 
-    def maybe_erase(self):
+    def maybe_erase(self) -> None:
         return True
 
-    def return_tup(self):
+    def return_tup(self) -> (int, int):
         return self.spaces, self.width_or_height
 
     def is_input_valid(self) -> bool:
         return bool(self.valid)
 
-    def start(self):
+    def start(self) -> (int, int):
         printer.print_doc(self.doc)
 
         utils.show_single_x(self.default_x, self.thumbnail_size)
@@ -210,16 +210,16 @@ class _XPadding(_AbstractPadding):
         self.default_x = config.xcoords_config()[0]
         self.find_dim_func = _FindImageWidth
 
-    def write(self):
+    def write(self) -> 'IO':
         printer.write(f'x spacing = {self.spaces}')
 
-    def maybe_move_down(self, *a):
+    def maybe_move_down(self, *a) -> None:
         return True
 
-    def maybe_move_up(self):
+    def maybe_move_up(self) -> None:
         return True
 
-    def show_func_args(self):
+    def show_func_args(self) -> Image:
         return self.show_func(
             self.default_x + self.width_or_height + self.spaces,
             self.thumbnail_size
@@ -239,16 +239,16 @@ class _YPadding(_AbstractPadding):
         self.default_x = config.xcoords_config()[1]
         self.find_dim_func = _FindImageHeight
 
-    def write(self):
+    def write(self) -> 'IO':
         printer.write(f'y spacing = {self.spaces}')
 
-    def maybe_move_down(self):
+    def maybe_move_down(self) -> 'IO':
         printer.move_cursor_down(self.width_or_height)
 
-    def maybe_move_up(self):
+    def maybe_move_up(self) -> 'IO':
         printer.move_cursor_up(self.spaces)
 
-    def show_func_args(self):
+    def show_func_args(self) -> Image:
         return self.show_func(
             self.width_or_height + self.spaces,
             self.thumbnail_size
@@ -265,22 +265,22 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
         self.start_spaces: int
         self.image = None
 
-    def write(self):
+    def write(self) -> 'IO':
         printer.write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
 
-    def maybe_move_down(self):
+    def maybe_move_down(self) -> None:
         return True
 
-    def show_func_args(self):
+    def show_func_args(self) -> Image:
         return self.show_func(self.spaces, self.thumbnail_size)
 
-    def maybe_erase(self):
+    def maybe_erase(self) -> 'IO':
         printer.erase_line()
 
-    def return_tup(self):
+    def return_tup(self) -> (int, int):
         return self.spaces - self.start_spaces, self.image
 
-    def is_input_valid(self):
+    def is_input_valid(self) -> bool:
         return self.spaces >= self.start_spaces and self.valid
 
 
@@ -292,7 +292,7 @@ class _FindImageWidth(_FindImageDimension):
         self.start_spaces = config.xcoords_config()[0]
         super().__init__()
 
-    def maybe_move_up(self):
+    def maybe_move_up(self) -> None:
         return True
 
 
@@ -304,11 +304,11 @@ class _FindImageHeight(_FindImageDimension):
         self.start_spaces = 0
         super().__init__()
 
-    def maybe_move_up(self):
+    def maybe_move_up(self) -> 'IO':
         printer.move_cursor_up(self.spaces)
 
 
-def page_spacing_assistant(thumbnail_size):
+def page_spacing_assistant(thumbnail_size: int) -> int:
     # This doesn't use print_doc() as a clean state is needed
     os.system('clear')
     print(*(
@@ -341,7 +341,7 @@ def page_spacing_assistant(thumbnail_size):
         print('Must enter a number!')
 
 
-def gallery_print_spacing_assistant(size, image_width, xpadding):
+def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[int]':
     """=== Gallery print spacing ===
     Use +/= to increase the spacing, and -/_ to decrease it
     Use q to exit the program, and press enter to go to the next assistant
@@ -396,7 +396,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding):
                 return spacings
 
 
-def user_info_assistant(thumbnail_size, xpadding, image_width):
+def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     """=== User print name xcoord ===
     Use +/= to move the text right, and -/_ to move it left
     Adjust the position as you see fit

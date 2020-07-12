@@ -172,7 +172,7 @@ def maybe_page_spacing(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]
     return None, None
 
 
-def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width: int) -> int:
+def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width: int) -> 'list[int]':
     if 5 in actions or 7 in actions:
         return assistants.gallery_print_spacing_assistant(
             size, xpadding, image_width

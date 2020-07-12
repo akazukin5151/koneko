@@ -19,13 +19,15 @@ def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit):
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     assert not prompt.ask_quit()
 
-@pytest.mark.parametrize('letter', ['y', 'q', '', 'h'])
-def test_ask_quit_enter_and_letter_quits(monkeypatch, patch_cbreak, customexit_to_quit, letter):
+def test_ask_quit_enter(monkeypatch, patch_cbreak, customexit_to_quit):
     fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()
 
+@pytest.mark.parametrize('letter', ['y', 'q', '', 'h'])
+def test_ask_quit_letter(monkeypatch, patch_cbreak, customexit_to_quit, letter):
+    fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
     fake_inkey.__call__ = lambda x: letter
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):

@@ -106,6 +106,8 @@ def browse_cache():
 
     if '.koneko' in os.listdir(path):
         lscat.show_instant(lscat.TrackDownloadsUsers, data)
+    elif 'individual' in str(path):
+        lscat.icat(path / os.listdir(path)[0])
     else:
         lscat.show_instant(lscat.TrackDownloads, data, True)
 

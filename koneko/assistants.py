@@ -113,14 +113,14 @@ class _AbstractImageAdjuster(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def maybe_erase(self) -> 'IO':
+        raise NotImplementedError
+
+    @abstractmethod
     def show_func_args(self) -> Image:
         """Show pixcat image, where the function and its args can be customized
         Returns a reference of that Image, so it can be hidden later
         """
-        raise NotImplementedError
-
-    @abstractmethod
-    def maybe_erase(self) -> 'IO':
         raise NotImplementedError
 
     @abstractmethod
@@ -293,13 +293,13 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
         """Implements abstractmethod: No action needed"""
         return True
 
-    def show_func_args(self) -> Image:
-        """Implements abstractmethod: first argument is unique"""
-        return self.show_func(self.spaces, self.thumbnail_size)
-
     def maybe_erase(self) -> 'IO':
         """Implements abstractmethod"""
         printer.erase_line()
+
+    def show_func_args(self) -> Image:
+        """Implements abstractmethod: first argument is unique"""
+        return self.show_func(self.spaces, self.thumbnail_size)
 
     def return_tup(self) -> (int, int):
         """Implements abstractmethod"""

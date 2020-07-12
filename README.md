@@ -108,8 +108,18 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ### Version 0.9.2
 
+#### Features
+* lscat app: Display first picture if a mode 2 directory is selected
+
 #### Bug fixes
 * Fixed mode 2 exclusive filter showing mode 1 page dirs
+
+#### Code maintenance
+* Added more type annotations
+* Rename AbstractImageAdjuster.write() to report()
+* Added docstrings in assistants.py
+* Added image_adjuster.puml, displayed in HACKING.md
+ 
 
 # Roadmap
 
@@ -123,7 +133,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Filter modes in koneko main should go back to main screen on 'q' key
 * Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
     - [ ] Handle moving around pages
-    - [ ] Mode 2 dirs in lscat_app should do something (currently does nothing)
+    - [x] Mode 2 dirs in lscat_app should do something (currently does nothing)
     - [ ] Documentation
 * Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)

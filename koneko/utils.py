@@ -13,7 +13,6 @@ import os
 import logging
 import itertools
 import threading
-from copy import copy
 from math import ceil
 from pathlib import Path
 from collections import Counter
@@ -22,7 +21,6 @@ from logging.handlers import RotatingFileHandler
 
 import funcy
 from pixcat import Image
-from placeholder import m
 
 from koneko import pure, printer, TERM, KONEKODIR
 from koneko.config import ncols_config, xcoords_config

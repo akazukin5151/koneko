@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod
+from unittest.mock import Mock
 from collections import namedtuple
+from abc import ABC, abstractmethod
 
 import pytest
 from blessed.keyboard import Keystroke
@@ -19,11 +20,13 @@ def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit):
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     assert not prompt.ask_quit()
 
+
 def test_ask_quit_enter(monkeypatch, patch_cbreak, customexit_to_quit):
     fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()
+
 
 @pytest.mark.parametrize('letter', ['y', 'q', '', 'h'])
 def test_ask_quit_letter(monkeypatch, patch_cbreak, customexit_to_quit, letter):
@@ -45,27 +48,28 @@ class FakeInKey(ABC):
     def __call__(self):
         raise NotImplementedError
 
-class FakeGallery:
-    @staticmethod
-    def help():                  raise CustomExit()
-    def next_page(self):         raise CustomExit()
-    def previous_page(self):     raise CustomExit()
-    def handle_prompt(self, *a): raise CustomExit()
-    def view_image(self, *a):    raise CustomExit()
-    def __init__(self):          self.data = None
+
+exit_mock = Mock(side_effect=CustomExit)
+fakegallery = Mock()
+fakegallery.help = exit_mock
+fakegallery.next_page = exit_mock
+fakegallery.previous_page = exit_mock
+fakegallery.handle_prompt = exit_mock
+fakegallery.view_image  = exit_mock
 
 
 @pytest.mark.parametrize('letter', ['n', 'h', 'b', 'r'])
 def test_gallery_like_prompt(monkeypatch, patch_cbreak, letter):
-    fakegallery = FakeGallery()
     class FakeInKeyNew(FakeInKey):
         def __call__(self):
             return Keystroke(ucs=letter, code=1, name=letter)
 
     fake_inkey = FakeInKeyNew()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
+
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
+
 
 def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
     class FakeInKeyPrev(FakeInKey):
@@ -75,9 +79,10 @@ def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
     fake_inkey = FakeInKeyPrev()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     monkeypatch.setattr('koneko.ui.AbstractGallery.previous_page', raises_customexit)
-    fakegallery = FakeGallery()
+
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
+
 
 def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak):
     class FakeInKeyQuit(FakeInKey):
@@ -87,7 +92,6 @@ def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak):
     fake_inkey = FakeInKeyQuit()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
-    fakegallery = FakeGallery()
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
 
@@ -103,7 +107,6 @@ def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak):
 
     fake_inkey = iter([FakeInKey1(), FakeInKey2()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
-    fakegallery = FakeGallery()
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
 
@@ -129,19 +132,17 @@ def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak):
 #        assert prompt.gallery_like_prompt(fakegallery)
 
 
-class FakeImage:
-    def __init__(self):       self.data = None
-    def open_image(self):     raise CustomExit()
-    def download_image(self): raise CustomExit()
-    def next_image(self):     raise CustomExit()
-    def previous_image(self): raise CustomExit()
-    def show_full_res(self):  raise CustomExit()
-    def leave(self, *a):      raise CustomExit()
+fakeimage = Mock()
+fakeimage.open_image = exit_mock
+fakeimage.download_image  = exit_mock
+fakeimage.next_image = exit_mock
+fakeimage.previous_image = exit_mock
+fakeimage.show_full_res= exit_mock
+fakeimage.leave = exit_mock
 
 @pytest.mark.parametrize('letter', (u'a', u'b', u'q', u'o', u'd', u'n', u'p', u'f'))
 def test_image_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
-    fakeimage = FakeImage()
     class FakeInKeyNew(FakeInKey):
         def __call__(self):
             return Keystroke(ucs=letter, code=1, name=letter)
@@ -163,24 +164,21 @@ def test_image_prompt_seq(monkeypatch, patch_cbreak):
     fake_inkey = iter([FakeInKey1(), FakeInKey2()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
     monkeypatch.setattr('koneko.ui.jump_to_image', raises_customexit)
-    fakeimage = FakeImage()
     with pytest.raises(CustomExit):
         assert prompt.image_prompt(fakeimage)
 
 
 
-class FakeUser:
-    def __init__(self):           self.data = None
-    def next_page(self):          raise CustomExit()
-    def previous_page(self):      raise CustomExit()
-    def reload(self):             raise CustomExit()
-    def go_artist_mode(self, *a): raise CustomExit()
+fakeuser = Mock()
+fakeuser.next_page = exit_mock
+fakeuser.previous_page = exit_mock
+fakeuser.reload = exit_mock
+fakeuser.go_artist_mode = exit_mock
 
 @pytest.mark.parametrize('letter', (u'n', u'r', u'p', u'q'))
 def test_user_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     monkeypatch.setattr('koneko.ui.AbstractUsers.previous_page', raises_customexit)
-    fakeuser = FakeUser()
     class FakeInKeyNew(FakeInKey):
         def __call__(self):
             return Keystroke(ucs=letter, code=1, name=letter)
@@ -201,6 +199,5 @@ def test_user_prompt_seq(monkeypatch, patch_cbreak):
 
     fake_inkey = iter([FakeInKey1(), FakeInKey2()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
-    fakeuser = FakeUser()
     with pytest.raises(CustomExit):
         assert prompt.user_prompt(fakeuser)

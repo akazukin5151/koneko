@@ -157,7 +157,7 @@ def test_handle_cd_path_is_dir(tmp_path):
 
 def test_actions_from_dir_filter_inactive(monkeypatch):
     monkeypatch.setattr('koneko.files.filter_history', lambda x: True)
-    assert picker.actions_from_dir('not_konekodir', None)
+    assert picker.actions_from_dir('not_konekodir', [])
 
 
 def test_actions_from_dir_filter_active(monkeypatch):

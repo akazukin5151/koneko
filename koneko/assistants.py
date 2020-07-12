@@ -100,7 +100,7 @@ class _AbstractImageAdjuster(ABC):
         self.valid: bool
 
     @abstractmethod
-    def write(self) -> 'IO':
+    def report(self) -> 'IO':
         raise NotImplementedError
 
     @abstractmethod
@@ -134,7 +134,7 @@ class _AbstractImageAdjuster(ABC):
 
         self.maybe_move_up()
         printer.write('\r' + ' ' * 20 + '\r')
-        self.write()
+        self.report()
 
     def start(self) -> (int, int):
         self.maybe_move_down()
@@ -210,7 +210,7 @@ class _XPadding(_AbstractPadding):
         self.default_x = config.xcoords_config()[0]
         self.find_dim_func = _FindImageWidth
 
-    def write(self) -> 'IO':
+    def report(self) -> 'IO':
         printer.write(f'x spacing = {self.spaces}')
 
     def maybe_move_down(self, *a) -> None:
@@ -239,7 +239,7 @@ class _YPadding(_AbstractPadding):
         self.default_x = config.xcoords_config()[1]
         self.find_dim_func = _FindImageHeight
 
-    def write(self) -> 'IO':
+    def report(self) -> 'IO':
         printer.write(f'y spacing = {self.spaces}')
 
     def maybe_move_down(self) -> 'IO':
@@ -265,7 +265,7 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
         self.start_spaces: int
         self.image = None
 
-    def write(self) -> 'IO':
+    def report(self) -> 'IO':
         printer.write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
 
     def maybe_move_down(self) -> None:

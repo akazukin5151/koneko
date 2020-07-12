@@ -187,6 +187,8 @@ def handle_cd(path, actions, ans, modes):
 def actions_from_dir(path, modes):
     if path == KONEKODIR and modes is not None:  # Filter active
         return try_filter_dir(modes)
+    if '2' in modes and '1' not in modes and 'individual' not in str(path):
+        return ['individual']
     return files.filter_history(path)
 
 

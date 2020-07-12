@@ -11,14 +11,14 @@ from koneko import files, assistants, KONEKODIR
 EMPTY_WARNING = "**No directories match the filter! Press 'f' to re-filter**"
 
 
-def ws_picker(actions, title, **kwargs) -> Picker:
+def ws_picker(actions: 'list[str]', title: str, **kwargs) -> Picker:
     picker = Picker(actions, title, **kwargs)
     picker.register_custom_handler(ord('w'), m.move_up())
     picker.register_custom_handler(ord('s'), m.move_down())
     return picker
 
 
-def _pick_dirs_picker(actions, title) -> Picker:
+def _pick_dirs_picker(actions: 'list[str]', title: str) -> Picker:
     picker = Picker(actions, title)
     picker.register_custom_handler(ord('w'), m.move_up())
     picker.register_custom_handler(ord('s'), m.move_down())

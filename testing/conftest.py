@@ -21,11 +21,6 @@ def patch_cbreak(monkeypatch):
     monkeypatch.setattr('koneko.TERM.cbreak', fakecbreak)
 
 
-@pytest.fixture
-def patch_cbreak(monkeypatch):
-    monkeypatch.setattr('koneko.TERM.cbreak', fakecbreak)
-
-
 class CustomExit(SystemExit):
     """Replaces all expected instances of an exit,
     to ensure that code exits only where this exception is mocked into

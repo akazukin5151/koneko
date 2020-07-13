@@ -29,11 +29,11 @@ lint:
     - pip install flake8
     - |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --ignore=F821,F722,W391
+        flake8 koneko/ --count --select=E9,F63,F7,F82 --show-source --statistics --ignore=F821,F722,W391
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --ignore=F821,F722,W391
+        flake8 koneko/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --ignore=F821,F722,W391
         # These errors should all occur inside string type annotations, ignore if so
-        flake8 . --count --exit-zero --select=F821,F722 --show-source
+        flake8 koneko/ --count --exit-zero --select=F821,F722 --show-source
 
 test:
   script:

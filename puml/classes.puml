@@ -202,25 +202,25 @@ package prompt {
 }
 
 
-class data.GalleryJson {
+class data.GalleryData {
+    ..Implements..
     + page_num
     + main_path
-    + all_pages_cache
     + offset
+    + next_url
     + download_path
     + all_urls
     + all_names
-    + next_url
-    + first_img
     +update()
     +artist_user_id()
     ..Unique..
+    + all_pages_cache
     + current_illusts
     +post_json()
     +image_id()
     +url()
 }
-class data.ImageJson {
+class data.ImageData {
     + image_id
     + artist_illust_id
     + page_num
@@ -232,29 +232,48 @@ class data.ImageJson {
     + next_img_url
     + current_url
 }
-class data.UserJson {
+class data.UserData {
+    ..Implements..
     + page_num
     + main_path
-    + ids_cache
-    + names_cache
     + offset
+    + next_url
     + download_path
     + all_urls
     + all_names
-    + next_url
-    + first_img
     +update()
     +artist_user_id()
     ..Unique..
+    + ids_cache
+    + names_cache
     + names
     + splitpoint
     + profile_pic_urls
     + image_urls
 }
+abstract class data.AbstractData <<(A, red)>>{
+    ..Required attributes..
+    +{abstract} page_num
+    +{abstract} main_path
+    +{abstract} offset
+    +{abstract} next_url
+    +{abstract} download_path
+    +{abstract} all_urls
+    +{abstract} all_names
+    ..Required methods..
+    +{abstract}update()
+    +{abstract}artist_user_id()
+    ..Common methods..
+    +urls_as_names()
+    +newnames_with_ext()
+}
 
-data.GalleryJson *-up-- ui.AbstractGallery
-data.ImageJson *-up-- ui.Image
-data.UserJson *-up-- ui.AbstractUsers
+data.GalleryData *-up-- ui.AbstractGallery
+data.ImageData *-up-- ui.Image
+data.UserData *-up-- ui.AbstractUsers
+
+data.GalleryData <-up- data.AbstractData
+data.UserData <-up- data.AbstractData
 
 
 class api.APIHandler << (S,#FF7700) Singleton >> {
@@ -262,7 +281,7 @@ class api.APIHandler << (S,#FF7700) Singleton >> {
     - api
     - api_queue
     - api_thread
-    + credentials
+    - credentials
     +start()
     +await_login()
     ..Requests..

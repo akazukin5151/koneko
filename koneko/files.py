@@ -10,7 +10,7 @@ from returns.pipeline import flow
 from koneko import utils, KONEKODIR
 
 
-def find_mode2_dirs():
+def find_mode2_dirs() -> 'list[str]':
     return [f for f in os.listdir(KONEKODIR)
             if f.isdigit()
             and 'individual' in os.listdir(KONEKODIR / f)]
@@ -27,7 +27,7 @@ def remove_dir_if_exist(data) -> 'Maybe[IO]':
         rmtree(data.download_path)
 
 
-def filter_history(path):
+def filter_history(path) -> 'list[str]':
     return flow(
         path,
         os.listdir,

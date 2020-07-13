@@ -33,35 +33,35 @@ def _print_info(message_xcoord: int) -> 'IO':
           ' ' * message_xcoord, 'Example artist', sep='')
 
 
-def maybe_print_size(actions, size):
+def maybe_print_size(actions, size) -> 'IO':
     if 1 in actions or 7 in actions:
         print(f'image_thumbnail_size = {size}')
 
 
-def maybe_print_width_xpadding(actions, image_width, xpadding):
+def maybe_print_width_xpadding(actions, image_width, xpadding) -> 'IO':
     if 2 in actions or 7 in actions:
         print(f'image_width = {image_width}')
         print(f'images_x_spacing = {xpadding}')
 
 
-def maybe_print_height_ypadding(actions, image_height, ypadding):
+def maybe_print_height_ypadding(actions, image_height, ypadding) -> 'IO':
     if 3 in actions or 7 in actions:
         print(f'image_height = {image_height}')
         print(f'images_y_spacing = {ypadding}')
 
 
-def maybe_print_page_spacing(actions, page_spacing):
+def maybe_print_page_spacing(actions, page_spacing) -> 'IO':
     if 4 in actions or 7 in actions:
         print(f'page_spacing = {page_spacing}')
 
 
-def maybe_print_print_spacing(actions, gallery_print_spacing):
+def maybe_print_print_spacing(actions, gallery_print_spacing) -> 'IO':
     if 5 in actions or 7 in actions:
         print('gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
 
-def maybe_print_user_info(actions, user_info_xcoord):
+def maybe_print_user_info(actions, user_info_xcoord) -> 'IO':
     if 6 in actions or 7 in actions:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
 
@@ -75,7 +75,7 @@ def print_doc(doc: str) -> 'IO':
     print(doc)
 
 
-def print_multiple_imgs(illusts_json: 'Json') -> None:
+def print_multiple_imgs(illusts_json: 'Json') -> 'IO':
     HASHTAG = f'{c.RED}#'
     HAS = f'{c.RESET} has {c.BLUE}'
     OF_PAGES = f'{c.RESET} pages'
@@ -85,7 +85,7 @@ def print_multiple_imgs(illusts_json: 'Json') -> None:
     print('')
 
 
-def update_gallery_info(spacings, ncols, current_selection):
+def update_gallery_info(spacings, ncols, current_selection) -> 'IO':
     move_cursor_up(2)
     erase_line()
     print_cols(spacings, ncols)
@@ -95,16 +95,16 @@ def update_gallery_info(spacings, ncols, current_selection):
     move_cursor_up(1)
 
 
-def update_user_info(spacing):
-    erase_line()         # Erase the first line
-    move_cursor_down()   # Go down and erase the second line
+def update_user_info(spacing) -> 'IO':
+    erase_line()          # Erase the first line
+    move_cursor_down()    # Go down and erase the second line
     erase_line()
-    move_cursor_up(1)    # Go back up to the original position
+    move_cursor_up(1)     # Go back up to the original position
     _print_info(spacing)  # Print info takes up 2 lines
-    move_cursor_up(2)    # so go back to the top
+    move_cursor_up(2)     # so go back to the top
 
 
-def image_help():
+def image_help() -> 'IO':
     print('')
     print(''.join([
         c.b, 'ack; ',
@@ -118,7 +118,7 @@ def image_help():
     ]))
 
 
-def user_help():
+def user_help() -> 'IO':
     print('')
     print(''.join([
         'view ', c.BLUE_N, "th artist's illusts ",

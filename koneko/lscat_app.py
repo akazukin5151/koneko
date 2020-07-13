@@ -106,6 +106,8 @@ def browse_cache():
 
     if '.koneko' in os.listdir(path):
         lscat.show_instant(lscat.TrackDownloadsUsers, data)
+    elif 'individual' in str(path):
+        lscat.icat(path / os.listdir(path)[0])
     else:
         lscat.show_instant(lscat.TrackDownloads, data, True)
 
@@ -138,20 +140,20 @@ def config_assistance(actions: 'Optional[list[int]]' = None):
     input('\nEnter any key to quit\n')
 
 
-def maybe_ask_assistant(actions):
+def maybe_ask_assistant(actions: 'Optional[list[int]]') -> 'list[int]':
     if not actions:
         return picker.ask_assistant()
     # Docopt intercepts additional arguments as str
     return [int(x) for x in actions]
 
 
-def maybe_thumbnail_size(actions):
+def maybe_thumbnail_size(actions: 'list[int]') -> int:
     if 1 in actions or 7 in actions:
         return assistants.thumbnail_size_assistant()
     return config.thumbnail_size_config()
 
 
-def maybe_xpadding_img_width(actions, size):
+def maybe_xpadding_img_width(actions: 'list[int]', size: int) -> 'tuple[int]':
     if 2 in actions or 7 in actions:
         return assistants.xpadding_assistant(size)
     return (
@@ -160,26 +162,26 @@ def maybe_xpadding_img_width(actions, size):
     )
 
 
-def maybe_ypadding_img_height(actions, size):
+def maybe_ypadding_img_height(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]':
     if 3 in actions or 7 in actions:
         return assistants.ypadding_assistant(size)
     return None, None
 
 
-def maybe_page_spacing(actions, size):
+def maybe_page_spacing(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]':
     if 4 in actions or 7 in actions:
         return assistants.page_spacing_assistant(size)
     return None, None
 
 
-def maybe_print_spacing(actions, size, xpadding, image_width):
+def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width: int) -> 'list[int]':
     if 5 in actions or 7 in actions:
         return assistants.gallery_print_spacing_assistant(
             size, xpadding, image_width
         )
 
 
-def maybe_print_xcoord(actions, size, xpadding, image_width):
+def maybe_print_xcoord(actions: 'list[int]', size, xpadding, image_width: int) -> int:
     if 6 in actions or 7 in actions:
         return assistants.user_info_assistant(
             size,

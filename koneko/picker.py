@@ -11,14 +11,14 @@ from koneko import files, assistants, KONEKODIR
 EMPTY_WARNING = "**No directories match the filter! Press 'f' to re-filter**"
 
 
-def ws_picker(actions, title, **kwargs):
+def ws_picker(actions: 'list[str]', title: str, **kwargs) -> Picker:
     picker = Picker(actions, title, **kwargs)
     picker.register_custom_handler(ord('w'), m.move_up())
     picker.register_custom_handler(ord('s'), m.move_down())
     return picker
 
 
-def _pick_dirs_picker(actions, title):
+def _pick_dirs_picker(actions: 'list[str]', title: str) -> Picker:
     picker = Picker(actions, title)
     picker.register_custom_handler(ord('w'), m.move_up())
     picker.register_custom_handler(ord('s'), m.move_down())
@@ -30,7 +30,7 @@ def _pick_dirs_picker(actions, title):
     return picker
 
 
-def lscat_app_main():
+def lscat_app_main() -> int:
     os.system('clear')
     title = ('Welcome to the lscat interactive script\n'
              'Please select an action')
@@ -47,7 +47,7 @@ def lscat_app_main():
     return ans
 
 
-def frequent_modes_picker(actions):
+def frequent_modes_picker(actions: 'list[str]') -> int:
     title = (
         "Please pick an input\n"
         "[mode]: [pixiv ID or searchstr] (frequency)\n"
@@ -61,7 +61,7 @@ def frequent_modes_picker(actions):
     return idx
 
 
-def _multiselect_picker(actions, title, to_str=True) -> 'IO[list[int]]':
+def _multiselect_picker(actions: 'list[str]', title: str, to_str=True) -> 'IO[list[int | str]]':
     """Returns a list of all the indices of actions"""
     picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
     selected = picker.start()
@@ -70,7 +70,7 @@ def _multiselect_picker(actions, title, to_str=True) -> 'IO[list[int]]':
     return [x[1] + 1 for x in selected]
 
 
-def select_modes_filter(more=False):
+def select_modes_filter(more=False) -> 'IO[list[str]]':
     title = "Use SPACE to select a mode to show and ENTER to confirm"
     # Copied from screens
     actions = [
@@ -106,7 +106,7 @@ def ask_assistant() -> 'IO[list[int]]':
     return _multiselect_picker(actions, title, to_str=False)
 
 
-def pick_dir():
+def pick_dir() -> 'path':
     path = KONEKODIR
     # base is immutable
     basetitle = (
@@ -118,10 +118,10 @@ def pick_dir():
         "Press 'q' to exit"
     )
     actions = files.filter_history(path)
-    return _pick_dir_loop(path, basetitle, actions, None)
+    return _pick_dir_loop(path, basetitle, actions, [])
 
 
-def _pick_dir_loop(path, basetitle, actions, modes):
+def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
     title = basetitle
 
     while True:
@@ -143,18 +143,18 @@ def _pick_dir_loop(path, basetitle, actions, modes):
             continue
 
         else:
-            path, modes = handle_cd(path, actions, ans, modes)
+            path, modes = handle_cd(path, actions[ans], modes)
 
         actions = actions_from_dir(path, modes)
 
 
-def handle_back(path):
+def handle_back(path: 'path') -> 'path':
     if path != KONEKODIR:
         return path.parent
     return path
 
 
-def handle_delete(path):
+def handle_delete(path: 'path') -> 'IO[path]':
     print(f'Are you sure you want to delete {path}?')
     confirm = input("Enter 'y' to confirm\n")
     if confirm == 'y':
@@ -163,7 +163,7 @@ def handle_delete(path):
     return path
 
 
-def handle_filter(path, basetitle):
+def handle_filter(path: 'path', basetitle: str) -> (str, 'list[str]', 'list[str]'):
     modes = select_modes_filter(True)
     if '6' in modes:
         # Clear all filters
@@ -175,20 +175,24 @@ def handle_filter(path, basetitle):
     return title, actions, modes
 
 
-def handle_cd(path, actions, ans, modes):
-    selected_dir = actions[ans]
+def handle_cd(path, selected_dir: 'path', modes: 'list[str]') -> ('path', 'list[str]'):
     if selected_dir == EMPTY_WARNING:
-        return KONEKODIR, None
+        return KONEKODIR, []
     elif (newpath := path / selected_dir).is_dir():
         return newpath, modes
     return path, modes
 
 
-def actions_from_dir(path, modes):
-    if path == KONEKODIR and modes is not None:  # Filter active
+def actions_from_dir(path: 'path', modes: 'list[str]') -> 'list[str]':
+    if path == KONEKODIR and modes:  # Filter active
         return try_filter_dir(modes)
+    if ('2' in modes
+            and '1' not in modes
+            and 'individual' not in str(path)
+            and str(path).isdigit()):
+        return ['individual']
     return files.filter_history(path)
 
 
-def try_filter_dir(modes):
+def try_filter_dir(modes: 'list[str]') -> 'list[str]':
     return sorted(files.filter_dir(modes)) or [EMPTY_WARNING]

@@ -281,7 +281,7 @@ class api.APIHandler << (S,#FF7700) Singleton >> {
     - api
     - api_queue
     - api_thread
-    + credentials
+    - credentials
     +start()
     +await_login()
     ..Requests..

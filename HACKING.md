@@ -15,9 +15,9 @@
 \* Config has impure IO functions, safe functions that will return defaults on failure, and interactive functions
 
 
-## MVC?
+## MVC? MVA?
 
-While the code is not intentionally structured according to any design pattern, you might be able to analyse it through the lens of the Model-View_Controller pattern. The only communication method between all modules is through function returns, not through 'notifying' different objects (most of them are functions). The only exception is `downloads.py` will directly communicate to `lscat.py` through a callback.
+While the code is not intentionally structured according to any design pattern, you might be able to analyse it through the lens of the Model-View_Controller pattern. The only communication method between all modules is through function returns, not through 'notifying' different objects (most of them are functions). The only exception is `downloads.py` will directly communicate to `lscat.py` through a callback. Therefore, it seems to fit the [Model-View-Adapter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter) pattern better.
 
 Model:
 
@@ -38,7 +38,7 @@ View:
 * prompt
 * screens
 
-Controller:
+Controller / Adapter:
 
 * cli
 * lscat_app

@@ -142,9 +142,6 @@ class ImageData:
     def large_filename(self) -> str:
         return pure.split_backslash_last(self.page_urls[0])
 
-    def search_string(self, number_prefix: int) -> str:
-        return f"{str(number_prefix).rjust(3, '0')}_*"
-
 
 class UserData(AbstractData):
     """Stores data for user views (modes 3 and 4)"""

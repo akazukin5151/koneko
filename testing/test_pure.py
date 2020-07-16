@@ -1,4 +1,5 @@
 import sys
+import json
 from pathlib import Path
 
 from koneko import pure
@@ -11,6 +12,9 @@ from page_json import page_json  # isort:skip
 
 page_illusts = page_json["illusts"]
 
+
+with open('testing/files/mode1.json', 'r') as json_file:
+    page_illusts_new = json.load(json_file)['illusts']
 
 def test_split_backslash_last():
     assert (
@@ -41,39 +45,39 @@ def test_prefix_artist_name():
 
 def test_url_given_size():
     assert (
-        pure.url_given_size(page_illusts[0], "medium")
-        == "https://i.pximg.net/c/540x540_70/img-master/img/2020/03/10/04/07/08/80017594_p0_master1200.jpg"
+        pure.url_given_size(page_illusts_new[0], "medium")
+        == 'https://i.pximg.net/c/540x540_70/img-master/img/2020/05/14/06/45/24/81547984_p0_master1200.jpg'
     )
     assert (
-        pure.url_given_size(page_illusts[1], "large")
-        == "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2020/02/29/19/09/35/79799236_p0_master1200.jpg"
+        pure.url_given_size(page_illusts_new[1], "large")
+        == 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2020/05/12/06/36/27/81501385_p0_master1200.jpg'
     )
 
 
 def test_post_title():
-    assert pure.post_title(page_illusts, 0) == "310"
-    assert pure.post_title(page_illusts, 1) == "Midnight Sun"
+    assert pure.post_title(page_illusts_new, 0) == "みこっちゃん"
+    assert pure.post_title(page_illusts_new, 1) == "おりじなる"
 
 
 def test_medium_urls():
-    assert len(pure.medium_urls(page_illusts)) == 30
+    assert len(pure.medium_urls(page_illusts_new)) == 30
     assert (
-        pure.medium_urls(page_illusts)[0]
-        == "https://i.pximg.net/c/540x540_10_webp/img-master/img/2020/03/10/04/07/08/80017594_p0_square1200.jpg"
+        pure.medium_urls(page_illusts_new)[0]
+        == 'https://i.pximg.net/c/540x540_10_webp/img-master/img/2020/05/14/06/45/24/81547984_p0_square1200.jpg'
     )
 
 
 def test_page_urls_in_post():
-    assert pure.page_urls_in_post(page_illusts[14], size="medium") == ['https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p1_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p2_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p3_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p4_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p5_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p6_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p7_master1200.jpg']
-    assert len(pure.page_urls_in_post(page_illusts[14], size="medium")) == 8
-    assert pure.page_urls_in_post(page_illusts[0], size="medium") == ['https://i.pximg.net/c/540x540_70/img-master/img/2020/03/10/04/07/08/80017594_p0_master1200.jpg']
-    assert len(pure.page_urls_in_post(page_illusts[0], size="medium")) == 1
+    assert pure.page_urls_in_post(page_illusts_new[22], size="medium") == ['https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p1_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p2_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p3_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p4_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p5_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p6_master1200.jpg', 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p7_master1200.jpg']
+    assert len(pure.page_urls_in_post(page_illusts_new[22], size="medium")) == 8
+    assert pure.page_urls_in_post(page_illusts_new[0], size="medium") == ['https://i.pximg.net/c/540x540_70/img-master/img/2020/05/14/06/45/24/81547984_p0_master1200.jpg']
+    assert len(pure.page_urls_in_post(page_illusts_new[0], size="medium")) == 1
 
 
 def test_post_titles_in_page():
-    assert len(pure.post_titles_in_page(page_illusts)) == 30
-    assert pure.post_titles_in_page(page_illusts)[0] == "310"
-    assert pure.post_titles_in_page(page_illusts)[1] == "Midnight Sun"
+    assert len(pure.post_titles_in_page(page_illusts_new)) == 30
+    assert pure.post_titles_in_page(page_illusts_new)[0] == 'みこっちゃん'
+    assert pure.post_titles_in_page(page_illusts_new)[1] == 'おりじなる'
 
 
 def test_change_url_to_full():

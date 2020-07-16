@@ -51,14 +51,14 @@ def test_get_settings_nonexistent(use_test_cfg_path):
     assert isinstance(config.get_settings('wewr', 'asda').failure(), KeyError)
 
 
-def test_being_config_exists(monkeypatch, tmp_path, use_test_cfg_path):
+def test_begin_config_exists(monkeypatch, tmp_path, use_test_cfg_path):
     setup_test_config(tmp_path)
     creds, your_id = config.begin_config()
     assert your_id == '1234'
     assert type(creds) is configparser.SectionProxy
 
 
-def test_being_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path):
+def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path):
     """Config path does not exist, user saves their ID"""
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'y', 'myid'])
@@ -78,7 +78,7 @@ def test_being_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path):
     assert config.get_settings('Credentials', 'password') == Success('mypassword')
 
 
-def test_being_config_nonexistant_no_id(monkeypatch, tmp_path, use_test_cfg_path):
+def test_begin_config_nonexistant_no_id(monkeypatch, tmp_path, use_test_cfg_path):
     """Config path does not exist, user does not save their ID"""
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'n'])

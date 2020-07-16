@@ -1,4 +1,5 @@
 import sys
+import json
 import pytest
 
 from koneko import printer
@@ -10,12 +11,19 @@ from page_json import page_json  # isort:skip
 
 page_illusts = page_json["illusts"]
 
+with open('testing/files/mode1.json', 'r') as json_file:
+    page_illusts_new = json.load(json_file)['illusts']
 
-def test_print_multiple_imgs(capsys):
+
+def test_print_multiple_imgs_two_posts(capsys):
     printer.print_multiple_imgs(page_illusts)
     captured = capsys.readouterr()
     assert captured.out == "\x1b[31m#14\x1b[39m has \x1b[34m8\x1b[39m pages, \x1b[31m#25\x1b[39m has \x1b[34m50\x1b[39m pages, \n"
 
+def test_print_multiple_imgs_one_post(capsys):
+    printer.print_multiple_imgs(page_illusts_new)
+    captured = capsys.readouterr()
+    assert captured.out == '\x1b[31m#22\x1b[39m has \x1b[34m8\x1b[39m pages, \n'
 
 def test_write(capsys):
     printer.write('hi')

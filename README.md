@@ -110,6 +110,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 #### Features
 * lscat app: Display first picture if a mode 2 directory is selected
+* This project is now mirrored on gitlab [here](https://gitlab.com/twenty5151/koneko)
 
 #### Bug fixes
 * Fixed mode 2 exclusive filter showing mode 1 page dirs
@@ -119,6 +120,13 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Rename AbstractImageAdjuster.write() to report()
 * Added docstrings in assistants.py
 * Added image_adjuster.puml, displayed in HACKING.md
+* Use namedtuple instead of classes in some tests
+* Use mocks instead of repetitive fake classes
+* Add AbstractData to puml
+* Use new json in some tests
+* Test print multiple images with one and two posts
+* Add some comments on MVC vs MVA
+* Removed unused search_string() method
  
 
 # Roadmap

@@ -107,7 +107,7 @@ def browse_cache():
     if '.koneko' in os.listdir(path):
         lscat_prompt.gallery_user_loop(data, lscat.TrackDownloadsUsers)
     elif 'individual' in str(path):
-        lscat.icat(path / os.listdir(path)[0])
+        lscat_prompt.image_loop(path, sorted(os.listdir(path))[0])
     else:
         lscat_prompt.gallery_user_loop(data, lscat.TrackDownloads)
 

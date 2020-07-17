@@ -103,25 +103,44 @@ def filter_dir(modes: 'list[str]') -> 'list[str]':
     return [d for d in dirs if predicate(d)]
 
 
-def path_valid(path) -> bool:
-    mode1 = (
+def valid_mode1(path) -> bool:
+    return (
         path.parent.parent == KONEKODIR
         and path.name.isdigit()
         and 'following' not in str(path)
         and 'search' not in str(path)
+        and 'illustfollow' not in str(path)
     )
 
+
+def valid_mode2(path) -> bool:
     # If the 'individual' dir only contains files, it is valid
-    mode2 = (
+    return (
         path.parent.name == 'individual'
-        or path.parent.parent.name == 'individual'
         or (
             path.name == 'individual'
-            and all([x.is_file() for x in os.scandir(path)])
+            and any([x.is_file() for x in os.scandir(path)])
         )
     )
 
-    mode3 = path.parent.parent.name == 'following'
-    mode4 = path.parent.parent.name == 'search'
-    mode5 = path.parent.name == 'illustfollow'
-    return mode1 or mode2 or mode3 or mode4 or mode5
+
+def valid_mode3(path):
+    return path.parent.parent.name == 'following'
+
+
+def valid_mode4(path):
+    return path.parent.parent.name == 'search'
+
+
+def valid_mode5(path):
+    return path.parent.name == 'illustfollow'
+
+
+def path_valid(path) -> bool:
+    return (
+        valid_mode1(path)
+        or valid_mode2(path)
+        or valid_mode3(path)
+        or valid_mode4(path)
+        or valid_mode5(path)
+    )

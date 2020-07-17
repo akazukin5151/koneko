@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import pytest
 
-from koneko import files
+from koneko import files, KONEKODIR
 
 
 def test_find_mode2_dirs(tmp_path, monkeypatch):
@@ -125,3 +125,164 @@ def test_filter_dir_5(monkeypatch, tmp_path):
     (tmp_path / 'notanumber').touch()
 
     assert files.filter_dir(['5']) == ['illustfollow']
+
+
+def test_valid_mode1_valid():
+    assert files.valid_mode1(KONEKODIR / '123/1') is True
+
+def test_valid_mode2_valid():
+    assert files.valid_mode2(KONEKODIR / '123/individual/123') is True
+
+def test_valid_mode2_individual_with_file_is_valid(monkeypatch, tmp_path):
+    # A bare 'individual' dir is valid if and only if there are files inside
+    monkeypatch.setattr('koneko.KONEKODIR', tmp_path)
+    mydir = tmp_path / '123/individual/'
+    myfile = mydir / 'testfile'
+    mydir.mkdir(parents=True)
+    myfile.touch()
+    assert files.valid_mode2(mydir) is True
+
+def test_valid_mode2_individual_with_file_and_dir_is_valid(monkeypatch, tmp_path):
+    # Differs from previous test by only one line: the one after the comment
+    monkeypatch.setattr('koneko.KONEKODIR', tmp_path)
+    mydir = tmp_path / '123/individual/'
+    myfile = mydir / 'testfile'
+    mydir.mkdir(parents=True)
+    myfile.touch()
+    # Dir contains file and dir, still valid
+    (mydir / 'newdir').mkdir()
+    assert files.valid_mode2(mydir) is True
+
+def test_valid_mode3_valid():
+    assert files.valid_mode3(KONEKODIR / 'following/123/1') is True
+
+def test_valid_mode4_valid():
+    assert files.valid_mode4(KONEKODIR / 'search/searchstr/1') is True
+
+def test_valid_mode5_valid():
+    assert files.valid_mode5(KONEKODIR / 'illustfollow/1') is True
+
+
+@pytest.mark.parametrize('path', (
+    '123',
+    '123/individual',
+    '123/individual/1',
+    "following",
+    "following/2232374",
+    "following/2232374/1",
+    "search",
+    "search/searchstr",
+    "search/searchstr/1",
+    'illustfollow',
+    'illustfollow/1',
+    )
+)
+def test_valid_mode1_invalid(path):
+    assert files.valid_mode1(KONEKODIR / path) is False
+
+
+@pytest.mark.parametrize('path', (
+    '123',
+    '123/1',
+    "following",
+    "following/2232374",
+    "following/2232374/1",
+    "search",
+    "search/searchstr",
+    "search/searchstr/1",
+    'illustfollow',
+    'illustfollow/1',
+    )
+)
+def test_valid_mode2_invalid(path):
+    assert files.valid_mode2(KONEKODIR / path) is False
+
+def test_valid_mode2_individual_no_files_is_invalid(monkeypatch, tmp_path):
+    # A bare 'individual' dir is valid if and only if it contains files only
+    monkeypatch.setattr('koneko.KONEKODIR', tmp_path)
+    mydir = tmp_path / '123/individual/'
+    mydir.mkdir(parents=True)
+    # No files in dir: invalid
+    assert files.valid_mode2(mydir) is False
+
+def test_valid_mode2_individual_dirs_only_is_invalid(monkeypatch, tmp_path):
+    # A bare 'individual' dir is valid if and only if it contains files only
+    monkeypatch.setattr('koneko.KONEKODIR', tmp_path)
+    mydir = tmp_path / '123/individual/'
+    mydir.mkdir(parents=True)
+    # dir only has other dirs
+    (mydir / 'newdir').mkdir()
+    assert files.valid_mode2(mydir) is False
+
+
+@pytest.mark.parametrize('path', (
+    '123',
+    '123/1',
+    '123/individual',
+    '123/individual/1',
+    "search",
+    "search/searchstr",
+    "search/searchstr/1",
+    'illustfollow',
+    'illustfollow/1',
+    )
+)
+def test_valid_mode3_invalid(path):
+    assert files.valid_mode3(KONEKODIR / path) is False
+
+
+@pytest.mark.parametrize('path', (
+    '123',
+    '123/1',
+    '123/individual',
+    '123/individual/1',
+    "following",
+    "following/2232374",
+    "following/2232374/1",
+    'illustfollow',
+    'illustfollow/1',
+    )
+)
+def test_valid_mode4_invalid(path):
+    assert files.valid_mode4(KONEKODIR / path) is False
+
+@pytest.mark.parametrize('path', (
+    '123',
+    '123/1',
+    '123/individual',
+    '123/individual/1',
+    "following",
+    "following/2232374",
+    "following/2232374/1",
+    "search",
+    "search/searchstr",
+    "search/searchstr/1",
+    )
+)
+def test_valid_mode5_invalid(path):
+    assert files.valid_mode5(KONEKODIR / path) is False
+
+
+@pytest.mark.parametrize('path', (
+    '123/1',
+    '123/individual/1',
+    "following/2232374/1",
+    "search/searchstr/1",
+    'illustfollow/1',
+    )
+)
+def test_path_valid_valids(path):
+    assert files.path_valid(KONEKODIR / path) is True
+
+
+@pytest.mark.parametrize('path', (
+    '123',
+    "following",
+    "following/2232374",
+    "search",
+    "search/searchstr",
+    'illustfollow',
+    )
+)
+def test_path_valid_invalids(path):
+    assert files.path_valid(KONEKODIR / path) is False

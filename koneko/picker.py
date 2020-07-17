@@ -130,7 +130,7 @@ def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
         _, ans = picker.start()
         assistants.check_quit(ans)
 
-        if ans == 'y' and path_valid(path):
+        if ans == 'y' and files.path_valid(path):
             return path
 
         elif ans == 'b':
@@ -147,30 +147,6 @@ def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
             path, modes = handle_cd(path, actions[ans], modes)
 
         actions = actions_from_dir(path, modes)
-
-
-def path_valid(path) -> bool:
-    mode1 = (
-        path.parent.parent == KONEKODIR
-        and path.name.isdigit()
-        and path.parent.name != 'following'
-        and path.parent.name != 'search'
-    )
-
-    # If the 'individual' dir only contains files, it is valid
-    mode2 = (
-        path.parent.name == 'individual'
-        or path.parent.parent.name == 'individual'
-        or (
-            path.name == 'individual'
-            and all([x.is_file() for x in os.scandir(path)])
-        )
-    )
-
-    mode3 = path.parent.parent.name == 'following'
-    mode4 = path.parent.parent.name == 'search'
-    mode5 = path.parent.name == 'illustfollow'
-    return mode1 or mode2 or mode3 or mode4 or mode5
 
 
 def handle_back(path: 'path') -> 'path':

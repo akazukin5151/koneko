@@ -31,13 +31,15 @@ class AbstractUI(ABC):
         declare the data attribute as appropriate.
         Main path includes any user input (eg, artist user id or search string)
         """
+        # Reference to the appropriate class or function
         self.prompt: 'prompt.<function>'
-        # Reference to the class
         self.data_class: 'data.<class>'
         self.tracker_class: 'lscat.<class>'
 
         # Attribute defined in self.start()
-        self.data: 'data.<class>'  # Instantiated data class
+        self.data: 'data.<class>'  # Instantiated data class, not reference
+        # Attribute defined in self.prefetch_thread()
+        self.prefetch_thread: threading.Thread
 
         self.start(main_path)
 

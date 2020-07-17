@@ -25,11 +25,10 @@ main.AbstractLoop <-up[hidden]- illust_follow_mode_loop
 
 abstract class ui.AbstractUI <<(A, red)>>{
     ..Required attribute..
-    - {abstract} data
+    - {abstract} prompt
+    - {abstract} data_class
+    - {abstract} tracker_class
     ..Required behaviour..
-    -{abstract}data_class()
-    -{abstract}tracker()
-    -{abstract}show_instant()
     -{abstract}pixivrequest()
     -{abstract}action_before_prefetch()
     -{abstract}print_page_info()
@@ -44,10 +43,9 @@ abstract class ui.AbstractUI <<(A, red)>>{
 
 abstract class ui.AbstractGallery <<(A, red)>>{
     ..Implements..
-    - data
-    -data_class()
-    -tracker()
-    -show_instant()
+    - prompt
+    - data_class
+    - tracker_class
     -action_before_prefetch()
     -print_page_info()
     ..Unique..
@@ -144,10 +142,9 @@ class ui.SearchUsers <<(C, cyan)>> {
 }
 abstract class ui.AbstractUsers <<(A, red)>>{
     ..Implements..
-    - data
-    -data_class()
-    -tracker()
-    -show_instant()
+    - prompt
+    - data_class
+    - tracker_class
     -action_before_prefetch()
     -print_page_info()
     ..Unique..

@@ -32,6 +32,7 @@ class AbstractUI(ABC):
         Main path includes any user input (eg, artist user id or search string)
         """
         self.data: 'data.<class>'  # Define in self.data_class(), not __init__
+        self.prompt: 'prompt.<function>'
         self.start(main_path)
 
     @abstractmethod
@@ -163,13 +164,14 @@ class AbstractUI(ABC):
             rmtree(self.data.main_path)
             # Will remove all data, but keep info on the main path
             self.start(self.data.main_path)
-        prompt.user_prompt(self)
+        self.prompt(self)
 
 
 class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for galleries"""
+        self.prompt = prompt.gallery_like_prompt
         super().__init__(main_path)
 
     def data_class(self, main_path):
@@ -411,6 +413,7 @@ class AbstractUsers(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for user modes"""
+        self.prompt = prompt.user_prompt
         super().__init__(main_path)
 
     def data_class(self, main_path):

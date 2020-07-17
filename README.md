@@ -137,7 +137,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Known bugs
 
-* Reloading then going back just redraws the current mode again, with possible instability
 * Passing an invalid command via cli will re-prompt the user, but ctrl+c traps the user in koneko with no way to quit.
 * Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
 * In the logs, urllib3 warns that `Connection pool is full, discarding connection: i.pximg.net`. See [customising pool behaviour](https://urllib3.readthedocs.io/en/latest/advanced-usage.html#customizing-pool-behavior) from urllib3.

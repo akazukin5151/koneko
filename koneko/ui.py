@@ -182,7 +182,7 @@ class AbstractGallery(AbstractUI, ABC):
 
     def show_instant(self):
         """Implements abstractmethod: Runs show_instant for galleries"""
-        return lscat.show_instant(lscat.TrackDownloads, self.data, True)
+        return lscat.show_instant(lscat.TrackDownloads, self.data)
 
     def maybe_join_thread(self):
         """Implements abstractmethod: No action needed"""

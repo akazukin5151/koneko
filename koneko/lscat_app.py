@@ -80,7 +80,7 @@ def _main():
 
 def display_gallery():
     data = FakeData(KONEKODIR / 'testgallery')
-    lscat.show_instant(lscat.TrackDownloads, data, True)
+    lscat.show_instant(lscat.TrackDownloads, data)
 
 
 def display_user():
@@ -97,7 +97,7 @@ def display_path(path=None):
         sys.exit(1)
 
     data = FakeData(path)
-    lscat.show_instant(lscat.TrackDownloads, data, True)
+    lscat.show_instant(lscat.TrackDownloads, data)
 
 
 def browse_cache():
@@ -105,11 +105,11 @@ def browse_cache():
     data = FakeData(path)
 
     if '.koneko' in os.listdir(path):
-        lscat_prompt.gallery_loop(data, lscat.TrackDownloadsUsers, False)
+        lscat_prompt.gallery_loop(data, lscat.TrackDownloadsUsers)
     elif 'individual' in str(path):
         lscat.icat(path / os.listdir(path)[0])
     else:
-        lscat_prompt.gallery_loop(data, lscat.TrackDownloads, True)
+        lscat_prompt.gallery_loop(data, lscat.TrackDownloads)
 
 
 def config_assistance(actions: 'Optional[list[int]]' = None):

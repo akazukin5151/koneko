@@ -9,7 +9,7 @@ from koneko import lscat, TERM
 FakeData = namedtuple('data', ('download_path',))
 
 
-def gallery_loop(data, cls, gallerymode):
+def gallery_loop(data, cls):
     show_images = True
     max_pages = len([x for x in os.listdir(data.download_path.parent)
                      if x.isdigit()])
@@ -19,7 +19,7 @@ def gallery_loop(data, cls, gallerymode):
             current_page = int(data.download_path.name)
 
             if show_images:
-                lscat.show_instant(cls, data, gallerymode)
+                lscat.show_instant(cls, data)
                 print(f'Page {current_page} / {max_pages}')
                 print("Press 'n' to go to next page, "
                         "'p' to go to the previous page, "

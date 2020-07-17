@@ -36,7 +36,7 @@ def icat(path: str) -> 'IO':
     Image(path).show()
 
 
-def show_instant(cls, data, gallerymode=False) -> 'IO':
+def show_instant(cls, data) -> 'IO':
     tracker = cls(data)
     # Filter out invisible files
     # (used to save splitpoint and total_imgs without requesting)
@@ -44,7 +44,7 @@ def show_instant(cls, data, gallerymode=False) -> 'IO':
          for x in os.listdir(data.download_path)
          if not x.startswith('.')]
 
-    if gallerymode and config.check_print_info():
+    if isinstance(cls, TrackDownloads) and config.check_print_info():
         number_of_cols = config.ncols_config()
         spacings = config.gallery_print_spacing_config()
         printer.print_cols(spacings, number_of_cols)

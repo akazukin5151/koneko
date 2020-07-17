@@ -45,17 +45,18 @@ def test_display_user(monkeypatch, argv):
 def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.lscat_prompt.gallery_user_loop', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.GalleryUserLoop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
 
     lscat_app.main()
-    assert mock.mock_calls == mock.call_args_list == [
+    assert mock.mock_calls == [
         call(
             FakeData(tmp_path),
             lscat.TrackDownloads,
-        )
+        ),
+        call().start()
     ]
 
 
@@ -63,18 +64,19 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
 def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.lscat_prompt.gallery_user_loop', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.GalleryUserLoop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
     (tmp_path / '.koneko').touch()
 
     lscat_app.main()
-    assert mock.mock_calls == mock.call_args_list == [
+    assert mock.mock_calls == [
         call(
             FakeData(tmp_path),
             lscat.TrackDownloadsUsers,
-        )
+        ),
+        call().start()
     ]
 
 

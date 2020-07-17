@@ -1,5 +1,6 @@
 import os
 import sys
+from abc import ABC, abstractmethod
 from collections import namedtuple
 
 from koneko import lscat, TERM
@@ -8,92 +9,97 @@ from koneko import lscat, TERM
 # Duplicated due to circular import
 FakeData = namedtuple('data', ('download_path',))
 
+class AbstractLoop(ABC):
+    @abstractmethod
+    def __init__(self):
+        self.max_pages: int
+        self.condition: int
+        self.current_page: int
 
-def gallery_user_loop(data, cls):
-    current_page = int(data.download_path.name)
-    show_images = True
-    max_pages = len([x for x in os.listdir(data.download_path.parent)
-                     if x.isdigit()])
+    @abstractmethod
+    def show_func(self):
+        raise NotImplementedError
 
-    with TERM.cbreak():
-        while True:
-            if show_images:
-                lscat.show_instant(cls, data)
-                print(f'Page {current_page} / {max_pages}')
-                print("Press 'n' to go to next page, "
-                        "'p' to go to the previous page, "
-                        "and 'q' to quit")
+    @abstractmethod
+    def end_func(self):
+        raise NotImplementedError
 
-            ans = TERM.inkey()
-            print(ans)
+    def start(self):
+        show_images = True
+        with TERM.cbreak():
+            while True:
+                if show_images:
+                    self.show_func()
+                    print(f'Page {self.current_page} / {self.max_pages}')
+                    print("Press 'n' to go to next page, "
+                            "'p' to go to the previous page, "
+                            "and 'q' to quit")
 
-            if ans == 'n' and current_page == max_pages:
-                print("This is the last cached page!")
-                show_images = False
+                ans = TERM.inkey()
+                print(ans)
 
-            elif ans == 'p' and current_page == 1:
-                print("This is the last page!")
-                show_images = False
+                if ans == 'n' and self.current_page == self.max_pages:
+                    print("This is the last cached page!")
+                    show_images = False
 
-            elif ans == 'n':
-                current_page += 1
-                show_images = True
+                elif ans == 'p' and self.current_page == self.condition:
+                    print("This is the last page!")
+                    show_images = False
 
-            elif ans == 'p':
-                current_page -= 1
-                show_images = True
+                elif ans == 'n':
+                    self.current_page += 1
+                    show_images = True
 
-            elif ans == 'q':
-                sys.exit(0)
+                elif ans == 'p':
+                    self.current_page -= 1
+                    show_images = True
 
-            else:
-                print("Invalid input!")
-                show_images = False
+                elif ans == 'q':
+                    sys.exit(0)
 
-            if show_images:
-                data = FakeData(data.download_path.parent / str(current_page))
+                else:
+                    print("Invalid input!")
+                    show_images = False
+
+                if show_images:
+                    self.end_func()
 
 
-def image_loop(root, image):
-    show_images = True
-    current_image_num = 0
-    all_images = sorted(os.listdir(root))
-    max_pages = len(all_images) - 1
+class GalleryUserLoop(AbstractLoop):
+    def __init__(self, data, cls):
+        # Unique
+        self.cls = cls
+        self.data = data
 
-    with TERM.cbreak():
-        while True:
-            if show_images:
-                lscat.icat(root / image)
-                print(f'Page {current_image_num} / {max_pages}')
-                print("Press 'n' to go to next page, "
-                        "'p' to go to the previous page, "
-                        "and 'q' to quit")
+        # Base ABC
+        self.condition = 1
+        self.current_page = int(data.download_path.name)
+        self.max_pages = len(
+            [x for x in os.listdir(data.download_path.parent)
+             if x.isdigit()]
+        )
 
-            ans = TERM.inkey()
-            print(ans)
+    def show_func(self):
+        lscat.show_instant(self.cls, self.data)
 
-            if ans == 'n' and current_image_num == max_pages:
-                print("This is the last cached page!")
-                show_images = False
+    def end_func(self):
+        self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
-            elif ans == 'p' and current_image_num == 0:
-                print("This is the last page!")
-                show_images = False
 
-            elif ans == 'n':
-                current_image_num += 1
-                show_images = True
+class ImageLoop(AbstractLoop):
+    def __init__(self, root, image):
+        # Unique
+        self.root = root
+        self.image = image
+        self.all_images = sorted(os.listdir(root))
 
-            elif ans == 'p':
-                current_image_num -= 1
-                show_images = True
+        # Base ABC
+        self.condition = 0
+        self.current_page = 0
+        self.max_pages = len(self.all_images) - 1
 
-            elif ans == 'q':
-                sys.exit(0)
+    def show_func(self):
+        lscat.icat(self.root / self.image)
 
-            else:
-                print("Invalid input!")
-                show_images = False
-
-            if show_images:
-                image = all_images[current_image_num]
+    def end_func(self):
+        self.image = self.all_images[self.current_page]

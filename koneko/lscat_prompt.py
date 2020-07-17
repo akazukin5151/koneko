@@ -55,7 +55,7 @@ def gallery_user_loop(data, cls):
                 data = FakeData(data.download_path.parent / str(current_page))
 
 
-def image_loop(root, current_image_path):
+def image_loop(root, image):
     show_images = True
     current_image_num = 0
     all_images = sorted(os.listdir(root))
@@ -64,7 +64,7 @@ def image_loop(root, current_image_path):
     with TERM.cbreak():
         while True:
             if show_images:
-                lscat.icat(root / current_image_path)
+                lscat.icat(root / image)
                 print(f'Page {current_image_num} / {max_pages}')
                 print("Press 'n' to go to next page, "
                         "'p' to go to the previous page, "
@@ -97,4 +97,4 @@ def image_loop(root, current_image_path):
                 show_images = False
 
             if show_images:
-                current_image_path = all_images[current_image_num]
+                image = all_images[current_image_num]

@@ -31,18 +31,15 @@ class AbstractUI(ABC):
         declare the data attribute as appropriate.
         Main path includes any user input (eg, artist user id or search string)
         """
-        self.data_class: 'data.<class>'  # Reference to the class
         self.prompt: 'prompt.<function>'
+        # Reference to the class
+        self.data_class: 'data.<class>'
+        self.tracker_class: 'lscat.<class>'
 
         # Attribute defined in self.start()
         self.data: 'data.<class>'  # Instantiated data class
 
         self.start(main_path)
-
-    @abstractmethod
-    def tracker(self) -> None:
-        """Instantiate the appropriate tracker object here (with args and bracket)"""
-        raise NotImplementedError
 
     @abstractmethod
     def show_instant(self) -> 'IO':
@@ -78,7 +75,7 @@ class AbstractUI(ABC):
         if files.dir_not_empty(self.data):
             return True
         files.remove_dir_if_exist(self.data)
-        download.init_download(self.data, self.tracker())
+        download.init_download(self.data, self.tracker_class(self.data))
 
     def _parse_and_download(self) -> 'IO':
         """If download path not empty, immediately show.
@@ -97,7 +94,7 @@ class AbstractUI(ABC):
         files.remove_dir_if_exist(self.data)
 
         self._parse_user_infos()
-        download.init_download(self.data, self.tracker())
+        download.init_download(self.data, self.tracker_class(self.data))
         self.print_page_info()
 
     def _prefetch_thread(self) -> 'IO':
@@ -172,11 +169,8 @@ class AbstractGallery(AbstractUI, ABC):
         """Complements abstractmethod: Define download function for galleries"""
         self.prompt = prompt.gallery_like_prompt
         self.data_class = data.GalleryData
+        self.tracker_class = lscat.TrackDownloads
         super().__init__(main_path)
-
-    def tracker(self):
-        """Implements abstractmethod: Instantiate tracker for galleries"""
-        return lscat.TrackDownloads(self.data)
 
     def show_instant(self):
         """Implements abstractmethod: Runs show_instant for galleries"""
@@ -411,11 +405,8 @@ class AbstractUsers(AbstractUI, ABC):
         """Complements abstractmethod: Define download function for user modes"""
         self.prompt = prompt.user_prompt
         self.data_class = data.UserData
+        self.tracker_class = lscat.TrackDownloadsUsers
         super().__init__(main_path)
-
-    def tracker(self):
-        """Implements abstractmethod: Instantiate tracker for user modes"""
-        return lscat.TrackDownloadsUsers(self.data)
 
     def show_instant(self):
         """Implements abstractmethod: Runs show_instant for user modes"""

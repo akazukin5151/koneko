@@ -165,7 +165,6 @@ Using image number, where {number} is the nth image in order (see examples)
     n                  -- view the next page
     p                  -- view the previous page
     r                  -- delete all cached images, re-download and reload view
-    b                  -- go back to main screen
     h                  -- show keybindings
     m                  -- show this manual
     q                  -- quit (with confirmation)

@@ -26,7 +26,7 @@ Artist_gallery1 <-[#red]-> Image2
 
 usecase start5 #BlueViolet
 Illust_following5 <-[#BlueViolet]-> Image2
-Illust_following5 <-[#BlueViolet]left-> start5
+Illust_following5 <-[#BlueViolet]left- start5
 Artist_gallery1 <-[#BlueViolet]-> Image2
 Illust_following5 <-[#BlueViolet]right-> Artist_gallery1
 

@@ -42,13 +42,6 @@ class AbstractUI(ABC):
         self.start(main_path)
 
     @abstractmethod
-    def show_instant(self) -> 'IO':
-        """Run the appropriate lscat.show_instant function here
-        (will actually display)
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def _pixivrequest(self) -> 'Json':
         """Run the appropriate api request function and return the result
         Must pass in `offset=self.data.offset` into API for pages to work
@@ -84,7 +77,7 @@ class AbstractUI(ABC):
         After fetching, double check all files in dir match the cache
         """
         if files.dir_not_empty(self.data):
-            self.show_instant()
+            lscat.show_instant(self.tracker_class, self.data)
             self._parse_user_infos()
             self.verify_up_to_date()
             self.print_page_info()
@@ -150,7 +143,7 @@ class AbstractUI(ABC):
             print('This is the last page!')
             self.data.page_num -= 1
             return False
-        self.show_instant()
+        lscat.show_instant(self.tracker_class, self.data)
         self.print_page_info()
 
     def reload(self) -> 'IO':
@@ -171,10 +164,6 @@ class AbstractGallery(AbstractUI, ABC):
         self.data_class = data.GalleryData
         self.tracker_class = lscat.TrackDownloads
         super().__init__(main_path)
-
-    def show_instant(self):
-        """Implements abstractmethod: Runs show_instant for galleries"""
-        return lscat.show_instant(lscat.TrackDownloads, self.data)
 
     def maybe_join_thread(self):
         """Implements abstractmethod: No action needed"""
@@ -235,7 +224,7 @@ class AbstractGallery(AbstractUI, ABC):
 
     def _back(self) -> 'IO':
         """After user 'back's from image prompt or artist gallery, start mode again"""
-        self.show_instant()
+        lscat.show_instant(self.tracker_class, self.data)
         self.print_page_info()
         prompt.gallery_like_prompt(self)
 
@@ -407,10 +396,6 @@ class AbstractUsers(AbstractUI, ABC):
         self.data_class = data.UserData
         self.tracker_class = lscat.TrackDownloadsUsers
         super().__init__(main_path)
-
-    def show_instant(self):
-        """Implements abstractmethod: Runs show_instant for user modes"""
-        return lscat.show_instant(lscat.TrackDownloadsUsers, self.data)
 
     def maybe_join_thread(self):
         """Implements abstractmethod: Wait for parse_thread to join (if any)"""

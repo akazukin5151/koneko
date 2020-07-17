@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 
@@ -31,14 +32,14 @@ def test_download_image_coords(monkeypatch):
 
 def test_previous_page_gallery(monkeypatch):
     monkeypatch.setattr('koneko.files.dir_not_empty', lambda x: True)
+    monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
 
     class FakeGallery:
         def __init__(self):
             self.data = data
+            self.tracker_class = Mock()
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
-        def show_instant(self, *a):
-            return True
         def print_page_info(self, *a):
             return True
 
@@ -51,14 +52,14 @@ def test_previous_page_gallery(monkeypatch):
 
 def test_previous_page_users(monkeypatch):
     monkeypatch.setattr('koneko.files.dir_not_empty', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
 
     class FakeGallery:
         def __init__(self):
             self.data = data
+            self.tracker_class = Mock()
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
-        def show_instant(self, *a):
-            return True
         def print_page_info(self, *a):
             return True
 

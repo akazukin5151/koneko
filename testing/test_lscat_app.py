@@ -20,7 +20,6 @@ def test_display_gallery(monkeypatch, argv):
         call(
             lscat.TrackDownloads,
             FakeData(KONEKODIR / 'testgallery'),
-            True
         )
     ]
 
@@ -52,14 +51,19 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
 
     lscat_app.main()
-    assert mock.mock_calls == mock.call_args_list == [call(FakeData(tmp_path))]
+    assert mock.mock_calls == mock.call_args_list == [
+        call(
+            FakeData(tmp_path),
+            lscat.TrackDownloads,
+        )
+    ]
 
 
 @pytest.mark.parametrize('argv', (['4'], []))
 def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.lscat.show_instant', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.gallery_loop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
@@ -68,8 +72,8 @@ def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     lscat_app.main()
     assert mock.mock_calls == mock.call_args_list == [
         call(
+            FakeData(tmp_path),
             lscat.TrackDownloadsUsers,
-            FakeData(tmp_path)
         )
     ]
 
@@ -97,7 +101,6 @@ def test_display_path_cli_complete(monkeypatch, tmp_path):
         call(
             lscat.TrackDownloads,
             FakeData(str(tmp_path)),
-            True
         )
     ]
 
@@ -116,7 +119,6 @@ def test_display_path_cli_incomplete(monkeypatch, tmp_path):
         call(
             lscat.TrackDownloads,
             FakeData(str(tmp_path)),
-            True
         )
     ]
 

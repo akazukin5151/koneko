@@ -41,7 +41,7 @@ def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
     setup_test_config(tmp_path)
 
     fakedata = FakeData(Path('testing/files/'))
-    lscat.show_instant(FakeTracker, fakedata, True)
+    lscat.show_instant(FakeTracker, fakedata)
     # First one works for me, but second one works for github
     assert set(showed) == {
         'test_config.ini', '004_祝！！！.jpg', 'mode3.json',

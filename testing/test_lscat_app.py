@@ -46,19 +46,13 @@ def test_display_user(monkeypatch, argv):
 def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.lscat.show_instant', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.gallery_loop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
 
     lscat_app.main()
-    assert mock.mock_calls == mock.call_args_list == [
-        call(
-            lscat.TrackDownloads,
-            FakeData(tmp_path),
-            True
-        )
-    ]
+    assert mock.mock_calls == mock.call_args_list == [call(FakeData(tmp_path))]
 
 
 @pytest.mark.parametrize('argv', (['4'], []))

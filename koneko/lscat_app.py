@@ -32,7 +32,7 @@ from collections import namedtuple
 
 from docopt import docopt
 
-from koneko import lscat, config, picker, printer, assistants, KONEKODIR
+from koneko import lscat, config, picker, printer, assistants, lscat_prompt, KONEKODIR
 
 
 # Small 'functions'
@@ -109,7 +109,7 @@ def browse_cache():
     elif 'individual' in str(path):
         lscat.icat(path / os.listdir(path)[0])
     else:
-        lscat.show_instant(lscat.TrackDownloads, data, True)
+        lscat_prompt.gallery_loop(data)
 
 
 def config_assistance(actions: 'Optional[list[int]]' = None):

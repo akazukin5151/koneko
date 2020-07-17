@@ -163,18 +163,20 @@ def test_valid_mode5_valid():
     assert files.valid_mode5(KONEKODIR / 'illustfollow/1') is True
 
 
+root = '123'
+mode1_paths = ('123/1',)
+mode2_paths = ('123/individual', '123/individual/1')
+mode3_paths = ("following", "following/2232374", "following/2232374/1")
+mode4_paths = ("search", "search/searchstr", "search/searchstr/1")
+mode5_paths = ('illustfollow', 'illustfollow/1')
+
+
 @pytest.mark.parametrize('path', (
-    '123',
-    '123/individual',
-    '123/individual/1',
-    "following",
-    "following/2232374",
-    "following/2232374/1",
-    "search",
-    "search/searchstr",
-    "search/searchstr/1",
-    'illustfollow',
-    'illustfollow/1',
+    root,
+    *mode2_paths,
+    *mode3_paths,
+    *mode4_paths,
+    *mode5_paths,
     )
 )
 def test_valid_mode1_invalid(path):
@@ -182,16 +184,11 @@ def test_valid_mode1_invalid(path):
 
 
 @pytest.mark.parametrize('path', (
-    '123',
-    '123/1',
-    "following",
-    "following/2232374",
-    "following/2232374/1",
-    "search",
-    "search/searchstr",
-    "search/searchstr/1",
-    'illustfollow',
-    'illustfollow/1',
+    root,
+    *mode1_paths,
+    *mode3_paths,
+    *mode4_paths,
+    *mode5_paths,
     )
 )
 def test_valid_mode2_invalid(path):
@@ -216,15 +213,11 @@ def test_valid_mode2_individual_dirs_only_is_invalid(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize('path', (
-    '123',
-    '123/1',
-    '123/individual',
-    '123/individual/1',
-    "search",
-    "search/searchstr",
-    "search/searchstr/1",
-    'illustfollow',
-    'illustfollow/1',
+    root,
+    *mode1_paths,
+    *mode2_paths,
+    *mode4_paths,
+    *mode5_paths,
     )
 )
 def test_valid_mode3_invalid(path):
@@ -232,31 +225,22 @@ def test_valid_mode3_invalid(path):
 
 
 @pytest.mark.parametrize('path', (
-    '123',
-    '123/1',
-    '123/individual',
-    '123/individual/1',
-    "following",
-    "following/2232374",
-    "following/2232374/1",
-    'illustfollow',
-    'illustfollow/1',
+    root,
+    *mode1_paths,
+    *mode2_paths,
+    *mode3_paths,
+    *mode5_paths,
     )
 )
 def test_valid_mode4_invalid(path):
     assert files.valid_mode4(KONEKODIR / path) is False
 
 @pytest.mark.parametrize('path', (
-    '123',
-    '123/1',
-    '123/individual',
-    '123/individual/1',
-    "following",
-    "following/2232374",
-    "following/2232374/1",
-    "search",
-    "search/searchstr",
-    "search/searchstr/1",
+    root,
+    *mode1_paths,
+    *mode2_paths,
+    *mode3_paths,
+    *mode4_paths,
     )
 )
 def test_valid_mode5_invalid(path):
@@ -271,7 +255,7 @@ def test_valid_mode5_invalid(path):
     'illustfollow/1',
     )
 )
-def test_path_valid_valids(path):
+def test_path_valid_full_are_valid(path):
     assert files.path_valid(KONEKODIR / path) is True
 
 
@@ -284,5 +268,5 @@ def test_path_valid_valids(path):
     'illustfollow',
     )
 )
-def test_path_valid_invalids(path):
+def test_path_valid_partial_are_invalid(path):
     assert files.path_valid(KONEKODIR / path) is False

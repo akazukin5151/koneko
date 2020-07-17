@@ -137,10 +137,10 @@ def valid_mode5(path):
 
 
 def path_valid(path) -> bool:
-    return (
-        valid_mode1(path)
-        or valid_mode2(path)
-        or valid_mode3(path)
-        or valid_mode4(path)
-        or valid_mode5(path)
-    )
+    return any((
+        valid_mode1(path),
+        valid_mode2(path),
+        valid_mode3(path),
+        valid_mode4(path),
+        valid_mode5(path),
+    ))

@@ -10,7 +10,7 @@ FakeData = namedtuple('data', ('download_path',))
 
 
 def gallery_user_loop(data, cls):
-    current_page = 1
+    current_page = int(data.download_path.name)
     show_images = True
     max_pages = len([x for x in os.listdir(data.download_path.parent)
                      if x.isdigit()])

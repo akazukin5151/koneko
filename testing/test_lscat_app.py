@@ -45,7 +45,7 @@ def test_display_user(monkeypatch, argv):
 def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.lscat_prompt.gallery_loop', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.gallery_user_loop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
@@ -63,7 +63,7 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
 def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.lscat_prompt.gallery_loop', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.gallery_user_loop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)

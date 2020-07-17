@@ -9,7 +9,7 @@ from koneko import lscat, TERM
 FakeData = namedtuple('data', ('download_path',))
 
 
-def gallery_loop(data, cls):
+def gallery_user_loop(data, cls):
     show_images = True
     max_pages = len([x for x in os.listdir(data.download_path.parent)
                      if x.isdigit()])

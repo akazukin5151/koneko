@@ -87,7 +87,9 @@ def test_ask_assistant(monkeypatch):
 def test_pick_dir_y(monkeypatch, patch_filter_history):
     # Just to test the branch is reachable
     monkeypatch.setattr('koneko.picker.Picker.start', lambda x: (None, 'y'))
-    assert picker.pick_dir() == KONEKODIR
+    monkeypatch.setattr('koneko.picker.actions_from_dir', raises_customexit)
+    with pytest.raises(CustomExit):
+        picker.pick_dir()
 
 
 def test_pick_dir_b(monkeypatch, patch_filter_history):

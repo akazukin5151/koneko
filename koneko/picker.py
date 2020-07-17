@@ -131,7 +131,15 @@ def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
         assistants.check_quit(ans)
 
         if ans == 'y':
-            return path  # TODO: prevent return if path is not valid
+            mode1 = path.parent.parent == KONEKODIR
+            mode2 = (path.parent.name == 'individual'
+                    or path.parent.parent.name == 'individual')
+            mode3 = path.parent.parent.name == 'following'
+            mode4 = path.parent.parent.name == 'search'
+            mode5 = path.parent.name == 'illustfollow'
+
+            if mode1 or mode2 or mode3 or mode4 or mode5:
+                return path
 
         elif ans == 'b':
             path = handle_back(path)

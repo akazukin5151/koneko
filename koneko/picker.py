@@ -8,7 +8,8 @@ from koneko import files, assistants, KONEKODIR
 
 
 # Constants
-EMPTY_WARNING = "**No directories match the filter! Press 'f' to re-filter**"
+EMPTY_FILTER_WARNING = "~~No directories match the filter! Press 'f' to re-filter~~"
+EMPTY_WARNING = "~~This directory is empty!~~"
 
 
 def ws_picker(actions: 'list[str]', title: str, **kwargs) -> Picker:
@@ -176,7 +177,7 @@ def handle_filter(path: 'path', basetitle: str) -> (str, 'list[str]', 'list[str]
 
 
 def handle_cd(path, selected_dir: 'path', modes: 'list[str]') -> ('path', 'list[str]'):
-    if selected_dir == EMPTY_WARNING:
+    if selected_dir == EMPTY_FILTER_WARNING:
         return KONEKODIR, []
     elif (newpath := path / selected_dir).is_dir():
         return newpath, modes
@@ -191,8 +192,9 @@ def actions_from_dir(path: 'path', modes: 'list[str]') -> 'list[str]':
             and 'individual' not in str(path)
             and str(path).isdigit()):
         return ['individual']
-    return files.filter_history(path)
+
+    return files.filter_history(path) or [EMPTY_WARNING]
 
 
 def try_filter_dir(modes: 'list[str]') -> 'list[str]':
-    return sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
+    return sorted(files.filter_dir(modes)) or [EMPTY_FILTER_WARNING]

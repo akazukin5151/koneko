@@ -31,14 +31,13 @@ class AbstractUI(ABC):
         declare the data attribute as appropriate.
         Main path includes any user input (eg, artist user id or search string)
         """
-        self.data: 'data.<class>'  # Define in self.data_class(), not __init__
+        self.data_class: 'data.<class>'  # Reference to the class
         self.prompt: 'prompt.<function>'
-        self.start(main_path)
 
-    @abstractmethod
-    def data_class(self, main_path) -> None:
-        """Instantiate the appropriate data object here (with args and bracket)"""
-        raise NotImplementedError
+        # Attribute defined in self.start()
+        self.data: 'data.<class>'  # Instantiated data class
+
+        self.start(main_path)
 
     @abstractmethod
     def tracker(self) -> None:
@@ -71,7 +70,7 @@ class AbstractUI(ABC):
 
     def start(self, main_path: 'Path') -> 'IO':
         # self.data defined here not in __init__, so that reload() will wipe cache
-        self.data = self.data_class(main_path)
+        self.data = self.data_class(1, main_path)
         self._parse_and_download()
         self._prefetch_thread()
 
@@ -172,11 +171,8 @@ class AbstractGallery(AbstractUI, ABC):
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for galleries"""
         self.prompt = prompt.gallery_like_prompt
+        self.data_class = data.GalleryData
         super().__init__(main_path)
-
-    def data_class(self, main_path):
-        """Implements abstractmethod: Instantiate the dataclass for galleries"""
-        return data.GalleryData(1, main_path)
 
     def tracker(self):
         """Implements abstractmethod: Instantiate tracker for galleries"""
@@ -414,11 +410,8 @@ class AbstractUsers(AbstractUI, ABC):
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for user modes"""
         self.prompt = prompt.user_prompt
+        self.data_class = data.UserData
         super().__init__(main_path)
-
-    def data_class(self, main_path):
-        """Implements abstractmethod: Instantiate the dataclass for user modes"""
-        return data.UserData(1, main_path)
 
     def tracker(self):
         """Implements abstractmethod: Instantiate tracker for user modes"""

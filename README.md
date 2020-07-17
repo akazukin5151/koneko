@@ -113,9 +113,13 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
+* Fixed docs: mode 5 cannot go back to main screen
+* Fixed reloading in a gallery mode leading to user prompt
+* Browse cache now no longer accepts an invalid directory to display on
 
 #### Code maintenance
 * lscat show_instant() now inspects the cls passed in instead of a bool argument
+* "Inlined" some abstract methods in AbstractUI into attributes
  
 
 # Roadmap

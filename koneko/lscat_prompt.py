@@ -48,7 +48,7 @@ def gallery_user_loop(data, cls):
                 sys.exit(0)
 
             else:
-                print("Inshow_images input!")
+                print("Invalid input!")
                 show_images = False
 
             if show_images:

@@ -105,11 +105,11 @@ def browse_cache():
     data = FakeData(path)
 
     if '.koneko' in os.listdir(path):
-        lscat.show_instant(lscat.TrackDownloadsUsers, data)
+        lscat_prompt.gallery_loop(data, lscat.TrackDownloadsUsers, False)
     elif 'individual' in str(path):
         lscat.icat(path / os.listdir(path)[0])
     else:
-        lscat_prompt.gallery_loop(data)
+        lscat_prompt.gallery_loop(data, lscat.TrackDownloads, True)
 
 
 def config_assistance(actions: 'Optional[list[int]]' = None):

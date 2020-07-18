@@ -140,7 +140,8 @@ fakeimage.previous_image = exit_mock
 fakeimage.show_full_res= exit_mock
 fakeimage.leave = exit_mock
 
-@pytest.mark.parametrize('letter', (u'a', u'b', u'q', u'o', u'd', u'n', u'p', u'f'))
+# missing keys 'a' and 'b'
+@pytest.mark.parametrize('letter', (u'q', u'o', u'd', u'n', u'p', u'f'))
 def test_image_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     class FakeInKeyNew(FakeInKey):

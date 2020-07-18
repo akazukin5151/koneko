@@ -491,7 +491,7 @@ def view_post_mode(image_id) -> 'IO':
 
     image = Image(image_id, idata, True)
 
-    image.start_preview()
+    start_preview(idata)
 
     prompt.image_prompt(image)
 
@@ -534,44 +534,6 @@ class Image:
 
     def _jump(self) -> 'IO':
         _jump(self._data)
-
-    def leave(self, force=False) -> 'IO':
-        self._data.event.set()
-        if self._data.firstmode or force:
-            # Came from view post mode, don't know current page num
-            # Defaults to page 1
-            mode = ArtistGallery(self._data.artist_user_id)
-            prompt.gallery_like_prompt(mode)
-        # Else: image prompt and class ends, goes back to previous mode
-
-    def start_preview(self):
-        if config.check_image_preview() and self._data.number_of_pages > 1:
-            self._data.event = threading.Event()  # Reset event, in case if it's set
-            self._data.thread = threading.Thread(target=self.preview)
-            self._data.thread.start()
-
-    def preview(self) -> 'IO':
-        """Download the next four images in the background and/or display them
-        one at a time, so if user interrupts, it won't hang.
-        """
-        tracker = lscat.TrackDownloadsImage(self._data)
-        i = 1
-        while not self._data.event.is_set() and i <= 4:
-            url = self._data.page_urls[self._data.page_num + i]
-            name = pure.split_backslash_last(url)
-            path = self._data.download_path / name
-
-            if path.is_file():
-                tracker.update(name)
-            else:
-                download.async_download_no_rename(
-                    self._data.download_path, [url], tracker=tracker
-                )
-
-            if i == 4:  # Last pic
-                print('\n' * config.image_text_offset())
-
-            i += 1
 
 
 def show_full_res(data):
@@ -673,3 +635,12 @@ def preview(data) -> 'IO':
             print('\n' * config.image_text_offset())
 
         i += 1
+
+def leave(data, force=False) -> 'IO':
+    data.event.set()
+    if data.firstmode or force:
+        # Came from view post mode, don't know current page num
+        # Defaults to page 1
+        mode = ArtistGallery(data.artist_user_id)
+        prompt.gallery_like_prompt(mode)
+    # Else: image prompt and class ends, goes back to previous mode

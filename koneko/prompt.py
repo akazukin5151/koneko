@@ -158,10 +158,10 @@ def image_prompt(image):
 
             # 3. Single char input with action that leaves prompt
             if image_prompt_command == 'b':
-                return image.leave(False)
+                return ui.leave(image._data, False)
 
             elif image_prompt_command == 'a':
-                return image.leave(True)
+                return ui.leave(image._data, True)
 
             # 4. Common
             keyseqs = common(case, image_prompt_command, keyseqs)

@@ -46,7 +46,6 @@ See [example config](example_config.ini) for reference.
 
 ## Experimental
 * `image_mode_previews`: In view post mode (mode 2), preview the next four images for multi-image posts. Unstable because of pixcat implementation details -- it prints out escape codes that moves the terminal cursor, changing the location of other print statements.
-* `image_mode_text_offset`: number of '\n' newlines to print after displaying all four image previews, to mitigate the cursor being moved higher.
 
 # Usage
 

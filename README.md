@@ -127,7 +127,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Pass in path to api.download instead of cd-ing into the dir
 * Make sure the diagrams in HACKING.md is up-to-date
-* `image_mode_text_offset` doesn't have a configuration assistant, or fix the cursor position again.
 * Consistent public and private methods and attributes again
 * In-depth usage documentation?
 

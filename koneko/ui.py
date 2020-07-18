@@ -537,10 +537,6 @@ class Image:
 
     def _jump(self) -> 'IO':
         _jump(self._data)
-        threading.Thread(target=self._prefetch_next_image).start()
-
-    def _prefetch_next_image(self) -> 'IO':
-        _prefetch_next_image(self._data)
 
     def leave(self, force=False) -> 'IO':
         self._data.event.set()
@@ -630,6 +626,7 @@ def jump_to_image(data, selected_image_num: int):
 
 def _jump(data):
     """Downloads next image if not downloaded, display it, prefetch next"""
+    threading.Thread(target=_prefetch_next_image, args=(data,)).start()
     if not (data.download_path / data.image_filename).is_dir():
         download.async_download_spinner(
             data.download_path, [data.current_url]

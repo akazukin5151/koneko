@@ -26,7 +26,7 @@ def remove_dir_if_exist(data) -> 'Maybe[IO]':
         rmtree(data.download_path)
 
 
-def filter_history(path) -> 'list[str]':
+def filter_history(path: 'Path') -> 'list[str]':
     return flow(
         path,
         os.listdir,
@@ -101,7 +101,7 @@ def filter_modes_predicate(modes: 'list[str]', allowed_names: 'set[str]') -> 'fu
     return lambda d: d in allowed_names
 
 
-def valid_mode1(path) -> bool:
+def valid_mode1(path: 'Path') -> bool:
     return (
         path.parent.parent == KONEKODIR
         and path.name.isdigit()
@@ -111,7 +111,7 @@ def valid_mode1(path) -> bool:
     )
 
 
-def valid_mode2(path) -> bool:
+def valid_mode2(path: 'Path') -> bool:
     # If the 'individual' dir only contains files, it is valid
     return (
         path.parent.name == 'individual'
@@ -122,19 +122,19 @@ def valid_mode2(path) -> bool:
     )
 
 
-def valid_mode3(path):
+def valid_mode3(path: 'Path') -> bool:
     return path.parent.parent.name == 'following'
 
 
-def valid_mode4(path):
+def valid_mode4(path: 'Path') -> bool:
     return path.parent.parent.name == 'search'
 
 
-def valid_mode5(path):
+def valid_mode5(path: 'Path') -> bool:
     return path.parent.name == 'illustfollow'
 
 
-def path_valid(path) -> bool:
+def path_valid(path: 'Path') -> bool:
     return any((
         valid_mode1(path),
         valid_mode2(path),

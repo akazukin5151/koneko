@@ -75,31 +75,30 @@ def dir_not_empty(data: 'Data') -> bool:
 
 def filter_dir(modes: 'list[str]') -> 'list[str]':
     """Given a list of modes to include, filter KONEKODIR to those modes"""
-    path = KONEKODIR
-    dirs = os.listdir(path)
-    allowed_names = set()
+    allowed_names = filter_modes_allowed(modes)
+    predicate = filter_modes_predicate(modes, allowed_names)
+    return [d for d in os.listdir(KONEKODIR) if predicate(d)]
 
+
+def filter_modes_allowed(modes: 'list[str]') -> 'set[str]':
+    allowed_names = set()
     if '1' in modes:
         allowed_names.add('testgallery')
-        predicate = lambda d: d.isdigit() or d in allowed_names
-
-    if '2' in modes:
-        mode2_dirs = find_mode2_dirs()
-        predicate = lambda d: d in mode2_dirs or d in allowed_names
-
     if '3' in modes:
         allowed_names.update(('following', 'testuser'))
-
     if '4' in modes:
         allowed_names.add('search')
-
     if '5' in modes:
         allowed_names.add('illustfollow')
+    return allowed_names
 
-    if '1' not in modes and '2' not in modes:
-        predicate = lambda d: d in allowed_names
 
-    return [d for d in dirs if predicate(d)]
+def filter_modes_predicate(modes: 'list[str]', allowed_names: 'set[str]') -> 'func(str) -> bool':
+    if '1' in modes:
+        return lambda d: d.isdigit() or d in allowed_names
+    elif '2' in modes:
+        return lambda d: d in find_mode2_dirs() or d in allowed_names
+    return lambda d: d in allowed_names
 
 
 def valid_mode1(path) -> bool:

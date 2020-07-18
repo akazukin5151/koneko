@@ -40,7 +40,7 @@ def test_previous_page_gallery(monkeypatch):
             self._tracker_class = Mock()
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
-        def print_page_info(self, *a):
+        def _print_page_info(self, *a):
             return True
 
     gallery = FakeGallery()
@@ -60,7 +60,7 @@ def test_previous_page_users(monkeypatch):
             self._tracker_class = Mock()
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
-        def print_page_info(self, *a):
+        def _print_page_info(self, *a):
             return True
 
 

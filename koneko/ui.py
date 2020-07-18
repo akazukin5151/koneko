@@ -51,12 +51,12 @@ class AbstractUI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def maybe_join_thread(self) -> None:
+    def _maybe_join_thread(self) -> None:
         """Run any procedure before prefetching (either in background or not)"""
         raise NotImplementedError
 
     @abstractmethod
-    def print_page_info(self) -> None:
+    def _print_page_info(self) -> None:
         """Run any procedure to print the page info"""
         raise NotImplementedError
 
@@ -66,7 +66,7 @@ class AbstractUI(ABC):
         self._parse_and_download()
         self._prefetch()
 
-    def verify_up_to_date(self):
+    def _verify_up_to_date(self):
         if files.dir_not_empty(self._data):
             return True
         files.remove_dir_if_exist(self._data)
@@ -81,8 +81,8 @@ class AbstractUI(ABC):
         if files.dir_not_empty(self._data):
             lscat.show_instant(self._tracker_class, self._data)
             self._parse_user_infos()
-            self.verify_up_to_date()
-            self.print_page_info()
+            self._verify_up_to_date()
+            self._print_page_info()
             return True
 
         # No valid cached images, download all from scratch
@@ -90,7 +90,7 @@ class AbstractUI(ABC):
 
         self._parse_user_infos()
         download.init_download(self._data, self._tracker_class(self._data))
-        self.print_page_info()
+        self._print_page_info()
 
     def _prefetch(self) -> 'IO':
         """Reassign the thread again and start; as threads can only be started once"""
@@ -105,7 +105,7 @@ class AbstractUI(ABC):
     def _prefetch_next_page(self) -> 'IO':
         # Wait for initial request to finish, so the data object is instantiated
         # Else next_url won't be set yet
-        self.maybe_join_thread()
+        self._maybe_join_thread()
         if not self._data.next_url:  # Last page
             return True
 
@@ -146,7 +146,7 @@ class AbstractUI(ABC):
             self._data.page_num -= 1
             return False
         lscat.show_instant(self._tracker_class, self._data)
-        self.print_page_info()
+        self._print_page_info()
 
     def reload(self) -> 'IO':
         print('This will delete cached images and redownload them. Proceed?')
@@ -167,11 +167,11 @@ class AbstractGallery(AbstractUI, ABC):
         self._tracker_class = lscat.TrackDownloads
         super().__init__(main_path)
 
-    def maybe_join_thread(self):
+    def _maybe_join_thread(self):
         """Implements abstractmethod: No action needed"""
         return True
 
-    def print_page_info(self):
+    def _print_page_info(self):
         """Implements abstractmethod: Indicate which posts are multi-image and
         current page number
         """
@@ -227,7 +227,7 @@ class AbstractGallery(AbstractUI, ABC):
     def _back(self) -> 'IO':
         """After user 'back's from image prompt or artist gallery, start mode again"""
         lscat.show_instant(self._tracker_class, self._data)
-        self.print_page_info()
+        self._print_page_info()
         prompt.gallery_like_prompt(self)
 
 
@@ -399,12 +399,12 @@ class AbstractUsers(AbstractUI, ABC):
         self._tracker_class = lscat.TrackDownloadsUsers
         super().__init__(main_path)
 
-    def maybe_join_thread(self):
+    def _maybe_join_thread(self):
         """Implements abstractmethod: Wait for parse_thread to join (if any)"""
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
 
-    def print_page_info(self):
+    def _print_page_info(self):
         """Implements abstractmethod: Indicate current page number"""
         print(f'Page {self._data.page_num}')
 

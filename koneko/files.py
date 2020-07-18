@@ -7,7 +7,7 @@ from placeholder import _
 from funcy import curry, lfilter
 from returns.pipeline import flow
 
-from koneko import utils, KONEKODIR
+from koneko import KONEKODIR
 
 
 def find_mode2_dirs() -> 'list[str]':
@@ -17,9 +17,8 @@ def find_mode2_dirs() -> 'list[str]':
 
 
 def read_invis(data) -> 'IO[int]':
-    with utils.cd(data.download_path):
-        with open('.koneko', 'r') as f:
-            return int(f.read())
+    with open(data.download_path / '.koneko', 'r') as f:
+        return int(f.read())
 
 
 def remove_dir_if_exist(data) -> 'Maybe[IO]':

@@ -190,7 +190,7 @@ def actions_from_dir(path: 'path', modes: 'list[str]') -> 'list[str]':
     if ('2' in modes
             and '1' not in modes
             and 'individual' not in str(path)
-            and str(path).isdigit()):
+            and str(path.name).isdigit()):
         return ['individual']
 
     return files.filter_history(path) or [EMPTY_WARNING]

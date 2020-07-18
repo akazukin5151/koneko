@@ -68,6 +68,7 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 * Python 3.8+
 * It has been tested on kitty v0.17.2 onwards, but should work on older versions
 * Operating system: all OSes that kitty supports, which means Linux and macOS.
+* Uses xdg-open (for opening links in your browser) and curl (for safety fallback, see below)
 
 <details>
   <summary>If it crashes (it shouldn't), it might be because pip didn't 'install' the welcome pictures, *and* the script failed to download them for some reason. Try:</summary>

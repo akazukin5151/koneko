@@ -96,3 +96,11 @@ def test_begin_config_nonexistant_no_id(monkeypatch, tmp_path, use_test_cfg_path
 
     assert config.get_settings('Credentials', 'username') == Success('myusername')
     assert config.get_settings('Credentials', 'password') == Success('mypassword')
+
+
+def test_gallery_print_spacing_config(tmp_path, use_test_cfg_path):
+    setup_test_config(tmp_path)
+    assert config.gallery_print_spacing_config() == ['9', '17', '17', '17', '17']
+
+def test_gallery_print_spacing_config_default(use_test_cfg_path):
+    assert config.gallery_print_spacing_config() == ['9', '17', '17', '17', '17']

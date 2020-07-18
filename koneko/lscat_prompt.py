@@ -39,11 +39,11 @@ class AbstractLoop(ABC):
                 print(ans)
 
                 if ans == 'n' and self.current_page == self.max_pages:
-                    print("This is the last cached page!")
+                    print('This is the last cached page!')
                     show_images = False
 
                 elif ans == 'p' and self.current_page == self.condition:
-                    print("This is the last page!")
+                    print('This is the last page!')
                     show_images = False
 
                 elif ans == 'n':
@@ -58,7 +58,7 @@ class AbstractLoop(ABC):
                     sys.exit(0)
 
                 else:
-                    print("Invalid input!")
+                    print('Invalid input!')
                     show_images = False
 
                 if show_images:

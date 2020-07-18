@@ -9,7 +9,7 @@ sys.path.append('testing')
 
 from page_json import page_json  # isort:skip
 
-page_illusts = page_json["illusts"]
+page_illusts = page_json['illusts']
 
 with open('testing/files/mode1.json', 'r') as json_file:
     page_illusts_new = json.load(json_file)['illusts']
@@ -18,7 +18,7 @@ with open('testing/files/mode1.json', 'r') as json_file:
 def test_print_multiple_imgs_two_posts(capsys):
     printer.print_multiple_imgs(page_illusts)
     captured = capsys.readouterr()
-    assert captured.out == "\x1b[31m#14\x1b[39m has \x1b[34m8\x1b[39m pages, \x1b[31m#25\x1b[39m has \x1b[34m50\x1b[39m pages, \n"
+    assert captured.out == '\x1b[31m#14\x1b[39m has \x1b[34m8\x1b[39m pages, \x1b[31m#25\x1b[39m has \x1b[34m50\x1b[39m pages, \n'
 
 def test_print_multiple_imgs_one_post(capsys):
     printer.print_multiple_imgs(page_illusts_new)
@@ -28,7 +28,7 @@ def test_print_multiple_imgs_one_post(capsys):
 def test_write(capsys):
     printer.write('hi')
     captured = capsys.readouterr()
-    assert captured.out == "hi"
+    assert captured.out == 'hi'
 
 
 def test_cursor_move_up(capsys):

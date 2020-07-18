@@ -11,7 +11,7 @@ sys.path.append('testing')
 
 from page_json import page_json  # isort:skip
 
-page_illusts = page_json["illusts"]
+page_illusts = page_json['illusts']
 
 
 def test_find_number_map(monkeypatch):

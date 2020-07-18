@@ -16,7 +16,7 @@ with open('testing/files/mode3.json', 'r') as json_file:
 
 
 def gallery():
-    return data.GalleryData(1, KONEKODIR / "2232374")
+    return data.GalleryData(1, KONEKODIR / '2232374')
 
 def gallery_updated():
     data = gallery()
@@ -24,10 +24,10 @@ def gallery_updated():
     return data
 
 def image():
-    return data.ImageData(mode2["illust"], "76695217")
+    return data.ImageData(mode2['illust'], '76695217')
 
 def user():
-    return data.UserData(1, KONEKODIR / "following/2232374")
+    return data.UserData(1, KONEKODIR / 'following/2232374')
 
 def user_updated():
     data = user()
@@ -63,17 +63,17 @@ def test_gallery_init():
     assert gdata
     assert gdata.all_pages_cache == {}
     assert gdata.page_num == 1
-    assert gdata.main_path == Path(f"{KONEKODIR}/2232374/")
+    assert gdata.main_path == Path(f'{KONEKODIR}/2232374/')
 
 def test_gallery_update():
     gdata = gallery()
     gdata.update(mode1)
     assert list(gdata.all_pages_cache.keys()) == ['1']
-    assert gdata.all_pages_cache["1"] == mode1
+    assert gdata.all_pages_cache['1'] == mode1
 
 def test_gallery_download_path():
     gdata = gallery_updated()
-    assert gdata.download_path == KONEKODIR / "2232374" / '1'
+    assert gdata.download_path == KONEKODIR / '2232374' / '1'
 
 def test_gallery_current_illusts():
     gdata = gallery_updated()
@@ -93,7 +93,7 @@ def test_gallery_image_id():
 
 def test_gallery_next_url():
     gdata = gallery_updated()
-    assert gdata.next_url == "https://app-api.pixiv.net/v1/user/illusts?user_id=2232374&filter=for_ios&type=illust&offset=30"
+    assert gdata.next_url == 'https://app-api.pixiv.net/v1/user/illusts?user_id=2232374&filter=for_ios&type=illust&offset=30'
 
 def test_gallery_url():
     gdata = gallery_updated()
@@ -122,27 +122,27 @@ def test_image_number_of_pages():
 
 def test_image_page_urls():
     idata = image()
-    assert idata.page_urls == ["https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg", "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p1_master1200.jpg", "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p2_master1200.jpg", "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p3_master1200.jpg", "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p4_master1200.jpg", "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p5_master1200.jpg", "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p6_master1200.jpg", "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p7_master1200.jpg"]
+    assert idata.page_urls == ['https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg', 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p1_master1200.jpg', 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p2_master1200.jpg', 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p3_master1200.jpg', 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p4_master1200.jpg', 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p5_master1200.jpg', 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p6_master1200.jpg', 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p7_master1200.jpg']
 
 def test_image_download_path():
     idata = image()
-    assert idata.download_path == Path(f"{KONEKODIR}/2232374/individual/76695217/")
+    assert idata.download_path == Path(f'{KONEKODIR}/2232374/individual/76695217/')
 
 def test_image_image_filename():
     idata = image()
-    assert idata.image_filename == "76695217_p0_master1200.jpg"
+    assert idata.image_filename == '76695217_p0_master1200.jpg'
 
 def test_image_filepath():
     idata = image()
-    assert idata.filepath == Path(f"{KONEKODIR}/2232374/individual/76695217/76695217_p0_master1200.jpg")
+    assert idata.filepath == Path(f'{KONEKODIR}/2232374/individual/76695217/76695217_p0_master1200.jpg')
 
 def test_image_next_img_url():
     idata = image()
-    assert idata.next_img_url == "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p1_master1200.jpg"
+    assert idata.next_img_url == 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p1_master1200.jpg'
 
 def test_image_current_url():
     idata = image()
-    assert idata.current_url == "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg"
+    assert idata.current_url == 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg'
 
 
 def test_user_init():
@@ -154,11 +154,11 @@ def test_user_init():
 def test_user_update():
     udata = user()
     udata.update(mode3)
-    assert udata.next_url == "https://app-api.pixiv.net/v1/user/following?user_id=2232374&restrict=private&offset=30"
+    assert udata.next_url == 'https://app-api.pixiv.net/v1/user/following?user_id=2232374&restrict=private&offset=30'
 
     assert udata.ids_cache == {1: [219621, 1510169, 12612404, 8660134, 15063, 28245700, 33137265, 2702224, 24218478, 625051, 95391, 9427, 1193008, 1554775, 11103, 7309825, 5301174, 4316556, 10573236, 29362997, 809099, 82688, 15608555, 30803054, 18836733, 644670, 2397243, 14211481, 8092144, 8175661]}
 
-    assert udata.names_cache == {1: ["畳と桧", "ざるつ", "春夫", "JAM", "肋兵器", "おてん!!!!!!!!", "saber", "sola7764", "￦ANKE", "ToY", "sigma99", "アマガイタロー", "望月けい", "米山舞", "にえあ@冬コミ新刊委託中です", "白萝炖黑兔", "Kelinch1", "三崎二式.N3", "ﾕｳｷ", "sunhyunそんひょん선현", "うまくち醤油", "Prime", "哦雅思密乃", "ホリセイ", "pattsk138", "DELF", "キンタ", "cookies", "Aluppia", "うにゃりすたー"]}
+    assert udata.names_cache == {1: ['畳と桧', 'ざるつ', '春夫', 'JAM', '肋兵器', 'おてん!!!!!!!!', 'saber', 'sola7764', '￦ANKE', 'ToY', 'sigma99', 'アマガイタロー', '望月けい', '米山舞', 'にえあ@冬コミ新刊委託中です', '白萝炖黑兔', 'Kelinch1', '三崎二式.N3', 'ﾕｳｷ', 'sunhyunそんひょん선현', 'うまくち醤油', 'Prime', '哦雅思密乃', 'ホリセイ', 'pattsk138', 'DELF', 'キンタ', 'cookies', 'Aluppia', 'うにゃりすたー']}
 
     assert len(udata.profile_pic_urls) == 30
 
@@ -166,7 +166,7 @@ def test_user_update():
 
 def test_user_download_path():
     udata = user_updated()
-    assert udata.download_path == KONEKODIR / "following/2232374/1"
+    assert udata.download_path == KONEKODIR / 'following/2232374/1'
 
 def test_user_artist_user_id():
     udata = user_updated()
@@ -182,8 +182,8 @@ def test_user_all_urls():
 
 def test_user_all_names():
     udata = user_updated()
-    assert udata.all_names[:10] == ["畳と桧", "ざるつ", "春夫", "JAM", "肋兵器", "おてん!!!!!!!!", "saber", "sola7764", "￦ANKE", "ToY"]
-    assert udata.all_names[-10:] == ["76547709_p0_square1200", "79708221_p0_square1200", "76623178_p0_square1200", "74653820_p0_square1200", "81542404_p0_square1200", "80414334_p0_square1200", "79663557_p0_square1200", "79028150_p0_square1200", "79027961_p0_square1200", "79027291_p0_square1200"]
+    assert udata.all_names[:10] == ['畳と桧', 'ざるつ', '春夫', 'JAM', '肋兵器', 'おてん!!!!!!!!', 'saber', 'sola7764', '￦ANKE', 'ToY']
+    assert udata.all_names[-10:] == ['76547709_p0_square1200', '79708221_p0_square1200', '76623178_p0_square1200', '74653820_p0_square1200', '81542404_p0_square1200', '80414334_p0_square1200', '79663557_p0_square1200', '79028150_p0_square1200', '79027961_p0_square1200', '79027291_p0_square1200']
 
 def test_user_splitpoint():
     udata = user_updated()

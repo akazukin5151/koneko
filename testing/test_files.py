@@ -15,10 +15,10 @@ def test_find_mode2_dirs(tmp_path, monkeypatch):
 
 
 def test_verify_full_download():
-    assert files.verify_full_download("testing/files/008_77803142_p0.png") is True
-    assert files.verify_full_download("testing/files/not_an_image.txt") is False
+    assert files.verify_full_download('testing/files/008_77803142_p0.png') is True
+    assert files.verify_full_download('testing/files/not_an_image.txt') is False
     # The above code will remove the file
-    os.system("touch testing/files/not_an_image.txt")
+    os.system('touch testing/files/not_an_image.txt')
 
 
 @pytest.mark.parametrize('mkdir', (True, False))
@@ -40,8 +40,8 @@ def test_filter_history(tmp_path):
 def data_faker(tmp_path):
     FakeData = namedtuple('data', ('download_path', 'first_img', 'all_names'))
     data = FakeData(
-        tmp_path, "004_祝！！！.jpg",
-        ["004_祝！！！.jpg", '008_77803142_p0.png', '017_ミコニャン.jpg']
+        tmp_path, '004_祝！！！.jpg',
+        ['004_祝！！！.jpg', '008_77803142_p0.png', '017_ミコニャン.jpg']
     )
     return data
 
@@ -166,8 +166,8 @@ def test_valid_mode5_valid():
 root = '123'
 mode1_paths = ('123/1',)
 mode2_paths = ('123/individual', '123/individual/1')
-mode3_paths = ("following", "following/2232374", "following/2232374/1")
-mode4_paths = ("search", "search/searchstr", "search/searchstr/1")
+mode3_paths = ('following', 'following/2232374', 'following/2232374/1')
+mode4_paths = ('search', 'search/searchstr', 'search/searchstr/1')
 mode5_paths = ('illustfollow', 'illustfollow/1')
 
 
@@ -250,8 +250,8 @@ def test_valid_mode5_invalid(path):
 @pytest.mark.parametrize('path', (
     '123/1',
     '123/individual/1',
-    "following/2232374/1",
-    "search/searchstr/1",
+    'following/2232374/1',
+    'search/searchstr/1',
     'illustfollow/1',
     )
 )
@@ -261,10 +261,10 @@ def test_path_valid_full_are_valid(path):
 
 @pytest.mark.parametrize('path', (
     '123',
-    "following",
-    "following/2232374",
-    "search",
-    "search/searchstr",
+    'following',
+    'following/2232374',
+    'search',
+    'search/searchstr',
     'illustfollow',
     )
 )

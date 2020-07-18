@@ -9,7 +9,7 @@ from koneko import files, assistants, KONEKODIR
 
 # Constants
 EMPTY_FILTER_WARNING = "~~No directories match the filter! Press 'f' to re-filter~~"
-EMPTY_WARNING = "~~This directory is empty!~~"
+EMPTY_WARNING = '~~This directory is empty!~~'
 
 
 def ws_picker(actions: 'list[str]', title: str, **kwargs) -> Picker:
@@ -50,8 +50,8 @@ def lscat_app_main() -> int:
 
 def frequent_modes_picker(actions: 'list[str]') -> int:
     title = (
-        "Please pick an input\n"
-        "[mode]: [pixiv ID or searchstr] (frequency)\n"
+        'Please pick an input\n'
+        '[mode]: [pixiv ID or searchstr] (frequency)\n'
         "Press 'f' to filter modes"
     )
 
@@ -72,7 +72,7 @@ def _multiselect_picker(actions: 'list[str]', title: str, to_str=True) -> 'IO[li
 
 
 def select_modes_filter(more=False) -> 'IO[list[str]]':
-    title = "Use SPACE to select a mode to show and ENTER to confirm"
+    title = 'Use SPACE to select a mode to show and ENTER to confirm'
     # Copied from screens
     actions = [
         '1. View artist illustrations',
@@ -171,7 +171,7 @@ def handle_filter(path: 'path', basetitle: str) -> (str, 'list[str]', 'list[str]
         actions = files.filter_history(path)
         return basetitle, actions, modes
 
-    title = f"Filtering {modes=}\n" + basetitle
+    title = f'Filtering {modes=}\n' + basetitle
     actions = try_filter_dir(modes)
     return title, actions, modes
 

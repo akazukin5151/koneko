@@ -114,6 +114,7 @@ class ImageData:
         self.image_id = image_id
         self.artist_user_id = raw['user']['id']
         self.page_num = 0
+        self.firstmode = firstmode
 
         # These are assigned here not as a method, as raw won't be updated
         self.page_urls = pure.page_urls_in_post(raw, 'large')
@@ -122,10 +123,6 @@ class ImageData:
         # Store multi image posts within their own dir
         if self.number_of_pages != 1:
             self.download_path = self.download_path / str(image_id)
-
-        self.event = threading.Event()
-        self.firstmode = firstmode
-        self.thread: threading.Thread
 
     @property
     def current_url(self) -> str:

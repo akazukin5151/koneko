@@ -130,7 +130,7 @@ def gallery_like_prompt(gallery):
             keyseqs = common(case, gallery_command, keyseqs, sequenceable_keys)
 
 
-def image_prompt(image, idata):
+def image_prompt(image):
     """if-else statements to intercept key presses and do the correct action"""
     keyseqs = []
     case = {
@@ -150,7 +150,7 @@ def image_prompt(image, idata):
 
             # 1. Two digit sequence -- jump to post number
             if two_digit_seq:
-                ui.jump_to_image(idata, pure.concat_seqs_to_int(keyseqs))
+                image.jump_to_image(pure.concat_seqs_to_int(keyseqs))
                 keyseqs = []
 
             # 2. Ask and wait for user input
@@ -158,10 +158,10 @@ def image_prompt(image, idata):
 
             # 3. Single char input with action that leaves prompt
             if image_prompt_command == 'b':
-                return ui.leave(idata, False)
+                return image.leave(False)
 
             elif image_prompt_command == 'a':
-                return ui.leave(idata, True)
+                return image.leave(True)
 
             # 4. Common
             keyseqs = common(case, image_prompt_command, keyseqs)

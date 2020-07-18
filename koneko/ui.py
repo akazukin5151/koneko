@@ -209,7 +209,7 @@ class AbstractGallery(AbstractUI, ABC):
         """
         post_json = self._data.post_json(selected_image_num)
         image_id = post_json.id
-        idata = data.ImageData(post_json, image_id, False)
+        idata = Image(post_json, image_id, False)
 
         _display_medium_preview(self._data, idata, selected_image_num)
 
@@ -218,8 +218,7 @@ class AbstractGallery(AbstractUI, ABC):
 
         lscat.icat(idata.download_path / idata.large_filename)
 
-        image = Image(image_id, idata)
-        prompt.image_prompt(image, idata)
+        prompt.image_prompt(idata)
 
         # Image prompt ends, user presses back
         self._back()
@@ -481,7 +480,7 @@ def view_post_mode(image_id) -> 'IO':
         print('Work has been deleted or the ID does not exist!')
         sys.exit(1)
 
-    idata = data.ImageData(post_json, image_id, True)
+    idata = Image(post_json, image_id, True)
 
     download.download_url(idata.download_path, idata.current_url, idata.image_filename)
 
@@ -489,14 +488,12 @@ def view_post_mode(image_id) -> 'IO':
 
     print(f'Page 1/{idata.number_of_pages}')
 
-    image = Image(image_id, idata)
+    idata.start_preview()
 
-    start_preview(idata)
-
-    prompt.image_prompt(image, idata)
+    prompt.image_prompt(idata)
 
 
-class Image:
+class Image(data.ImageData):  # Extends the data class by adding IO actions on top
     """
     Image view commands (No need to press enter):
         b -- go back to the gallery
@@ -510,130 +507,119 @@ class Image:
         m -- show this manual
         q -- quit (with confirmation)
     """
-    def __init__(self, image_id, idata):
-        self._data = idata
+    def __init__(self, raw: 'Json', image_id: str, firstmode=False):
+        super().__init__(raw, image_id, firstmode)
+        self.event = threading.Event()
+        self.thread: threading.Thread
 
     def open_image(self) -> 'IO':
-        utils.open_in_browser(self._data.image_id)
+        utils.open_in_browser(self.image_id)
 
     def download_image(self) -> 'IO':
-        download.download_url_verified(self._data.current_url)
+        download.download_url_verified(self.current_url)
 
     def show_full_res(self) -> 'IO':
-        show_full_res(self._data)
+        # FIXME: some images that need to be downloaded in png won't work
+        # Can use verified function above
+        large_url = pure.change_url_to_full(self.current_url)
+        filename = pure.split_backslash_last(large_url)
+        download.download_url(self.download_path, large_url, filename)
+        lscat.icat(self.download_path / filename)
 
     def next_image(self) -> 'IO':
-        next_image(self._data)
+        self.event.set()
+        if not self.page_urls:
+            print('This is the only page in the post!')
+            return False
+        elif self.page_num + 1 == self.number_of_pages:
+            print('This is the last image in the post!')
+            return False
+
+        # jump_to_image corrects for 1-based
+        self.page_num += 1
+        self.jump_to_image(self.page_num + 1)
 
     def previous_image(self) -> 'IO':
-        previous_image(self._data)
+        self.event.set()
+        if not self.page_urls:
+            print('This is the only page in the post!')
+            return False
+        elif self.page_num == 0:
+            print('This is the first image in the post!')
+            return False
+
+        self.page_num -= 1
+        self.jump_to_image(self.page_num + 1)
+
+    def jump_to_image(self, selected_image_num: int):
+        self.event.set()
+        if selected_image_num <= 0 or selected_image_num > len(self.page_urls):
+            print('Invalid number!')
+            return False
+
+        # Internally 0-based, but externally 1-based
+        self.page_num = selected_image_num - 1
+        self._jump()
 
 
-def show_full_res(data):
-    # FIXME: some images that need to be downloaded in png won't work
-    # Can use verified function above
-    large_url = pure.change_url_to_full(data.current_url)
-    filename = pure.split_backslash_last(large_url)
-    download.download_url(data.download_path, large_url, filename)
-    lscat.icat(data.download_path / filename)
-
-
-def next_image(data):
-    data.event.set()
-    if not data.page_urls:
-        print('This is the only page in the post!')
-        return False
-    elif data.page_num + 1 == data.number_of_pages:
-        print('This is the last image in the post!')
-        return False
-
-    # jump_to_image corrects for 1-based
-    data.page_num += 1
-    jump_to_image(data, data.page_num + 1)
-
-
-def previous_image(data):
-    data.event.set()
-    if not data.page_urls:
-        print('This is the only page in the post!')
-        return False
-    elif data.page_num == 0:
-        print('This is the first image in the post!')
-        return False
-
-    data.page_num -= 1
-    jump_to_image(data, data.page_num + 1)
-
-
-def jump_to_image(data, selected_image_num: int):
-    data.event.set()
-    if selected_image_num <= 0 or selected_image_num > len(data.page_urls):
-        print('Invalid number!')
-        return False
-
-    # Internally 0-based, but externally 1-based
-    data.page_num = selected_image_num - 1
-    _jump(data)
-
-
-def _jump(data):
-    """Downloads next image if not downloaded, display it, prefetch next"""
-    # FIXME: thread might download to the user's current dir.
-    # Pass in path to api.download as planned
-    threading.Thread(target=_prefetch_next_image, args=(data,)).start()
-    if not (data.download_path / data.image_filename).is_dir():
-        download.async_download_spinner(
-            data.download_path, [data.current_url]
-        )
-
-    os.system('clear')
-
-    lscat.icat(data.filepath)
-
-    print(f'Page {data.page_num+1}/{data.number_of_pages}')
-    start_preview(data)
-
-
-def _prefetch_next_image(data):
-    with funcy.suppress(IndexError):
-        next_img_url = data.next_img_url
-    if next_img_url:
-        download.async_download_spinner(data.download_path, [next_img_url])
-
-def start_preview(data):
-    if config.check_image_preview() and data.number_of_pages > 1:
-        data.event = threading.Event()  # Reset event, in case if it's set
-        data.thread = threading.Thread(target=preview, args=(data,))
-        data.thread.start()
-
-def preview(data) -> 'IO':
-    """Download the next four images in the background and/or display them
-    one at a time, so if user interrupts, it won't hang.
-    """
-    tracker = lscat.TrackDownloadsImage(data)
-    i = 1
-    while not data.event.is_set() and i <= 4:
-        url = data.page_urls[data.page_num + i]
-        name = pure.split_backslash_last(url)
-        path = data.download_path / name
-
-        if path.is_file():
-            tracker.update(name)
-        else:
-            download.async_download_no_rename(
-                data.download_path, [url], tracker=tracker
+    def _jump(self):
+        """Downloads next image if not downloaded, display it, prefetch next"""
+        # FIXME: thread might download to the user's current dir.
+        # Pass in path to api.download as planned
+        threading.Thread(target=self._prefetch_next_image).start()
+        if not (self.download_path / self.image_filename).is_dir():
+            download.async_download_spinner(
+                self.download_path, [self.current_url]
             )
 
-        if i == 4:  # Last pic
-            print('\n' * config.image_text_offset())
+        os.system('clear')
 
-        i += 1
+        lscat.icat(self.filepath)
 
-def leave(data, force=False) -> 'IO':
-    data.event.set()
-    if data.firstmode or force:
-        # Came from view post mode, don't know current page num
-        # Defaults to page 1
-        mode = ArtistGallery(data.artist_user_id)
-        prompt.gallery_like_prompt(mode)
-    # Else: image prompt and class ends, goes back to previous mode
+        print(f'Page {self.page_num+1}/{self.number_of_pages}')
+        self.start_preview()
+
+
+    def _prefetch_next_image(self):
+        with funcy.suppress(IndexError):
+            next_img_url = self.next_img_url
+        if next_img_url:
+            download.async_download_spinner(self.download_path, [next_img_url])
+
+    def start_preview(self):
+        if config.check_image_preview() and self.number_of_pages > 1:
+            self.event = threading.Event()  # Reset event, in case if it's set
+            self.thread = threading.Thread(target=self.preview)
+            self.thread.start()
+
+    def preview(self) -> 'IO':
+        """Download the next four images in the background and/or display them
+        one at a time, so if user interrupts, it won't hang.
+        """
+        tracker = lscat.TrackDownloadsImage(self)
+        i = 1
+        while not self.event.is_set() and i <= 4:
+            url = self.page_urls[self.page_num + i]
+            name = pure.split_backslash_last(url)
+            path = self.download_path / name
+
+            if path.is_file():
+                tracker.update(name)
+            else:
+                download.async_download_no_rename(
+                     self.download_path, [url], tracker=tracker
+                )
+
+            if i == 4:  # Last pic
+                print('\n' * config.image_text_offset())
+
+            i += 1
+
+    def leave(self, force=False) -> 'IO':
+        self.event.set()
+        if self.firstmode or force:
+            # Came from view post mode, don't know current page num
+            # Defaults to page 1
+            mode = ArtistGallery(self.artist_user_id)
+            prompt.gallery_like_prompt(mode)
+        # Else: image prompt and class ends, goes back to previous mode

@@ -18,6 +18,10 @@ def move_cursor_down(num=1) -> 'IO':
         write(f'\033[{num}B')
 
 
+def move_cursor_xy(x, y):
+    write(f'\033[{x};{y}H')
+
+
 def erase_line() -> 'IO':
     write('\033[K')
 

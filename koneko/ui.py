@@ -12,6 +12,7 @@ from koneko import (
     api,
     data,
     pure,
+    TERM,
     lscat,
     utils,
     files,
@@ -511,6 +512,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         super().__init__(raw, image_id, firstmode)
         self.event = threading.Event()
         self.thread: threading.Thread
+        # Defined in self.start_preview()
+        self.loc: tuple[int]
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self.image_id)
@@ -527,7 +530,6 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         lscat.icat(self.download_path / filename)
 
     def next_image(self) -> 'IO':
-        self.event.set()
         if not self.page_urls:
             print('This is the only page in the post!')
             return False
@@ -540,7 +542,6 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.jump_to_image(self.page_num + 1)
 
     def previous_image(self) -> 'IO':
-        self.event.set()
         if not self.page_urls:
             print('This is the only page in the post!')
             return False
@@ -587,6 +588,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             download.async_download_spinner(self.download_path, [next_img_url])
 
     def start_preview(self):
+        self.loc = TERM.get_location()
         if config.check_image_preview() and self.number_of_pages > 1:
             self.event = threading.Event()  # Reset event, in case if it's set
             self.thread = threading.Thread(target=self.preview)
@@ -614,7 +616,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
                 )
 
             if i == 4:  # Last pic
-                print('\n' * config.image_text_offset())
+                printer.move_cursor_xy(self.loc[0], self.loc[1])
 
             i += 1
 

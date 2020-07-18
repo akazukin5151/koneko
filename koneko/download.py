@@ -88,12 +88,11 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
 
 
 def _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker):
-    helper = partial(_download_then_rename, tracker=tracker)
+    helper = partial(_download_then_rename, path=data.download_path, tracker=tracker)
 
     os.makedirs(data.download_path, exist_ok=True)
-    with utils.cd(data.download_path):
-        with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
-            executor.map(helper, data.all_urls, downloaded_oldnames, downloaded_newnames)
+    with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
+        executor.map(helper, data.all_urls, downloaded_newnames)
 
     # Might multiprocessing be faster to bypass urllib's pool limit?
     # 'Cannot pickle generator'
@@ -102,19 +101,9 @@ def _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, t
         #p.map(helper, (data.all_urls, downloaded_oldnames, downloaded_newnames))
 
 
-def _download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':
+def _download_then_rename(url, img_name, path, tracker=None) -> 'IO':
     """Actually downloads one pic given one url, rename if needed."""
-    api.myapi.protected_download(url)
-
-    # Best to rename every completed download in their own thread
-    # to avoid race conditions
-    if new_file_name:
-        # This character break renames
-        if '/' in new_file_name:
-            new_file_name = new_file_name.replace('/', '')
-        os.rename(img_name, new_file_name)
-        img_name = new_file_name
-
+    api.myapi.protected_download(url, path, img_name)
     if tracker:
         tracker.update(img_name)
 
@@ -127,8 +116,7 @@ def download_url(download_path: Path, url, filename: str) -> 'IO':
     os.makedirs(download_path, exist_ok=True)
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
-        with utils.cd(download_path):
-            _download_then_rename(url, filename)
+        _download_then_rename(url, filename, download_path)
 
 
 def download_url_verified(url, png=False) -> 'IO':

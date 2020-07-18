@@ -137,6 +137,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 # Roadmap
 
+* lscat app: Move browse cache and specify path to mode 2 and 3 respectively, moving testgallery & testuser to the end
 * Make sure the diagrams in HACKING.md is up-to-date
 * In-depth usage documentation?
 

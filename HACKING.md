@@ -17,7 +17,7 @@ In other words, the adapter organises code, while the models and view does the a
 
 | Role of code | Model (functional core) | Inbound IO (imperative shell) | Outbound IO (imperative shell) | Adapter (organises everything)
 | --- | --- | --- | --- | ---
-| Does work | <ul><li>colors</li><li>config \*</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>config \*</li><li>download</li><li>picker</li></ul> | <ul><li>config \*</li><li>files</li><li>printer</li><li>screens</li><li>utils</li></ul>  |
+| Does work | <ul><li>colors</li><li>config \*</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>config \*</li><li>download</li><li>files</li><li>picker</li></ul> | <ul><li>config \*</li><li>printer</li><li>screens</li><li>utils</li></ul>  |
 | Organizes work |  | <ul><li>assistants</li><li>prompt</li></ul> | <ul><li>lscat</li></ul> | <ul><li>cli</li><li>lscat_app</li><li>main</li><li>ui</li></ul>
 
 The overall code is neither OOP nor functional: the only communication between all modules is through function returns, not through 'notifying' different objects. The only (major?) exception is that `downloads.py` will directly trigger a callback to `lscat.py`.

@@ -10,21 +10,23 @@ from returns.pipeline import flow
 from koneko import KONEKODIR
 
 
-def find_mode2_dirs() -> 'list[str]':
-    return [f for f in os.listdir(KONEKODIR)
-            if f.isdigit()
-            and 'individual' in os.listdir(KONEKODIR / f)]
-
-
-def read_invis(data) -> 'IO[int]':
-    with open(data.download_path / '.koneko', 'r') as f:
-        return int(f.read())
-
-
+# Outbound IO
 def remove_dir_if_exist(data) -> 'Maybe[IO]':
     if data.download_path.is_dir():
         rmtree(data.download_path)
 
+def verify_full_download(filepath: Path) -> 'IO[bool]':
+    verified = imghdr.what(filepath)
+    if not verified:
+        os.remove(filepath)
+        return False
+    return True
+
+
+# Inbound IO
+def read_invis(data) -> 'IO[int]':
+    with open(data.download_path / '.koneko', 'r') as f:
+        return int(f.read())
 
 def filter_history(path: 'Path') -> 'list[str]':
     return flow(
@@ -33,14 +35,6 @@ def filter_history(path: 'Path') -> 'list[str]':
         sorted,
         curry(lfilter)(_ != 'history')
     )
-
-
-def verify_full_download(filepath: Path) -> 'IO[bool]':
-    verified = imghdr.what(filepath)
-    if not verified:
-        os.remove(filepath)
-        return False
-    return True
 
 
 def _dir_up_to_date(data, _dir) -> bool:
@@ -81,6 +75,7 @@ def filter_dir(modes: 'list[str]') -> 'list[str]':
 
 
 def filter_modes_allowed(modes: 'list[str]') -> 'set[str]':
+    """Pure"""
     allowed_names = set()
     if '1' in modes:
         allowed_names.add('testgallery')
@@ -94,11 +89,18 @@ def filter_modes_allowed(modes: 'list[str]') -> 'set[str]':
 
 
 def filter_modes_predicate(modes: 'list[str]', allowed_names: 'set[str]') -> 'func(str) -> bool':
+    """Pure"""
     if '1' in modes:
         return lambda d: d.isdigit() or d in allowed_names
     elif '2' in modes:
         return lambda d: d in find_mode2_dirs() or d in allowed_names
     return lambda d: d in allowed_names
+
+
+def find_mode2_dirs() -> 'list[str]':
+    return [f for f in os.listdir(KONEKODIR)
+            if f.isdigit()
+            and 'individual' in os.listdir(KONEKODIR / f)]
 
 
 def valid_mode1(path: 'Path') -> bool:

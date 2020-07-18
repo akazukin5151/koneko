@@ -524,24 +524,20 @@ class Image:
         show_full_res(self._data)
 
     def next_image(self) -> 'IO':
-        self._data.event.set()
         next_image(self._data)
         self.start_preview()
 
     def previous_image(self) -> 'IO':
-        self._data.event.set()
         previous_image(self._data)
         self.start_preview()
 
     def jump_to_image(self, selected_image_num: int) -> 'IO':
-        self._data.event.set()
         jump_to_image(self._data, selected_image_num)
         self.start_preview()
 
     def _jump(self) -> 'IO':
         _jump(self._data)
-        self._prefetch_thread = threading.Thread(target=self._prefetch_next_image)
-        self._prefetch_thread.start()
+        threading.Thread(target=self._prefetch_next_image).start()
 
     def _prefetch_next_image(self) -> 'IO':
         _prefetch_next_image(self._data)
@@ -595,6 +591,7 @@ def show_full_res(data):
 
 
 def next_image(data):
+    data.event.set()
     if not data.page_urls:
         print('This is the only page in the post!')
         return False
@@ -608,6 +605,7 @@ def next_image(data):
 
 
 def previous_image(data):
+    data.event.set()
     if not data.page_urls:
         print('This is the only page in the post!')
         return False
@@ -620,6 +618,7 @@ def previous_image(data):
 
 
 def jump_to_image(data, selected_image_num: int):
+    data.event.set()
     if selected_image_num <= 0 or selected_image_num > len(data.page_urls):
         print('Invalid number!')
         return False

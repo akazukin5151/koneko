@@ -209,7 +209,7 @@ class AbstractGallery(AbstractUI, ABC):
         """
         post_json = self._data.post_json(selected_image_num)
         image_id = post_json.id
-        idata = data.ImageData(post_json, image_id)
+        idata = data.ImageData(post_json, image_id, False)
 
         _display_medium_preview(self._data, idata, selected_image_num)
 
@@ -218,7 +218,7 @@ class AbstractGallery(AbstractUI, ABC):
 
         lscat.icat(idata.download_path / idata.large_filename)
 
-        image = Image(image_id, idata, False)
+        image = Image(image_id, idata)
         prompt.image_prompt(image, idata)
 
         # Image prompt ends, user presses back
@@ -481,7 +481,7 @@ def view_post_mode(image_id) -> 'IO':
         print('Work has been deleted or the ID does not exist!')
         sys.exit(1)
 
-    idata = data.ImageData(post_json, image_id)
+    idata = data.ImageData(post_json, image_id, True)
 
     download.download_url(idata.download_path, idata.current_url, idata.image_filename)
 
@@ -489,7 +489,7 @@ def view_post_mode(image_id) -> 'IO':
 
     print(f'Page 1/{idata.number_of_pages}')
 
-    image = Image(image_id, idata, True)
+    image = Image(image_id, idata)
 
     start_preview(idata)
 
@@ -510,9 +510,8 @@ class Image:
         m -- show this manual
         q -- quit (with confirmation)
     """
-    def __init__(self, image_id, idata, firstmode=False):
+    def __init__(self, image_id, idata):
         self._data = idata
-        self._data.firstmode = firstmode
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self._data.image_id)

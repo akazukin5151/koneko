@@ -280,7 +280,7 @@ class api.APIHandler << (S,#FF7700) Singleton >> {
     - api_thread
     - credentials
     +start()
-    +await_login()
+    -await_login()
     ..Requests..
     +artist_gallery()
     +protected_illust_detail()

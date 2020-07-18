@@ -73,7 +73,7 @@ def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     FakeData = namedtuple('data', ('download_path', 'all_urls'))
     data = FakeData(download_path, urls)
 
-    oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
+    oldnames_ext = [pure.split_backslash_last(url) for url in urls]
     names = itertools.cycle((None,))
 
     _async_filter_and_download(data, names, tracker)

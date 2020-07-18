@@ -44,15 +44,12 @@ _COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
                   'y', RED, '}', RESET])
 
 
-# Duplicated from pure because circular import
-_Map = curry(lmap)
-
 # Public constants
-n, p, r, q, m, b, o_, d_, f = flow(_letters, _Map(_letter_with_brackets))
+n, p, r, q, m, b, o_, d_, f = [_letter_with_brackets(letter) for letter in _letters]
 
 i = _letter_with_coords('i')
 
-a, o, d = flow(_tlc, _Map(_two_letter_with_coords))
+a, o, d = [_two_letter_with_coords(letter) for letter in _tlc]
 
 # For galleries
 base1 = [

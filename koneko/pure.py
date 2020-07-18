@@ -6,11 +6,7 @@ from pathlib import Path
 
 import funcy
 from placeholder import _, m
-from funcy import curry, lmap
 from returns.pipeline import flow
-
-
-Map = curry(lmap)
 
 
 def split_backslash_last(string: str) -> str:
@@ -50,19 +46,13 @@ def post_title(current_page_illusts: 'Json', post_number: int) -> str:
 
 
 def medium_urls(current_page_illusts: 'Json') -> 'list[str]':
-    return flow(
-        current_page_illusts,
-        Map(url_given_size(_, size='square_medium')),
-    )
+    return [url_given_size(x, size='square_medium')
+            for x in current_page_illusts]
 
 
 def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
-    return flow(
-        current_page_illusts,
-        len,
-        range,
-        Map(post_title(current_page_illusts))
-    )
+    return [post_title(current_page_illusts, num)
+            for num in range(len(current_page_illusts))]
 
 
 def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':

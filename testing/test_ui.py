@@ -36,7 +36,7 @@ def test_previous_page_gallery(monkeypatch):
 
     class FakeGallery:
         def __init__(self):
-            self.data = data
+            self._data = data
             self._tracker_class = Mock()
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
@@ -44,10 +44,10 @@ def test_previous_page_gallery(monkeypatch):
             return True
 
     gallery = FakeGallery()
-    gallery.data.page_num = 2
-    gallery.data.current_illusts = None
-    gallery.data.offset = 60
-    gallery.data.download_path = 'fake'
+    gallery._data.page_num = 2
+    gallery._data.current_illusts = None
+    gallery._data.offset = 60
+    gallery._data.download_path = 'fake'
     ui.AbstractGallery.previous_page(gallery)
 
 def test_previous_page_users(monkeypatch):
@@ -56,7 +56,7 @@ def test_previous_page_users(monkeypatch):
 
     class FakeGallery:
         def __init__(self):
-            self.data = data
+            self._data = data
             self._tracker_class = Mock()
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
@@ -65,15 +65,15 @@ def test_previous_page_users(monkeypatch):
 
 
     gallery = FakeGallery()
-    gallery.data.page_num = 2
-    gallery.data.offset = 60
+    gallery._data.page_num = 2
+    gallery._data.offset = 60
     ui.AbstractGallery.previous_page(gallery)
-    assert gallery.data.offset == 30
+    assert gallery._data.offset == 30
 
-    gallery.data.offset = 60
+    gallery._data.offset = 60
     monkeypatch.setattr('koneko.files.dir_not_empty', lambda *a: False)
     assert not ui.AbstractUsers.previous_page(gallery)
-    assert gallery.data.offset == 60
+    assert gallery._data.offset == 60
 
 def test_show_full_res(monkeypatch):
     monkeypatch.setattr('koneko.download.download_url', lambda *a: True)

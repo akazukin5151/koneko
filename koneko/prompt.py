@@ -150,7 +150,7 @@ def image_prompt(image):
 
             # 1. Two digit sequence -- jump to post number
             if two_digit_seq:
-                ui.jump_to_image(image.data, pure.concat_seqs_to_int(keyseqs))
+                ui.jump_to_image(image._data, pure.concat_seqs_to_int(keyseqs))
                 keyseqs = []
 
             # 2. Ask and wait for user input
@@ -205,18 +205,18 @@ def open_or_download(gallery, keyseqs: 'list[str]'):
     letter = keyseqs[0]
     first_num, second_num = keyseqs[-2:]
     if letter == 'o':
-        utils.open_link_coords(gallery.data, int(first_num), int(second_num))
+        utils.open_link_coords(gallery._data, int(first_num), int(second_num))
 
     elif letter == 'd':
-        download.download_image_coords(gallery.data, int(first_num), int(second_num))
+        download.download_image_coords(gallery._data, int(first_num), int(second_num))
 
     selected_image_num = int(f'{first_num}{second_num}')
 
     if letter == 'O':
-        utils.open_link_num(gallery.data, selected_image_num)
+        utils.open_link_num(gallery._data, selected_image_num)
 
     elif letter == 'D':
-        download.download_image_num(gallery.data, selected_image_num)
+        download.download_image_num(gallery._data, selected_image_num)
 
 
 def goto_image(gallery, image_num: int):

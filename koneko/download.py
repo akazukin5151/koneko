@@ -39,9 +39,8 @@ def save_number_of_artists(data) -> 'IO':
     """"Save the number of artists == splitpoint
     So later accesses, which will not request, can display properly
     """
-    with utils.cd(data.download_path):
-        with open('.koneko', 'w') as f:
-            f.write(str(data.splitpoint))
+    with open(data.download_path / '.koneko', 'w') as f:
+        f.write(str(data.splitpoint))
 
 
 def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':

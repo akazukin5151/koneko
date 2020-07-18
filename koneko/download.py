@@ -24,7 +24,6 @@ import os
 import itertools
 from pathlib import Path
 from shutil import rmtree
-from functools import partial
 from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 
@@ -72,8 +71,6 @@ def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
 
     FakeData = namedtuple('data', ('download_path', 'all_urls'))
     data = FakeData(download_path, urls)
-
-    oldnames_ext = [pure.split_backslash_last(url) for url in urls]
     names = itertools.cycle((None,))
 
     _async_filter_and_download(data, names, tracker)

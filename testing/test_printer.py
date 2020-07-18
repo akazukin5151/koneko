@@ -51,6 +51,16 @@ def test_cursor_move_down(capsys):
     assert captured.out == '\033[42B'
 
 
+def test_cursor_move_xy(capsys):
+    printer.move_cursor_xy(1, 2)
+    captured = capsys.readouterr()
+    assert captured.out == '\033[1;2H'
+
+    printer.move_cursor_xy(42, 42)
+    captured = capsys.readouterr()
+    assert captured.out == '\033[42;42H'
+
+
 def test_erase_line(capsys):
     printer.erase_line()
     captured = capsys.readouterr()

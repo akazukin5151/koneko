@@ -4,11 +4,7 @@ Despite GalleryData and UserData having lots of shared attributes/properties/met
 there isn't much shared functionality, so there's nothing to extract to an abstract
 base class
 """
-import threading
 from abc import ABC, abstractmethod
-
-from placeholder import _
-from returns.pipeline import flow
 
 from koneko import pure, KONEKODIR
 

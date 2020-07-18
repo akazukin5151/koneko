@@ -5,7 +5,7 @@ from math import floor
 from pathlib import Path
 
 import funcy
-from placeholder import _, m
+from placeholder import m
 from returns.pipeline import flow
 
 

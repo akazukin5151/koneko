@@ -1,6 +1,4 @@
 """Export the colors for [h]elp screen keys. Functions are pure"""
-from funcy import curry, lmap
-from returns.pipeline import flow
 
 # Public constants
 RED = '\x1b[31m'

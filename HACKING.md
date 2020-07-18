@@ -102,7 +102,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 ### Functions in download.py
 
-![download UML](http://plantuml.com:80/plantuml/png/ZLDR3eCW4Fpd55x07g7fJGYLRRiDB0RNDYOUlhLLAGAcNuQPVS3CUEfOUUwj4OnieDBkISOfVMW78Tpv3WrNICXo8HPGTGCrAoezaB9G8CdjyrsBHE1ZzeA6mKj5EjczDl8DQ3DwvNflSfXyWCSBGZeChRg2R9ppkYkGr5iXUgpg2Q_7uqQQw3GN7GjAYIoyQSffKDBsxzOCi_PcbOrUNB0k3vSq287O6HsAnA-1LLswPzRck7mAHTRmk2oudKB9m92ew3NHpXBnqpidhlNEjYo-d_UkCRdMdD2TYazCJq1w-gzV)
+![download UML](http://plantuml.com:80/plantuml/png/ZLDRZi8m3FpFANg1SWJ4JQBG632RE57gBaBYy3osD8GurNvLcV7OrdYw6zaadhnJZEoWi-52BXYxYLUbmluC0tT8oFfDl44pNcbOK9s0Z8S6IM6T7oCIGIhP0pg6f0tPQlOYl22VD2Sp_6JrGax9IPZ-XOG7XBeRUdC4FOIGxDWWQV9AJTZrJxo_RR-yALvpqRPXbOX-QIGFMjx-MoemYrPsLaJpl8Yb9uthod3BfPoPbTQvI7sUkEldjSIxlzWY9M82oh9y_Xgg6kQ85SiNCrl4XtQEO4p1HrP_dyUiMxNM7DcLYbTkTq3s-QVV0G00)
 
 
 ### AbstractImageAdjuster classes in assistants.py

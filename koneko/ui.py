@@ -512,7 +512,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         super().__init__(raw, image_id, firstmode)
         self.event = threading.Event()
         # Defined in self.start_preview()
-        self.loc: tuple[int]
+        self.loc: 'tuple[int]'
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self.image_id)

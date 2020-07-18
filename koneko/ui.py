@@ -39,7 +39,7 @@ class AbstractUI(ABC):
         # Attribute defined in self.start()
         self._data: 'data.<class>'  # Instantiated data class, not reference
         # Attribute defined in self.prefetch_thread()
-        self.prefetch_thread: threading.Thread
+        self._prefetch_thread: threading.Thread
 
         self.start(main_path)
 
@@ -94,8 +94,8 @@ class AbstractUI(ABC):
 
     def _prefetch(self) -> 'IO':
         """Reassign the thread again and start; as threads can only be started once"""
-        self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
-        self.prefetch_thread.start()
+        self._prefetch_thread = threading.Thread(target=self._prefetch_next_page)
+        self._prefetch_thread.start()
 
     def _parse_user_infos(self) -> 'IO':
         """Parse json and get list of artist names, profile pic urls, and id"""
@@ -127,7 +127,7 @@ class AbstractUI(ABC):
         self._data.page_num = oldnum
 
     def next_page(self) -> 'IO':
-        self.prefetch_thread.join()
+        self._prefetch_thread.join()
         self._data.page_num += 1
         self._show_page()
         self._prefetch_next_page()
@@ -542,8 +542,8 @@ class Image:
 
     def _jump(self) -> 'IO':
         _jump(self._data)
-        self.prefetch_thread = threading.Thread(target=self._prefetch_next_image)
-        self.prefetch_thread.start()
+        self._prefetch_thread = threading.Thread(target=self._prefetch_next_image)
+        self._prefetch_thread.start()
 
     def _prefetch_next_image(self) -> 'IO':
         _prefetch_next_image(self._data)

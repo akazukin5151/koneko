@@ -512,9 +512,7 @@ class Image:
     """
     def __init__(self, image_id, idata, firstmode=False):
         self._data = idata
-        self.event = threading.Event()
-        self.thread: 'threading.Thread'
-        self._firstmode = firstmode
+        self._data.firstmode = firstmode
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self._data.image_id)
@@ -526,17 +524,17 @@ class Image:
         show_full_res(self._data)
 
     def next_image(self) -> 'IO':
-        self.event.set()
+        self._data.event.set()
         next_image(self._data)
         self.start_preview()
 
     def previous_image(self) -> 'IO':
-        self.event.set()
+        self._data.event.set()
         previous_image(self._data)
         self.start_preview()
 
     def jump_to_image(self, selected_image_num: int) -> 'IO':
-        self.event.set()
+        self._data.event.set()
         jump_to_image(self._data, selected_image_num)
         self.start_preview()
 
@@ -549,8 +547,8 @@ class Image:
         _prefetch_next_image(self._data)
 
     def leave(self, force=False) -> 'IO':
-        self.event.set()
-        if self._firstmode or force:
+        self._data.event.set()
+        if self._data.firstmode or force:
             # Came from view post mode, don't know current page num
             # Defaults to page 1
             mode = ArtistGallery(self._data.artist_user_id)
@@ -559,9 +557,9 @@ class Image:
 
     def start_preview(self):
         if config.check_image_preview() and self._data.number_of_pages > 1:
-            self.event = threading.Event()  # Reset event, in case if it's set
-            self.thread = threading.Thread(target=self.preview)
-            self.thread.start()
+            self._data.event = threading.Event()  # Reset event, in case if it's set
+            self._data.thread = threading.Thread(target=self.preview)
+            self._data.thread.start()
 
     def preview(self) -> 'IO':
         """Download the next four images in the background and/or display them
@@ -569,7 +567,7 @@ class Image:
         """
         tracker = lscat.TrackDownloadsImage(self._data)
         i = 1
-        while not self.event.is_set() and i <= 4:
+        while not self._data.event.is_set() and i <= 4:
             url = self._data.page_urls[self._data.page_num + i]
             name = pure.split_backslash_last(url)
             path = self._data.download_path / name

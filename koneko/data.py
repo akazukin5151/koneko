@@ -4,6 +4,7 @@ Despite GalleryData and UserData having lots of shared attributes/properties/met
 there isn't much shared functionality, so there's nothing to extract to an abstract
 base class
 """
+import threading
 from abc import ABC, abstractmethod
 
 from placeholder import _
@@ -109,7 +110,7 @@ class GalleryData(AbstractData):
 
 class ImageData:
     """Stores data for image view (mode 2)"""
-    def __init__(self, raw: 'Json', image_id: str):
+    def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         self.image_id = image_id
         self.artist_user_id = raw['user']['id']
         self.page_num = 0
@@ -121,6 +122,10 @@ class ImageData:
         # Store multi image posts within their own dir
         if self.number_of_pages != 1:
             self.download_path = self.download_path / str(image_id)
+
+        self.event = threading.Event()
+        self.firstmode = firstmode
+        self.thread: threading.Thread
 
     @property
     def current_url(self) -> str:

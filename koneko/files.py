@@ -101,3 +101,46 @@ def filter_dir(modes: 'list[str]') -> 'list[str]':
         predicate = lambda d: d in allowed_names
 
     return [d for d in dirs if predicate(d)]
+
+
+def valid_mode1(path) -> bool:
+    return (
+        path.parent.parent == KONEKODIR
+        and path.name.isdigit()
+        and 'following' not in str(path)
+        and 'search' not in str(path)
+        and 'illustfollow' not in str(path)
+    )
+
+
+def valid_mode2(path) -> bool:
+    # If the 'individual' dir only contains files, it is valid
+    return (
+        path.parent.name == 'individual'
+        or (
+            path.name == 'individual'
+            and any([x.is_file() for x in os.scandir(path)])
+        )
+    )
+
+
+def valid_mode3(path):
+    return path.parent.parent.name == 'following'
+
+
+def valid_mode4(path):
+    return path.parent.parent.name == 'search'
+
+
+def valid_mode5(path):
+    return path.parent.name == 'illustfollow'
+
+
+def path_valid(path) -> bool:
+    return any((
+        valid_mode1(path),
+        valid_mode2(path),
+        valid_mode3(path),
+        valid_mode4(path),
+        valid_mode5(path),
+    ))

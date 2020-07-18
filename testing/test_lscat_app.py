@@ -20,7 +20,6 @@ def test_display_gallery(monkeypatch, argv):
         call(
             lscat.TrackDownloads,
             FakeData(KONEKODIR / 'testgallery'),
-            True
         )
     ]
 
@@ -46,18 +45,18 @@ def test_display_user(monkeypatch, argv):
 def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.lscat.show_instant', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.GalleryUserLoop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
 
     lscat_app.main()
-    assert mock.mock_calls == mock.call_args_list == [
+    assert mock.mock_calls == [
         call(
-            lscat.TrackDownloads,
             FakeData(tmp_path),
-            True
-        )
+            lscat.TrackDownloads,
+        ),
+        call().start()
     ]
 
 
@@ -65,18 +64,19 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
 def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.lscat.show_instant', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.GalleryUserLoop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
     (tmp_path / '.koneko').touch()
 
     lscat_app.main()
-    assert mock.mock_calls == mock.call_args_list == [
+    assert mock.mock_calls == [
         call(
+            FakeData(tmp_path),
             lscat.TrackDownloadsUsers,
-            FakeData(tmp_path)
-        )
+        ),
+        call().start()
     ]
 
 
@@ -103,7 +103,6 @@ def test_display_path_cli_complete(monkeypatch, tmp_path):
         call(
             lscat.TrackDownloads,
             FakeData(str(tmp_path)),
-            True
         )
     ]
 
@@ -122,7 +121,6 @@ def test_display_path_cli_incomplete(monkeypatch, tmp_path):
         call(
             lscat.TrackDownloads,
             FakeData(str(tmp_path)),
-            True
         )
     ]
 
@@ -141,7 +139,7 @@ def test_maybe_thumbnail_size(monkeypatch, send_enter, capsys):
     lscat_app.config_assistance(['1'])
 
     captured = capsys.readouterr()
-    assert captured.out == "\n\nYour recommended settings are:\nimage_thumbnail_size = 99\n"
+    assert captured.out == '\n\nYour recommended settings are:\nimage_thumbnail_size = 99\n'
 
 
 def test_maybe_xpadding_img_width(monkeypatch, send_enter, capsys):

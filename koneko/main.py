@@ -41,7 +41,7 @@ def main():
         main_loop(args, your_id)
 
 
-def main_loop(args, your_id: str):
+def main_loop(_, your_id: str):
     """Ask for a mode and launch it (mode might ask for more info), for no cli args"""
     printmessage = True
     case = {

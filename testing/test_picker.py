@@ -5,7 +5,7 @@ import pytest
 from pick import Picker
 
 from koneko import picker, KONEKODIR
-from koneko.picker import EMPTY_WARNING
+from koneko.picker import EMPTY_FILTER_WARNING
 from conftest import CustomExit, raises_customexit
 
 
@@ -87,7 +87,9 @@ def test_ask_assistant(monkeypatch):
 def test_pick_dir_y(monkeypatch, patch_filter_history):
     # Just to test the branch is reachable
     monkeypatch.setattr('koneko.picker.Picker.start', lambda x: (None, 'y'))
-    assert picker.pick_dir() == KONEKODIR
+    monkeypatch.setattr('koneko.picker.actions_from_dir', raises_customexit)
+    with pytest.raises(CustomExit):
+        picker.pick_dir()
 
 
 def test_pick_dir_b(monkeypatch, patch_filter_history):
@@ -142,7 +144,7 @@ def test_handle_filter(monkeypatch, tmp_path, number):
             == (f"Filtering modes=['{number}']\ntitle", ['dirs'], [number]))
 
 def test_handle_cd_empty():
-    assert picker.handle_cd(None, EMPTY_WARNING, []) == (KONEKODIR, [])
+    assert picker.handle_cd(None, EMPTY_FILTER_WARNING, []) == (KONEKODIR, [])
 
 
 def test_handle_cd_path_not_dir(tmp_path):
@@ -172,5 +174,5 @@ def test_try_filter_dir_sorted(monkeypatch):
 
 def test_try_filter_dir_empty(monkeypatch):
     monkeypatch.setattr('koneko.files.filter_dir', lambda x: [])
-    assert picker.try_filter_dir('hi') == [EMPTY_WARNING]
+    assert picker.try_filter_dir('hi') == [EMPTY_FILTER_WARNING]
 

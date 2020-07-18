@@ -19,7 +19,7 @@ FakeData = namedtuple('data', ('download_path',))
 
 def test_icat():
     try:
-        lscat.icat("./testing/files/004_祝！！！.jpg")
+        lscat.icat('./testing/files/004_祝！！！.jpg')
     except OSError:
         # Github doesn't connect to terminal
         pass
@@ -41,7 +41,7 @@ def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
     setup_test_config(tmp_path)
 
     fakedata = FakeData(Path('testing/files/'))
-    lscat.show_instant(FakeTracker, fakedata, True)
+    lscat.show_instant(FakeTracker, fakedata)
     # First one works for me, but second one works for github
     assert set(showed) == {
         'test_config.ini', '004_祝！！！.jpg', 'mode3.json',
@@ -121,7 +121,7 @@ def test_TrackDownloadsUser2(monkeypatch, tmp_path, use_test_cfg_path):
 
     os.system('touch testing/files/user/.koneko')
     with open('testing/files/user/.koneko', 'w') as f:
-        f.write("3")
+        f.write('3')
 
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
@@ -133,9 +133,9 @@ def test_TrackDownloadsUser2(monkeypatch, tmp_path, use_test_cfg_path):
 
 def test_generate_page(monkeypatch):
     mocked_pixcat = Mock()
-    monkeypatch.setattr("koneko.lscat.Image", lambda *a, **k: mocked_pixcat)
-    monkeypatch.setattr("koneko.Terminal.width", 100)
-    monkeypatch.setattr("koneko.Terminal.height", 20)
+    monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
+    monkeypatch.setattr('koneko.Terminal.width', 100)
+    monkeypatch.setattr('koneko.Terminal.height', 20)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(30))]
@@ -166,9 +166,9 @@ def test_generate_page(monkeypatch):
 
 def test_generate_users(monkeypatch):
     mocked_pixcat = Mock()
-    monkeypatch.setattr("koneko.lscat.Image", lambda *a, **k: mocked_pixcat)
-    monkeypatch.setattr("koneko.Terminal.width", 100)
-    monkeypatch.setattr("koneko.Terminal.height", 20)
+    monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
+    monkeypatch.setattr('koneko.Terminal.width', 100)
+    monkeypatch.setattr('koneko.Terminal.height', 20)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]

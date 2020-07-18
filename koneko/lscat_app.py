@@ -32,7 +32,7 @@ from collections import namedtuple
 
 from docopt import docopt
 
-from koneko import lscat, config, picker, printer, assistants, KONEKODIR
+from koneko import lscat, config, picker, printer, assistants, lscat_prompt, KONEKODIR
 
 
 # Small 'functions'
@@ -80,7 +80,7 @@ def _main():
 
 def display_gallery():
     data = FakeData(KONEKODIR / 'testgallery')
-    lscat.show_instant(lscat.TrackDownloads, data, True)
+    lscat.show_instant(lscat.TrackDownloads, data)
 
 
 def display_user():
@@ -97,7 +97,7 @@ def display_path(path=None):
         sys.exit(1)
 
     data = FakeData(path)
-    lscat.show_instant(lscat.TrackDownloads, data, True)
+    lscat.show_instant(lscat.TrackDownloads, data)
 
 
 def browse_cache():
@@ -105,11 +105,11 @@ def browse_cache():
     data = FakeData(path)
 
     if '.koneko' in os.listdir(path):
-        lscat.show_instant(lscat.TrackDownloadsUsers, data)
+        lscat_prompt.GalleryUserLoop(data, lscat.TrackDownloadsUsers).start()
     elif 'individual' in str(path):
-        lscat.icat(path / os.listdir(path)[0])
+        lscat_prompt.ImageLoop(path, sorted(os.listdir(path))[0]).start()
     else:
-        lscat.show_instant(lscat.TrackDownloads, data, True)
+        lscat_prompt.GalleryUserLoop(data, lscat.TrackDownloads).start()
 
 
 def config_assistance(actions: 'Optional[list[int]]' = None):

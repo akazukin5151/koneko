@@ -11,19 +11,19 @@ import os
 
 def test_launch():
     curdir = os.getcwd()
-    os.system("cd ~")
+    os.system('cd ~')
     try:
-        os.system("koneko")
+        os.system('koneko')
     except EOFError:
         pass
     os.chdir(curdir)
 
 
 cmds = (
-    "pip install .",
-    "python setup.py install",
-    "python setup.py develop",
-    "python -m koneko.main"
+    'pip install .',
+    'python setup.py install',
+    'python setup.py develop',
+    'python -m koneko.main'
 )
 
 for cmd in cmds:

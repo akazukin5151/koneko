@@ -1,50 +1,37 @@
 # Hacking
 
-## Pure and impure modules
+> Developer guide to the codebase, plus some design notes and philosophy
 
-|          | Pure | Impure
-| -------- | ---- | ---
-| Frontend |      | <ul><li>assistants</li><li>main</li><li>prompt</li><li>ui</li><li>lscat_app</li><li>screens</li></ul>
-| Backend  | <ul><li>colors</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>cli</li><li>config \*</li><li>files</li><li>download</li><li>lscat</li><li>picker</li><li>printer</li><li>utils</li></ul>
+## 'Functional core, imperative shell' + MVA?
 
-* 'Pure' means functions are referentially transparent and globally pure (mutations may happen in local scope)
-* 'Frontend' means interacts with user (and catch and process user inputs)
-* 'Backend' means everything else
-* (Ideally the) 'backend' does work, 'frontend' organises work (if otherwise, please open an issue or make a PR).
+> "There are two roles of code: code that does work, and code that coordinates work" ([Sonmez](https://simpleprogrammer.com/there-are-only-two-roles-of-code/))
 
-\* Config has impure IO functions, safe functions that will return defaults on failure, and interactive functions
+If there is one sentence to keep in mind while reading the code, this is it.
 
+Although it seems contradictory, I think the code has uses both the functional-core-imperative-shell and the [model-view-adapter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter) OOP patterns.
+* The models are the functional core.
+* The views accepts user input (inbound IO) and interacts with the user (outbound IO) -- this is the imperative shell.
+* The adapters mediates between the functional core and the imperative shell. They launches the views, get user input, calls the appropriate models, and send that to the appropriate views. 
 
-## MVC? MVA?
+In other words, the adapter organises code, while the models and view does the actual work.
 
-While the code is not intentionally structured according to any design pattern, you might be able to analyse it through the lens of the Model-View_Controller pattern. The only communication method between all modules is through function returns, not through 'notifying' different objects (most of them are functions). The only exception is `downloads.py` will directly communicate to `lscat.py` through a callback. Therefore, it seems to fit the [Model-View-Adapter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter) pattern better.
+| Role of code | Model (functional core) | Inbound IO (imperative shell) | Outbound IO (imperative shell) | Adapter (organises everything)
+| --- | --- | --- | --- | ---
+| Does work | <ul><li>colors</li><li>config \*</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>config \*</li><li>download</li><li>picker</li></ul> | <ul><li>config \*</li><li>files</li><li>printer</li><li>screens</li><li>utils</li></ul>  |
+| Organizes work |  | <ul><li>assistants</li><li>prompt</li></ul> | <ul><li>lscat</li></ul> | <ul><li>cli</li><li>lscat_app</li><li>main</li><li>ui</li></ul>
 
-Model:
+The overall code is neither OOP nor functional: the only communication between all modules is through function returns, not through 'notifying' different objects. The only (major?) exception is that `downloads.py` will directly trigger a callback to `lscat.py`.
 
-* api
-* colors
-* config
-* data
-* download
-* files
-* pure
-* utils
+Now, this paints a rosy picture but in reality, there was no initial planning so the code was originally not written towards any structure or pattern. What still needs work is:
+* The config contains a functional core, inbound IO, and outbound IO. Better split them up
 
-View:
-
-* assistants
-* lscat
-* printer
-* prompt
-* screens
-
-Controller / Adapter:
-
-* cli
-* lscat_app
-* main
-* picker
-* ui
+Here are some good tips:
+* "The way to figure out the separation is by doing as much as you can without mutation, and then encapsulating the mutation separately" (Gary Bernhardt)
+* "Create your application to work without either a UI or a database so you can run automated regression-tests against the application, work when the database becomes unavailable, and **link applications together without any user involvement**" ([Alistair Cockburn](https://github.com/jschairb/sandbox/wiki/HexagonalArchitecture)) (Emphasis mine; it is possible to adapt koneko to work with sites other than pixiv)
+    * At the very least, only the api and download modules need to be replaced.
+    * `data.py` will need to be adapted to your new API structure.
+    * The config already handles username and passwords, but you can add something like an API key or OTP auth
+    * The navigation routes (eg pages, prompt handling) are in `ui.py`, while the starting dispatch logic is in `main.py`
 
 
 ## Cache directory structure
@@ -91,7 +78,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 ### Simplified UML diagram of the classes:
 
-![Classes UML](http://plantuml.com:80/plantuml/png/rLXDRzms4BthLmZenTwrXDnoCOm4ATowQD4WRdef2e8hZNPfSqMLekmOxlxt3abH8YLAILi3QGCa23cS3xuPlXdjcrPHgReZJnB558VqNjHmBvA4xbebQQ7IWjEsJO-KrVdRVkz78PhqylBixKKgeJo_kdfEKlopDRREpiqYUtOMJgIHujWeqabEX2IiT4Uqe82s7IHrqmtwv85oLb85uRPdTY-84kGeIa3XAKdyIALYhVe9HIPM6r-UtnmR3aUeLPldOmZnsARM6rhSqpqO-xr1iRi3H8XnthMAL89pyMWq24UlMYa2MzOrMIp8XRE_7LXPGlrxjkXccggE3LO-taJIbESVu8-EuLPAbP9irobmSAGZl2bYJwSAEpZG1oOwwHJ6y_euCH7CKwN_lGSv5xG7l0ghiN3gI8ORzeazIFGDRKIAVvceoGug8G7p21MeuX2n8bcjI8EvGq-Lw0_a-JjnF8fwTgMWYhSrVBAwRWFzF31uzFUmYAXiWT2w9ALuhBcWVedRkCZCaeJ-u6ajXTzHpa4-HVCuB-SnQTay7vCinB1VntG9oOyrmnmv_0myxEZZiqF7xjfZOWu868V-1Sx5pnYPOiNf0BmnA4qA-q_pakPGEIBG4lF2F0ZVNQJ54wrNCIIHijl6OmqZZ82HfOIQ64ZNWgONlCOGtOrvqDVcFN_56BV8T7sGUni5AOIGfQkRYBpkZYOZ4HhRPFe9P3FqasI1lpo522194diB_qfb4fRNDNx5odqlNh9lMFMV7q1ALaAW7Mjyfw7BT2piCPPpC3PZsPUKh6quVR8lBYWllH4hgAqZgU2LRaK3TRXZA2lOCUmdkZRSDKnITPmJ2KFLt7N7HYFXKnu7-Z2oWZwnpfEVww3JX2NnDERvrHJ0S6bEECYI0D4rqMMUH_d7hobRcgpUVqG2QBzQPLdXRAGw-Q7U0fN5uONZFArdC0xFkauaJe_pGujX_QzUPyweCpBN9Eu_CI-IbtNKT3lE2gQU-lKJpYUsUwmCUowC_ycSCBQLeLG-r-7D5PFvdKTo3xE_UjHBNh9IYvj5uql5k8dxc4rvl2se6kBxnQ8UIM0mbMDZriPc-tkeGL8bf0MtQ_Gx7vuafg_1Pk6zUElSEFssRmVjIjM6VaTdQ-RqjV-HoMG1cMpHpQA6PFk3Ykiby-hOv3fp-RARo6InoJbKQi738Yp-bztLWhAR1IpHXlE06IUjmDzs0zfSOZgMspS2pqHgAjOBQCQ_HYEq_eLAlkClK34wiM_uZIQ3B7R3UDFlpmVt7aulTELDfdEPPJDu5_lZeiR2jBjmZTCmD6WwpllQ-g4LxgU6RMhe50VlVgaZGefLXtwD6ePnMrBGuW3zhgYg5bI_6CQ-YHfsyDPRrlG8Rcs6CPJtouh9La-4-mZ9RCCFdGNIJujEIcG1Ol7f_PX1x0vlwspPh0rMjXY2nrq68pEG1GWv9NSN6q-VY65xWgDPUWYWP8SN49L5SmKwwwvY73HY0q8Sl3Fz1BttC7G0w9tWGhgm_ax6MHdcskJjFvvztpfEqamr0aS5TryfD7mu81L-L1Pdiu7FPFO--WSLcSCdPJ8Ux6Vv0FIv6TUrROfeWvBtDz-RRspTfTEpsujlhgzVltxrwZozHIhXeD2EF_lLJ37AKoxso1wkww6XyNy4mUd0Mwk31EfAjS0f04i5RVHO13zDqKVA53761xW_sB7IzTXj-Dq-ViK9XJq1IlSuIb2KSIUk73dQR4v-PMWD2qP58UTDXADJxpSo_TDN26oM6KRrUaGm52R96wXB_NlrNm00)
+![Classes UML](http://plantuml.com:80/plantuml/png/rLdTZzGs47_FNn6fBx1xYNZZ1Pr08DgJMXL1wGkgB6_YtJNdnAdjt76Y-xzt_9NOiHDGYqIBX5ZFs3FZttmwF9SA2pLsh2WKLOoKjxmdjxmey44gWHjLDWnBMNQOzlKBH_kPyw5yzkpHYwjIaFRnzVNdeeG_UoFhqMEpg3vx2HSq2DuD2es28IuGRVqMpMY8b1Ed7yRfFBh3ZBPOaPWSY3rnf3ZgU4k0UIcAq5AXg5I_0ClOQkshwvjkOAGZlP9rFPkGjsqfVS3DBJuH8zy9v8UF112YZ8rIeIDdZD-R4uY1Ldqe0rir3bNEo9Mz7ywqRKd_HxMgPkcgaKvItjzat5JNRycV8mLIYPKIz30guk4ePtXBYqnA1vzWP5IbFFtFBH41Ez1s86TyH_aelBRvu40_qJi16udCU1h-KjwZ0pboGS1Zv4XKSqxt3OBs2WtW9OYP8tSRwlebxphU9_gZUDttv9CzwmcWvuwI-v06uOA590ZtBMhvVSyu3eFPseKIIOAuZPSjP_s86IFY8UknD71ZzoG-IHrHRQEuXjtxde9NF6864Dg5Y1n0aR_ex8epGCI8owwK_HcWLxIvd0aR32wBeFtBP4aAZazopJ7P4u3sygfi7d2_YHhA1De-RsjiOGQCgaJOs816INJfW6jCrjsOP7rjSlKxshY7AkQCF5ahKCEvQAKNaVBxiJCUoPIeNQM3lahGBugLsXGSo01I5Bde_rT75cO57U5tYDmt_5ls17lyrpiY16r9T3hNr2vJ1nbft3zibG7RZEIGqr8vCFnWCouABqt81TJUbwKeI_Ty87rCCKKgefXwnqSPK-KP77eS6KE2J57pSUm6ZKHOv1Z1TtDLq3ksA-ENkkFIOKNUZNLzlGGmNfeT7h8YGdIBzQoki_KdZ2aRchG_lOS28BzRP5bcCYvTGbFV4IoQypUsyxBjmJmyssSoTWOrFvOOn__cTTAAcXHpNSJ350ii-RQAXl70Q4FLWri_m4HYkyV68EVD-CzE1dCZcOBZIptTNAf8RpcNyzZVcri3TnKRqRTR5RuMVhkyZcIIOxB1QhBlDujoncNHl0ojM0jBw2VI4u4L5nRSST2PFIKXxUK0xI78SQlSA7tb6e3SYDDOxwniIvo-zZyIMQmWKwsgMJqXwEciykUAD3fsjVPSlQucCqliQaQEQaN3AYpXE-rwvR3l_ZOxumd03911sZgo7ybIZkbHdcuOWOZIH6nWK59npObO-bSU2XL_nH5p9lSYt-bYKELkc6_pRdzqxsdtIX_ULTgNLPN0kzeHLq-ipBShrxXCOuAklhMBhLVmUps1zgMfi31zkwKs4ggkEhirFnubKMvX1Ydepcuv3Nt1Vb2gTyXWsUEEo4n5sSVlc9KARqHe8oLgS7CcZjgCGi0za8N8YJVJrqV9Uw_1EcwIlGVBWl9bO39JM03IllI7l7vhfVF5H5xWPfR1nO5pW6lnexLz0p6hxaWPqK0vebu6UzpOV0h0zm1eIdGX7Ll_UwVJDdQt4PTIt6-OeAaQE0mC_dw2QmHXC6f2mopKXf2CFGOxNqKCVb_t3Mi2DVo65S4RC1P0XoqvW3mWn-27dyDIDmJSs24BnenSS9-Eg3DlCvU9lHTy7SlxqNtqMeZJjY0ihUhvBNXltNfFrHd1HUtpB2bUhjfbdaMB19utkgTLb0wf63TI9Ghjmo09Y8MyjLs-2EC1DBsv-SbyGj4ZMVdetTKFhry_VVhaoUFo7VGDHXH05OxsFLKKivBn4xGAF-A0eFaNWYmPIR1MPq5mwmWDk18I7MGurqVV6l4zfWePuPE_tjfNm-If-BFC_4Zd2WO0qleos1A5AVFie--4DXmM7v6aQNbPLjpW5inPQV3HKt_BZ86jAjC-Wu4WUW4KnNFIj_g_6lu6)
 
 
 ### Actor-ish model of the ui.AbstractUI class

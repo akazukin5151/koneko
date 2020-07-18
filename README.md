@@ -68,6 +68,7 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 * Python 3.8+
 * It has been tested on kitty v0.17.2 onwards, but should work on older versions
 * Operating system: all OSes that kitty supports, which means Linux and macOS.
+* Uses xdg-open (for opening links in your browser) and curl (for safety fallback, see below)
 
 <details>
   <summary>If it crashes (it shouldn't), it might be because pip didn't 'install' the welcome pictures, *and* the script failed to download them for some reason. Try:</summary>
@@ -106,33 +107,26 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.9.2
+### Version 0.9.3
 
 #### Features
-* lscat app: Display first picture if a mode 2 directory is selected
-* This project is now mirrored on gitlab [here](https://gitlab.com/twenty5151/koneko)
+* Browse cache now supports navigating between pages
 
 #### Bug fixes
-* Fixed mode 2 exclusive filter showing mode 1 page dirs
+* Fixed browse cache crashing on empty directory
+* Fixed docs: mode 5 cannot go back to main screen
+* Fixed reloading in a gallery mode leading to user prompt
+* Browse cache now no longer accepts an invalid directory to display on
 
 #### Code maintenance
-* Added more type annotations
-* Rename AbstractImageAdjuster.write() to report()
-* Added docstrings in assistants.py
-* Added image_adjuster.puml, displayed in HACKING.md
-* Use namedtuple instead of classes in some tests
-* Use mocks instead of repetitive fake classes
-* Add AbstractData to puml
-* Use new json in some tests
-* Test print multiple images with one and two posts
-* Add some comments on MVC vs MVA
-* Removed unused search_string() method
+* lscat show_instant() now inspects the cls passed in instead of a bool argument
+* "Inlined" some abstract methods in AbstractUI into attributes
  
 
 # Roadmap
 
+* Pass in path to api.download instead of cd-ing into the dir
 * Make sure the diagrams in HACKING.md is up-to-date
-* `image_mode_text_offset` doesn't have a configuration assistant, or fix the cursor position again.
 * Consistent public and private methods and attributes again
 * In-depth usage documentation?
 
@@ -140,7 +134,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Filter modes in koneko main should go back to main screen on 'q' key
 * Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
-    - [ ] Handle moving around pages
+    - [x] Handle moving around pages
     - [x] Mode 2 dirs in lscat_app should do something (currently does nothing)
     - [ ] Documentation
 * Go to related works from image view (illust_related)
@@ -148,8 +142,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Known bugs
 
-* Reloading then going back just redraws the current mode again, with possible instability
-* Passing an invalid command via cli will re-prompt the user, but ctrl+c traps the user in koneko with no way to quit.
 * Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
 * In the logs, urllib3 warns that `Connection pool is full, discarding connection: i.pximg.net`. See [customising pool behaviour](https://urllib3.readthedocs.io/en/latest/advanced-usage.html#customizing-pool-behavior) from urllib3.
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.

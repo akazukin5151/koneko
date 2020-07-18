@@ -8,7 +8,8 @@ from koneko import files, assistants, KONEKODIR
 
 
 # Constants
-EMPTY_WARNING = "**No directories match the filter! Press 'f' to re-filter**"
+EMPTY_FILTER_WARNING = "~~No directories match the filter! Press 'f' to re-filter~~"
+EMPTY_WARNING = '~~This directory is empty!~~'
 
 
 def ws_picker(actions: 'list[str]', title: str, **kwargs) -> Picker:
@@ -49,8 +50,8 @@ def lscat_app_main() -> int:
 
 def frequent_modes_picker(actions: 'list[str]') -> int:
     title = (
-        "Please pick an input\n"
-        "[mode]: [pixiv ID or searchstr] (frequency)\n"
+        'Please pick an input\n'
+        '[mode]: [pixiv ID or searchstr] (frequency)\n'
         "Press 'f' to filter modes"
     )
 
@@ -71,7 +72,7 @@ def _multiselect_picker(actions: 'list[str]', title: str, to_str=True) -> 'IO[li
 
 
 def select_modes_filter(more=False) -> 'IO[list[str]]':
-    title = "Use SPACE to select a mode to show and ENTER to confirm"
+    title = 'Use SPACE to select a mode to show and ENTER to confirm'
     # Copied from screens
     actions = [
         '1. View artist illustrations',
@@ -129,8 +130,8 @@ def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
         _, ans = picker.start()
         assistants.check_quit(ans)
 
-        if ans == 'y':
-            return path  # TODO: prevent return if path is not valid
+        if ans == 'y' and files.path_valid(path):
+            return path
 
         elif ans == 'b':
             path = handle_back(path)
@@ -142,7 +143,7 @@ def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
             title, actions, modes = handle_filter(path, basetitle)
             continue
 
-        else:
+        elif isinstance(ans, int):
             path, modes = handle_cd(path, actions[ans], modes)
 
         actions = actions_from_dir(path, modes)
@@ -170,13 +171,13 @@ def handle_filter(path: 'path', basetitle: str) -> (str, 'list[str]', 'list[str]
         actions = files.filter_history(path)
         return basetitle, actions, modes
 
-    title = f"Filtering {modes=}\n" + basetitle
+    title = f'Filtering {modes=}\n' + basetitle
     actions = try_filter_dir(modes)
     return title, actions, modes
 
 
 def handle_cd(path, selected_dir: 'path', modes: 'list[str]') -> ('path', 'list[str]'):
-    if selected_dir == EMPTY_WARNING:
+    if selected_dir == EMPTY_FILTER_WARNING:
         return KONEKODIR, []
     elif (newpath := path / selected_dir).is_dir():
         return newpath, modes
@@ -191,8 +192,9 @@ def actions_from_dir(path: 'path', modes: 'list[str]') -> 'list[str]':
             and 'individual' not in str(path)
             and str(path).isdigit()):
         return ['individual']
-    return files.filter_history(path)
+
+    return files.filter_history(path) or [EMPTY_WARNING]
 
 
 def try_filter_dir(modes: 'list[str]') -> 'list[str]':
-    return sorted(files.filter_dir(modes)) or [EMPTY_WARNING]
+    return sorted(files.filter_dir(modes)) or [EMPTY_FILTER_WARNING]

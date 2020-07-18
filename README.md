@@ -111,7 +111,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 #### Features
 * Browse cache now supports navigating between pages
-* **Breaking**: Removed `image_mode_text_offset` config setting, now enabled by default
+* **Breaking**: Removed `image_mode_text_offset` config setting, now does nothing
 * Renewed developer guide in HACKING.md
 
 #### Bug fixes
@@ -120,7 +120,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed reloading in a gallery mode leading to user prompt
 * Browse cache now no longer accepts an invalid directory to display on
 * Fixed experimental image mode previews index errors due to it trying to download more images than possible
-* Almost fixing experimental image mode previews by saving previous cursor position and restoring it later
+* Almost fixing experimental image mode previews by saving previous cursor position and restoring it later; but still a bit unstable
 * Fixed grammar in prompt: "a image command" -> "an image command"
 * Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
 

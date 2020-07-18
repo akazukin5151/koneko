@@ -32,9 +32,9 @@ class AbstractUI(ABC):
         Main path includes any user input (eg, artist user id or search string)
         """
         # Reference to the appropriate class or function
-        self.prompt: 'prompt.<function>'
-        self.data_class: 'data.<class>'
-        self.tracker_class: 'lscat.<class>'
+        self._prompt: 'prompt.<function>'
+        self._data_class: 'data.<class>'
+        self._tracker_class: 'lscat.<class>'
 
         # Attribute defined in self.start()
         self.data: 'data.<class>'  # Instantiated data class, not reference
@@ -62,7 +62,7 @@ class AbstractUI(ABC):
 
     def start(self, main_path: 'Path') -> 'IO':
         # self.data defined here not in __init__, so that reload() will wipe cache
-        self.data = self.data_class(1, main_path)
+        self.data = self._data_class(1, main_path)
         self._parse_and_download()
         self._prefetch_thread()
 
@@ -70,7 +70,7 @@ class AbstractUI(ABC):
         if files.dir_not_empty(self.data):
             return True
         files.remove_dir_if_exist(self.data)
-        download.init_download(self.data, self.tracker_class(self.data))
+        download.init_download(self.data, self._tracker_class(self.data))
 
     def _parse_and_download(self) -> 'IO':
         """If download path not empty, immediately show.
@@ -79,7 +79,7 @@ class AbstractUI(ABC):
         After fetching, double check all files in dir match the cache
         """
         if files.dir_not_empty(self.data):
-            lscat.show_instant(self.tracker_class, self.data)
+            lscat.show_instant(self._tracker_class, self.data)
             self._parse_user_infos()
             self.verify_up_to_date()
             self.print_page_info()
@@ -89,7 +89,7 @@ class AbstractUI(ABC):
         files.remove_dir_if_exist(self.data)
 
         self._parse_user_infos()
-        download.init_download(self.data, self.tracker_class(self.data))
+        download.init_download(self.data, self._tracker_class(self.data))
         self.print_page_info()
 
     def _prefetch_thread(self) -> 'IO':
@@ -145,7 +145,7 @@ class AbstractUI(ABC):
             print('This is the last page!')
             self.data.page_num -= 1
             return False
-        lscat.show_instant(self.tracker_class, self.data)
+        lscat.show_instant(self._tracker_class, self.data)
         self.print_page_info()
 
     def reload(self) -> 'IO':
@@ -155,16 +155,16 @@ class AbstractUI(ABC):
             rmtree(self.data.main_path)
             # Will remove all data, but keep info on the main path
             self.start(self.data.main_path)
-        self.prompt(self)
+        self._prompt(self)
 
 
 class AbstractGallery(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for galleries"""
-        self.prompt = prompt.gallery_like_prompt
-        self.data_class = data.GalleryData
-        self.tracker_class = lscat.TrackDownloads
+        self._prompt = prompt.gallery_like_prompt
+        self._data_class = data.GalleryData
+        self._tracker_class = lscat.TrackDownloads
         super().__init__(main_path)
 
     def maybe_join_thread(self):
@@ -226,7 +226,7 @@ class AbstractGallery(AbstractUI, ABC):
 
     def _back(self) -> 'IO':
         """After user 'back's from image prompt or artist gallery, start mode again"""
-        lscat.show_instant(self.tracker_class, self.data)
+        lscat.show_instant(self._tracker_class, self.data)
         self.print_page_info()
         prompt.gallery_like_prompt(self)
 
@@ -394,9 +394,9 @@ class AbstractUsers(AbstractUI, ABC):
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for user modes"""
-        self.prompt = prompt.user_prompt
-        self.data_class = data.UserData
-        self.tracker_class = lscat.TrackDownloadsUsers
+        self._prompt = prompt.user_prompt
+        self._data_class = data.UserData
+        self._tracker_class = lscat.TrackDownloadsUsers
         super().__init__(main_path)
 
     def maybe_join_thread(self):

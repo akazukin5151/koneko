@@ -37,7 +37,7 @@ def test_previous_page_gallery(monkeypatch):
     class FakeGallery:
         def __init__(self):
             self.data = data
-            self.tracker_class = Mock()
+            self._tracker_class = Mock()
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
         def print_page_info(self, *a):
@@ -57,7 +57,7 @@ def test_previous_page_users(monkeypatch):
     class FakeGallery:
         def __init__(self):
             self.data = data
-            self.tracker_class = Mock()
+            self._tracker_class = Mock()
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
         def print_page_info(self, *a):

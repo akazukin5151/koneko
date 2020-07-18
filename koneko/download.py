@@ -62,9 +62,8 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
 
 # - Download functions for multiple images
 def _async_download_rename(data, tracker=None) -> 'IO':
-    downloaded_newnames = itertools.filterfalse(os.path.isfile, data.newnames_with_ext)
-    downloaded_oldnames = itertools.filterfalse(os.path.isfile, data.urls_as_names)
-    _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
+    newnames = itertools.filterfalse(os.path.isfile, data.newnames_with_ext)
+    _async_filter_and_download(data, newnames, tracker)
 
 
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
@@ -75,10 +74,9 @@ def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
     data = FakeData(download_path, urls)
 
     oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
-    downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_ext)
-    downloaded_newnames = itertools.cycle((None,))
+    names = itertools.cycle((None,))
 
-    _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
+    _async_filter_and_download(data, names, tracker)
 
 
 @utils.spinner('')
@@ -87,18 +85,18 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
     async_download_no_rename(download_path, urls)
 
 
-def _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker):
+def _async_filter_and_download(data, newnames, tracker):
     helper = partial(_download_then_rename, path=data.download_path, tracker=tracker)
 
     os.makedirs(data.download_path, exist_ok=True)
     with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
-        executor.map(helper, data.all_urls, downloaded_newnames)
+        executor.map(helper, data.all_urls, newnames)
 
     # Might multiprocessing be faster to bypass urllib's pool limit?
     # 'Cannot pickle generator'
     # essentially the entire lscat needs to be rewritten with multiprocessing in mind
     #with Pool(len(data.all_urls)) as p:
-        #p.map(helper, (data.all_urls, downloaded_oldnames, downloaded_newnames))
+        #p.map(helper, (data.all_urls, newnames))
 
 
 def _download_then_rename(url, img_name, path, tracker=None) -> 'IO':

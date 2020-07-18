@@ -1,50 +1,37 @@
 # Hacking
 
-## Pure and impure modules
+> Developer guide to the codebase, plus some design notes and philosophy
 
-|          | Pure | Impure
-| -------- | ---- | ---
-| Frontend |      | <ul><li>assistants</li><li>main</li><li>prompt</li><li>ui</li><li>lscat_app</li><li>screens</li></ul>
-| Backend  | <ul><li>colors</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>cli</li><li>config \*</li><li>files</li><li>download</li><li>lscat</li><li>picker</li><li>printer</li><li>utils</li></ul>
+## 'Functional core, imperative shell' + MVA?
 
-* 'Pure' means functions are referentially transparent and globally pure (mutations may happen in local scope)
-* 'Frontend' means interacts with user (and catch and process user inputs)
-* 'Backend' means everything else
-* (Ideally the) 'backend' does work, 'frontend' organises work (if otherwise, please open an issue or make a PR).
+> "There are two roles of code: code that does work, and code that coordinates work" ([Sonmez](https://simpleprogrammer.com/there-are-only-two-roles-of-code/))
 
-\* Config has impure IO functions, safe functions that will return defaults on failure, and interactive functions
+If there is one sentence to keep in mind while reading the code, this is it.
 
+Although it seems contradictory, I think the code has uses both the functional-core-imperative-shell and the [model-view-adapter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter) OOP patterns.
+* The models are the functional core.
+* The views accepts user input (inbound IO) and interacts with the user (outbound IO) -- this is the imperative shell.
+* The adapters mediates between the functional core and the imperative shell. They launches the views, get user input, calls the appropriate models, and send that to the appropriate views. 
 
-## MVC? MVA?
+In other words, the adapter organises code, while the models and view does the actual work.
 
-While the code is not intentionally structured according to any design pattern, you might be able to analyse it through the lens of the Model-View_Controller pattern. The only communication method between all modules is through function returns, not through 'notifying' different objects (most of them are functions). The only exception is `downloads.py` will directly communicate to `lscat.py` through a callback. Therefore, it seems to fit the [Model-View-Adapter](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93adapter) pattern better.
+| Role of code | Model (functional core) | Inbound IO (imperative shell) | Outbound IO (imperative shell) | Adapter (organises everything)
+| --- | --- | --- | --- | ---
+| Does work | <ul><li>colors</li><li>config \*</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>config \*</li><li>download</li><li>picker</li></ul> | <ul><li>config \*</li><li>files</li><li>printer</li><li>screens</li><li>utils</li></ul>  |
+| Organizes work |  | <ul><li>assistants</li><li>prompt</li></ul> | <ul><li>lscat</li></ul> | <ul><li>cli</li><li>lscat_app</li><li>main</li><li>ui</li></ul>
 
-Model:
+The overall code is neither OOP nor functional: the only communication between all modules is through function returns, not through 'notifying' different objects. The only (major?) exception is that `downloads.py` will directly trigger a callback to `lscat.py`.
 
-* api
-* colors
-* config
-* data
-* download
-* files
-* pure
-* utils
+Now, this paints a rosy picture but in reality, there was no initial planning so the code was originally not written towards any structure or pattern. What still needs work is:
+* The config contains a functional core, inbound IO, and outbound IO. Better split them up
 
-View:
-
-* assistants
-* lscat
-* printer
-* prompt
-* screens
-
-Controller / Adapter:
-
-* cli
-* lscat_app
-* main
-* picker
-* ui
+Here are some good tips:
+* "The way to figure out the separation is by doing as much as you can without mutation, and then encapsulating the mutation separately" (Gary Bernhardt)
+* "Create your application to work without either a UI or a database so you can run automated regression-tests against the application, work when the database becomes unavailable, and **link applications together without any user involvement**" ([Alistair Cockburn](https://github.com/jschairb/sandbox/wiki/HexagonalArchitecture)) (Emphasis mine; it is possible to adapt koneko to work with sites other than pixiv)
+    * At the very least, only the api and download modules need to be replaced.
+    * `data.py` will need to be adapted to your new API structure.
+    * The config already handles username and passwords, but you can add something like an API key or OTP auth
+    * The navigation routes (eg pages, prompt handling) are in `ui.py`, while the starting dispatch logic is in `main.py`
 
 
 ## Cache directory structure

@@ -86,6 +86,7 @@ def test_next_image(monkeypatch):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
     data.page_urls = False
+    data.event = Mock()
 
     # Only image
     data.number_of_pages = 1
@@ -105,6 +106,7 @@ def test_previous_image(monkeypatch):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
     data.page_urls = False
+    data.event = Mock()
 
     # Only image
     data.number_of_pages = 1

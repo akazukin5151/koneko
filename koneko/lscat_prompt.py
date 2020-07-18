@@ -124,6 +124,6 @@ class ImageLoop(AbstractLoop):
         if len(self.all_images) > 1:
             tracker = self.update_tracker()
             loc = TERM.get_location()
-            for image in self.all_images[self.current_page:][:4]:
+            for image in self.all_images[self.current_page + 1:][:4]:
                 tracker.update(image)
             printer.move_cursor_xy(loc[0], loc[1])

@@ -185,11 +185,7 @@ class TrackDownloadsImage(AbstractTracker):
 
     def update(self, new: str):
         """Overrides base class because numlist is different"""
-        with self._lock:
-            self._downloaded.append(new)
-            self._numlist.append(int(new.split('_')[1].replace('p', '')))
-
-        self._inspect()
+        self.generator.send(new)
 
 
 def generate_previews(path, min_num) -> 'IO':

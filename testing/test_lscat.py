@@ -147,7 +147,7 @@ def test_TrackDownloadsImage(monkeypatch):
     for pic in test_pics:
         tracker.update(pic)
 
-    assert len(mocked_generator.mock_calls) == 9
+    assert len(mocked_generator.mock_calls) == 10
     mock_calls = [call.send(f'12345_p{i}_master1200.jpg') for i in range(1, 10)]
     assert mocked_generator.mock_calls == mock_calls
 

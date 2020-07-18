@@ -2,7 +2,7 @@ import os
 import sys
 import random
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 from collections import namedtuple
 
 import pytest
@@ -130,6 +130,27 @@ def test_TrackDownloadsUser2(monkeypatch, tmp_path, use_test_cfg_path):
         tracker.update(pic)
 
     os.system(f'rm -r {data.download_path}')
+
+
+def test_TrackDownloadsImage(monkeypatch):
+    mocked_data = Mock()
+    mocked_generator = Mock()
+    mocked_data.page_num = 0
+    tracker = lscat.TrackDownloadsImage(mocked_data)
+    tracker.generator = mocked_generator
+
+    correct_order = list(range(10))
+    test_pics = [f"12345_p{idx}_master1200.jpg"
+                 for idx in list(range(10))]
+
+    # No need to shuffle because updates are always in order
+    for pic in test_pics:
+        tracker.update(pic)
+
+    assert len(mocked_generator.mock_calls) == 9
+    mock_calls = [call.send(f'12345_p{i}_master1200.jpg') for i in range(1, 10)]
+    assert mocked_generator.mock_calls == mock_calls
+
 
 def test_generate_page(monkeypatch):
     mocked_pixcat = Mock()

@@ -598,7 +598,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         """
         tracker = lscat.TrackDownloadsImage(self)
         i = 1
-        while not self.event.is_set() and i <= 4:
+        while (not self.event.is_set()
+                and i <= 4
+                and self.page_num + i < self.number_of_pages):
+
             url = self.page_urls[self.page_num + i]
             name = pure.split_backslash_last(url)
             path = self.download_path / name

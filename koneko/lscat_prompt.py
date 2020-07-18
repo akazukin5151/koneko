@@ -3,7 +3,7 @@ import sys
 from abc import ABC, abstractmethod
 from collections import namedtuple
 
-from koneko import lscat, TERM
+from koneko import lscat, TERM, printer
 
 
 # Duplicated due to circular import
@@ -21,6 +21,10 @@ class AbstractLoop(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def middle(self):
+        raise NotImplementedError
+
+    @abstractmethod
     def end_func(self):
         raise NotImplementedError
 
@@ -30,6 +34,7 @@ class AbstractLoop(ABC):
             while True:
                 if show_images:
                     self.show_func()
+                    self.middle()
                     print(f'Page {self.current_page} / {self.max_pages}')
                     print("Press 'n' to go to next page, "
                             "'p' to go to the previous page, "
@@ -47,10 +52,12 @@ class AbstractLoop(ABC):
                     show_images = False
 
                 elif ans == 'n':
+                    os.system('clear')
                     self.current_page += 1
                     show_images = True
 
                 elif ans == 'p':
+                    os.system('clear')
                     self.current_page -= 1
                     show_images = True
 
@@ -82,6 +89,9 @@ class GalleryUserLoop(AbstractLoop):
     def show_func(self):
         lscat.show_instant(self.cls, self.data)
 
+    def middle(self):
+        return True
+
     def end_func(self):
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
@@ -92,6 +102,8 @@ class ImageLoop(AbstractLoop):
         self.root = root
         self.image = image
         self.all_images = sorted(os.listdir(root))
+        if len(self.all_images) > 1:
+            self.FakeData = namedtuple('data', ('download_path', 'page_num'))
 
         # Base ABC
         self.condition = 0
@@ -103,3 +115,15 @@ class ImageLoop(AbstractLoop):
 
     def end_func(self):
         self.image = self.all_images[self.current_page]
+
+    def update_tracker(self):
+        data = self.FakeData(self.root, self.current_page)
+        return lscat.TrackDownloadsImage(data)
+
+    def middle(self):
+        if len(self.all_images) > 1:
+            tracker = self.update_tracker()
+            loc = TERM.get_location()
+            for image in self.all_images[self.current_page:][:4]:
+                tracker.update(image)
+            printer.move_cursor_xy(loc[0], loc[1])

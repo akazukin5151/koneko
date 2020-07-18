@@ -15,10 +15,59 @@ Although it seems contradictory, I think the code has uses both the functional-c
 
 In other words, the adapter organises code, while the models and view does the actual work.
 
-| Role of code | Model (functional core) | Inbound IO (imperative shell) | Outbound IO (imperative shell) | Adapter (organises everything)
-| --- | --- | --- | --- | ---
-| Does work | <ul><li>colors</li><li>config \*</li><li>data</li><li>pure</li></ul> | <ul><li>api</li><li>config \*</li><li>download</li><li>files</li><li>picker</li></ul> | <ul><li>config \*</li><li>printer</li><li>screens</li><li>utils</li></ul>  |
-| Organizes work |  | <ul><li>assistants</li><li>prompt</li></ul> | <ul><li>lscat</li></ul> | <ul><li>cli</li><li>lscat_app</li><li>main</li><li>ui</li></ul>
+<table>
+<thead>
+  <tr>
+    <th>Role of code</th>
+    <th>Model (functional core)</th>
+    <th>Inbound IO (imperative shell)</th>
+    <th>Outbound IO (imperative shell)<br></th>
+    <th>Adapter (organizes everything)</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>Does work</td>
+    <td><ul>
+        <li>colors</li>
+        <li>config *</li>
+        <li>data</li>
+        <li>pure</li>
+    </ul></td>
+    <td><ul>
+        <li>api</li>
+        <li>config *</li>
+        <li>download</li>
+        <li>files</li>
+        <li>picker</li>
+    </ul></td>
+    <td><ul>
+        <li>config *</li>
+        <li>printer</li>
+        <li>screens</li>
+        <li>utils</li>
+    </ul></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Organizes work</td>
+    <td></td>
+    <td><ul>
+        <li>assistants</li>
+        <li>prompt</li>
+    </ul></td>
+    <td><ul>
+        <li>lscat</li>
+    </ul></td>
+    <td><ul>
+        <li>cli</li>
+        <li>lscat_app</li>
+        <li>main</li>
+        <li>ui</li>
+    </ul></td>
+  </tr>
+</tbody>
+</table>
 
 The overall code is neither OOP nor functional: the only communication between all modules is through function returns, not through 'notifying' different objects. The only (major?) exception is that `downloads.py` will directly trigger a callback to `lscat.py`.
 

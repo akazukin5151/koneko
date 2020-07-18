@@ -511,7 +511,6 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         super().__init__(raw, image_id, firstmode)
         self.event = threading.Event()
-        self.thread: threading.Thread
         # Defined in self.start_preview()
         self.loc: tuple[int]
 
@@ -591,8 +590,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.loc = TERM.get_location()
         if config.check_image_preview() and self.number_of_pages > 1:
             self.event = threading.Event()  # Reset event, in case if it's set
-            self.thread = threading.Thread(target=self.preview)
-            self.thread.start()
+            threading.Thread(target=self.preview).start()
 
     def preview(self) -> 'IO':
         """Download the next four images in the background and/or display them

@@ -62,17 +62,6 @@ def format_frequent(counter: 'dict[str, int]') -> 'list[str]':
 
 
 # Wrapping other functions
-@contextmanager
-def cd(newdir: Path) -> 'IO':
-    """Change current directory, do something, change back to old directory"""
-    old = os.getcwd()
-    os.chdir(os.path.expanduser(newdir))
-    try:
-        yield
-    finally:
-        os.chdir(old)
-
-
 def _spin(done: 'Event', message: str) -> None:
     for char in itertools.cycle('|/-\\'):  # Infinite loop
         print(message, char, flush=True, end='\r')

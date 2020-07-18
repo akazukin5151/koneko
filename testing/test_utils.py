@@ -26,14 +26,6 @@ def test_find_number_map(monkeypatch):
             for y in range(1, 7)
             for x in range(1, 7)][:30] == list(range(30))
 
-def test_cd():
-    current_dir = os.getcwd()
-    with utils.cd(current_dir):
-        testdir = os.getcwd()
-
-    assert testdir == os.getcwd()
-    assert os.getcwd() == current_dir
-
 
 def test_history(monkeypatch, tmp_path):
     test_log = tmp_path / 'history'

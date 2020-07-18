@@ -139,10 +139,9 @@ def generate_page(path) -> 'IO':
         if number % (number_of_cols * number_of_rows) == 0 and number != 0:
             print('\n' * page_spacing)
 
-        with utils.cd(path):
-            Image(image).thumbnail(thumbnail_size).show(
-                align='left', x=left_shifts[x], y=rowspaces[(y % number_of_rows)]
-            )
+        Image(path / image).thumbnail(thumbnail_size).show(
+            align='left', x=left_shifts[x], y=rowspaces[(y % number_of_rows)]
+        )
 
 
 def generate_users(path, print_info=True) -> 'IO':
@@ -164,17 +163,16 @@ def generate_users(path, print_info=True) -> 'IO':
                   sep='')
         print('\n' * page_spacing)  # Scroll to new 'page'
 
-        with utils.cd(path):
-            # Display artist profile pic
-            Image(a_img).thumbnail(thumbnail_size).show(align='left', x=padding, y=0)
+        # Display artist profile pic
+        Image(path / a_img).thumbnail(thumbnail_size).show(align='left', x=padding, y=0)
 
-            # Display the three previews
-            i = 0                   # Always resets for every artist
-            while i < 3:            # Every artist has only 3 previews
-                p_img = yield       # Wait for preview pic
-                Image(p_img).thumbnail(thumbnail_size).show(align='left', y=0,
-                                                            x=preview_xcoords[i])
-                i += 1
+        # Display the three previews
+        i = 0                   # Always resets for every artist
+        while i < 3:            # Every artist has only 3 previews
+            p_img = yield       # Wait for preview pic
+            Image(path / p_img).thumbnail(thumbnail_size).show(align='left', y=0,
+                                                        x=preview_xcoords[i])
+            i += 1
 
 
 class TrackDownloadsImage(AbstractTracker):
@@ -213,9 +211,8 @@ def generate_previews(path, min_num) -> 'IO':
         else:
             x = 1
 
-        with utils.cd(path):
-            Image(image).thumbnail(thumbnail_size).show(
-                align='left', x=_xcoords[x], y=rowspaces[y]
-            )
+        Image(path / image).thumbnail(thumbnail_size).show(
+            align='left', x=_xcoords[x], y=rowspaces[y]
+        )
 
 

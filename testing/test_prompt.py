@@ -151,7 +151,7 @@ def test_image_prompt(monkeypatch, patch_cbreak, letter):
     fake_inkey = FakeInKeyNew()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
-        assert prompt.image_prompt(fakeimage)
+        assert prompt.image_prompt(fakeimage, Mock())
 
 def test_image_prompt_seq(monkeypatch, patch_cbreak):
     class FakeInKey1(FakeInKey):
@@ -166,7 +166,7 @@ def test_image_prompt_seq(monkeypatch, patch_cbreak):
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
     monkeypatch.setattr('koneko.ui.jump_to_image', raises_customexit)
     with pytest.raises(CustomExit):
-        assert prompt.image_prompt(fakeimage)
+        assert prompt.image_prompt(fakeimage, Mock())
 
 
 

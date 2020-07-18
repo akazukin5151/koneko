@@ -219,7 +219,7 @@ class AbstractGallery(AbstractUI, ABC):
         lscat.icat(idata.download_path / idata.large_filename)
 
         image = Image(image_id, idata, False)
-        prompt.image_prompt(image)
+        prompt.image_prompt(image, idata)
 
         # Image prompt ends, user presses back
         self._back()
@@ -493,7 +493,7 @@ def view_post_mode(image_id) -> 'IO':
 
     start_preview(idata)
 
-    prompt.image_prompt(image)
+    prompt.image_prompt(image, idata)
 
 
 class Image:
@@ -528,12 +528,6 @@ class Image:
 
     def previous_image(self) -> 'IO':
         previous_image(self._data)
-
-    def jump_to_image(self, selected_image_num: int) -> 'IO':
-        jump_to_image(self._data, selected_image_num)
-
-    def _jump(self) -> 'IO':
-        _jump(self._data)
 
 
 def show_full_res(data):

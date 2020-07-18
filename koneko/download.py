@@ -1,5 +1,5 @@
 """Download functions. See ../puml/download.puml. All of them download through
-_download_then_rename(), which downloads through api.myapi.protected_download().
+_download_with_tracker(), which downloads through api.myapi.protected_download().
 
 The _async_filter_and_download() branch is for downloading multiple images, and includes:
     - init_download()
@@ -86,7 +86,7 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
 
 
 def _async_filter_and_download(data, newnames, tracker):
-    helper = partial(_download_then_rename, path=data.download_path, tracker=tracker)
+    helper = partial(_download_with_tracker, path=data.download_path, tracker=tracker)
 
     os.makedirs(data.download_path, exist_ok=True)
     with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
@@ -99,11 +99,10 @@ def _async_filter_and_download(data, newnames, tracker):
         #p.map(helper, (data.all_urls, newnames))
 
 
-def _download_then_rename(url, img_name, path, tracker=None) -> 'IO':
+def _download_with_tracker(url, img_name, path, tracker) -> 'IO':
     """Actually downloads one pic given one url, rename if needed."""
     api.myapi.protected_download(url, path, img_name)
-    if tracker:
-        tracker.update(img_name)
+    tracker.update(img_name)
 
 
 # - Wrappers around the core functions for downloading one image
@@ -114,7 +113,7 @@ def download_url(download_path: Path, url, filename: str) -> 'IO':
     os.makedirs(download_path, exist_ok=True)
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
-        _download_then_rename(url, filename, download_path)
+        api.myapi.protected_download(url, download_path, filename)
 
 
 def download_url_verified(url, png=False) -> 'IO':

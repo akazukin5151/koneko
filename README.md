@@ -111,23 +111,33 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 #### Features
 * Browse cache now supports navigating between pages
+* **Breaking**: Removed `image_mode_text_offset` config setting, now enabled by default
+* Renewed developer guide in HACKING.md
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
 * Fixed docs: mode 5 cannot go back to main screen
 * Fixed reloading in a gallery mode leading to user prompt
 * Browse cache now no longer accepts an invalid directory to display on
+* Fixed experimental image mode previews index errors due to it trying to download more images than possible
+* Almost fixing experimental image mode previews by saving previous cursor position and restoring it later
+* Fixed grammar in prompt: "a image command" -> "an image command"
+* Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
 
 #### Code maintenance
 * lscat show_instant() now inspects the cls passed in instead of a bool argument
 * "Inlined" some abstract methods in AbstractUI into attributes
+* Consistent public and private methods and attributes again
+* Make all ui.Image methods depend on only data.ImageData like the associated free functions, so those methods can be moved to a subclass of data.ImageData (the new ui.Image class extends IO behaviours from the data class)
+* Pass in path and name to api.download instead of cd-ing into the dir and manually renaming downloads, simplifying a lot of code in the process
+* Replace pure.Map with list comprehensions. Can't force functional programming into Python after all
+* Use funcy.autocurry() instead of partial
+* Split up files.filter_dir()
  
 
 # Roadmap
 
-* Pass in path to api.download instead of cd-ing into the dir
 * Make sure the diagrams in HACKING.md is up-to-date
-* Consistent public and private methods and attributes again
 * In-depth usage documentation?
 
 ## Features

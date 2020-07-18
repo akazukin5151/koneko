@@ -35,7 +35,7 @@ abstract class ui.AbstractUI <<(A, red)>>{
     ..Common behaviour..
     +start()
     +next_page()
-    +preview_page()
+    +previous_page()
     -_parse_and_download()
     -_prefetch_next_page()
     +reload()

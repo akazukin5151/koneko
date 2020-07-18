@@ -39,9 +39,8 @@ def setup_history_log():
 
 
 def read_history() -> 'list[str]':
-    with cd(KONEKODIR):
-        with open('history', 'r') as f:
-            history = f.read()
+    with open(KONEKODIR / 'history', 'r') as f:
+        history = f.read()
 
     return history.split('\n')[:-1]  # Ignore trailing \n
 

@@ -5,7 +5,7 @@ import pytest
 from pick import Picker
 
 from koneko import picker, KONEKODIR
-from koneko.picker import EMPTY_FILTER_WARNING
+from koneko.picker import EMPTY_WARNING, EMPTY_FILTER_WARNING
 from conftest import CustomExit, raises_customexit
 
 
@@ -158,13 +158,36 @@ def test_handle_cd_path_is_dir(tmp_path):
 
 
 def test_actions_from_dir_filter_inactive(monkeypatch):
-    monkeypatch.setattr('koneko.files.filter_history', lambda x: True)
-    assert picker.actions_from_dir('not_konekodir', [])
+    monkeypatch.setattr('koneko.files.filter_history', lambda x: 'sentinel')
+    assert picker.actions_from_dir('not_konekodir', []) == 'sentinel'
+
+
+def test_actions_from_dir_filter_inactive_empty(monkeypatch):
+    monkeypatch.setattr('koneko.files.filter_history', lambda x: [])
+    assert picker.actions_from_dir('not_konekodir', []) == [EMPTY_WARNING]
 
 
 def test_actions_from_dir_filter_active(monkeypatch):
-    monkeypatch.setattr('koneko.picker.try_filter_dir', lambda x: True)
-    assert picker.actions_from_dir(KONEKODIR, 'modes_is_not_none')
+    monkeypatch.setattr('koneko.picker.try_filter_dir', lambda x: 'sentinel')
+    assert picker.actions_from_dir(KONEKODIR, 'modes_is_not_none') == 'sentinel'
+
+
+def test_actions_from_dir_mode2_success(monkeypatch):
+    assert picker.actions_from_dir(KONEKODIR / '123', ['2']) == ['individual']
+
+
+def test_actions_from_dir_mode2_mode1_fail(monkeypatch):
+    monkeypatch.setattr('koneko.files.filter_history', lambda x: 'sentinel')
+    assert picker.actions_from_dir(KONEKODIR / '123', ['2', '1']) == 'sentinel'
+
+
+def test_actions_from_dir_mode2_individual_fail(monkeypatch):
+    monkeypatch.setattr('koneko.files.filter_history', lambda x: 'sentinel')
+    assert picker.actions_from_dir(KONEKODIR / '123' / 'individual', ['2']) == 'sentinel'
+
+def test_actions_from_dir_mode2_path_notdigit_fail(monkeypatch):
+    monkeypatch.setattr('koneko.files.filter_history', lambda x: 'sentinel')
+    assert picker.actions_from_dir(KONEKODIR / 'notdigit', ['2']) == 'sentinel'
 
 
 def test_try_filter_dir_sorted(monkeypatch):

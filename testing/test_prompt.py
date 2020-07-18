@@ -140,8 +140,7 @@ fakeimage.previous_image = exit_mock
 fakeimage.show_full_res= exit_mock
 fakeimage.leave = exit_mock
 
-# missing keys 'a' and 'b'
-@pytest.mark.parametrize('letter', (u'q', u'o', u'd', u'n', u'p', u'f'))
+@pytest.mark.parametrize('letter', (u'a', 'b', u'q', u'o', u'd', u'n', u'p', u'f'))
 def test_image_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     class FakeInKeyNew(FakeInKey):
@@ -153,6 +152,7 @@ def test_image_prompt(monkeypatch, patch_cbreak, letter):
     with pytest.raises(CustomExit):
         assert prompt.image_prompt(fakeimage)
 
+# Again, multiple key seqs doesn't work
 #def test_image_prompt_seq(monkeypatch, patch_cbreak):
 #    class FakeInKey1(FakeInKey):
 #        def __call__(self):

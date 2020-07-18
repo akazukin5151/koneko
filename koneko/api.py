@@ -43,7 +43,7 @@ class APIHandler:
             print("Press 'q' and enter to exit")
             return
 
-        self._api_queue.put(_api)
+        self._api_queue.put(api)
 
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))

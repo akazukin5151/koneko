@@ -64,7 +64,7 @@ class AbstractUI(ABC):
         # self._data defined here not in __init__, so that reload() will wipe cache
         self._data = self._data_class(1, main_path)
         self._parse_and_download()
-        self._prefetch_thread()
+        self._prefetch()
 
     def verify_up_to_date(self):
         if files.dir_not_empty(self._data):
@@ -92,7 +92,7 @@ class AbstractUI(ABC):
         download.init_download(self._data, self._tracker_class(self._data))
         self.print_page_info()
 
-    def _prefetch_thread(self) -> 'IO':
+    def _prefetch(self) -> 'IO':
         """Reassign the thread again and start; as threads can only be started once"""
         self.prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self.prefetch_thread.start()

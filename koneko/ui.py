@@ -525,15 +525,12 @@ class Image:
 
     def next_image(self) -> 'IO':
         next_image(self._data)
-        self.start_preview()
 
     def previous_image(self) -> 'IO':
         previous_image(self._data)
-        self.start_preview()
 
     def jump_to_image(self, selected_image_num: int) -> 'IO':
         jump_to_image(self._data, selected_image_num)
-        self.start_preview()
 
     def _jump(self) -> 'IO':
         _jump(self._data)
@@ -639,6 +636,7 @@ def _jump(data):
     lscat.icat(data.filepath)
 
     print(f'Page {data.page_num+1}/{data.number_of_pages}')
+    start_preview(data)
 
 
 def _prefetch_next_image(data):
@@ -647,3 +645,31 @@ def _prefetch_next_image(data):
     if next_img_url:
         download.async_download_spinner(data.download_path, [next_img_url])
 
+def start_preview(data):
+    if config.check_image_preview() and data.number_of_pages > 1:
+        data.event = threading.Event()  # Reset event, in case if it's set
+        data.thread = threading.Thread(target=preview, args=(data,))
+        data.thread.start()
+
+def preview(data) -> 'IO':
+    """Download the next four images in the background and/or display them
+    one at a time, so if user interrupts, it won't hang.
+    """
+    tracker = lscat.TrackDownloadsImage(data)
+    i = 1
+    while not data.event.is_set() and i <= 4:
+        url = data.page_urls[data.page_num + i]
+        name = pure.split_backslash_last(url)
+        path = data.download_path / name
+
+        if path.is_file():
+            tracker.update(name)
+        else:
+            download.async_download_no_rename(
+                data.download_path, [url], tracker=tracker
+            )
+
+        if i == 4:  # Last pic
+            print('\n' * config.image_text_offset())
+
+        i += 1

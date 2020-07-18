@@ -144,6 +144,10 @@ def test_image_current_url():
     idata = image()
     assert idata.current_url == 'https://i.pximg.net/c/600x1200_90_webp/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg'
 
+def test_image_large_filename():
+    idata = image()
+    assert idata.large_filename == '76695217_p0_master1200.jpg'
+
 
 def test_user_init():
     udata = user()

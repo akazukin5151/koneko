@@ -1,3 +1,7 @@
+"""These are also essentially integration tests to test the code properly organises work
+Code that does work has already been tested
+"""
+
 from pathlib import Path
 from unittest.mock import Mock
 

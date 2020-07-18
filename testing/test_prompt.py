@@ -74,7 +74,7 @@ def test_gallery_like_prompt(monkeypatch, patch_cbreak, letter):
 def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
     class FakeInKeyPrev(FakeInKey):
         def __call__(self):
-            return Keystroke(ucs=u'p', code=1, name=u'p')
+            return Keystroke(ucs='p', code=1, name='p')
 
     fake_inkey = FakeInKeyPrev()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
@@ -87,7 +87,7 @@ def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
 def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak):
     class FakeInKeyQuit(FakeInKey):
         def __call__(self):
-            return Keystroke(ucs=u'q', code=1, name=u'quit')
+            return Keystroke(ucs='q', code=1, name='quit')
 
     fake_inkey = FakeInKeyQuit()
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
@@ -99,11 +99,11 @@ def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak):
 def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak):
     class FakeInKey1(FakeInKey):
         def __call__(self):
-            return Keystroke(ucs=u'1', code=1, name=u'1')
+            return Keystroke(ucs='1', code=1, name='1')
 
     class FakeInKey2(FakeInKey):
         def __call__(self):
-            return Keystroke(ucs=u'2', code=1, name=u'2')
+            return Keystroke(ucs='2', code=1, name='2')
 
     fake_inkey = iter([FakeInKey1(), FakeInKey2()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
@@ -114,15 +114,15 @@ def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak):
 #def test_gallery_like_prompt_3_seq(monkeypatch, patch_cbreak):
 #    class FakeInKey0(FakeInKey):
 #        def __call__(self):
-#            return Keystroke(ucs=u'o', code=1, name=u'o')
+#            return Keystroke(ucs='o', code=1, name='o')
 #
 #    class FakeInKey1(FakeInKey):
 #        def __call__(self):
-#            return Keystroke(ucs=u'1', code=1, name=u'1')
+#            return Keystroke(ucs='1', code=1, name='1')
 #
 #    class FakeInKey2(FakeInKey):
 #        def __call__(self):
-#            return Keystroke(ucs=u'2', code=1, name=u'2')
+#            return Keystroke(ucs='2', code=1, name='2')
 #
 #    fake_inkey = iter([FakeInKey0(), FakeInKey1(), FakeInKey2()])
 #    monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
@@ -140,8 +140,7 @@ fakeimage.previous_image = exit_mock
 fakeimage.show_full_res= exit_mock
 fakeimage.leave = exit_mock
 
-# missing keys 'a' and 'b'
-@pytest.mark.parametrize('letter', (u'q', u'o', u'd', u'n', u'p', u'f'))
+@pytest.mark.parametrize('letter', ('a', 'b', 'q', 'o', 'd', 'n', 'p', 'f'))
 def test_image_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     class FakeInKeyNew(FakeInKey):
@@ -153,14 +152,15 @@ def test_image_prompt(monkeypatch, patch_cbreak, letter):
     with pytest.raises(CustomExit):
         assert prompt.image_prompt(fakeimage)
 
+# Again, multiple key seqs doesn't work
 #def test_image_prompt_seq(monkeypatch, patch_cbreak):
 #    class FakeInKey1(FakeInKey):
 #        def __call__(self):
-#            return Keystroke(ucs=u'1', code=1, name=u'1')
+#            return Keystroke(ucs='1', code=1, name='1')
 #
 #    class FakeInKey2(FakeInKey):
 #        def __call__(self):
-#            return Keystroke(ucs=u'2', code=1, name=u'2')
+#            return Keystroke(ucs='2', code=1, name='2')
 #
 #    fake_inkey = iter([FakeInKey1(), FakeInKey2()])
 #    monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
@@ -176,7 +176,7 @@ fakeuser.previous_page = exit_mock
 fakeuser.reload = exit_mock
 fakeuser.go_artist_mode = exit_mock
 
-@pytest.mark.parametrize('letter', (u'n', u'r', u'p', u'q'))
+@pytest.mark.parametrize('letter', ('n', 'r', 'p', 'q'))
 def test_user_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     monkeypatch.setattr('koneko.ui.AbstractUsers.previous_page', raises_customexit)
@@ -192,11 +192,11 @@ def test_user_prompt(monkeypatch, patch_cbreak, letter):
 def test_user_prompt_seq(monkeypatch, patch_cbreak):
     class FakeInKey1(FakeInKey):
         def __call__(self):
-            return Keystroke(ucs=u'1', code=1, name=u'1')
+            return Keystroke(ucs='1', code=1, name='1')
 
     class FakeInKey2(FakeInKey):
         def __call__(self):
-            return Keystroke(ucs=u'2', code=1, name=u'2')
+            return Keystroke(ucs='2', code=1, name='2')
 
     fake_inkey = iter([FakeInKey1(), FakeInKey2()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))

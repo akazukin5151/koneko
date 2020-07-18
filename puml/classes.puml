@@ -266,7 +266,7 @@ abstract class data.AbstractData <<(A, red)>>{
 }
 
 data.GalleryData *-up-- ui.AbstractGallery
-data.ImageData *-up-- ui.Image
+data.ImageData <-up-- ui.Image
 data.UserData *-up-- ui.AbstractUsers
 
 data.GalleryData <-up- data.AbstractData

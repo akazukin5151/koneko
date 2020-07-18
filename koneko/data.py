@@ -4,11 +4,7 @@ Despite GalleryData and UserData having lots of shared attributes/properties/met
 there isn't much shared functionality, so there's nothing to extract to an abstract
 base class
 """
-import threading
 from abc import ABC, abstractmethod
-
-from placeholder import _
-from returns.pipeline import flow
 
 from koneko import pure, KONEKODIR
 
@@ -36,7 +32,7 @@ class AbstractData(ABC):
 
     @property
     def urls_as_names(self) -> 'list[str]':
-        return flow(self.all_urls, pure.Map(pure.split_backslash_last))
+        return [pure.split_backslash_last(url) for url in self.all_urls]
 
     @property
     def newnames_with_ext(self) -> 'list[str]':
@@ -166,23 +162,15 @@ class UserData(AbstractData):
         self.next_url = raw['next_url']
         page = raw['user_previews']
 
-        ids = flow(page, pure.Map(_['user']['id']))
+        ids = [x['user']['id'] for x in page]
         self.ids_cache.update({self.page_num: ids})
 
-        names = flow(page, pure.Map(_['user']['name']))
+        names = [x['user']['name'] for x in page]
         self.names_cache.update({self.page_num: names})
 
-        self.profile_pic_urls = flow(
-            page,
-            pure.Map(_['user']['profile_image_urls']['medium']),
-        )
+        self.profile_pic_urls = [x['user']['profile_image_urls']['medium'] for x in page]
 
         # [page[i]['illusts'][j]['image_urls']['square_medium']
-        #  for i in range(len(page))
-        #  for j in range(len(page[i]['illusts']))]
-        # where post == page[i] and illust == page[i]['illusts'][j]
-        # max(i) == number of artists on this page
-        # max(j) == 3 == 3 previews for every artist
         self.image_urls = [illust['image_urls']['square_medium']
                            for post in page
                            for illust in post['illusts']]

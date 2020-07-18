@@ -1,5 +1,5 @@
 """Download functions. See ../puml/download.puml. All of them download through
-_download_then_rename(), which downloads through api.myapi.protected_download().
+_download_with_tracker(), which downloads through api.myapi.protected_download().
 
 The _async_filter_and_download() branch is for downloading multiple images, and includes:
     - init_download()
@@ -24,11 +24,10 @@ import os
 import itertools
 from pathlib import Path
 from shutil import rmtree
-from functools import partial
 from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 
-from returns.pipeline import flow
+from funcy import autocurry
 
 from koneko.data import UserData
 from koneko import api, pure, utils, files
@@ -39,9 +38,8 @@ def save_number_of_artists(data) -> 'IO':
     """"Save the number of artists == splitpoint
     So later accesses, which will not request, can display properly
     """
-    with utils.cd(data.download_path):
-        with open('.koneko', 'w') as f:
-            f.write(str(data.splitpoint))
+    with open(data.download_path / '.koneko', 'w') as f:
+        f.write(str(data.splitpoint))
 
 
 def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
@@ -63,9 +61,8 @@ def init_download(data: 'data.<class>', tracker: 'lscat.<class>') -> 'IO':
 
 # - Download functions for multiple images
 def _async_download_rename(data, tracker=None) -> 'IO':
-    downloaded_newnames = itertools.filterfalse(os.path.isfile, data.newnames_with_ext)
-    downloaded_oldnames = itertools.filterfalse(os.path.isfile, data.urls_as_names)
-    _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
+    newnames = itertools.filterfalse(os.path.isfile, data.newnames_with_ext)
+    _async_filter_and_download(data, newnames, tracker)
 
 
 def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
@@ -74,12 +71,9 @@ def async_download_no_rename(download_path, urls, tracker=None) -> 'IO':
 
     FakeData = namedtuple('data', ('download_path', 'all_urls'))
     data = FakeData(download_path, urls)
+    names = itertools.cycle((None,))
 
-    oldnames_ext = flow(urls, pure.Map(pure.split_backslash_last))
-    downloaded_oldnames = itertools.filterfalse(os.path.isfile, oldnames_ext)
-    downloaded_newnames = itertools.cycle((None,))
-
-    _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker)
+    _async_filter_and_download(data, names, tracker)
 
 
 @utils.spinner('')
@@ -88,36 +82,24 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
     async_download_no_rename(download_path, urls)
 
 
-def _async_filter_and_download(data, downloaded_oldnames, downloaded_newnames, tracker):
-    helper = partial(_download_then_rename, tracker=tracker)
+# Might multiprocessing be faster to bypass urllib's pool limit?
+# 'Cannot pickle generator'
+# essentially the entire lscat needs to be rewritten with multiprocessing in mind
+#with Pool(len(data.all_urls)) as p:
+    #p.map(helper, (data.all_urls, newnames))
 
+def _async_filter_and_download(data, newnames, tracker):
+    helper = _download_with_tracker(path=data.download_path, tracker=tracker)
     os.makedirs(data.download_path, exist_ok=True)
-    with utils.cd(data.download_path):
-        with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
-            executor.map(helper, data.all_urls, downloaded_oldnames, downloaded_newnames)
-
-    # Might multiprocessing be faster to bypass urllib's pool limit?
-    # 'Cannot pickle generator'
-    # essentially the entire lscat needs to be rewritten with multiprocessing in mind
-    #with Pool(len(data.all_urls)) as p:
-        #p.map(helper, (data.all_urls, downloaded_oldnames, downloaded_newnames))
+    with ThreadPoolExecutor(max_workers=len(data.all_urls)) as executor:
+        executor.map(helper, data.all_urls, newnames)
 
 
-def _download_then_rename(url, img_name, new_file_name=None, tracker=None) -> 'IO':
+@autocurry
+def _download_with_tracker(url, img_name, path, tracker) -> 'IO':
     """Actually downloads one pic given one url, rename if needed."""
-    api.myapi.protected_download(url)
-
-    # Best to rename every completed download in their own thread
-    # to avoid race conditions
-    if new_file_name:
-        # This character break renames
-        if '/' in new_file_name:
-            new_file_name = new_file_name.replace('/', '')
-        os.rename(img_name, new_file_name)
-        img_name = new_file_name
-
-    if tracker:
-        tracker.update(img_name)
+    api.myapi.protected_download(url, path, img_name)
+    tracker.update(img_name)
 
 
 # - Wrappers around the core functions for downloading one image
@@ -128,8 +110,7 @@ def download_url(download_path: Path, url, filename: str) -> 'IO':
     os.makedirs(download_path, exist_ok=True)
     if not Path(filename).is_file():
         print('   Downloading illustration...', flush=True, end='\r')
-        with utils.cd(download_path):
-            _download_then_rename(url, filename)
+        api.myapi.protected_download(url, download_path, filename)
 
 
 def download_url_verified(url, png=False) -> 'IO':

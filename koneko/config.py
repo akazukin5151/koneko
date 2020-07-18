@@ -107,10 +107,10 @@ def get_gen_users_settings() -> (int, int):
     )
 
 
-def gallery_print_spacing_config() -> 'tuple[int]':
+def gallery_print_spacing_config() -> 'list[str]':
     return get_settings('lscat', 'gallery_print_spacing').map(
         m.split(',')
-    ).value_or((9, 17, 17, 17, 17))
+    ).value_or(['9', '17', '17', '17', '17'])
 
 
 

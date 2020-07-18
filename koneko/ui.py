@@ -561,7 +561,6 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.page_num = selected_image_num - 1
         self._jump()
 
-
     def _jump(self):
         """Downloads next image if not downloaded, display it, prefetch next"""
         # FIXME: thread might download to the user's current dir.
@@ -579,12 +578,20 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         print(f'Page {self.page_num+1}/{self.number_of_pages}')
         self.start_preview()
 
-
     def _prefetch_next_image(self):
         with funcy.suppress(IndexError):
             next_img_url = self.next_img_url
         if next_img_url:
             download.async_download_spinner(self.download_path, [next_img_url])
+
+    def leave(self, force=False) -> 'IO':
+        self.event.set()
+        if self.firstmode or force:
+            # Came from view post mode, don't know current page num
+            # Defaults to page 1
+            mode = ArtistGallery(self.artist_user_id)
+            prompt.gallery_like_prompt(mode)
+        # Else: image prompt and class ends, goes back to previous mode
 
     def start_preview(self):
         self.loc = TERM.get_location()
@@ -618,11 +625,3 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
             i += 1
 
-    def leave(self, force=False) -> 'IO':
-        self.event.set()
-        if self.firstmode or force:
-            # Came from view post mode, don't know current page num
-            # Defaults to page 1
-            mode = ArtistGallery(self.artist_user_id)
-            prompt.gallery_like_prompt(mode)
-        # Else: image prompt and class ends, goes back to previous mode

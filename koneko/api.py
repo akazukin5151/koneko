@@ -80,10 +80,10 @@ class APIHandler:
 
     # Download
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    def protected_download(self, url):
+    def protected_download(self, url, path, name):
         """Protect api download function with funcy.retry so it doesn't crash"""
         self._await_login()
-        self._api.download(url)
+        self._api.download(url, path=path, name=name)
 
 
 myapi = APIHandler()

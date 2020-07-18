@@ -80,6 +80,22 @@ def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     ]
 
 
+@pytest.mark.parametrize('argv', (['4'], []))
+def test_browse_cache_image(monkeypatch, tmp_path, argv):
+    path = tmp_path / 'individual'
+    path.mkdir()
+    (path / 'somefile').touch()
+    mock = Mock()
+    monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
+    monkeypatch.setattr('koneko.lscat_prompt.ImageLoop', mock)
+
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
+    monkeypatch.setattr('koneko.picker.pick_dir', lambda: path)
+
+    lscat_app.main()
+    assert mock.mock_calls == [call(path, 'somefile'), call().start()]
+
+
 def test_display_path_cli_invalid_quits(monkeypatch):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '5', 'notapath'])

@@ -130,12 +130,12 @@ class AbstractUI(ABC):
         self._prefetch_next_page()
 
     def previous_page(self) -> 'IO':
-        if self._data.page_num > 1:
-            self._data.page_num -= 1
-            self._data.offset = int(self._data.offset) - 30
-            self._show_page()
-            return True
-        print('This is the first page!')
+        if self._data.page_num <= 1:
+            print('This is the first page!')
+            return False
+        self._data.page_num -= 1
+        self._data.offset = int(self._data.offset) - 30
+        self._show_page()
 
     def _show_page(self) -> 'IO':
         if not files.dir_not_empty(self._data):

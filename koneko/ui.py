@@ -110,16 +110,15 @@ class AbstractUI(ABC):
         if not self._data.next_url:  # Last page
             return True
 
-        next_offset = self._data.next_url.split('&')[-1].split('=')[-1]
         # Won't download if not immediately next page, eg
         # p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
-        offset_diffs = int(next_offset) - int(self._data.offset)
+        offset_diffs = int(self._data.next_offset) - int(self._data.offset)
         immediate_next: bool = offset_diffs <= 30
         if not immediate_next:
             return
 
         oldnum = self._data.page_num
-        self._data.offset = next_offset
+        self._data.offset = self._data.next_offset
         self._data.page_num = int(self._data.offset) // 30 + 1
 
         self._parse_user_infos()

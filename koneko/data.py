@@ -31,6 +31,10 @@ class AbstractData(ABC):
         raise NotImplementedError
 
     @property
+    def next_offset(self) -> str:
+        return self.next_url.split('&')[-1].split('=')[-1]
+
+    @property
     def urls_as_names(self) -> 'list[str]':
         return [pure.split_backslash_last(url) for url in self.all_urls]
 

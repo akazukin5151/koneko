@@ -16,7 +16,6 @@ import threading
 from math import ceil
 from pathlib import Path
 from collections import Counter
-from contextlib import contextmanager
 from logging.handlers import RotatingFileHandler
 
 import funcy

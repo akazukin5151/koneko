@@ -113,6 +113,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Browse cache now supports navigating between pages
 * **Breaking**: Removed `image_mode_text_offset` config setting, now does nothing
 * Renewed developer guide in HACKING.md
+* **Breaking**: lscat app: move 'browse cache' and 'specify path' to mode 2 and 3 respectively, moving 'testgallery & 'testuser' to mode 4 and 5 respectively (swapped)
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
@@ -137,7 +138,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 # Roadmap
 
-* lscat app: Move browse cache and specify path to mode 2 and 3 respectively, moving testgallery & testuser to the end
 * Make sure the diagrams in HACKING.md is up-to-date
 * In-depth usage documentation?
 

@@ -3,17 +3,17 @@
 Usage:
   lscat
   lscat (1|c) [<actions> ...]
-  lscat (2|g)
-  lscat (3|u)
-  lscat (4|b)
-  lscat (5|p) [<path>]
+  lscat (2|b)
+  lscat (3|p) [<path>]
+  lscat (4|g)
+  lscat (5|u)
 
 Optional arguments (for specifying a mode):
   1 c  Koneko configuration assistance
-  2 g  Display KONEKODIR / testgallery
-  3 u  Display KONEKODIR / testuser
-  4 b  Browse a cached dir to display
-  5 p  Display a specified path
+  2 b  Browse a cached dir to display
+  3 p  Display a specified path
+  4 g  Display KONEKODIR / testgallery
+  5 u  Display KONEKODIR / testuser
 
 Possible configuration assistants:
   1  Thumbnail size
@@ -49,17 +49,17 @@ def main():
     if args['1'] or args['c']:
         config_assistance(args['<actions>'])
 
-    elif args['2'] or args['g']:
-        display_gallery()
-
-    elif args['3'] or args['u']:
-        display_user()
-
-    elif args['4'] or args['b']:
+    elif args['2'] or args['b']:
         browse_cache()
 
-    elif args['5'] or args['p']:
+    elif args['3'] or args['p']:
         display_path(args['<path>'])
+
+    elif args['4'] or args['g']:
+        display_gallery()
+
+    elif args['5'] or args['u']:
+        display_user()
 
 
 def _main():
@@ -67,10 +67,10 @@ def _main():
 
     case = {
         0: config_assistance,
-        1: display_gallery,
-        2: display_user,
-        3: browse_cache,
-        4: display_path,
+        1: browse_cache,
+        2: display_path,
+        3: display_gallery,
+        4: display_user,
     }
 
     func = case.get(ans, None)

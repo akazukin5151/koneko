@@ -35,10 +35,10 @@ def lscat_app_main() -> int:
              'Please select an action')
     actions = (
         '1. Launch koneko configuration assistance',
-        '2. Display KONEKODIR / testgallery',
-        '3. Display KONEKODIR / testuser',
-        '4. Browse a cached dir to display',
-        '5. Display a specified path',
+        '2. Browse a cached dir to display',
+        '3. Display a specified path',
+        '4. Display KONEKODIR / testgallery',
+        '5. Display KONEKODIR / testuser',
         'Quit'
     )
     mypicker = ws_picker(actions, title)

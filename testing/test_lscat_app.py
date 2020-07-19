@@ -7,13 +7,13 @@ from koneko import lscat_app, lscat, KONEKODIR
 from conftest import CustomExit, raises_customexit
 
 
-@pytest.mark.parametrize('argv', (['2'], []))
+@pytest.mark.parametrize('argv', (['4'], []))
 def test_display_gallery(monkeypatch, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
 
-    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 1)
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
 
     lscat_app.main()
     assert mock.mock_calls == mock.call_args_list == [
@@ -24,13 +24,13 @@ def test_display_gallery(monkeypatch, argv):
     ]
 
 
-@pytest.mark.parametrize('argv', (['3'], []))
+@pytest.mark.parametrize('argv', (['5'], []))
 def test_display_user(monkeypatch, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
 
-    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 2)
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 4)
 
     lscat_app.main()
     assert mock.mock_calls == mock.call_args_list == [
@@ -41,13 +41,13 @@ def test_display_user(monkeypatch, argv):
     ]
 
 
-@pytest.mark.parametrize('argv', (['4'], []))
+@pytest.mark.parametrize('argv', (['2'], []))
 def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
     monkeypatch.setattr('koneko.lscat_prompt.GalleryUserLoop', mock)
 
-    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 1)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
 
     lscat_app.main()
@@ -60,13 +60,13 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
     ]
 
 
-@pytest.mark.parametrize('argv', (['4'], []))
+@pytest.mark.parametrize('argv', (['2'], []))
 def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
     monkeypatch.setattr('koneko.lscat_prompt.GalleryUserLoop', mock)
 
-    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 1)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: tmp_path)
     (tmp_path / '.koneko').touch()
 
@@ -80,7 +80,7 @@ def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     ]
 
 
-@pytest.mark.parametrize('argv', (['4'], []))
+@pytest.mark.parametrize('argv', (['2'], []))
 def test_browse_cache_image(monkeypatch, tmp_path, argv):
     path = tmp_path / 'individual'
     path.mkdir()
@@ -89,7 +89,7 @@ def test_browse_cache_image(monkeypatch, tmp_path, argv):
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
     monkeypatch.setattr('koneko.lscat_prompt.ImageLoop', mock)
 
-    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 1)
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: path)
 
     lscat_app.main()
@@ -98,8 +98,8 @@ def test_browse_cache_image(monkeypatch, tmp_path, argv):
 
 def test_display_path_cli_invalid_quits(monkeypatch):
     mock = Mock()
-    monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '5', 'notapath'])
-    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 4)
+    monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '3', 'notapath'])
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 2)
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
     monkeypatch.setattr('koneko.lscat_app.sys.exit', raises_customexit)
 
@@ -109,10 +109,10 @@ def test_display_path_cli_invalid_quits(monkeypatch):
 
 def test_display_path_cli_complete(monkeypatch, tmp_path):
     mock = Mock()
-    monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '5', str(tmp_path)])
+    monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '3', str(tmp_path)])
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
 
-    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 4)
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 2)
 
     lscat_app.main()
     assert mock.mock_calls == mock.call_args_list == [
@@ -125,10 +125,10 @@ def test_display_path_cli_complete(monkeypatch, tmp_path):
 
 def test_display_path_cli_incomplete(monkeypatch, tmp_path):
     mock = Mock()
-    monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '5'])
+    monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '3'])
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
 
-    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 4)
+    monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 2)
     responses = iter((str(tmp_path),))
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 

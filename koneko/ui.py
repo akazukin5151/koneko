@@ -79,14 +79,13 @@ class AbstractUI(ABC):
 
     def _show_then_fetch(self):
         lscat.show_instant(self._tracker_class, self._data)
-        self._parse_user_infos()
+        self._request_then_save()
         self._verify_up_to_date()
         self._print_page_info()
 
     def _download_from_scratch(self) -> 'IO':
-        # No valid cached images, download all from scratch
         files.remove_dir_if_exist(self._data)
-        self._parse_user_infos()
+        self._request_then_save()
         download.init_download(self._data, self._tracker_class(self._data))
         self._print_page_info()
 
@@ -96,8 +95,8 @@ class AbstractUI(ABC):
         self._prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self._prefetch_thread.start()
 
-    def _parse_user_infos(self) -> 'IO':
-        """Parse json and get list of artist names, profile pic urls, and id"""
+    def _request_then_save(self) -> 'IO':
+        """Do request and save it"""
         result = self._pixivrequest()
         self._data.update(result)
 
@@ -119,7 +118,7 @@ class AbstractUI(ABC):
         self._data.offset = self._data.next_offset
         self._data.page_num = int(self._data.offset) // 30 + 1
 
-        self._parse_user_infos()
+        self._request_then_save()
         download.init_download(self._data, None)
 
         self._data.page_num = oldnum

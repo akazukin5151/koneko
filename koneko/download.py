@@ -97,9 +97,10 @@ def _async_filter_and_download(data, newnames, tracker):
 
 @autocurry
 def _download_with_tracker(url, img_name, path, tracker) -> 'IO':
-    """Actually downloads one pic given one url, rename if needed."""
+    """Actually downloads one pic given one url"""
     api.myapi.protected_download(url, path, img_name)
-    tracker.update(img_name)
+    if tracker:
+        tracker.update(img_name)
 
 
 # - Wrappers around the core functions for downloading one image

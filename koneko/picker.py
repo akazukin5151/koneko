@@ -20,9 +20,7 @@ def ws_picker(actions: 'list[str]', title: str, **kwargs) -> Picker:
 
 
 def _pick_dirs_picker(actions: 'list[str]', title: str) -> Picker:
-    picker = Picker(actions, title)
-    picker.register_custom_handler(ord('w'), m.move_up())
-    picker.register_custom_handler(ord('s'), m.move_down())
+    picker = ws_picker(actions, title)
     picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
     picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
     picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))

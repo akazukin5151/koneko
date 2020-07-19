@@ -64,7 +64,10 @@ class AbstractUI(ABC):
     def start(self, main_path: 'Path') -> 'IO':
         # self._data defined here not in __init__, so that reload() will wipe cache
         self._data = self._data_class(1, main_path)
-        self._parse_and_download()
+        if files.dir_not_empty(self._data):
+            self._show_then_fetch()
+        else:
+            self._download_from_scratch()
         self._prefetch()
 
     def _verify_up_to_date(self):
@@ -73,25 +76,20 @@ class AbstractUI(ABC):
         files.remove_dir_if_exist(self._data)
         download.init_download(self._data, self._tracker_class(self._data))
 
-    def _parse_and_download(self) -> 'IO':
-        """If download path not empty, immediately show.
-        Regardless, proceed to parse & download
-        Before fetching, show the dir first. Can only check for 'is dir' and 'not empty'
-        After fetching, double check all files in dir match the cache
-        """
-        if files.dir_not_empty(self._data):
-            lscat.show_instant(self._tracker_class, self._data)
-            self._parse_user_infos()
-            self._verify_up_to_date()
-            self._print_page_info()
-            return True
 
+    def _show_then_fetch(self):
+        lscat.show_instant(self._tracker_class, self._data)
+        self._parse_user_infos()
+        self._verify_up_to_date()
+        self._print_page_info()
+
+    def _download_from_scratch(self) -> 'IO':
         # No valid cached images, download all from scratch
         files.remove_dir_if_exist(self._data)
-
         self._parse_user_infos()
         download.init_download(self._data, self._tracker_class(self._data))
         self._print_page_info()
+
 
     def _prefetch(self) -> 'IO':
         """Reassign the thread again and start; as threads can only be started once"""

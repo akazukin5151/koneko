@@ -143,7 +143,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-* Filter modes in koneko main should go back to main screen on 'q' key
 * Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
     - [x] Handle moving around pages
     - [x] Mode 2 dirs in lscat_app should do something (currently does nothing)

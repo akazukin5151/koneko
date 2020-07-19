@@ -15,7 +15,7 @@ class APIHandler:
         self._api_queue = queue.Queue()
         self._api_thread = threading.Thread(target=self._login)
         # Set in self.start() (because singleton is instantiated before config)
-        self._credentials: 'Dict'
+        self._credentials: 'dict[str, str]'
         # Set in self._await_login()
         self._api: 'AppPixivAPI'  # Object to login and request on
 

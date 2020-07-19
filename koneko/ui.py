@@ -63,6 +63,7 @@ class AbstractUI(ABC):
 
     def start(self, main_path: 'Path') -> 'IO':
         # self._data defined here not in __init__, so that reload() will wipe cache
+        # This has to be taken into account before any attempts to make this a subclass of Data
         self._data = self._data_class(1, main_path)
         if files.dir_not_empty(self._data):
             self._show_then_fetch()

@@ -40,9 +40,9 @@ def show_instant(cls, data) -> 'IO':
     tracker = cls(data)
     # Filter out invisible files
     # (used to save splitpoint and total_imgs without requesting)
-    _ = [tracker.update(x)
-         for x in os.listdir(data.download_path)
-         if not x.startswith('.')]
+    for x in os.listdir(data.download_path):
+        if not x.startswith('.'):
+            tracker.update(x)
 
     if isinstance(cls, TrackDownloads) and config.check_print_info():
         number_of_cols = config.ncols_config()

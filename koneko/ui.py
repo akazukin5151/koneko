@@ -520,7 +520,7 @@ class ViewPostMode(ToImage):
     def get_image_id(self, _):
         return self._image_id
 
-    def maybe_show_preview(self, _):
+    def maybe_show_preview(self):
         return True
 
     def download_image(self, idata):

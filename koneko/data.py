@@ -4,6 +4,7 @@ Despite GalleryData and UserData having lots of shared attributes/properties/met
 there isn't much shared functionality, so there's nothing to extract to an abstract
 base class
 """
+from functools import lru_cache, cached_property
 from abc import ABC, abstractmethod
 
 from koneko import pure, KONEKODIR
@@ -109,13 +110,66 @@ class GalleryData(AbstractData):
     def url(self, number: int) -> str:
         return pure.url_given_size(self.post_json(number), 'large')
 
-    @property
-    def all_urls(self) -> 'list[str]':
-        return pure.medium_urls(self.current_illusts)
+
+class NewUserData(AbstractData):
+    def __init__(self, page_num: int, main_path: 'Path'):
+        self.page_num = page_num
+        self.main_path = main_path
+        self.all_pages_cache = {}
+        self.offset = 0
+
+    # Required
+    def update(self, raw: 'Json'):
+        """Adds newly requested raw json into the cache"""
+        self.all_pages_cache[self.page_num] = raw['user_previews']
+        self.next_url = raw['next_url']
+
+    @lru_cache
+    def artist_user_id(self, post_number: int) -> str:
+        """Get the artist user id for a specified post number"""
+        return self._iterate_cache(lambda x: x['user']['id'])[post_number]
 
     @property
+    def download_path(self) -> str:
+        """Get the download path of the current page"""
+        return self.main_path / str(self.page_num)
+
+    @cached_property
+    def all_urls(self) -> 'list[str]':
+        return self.profile_pic_urls + self.image_urls
+
+    @cached_property
     def all_names(self) -> 'list[str]':
-        return pure.post_titles_in_page(self.current_illusts)
+        preview_names_ext = map(pure.split_backslash_last, self.image_urls)
+        preview_names = [x.split('.')[0] for x in preview_names_ext]
+        return self.names + preview_names
+
+    # Unique
+    @cached_property
+    def names(self) -> 'list[str]':
+        return self._iterate_cache(lambda x: x['user']['name'])
+
+    @cached_property
+    def profile_pic_urls(self):
+        return self._iterate_cache(lambda x: x['user']['profile_image_urls']['medium'])
+
+    @lru_cache
+    def _iterate_cache(self, func) -> 'list[str]':
+        return [func(x)
+                for x in self.all_pages_cache[self.page_num]]
+
+    @cached_property
+    def image_urls(self):
+        return [illust['image_urls']['square_medium']
+                for post in self.all_pages_cache[self.page_num]
+                for illust in post['illusts']]
+
+
+    @cached_property
+    def splitpoint(self) -> int:
+        """Number of artists. The number where artists stop and previews start"""
+        return len(self.profile_pic_urls)
+
 
 
 class ImageData:

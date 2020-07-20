@@ -468,16 +468,11 @@ class ToImage(ABC):
         image_id = self.get_image_id(post_json)
         return Image(post_json, image_id, self.firstmode)
 
-    def display_initial(self, idata):
-        os.system('clear')
-        lscat.icat(idata.download_path / idata.large_filename)
-        print(f'Page 1/{idata.number_of_pages}')
-
     def start(self):
         idata = self.setup()
-        self.maybe_show_preview(idata)
+        self.maybe_show_preview()
         self.download_image(idata)
-        self.display_initial(idata)
+        idata.display_initial()
         idata.start_preview()
         prompt.image_prompt(idata)
 
@@ -555,6 +550,11 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.event = threading.Event()
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
+
+    def display_initial(self):
+        os.system('clear')
+        lscat.icat(self.download_path / self.large_filename)
+        print(f'Page 1/{self.number_of_pages}')
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self.image_id)

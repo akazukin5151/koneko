@@ -179,7 +179,7 @@ class UserData(AbstractData):
 
 class ImageData:
     """Stores data for image view (mode 2)"""
-    def __init__(self, raw: 'Json', image_id: str, firstmode=False):
+    def __init__(self, raw: 'Json', image_id: int, firstmode=False):
         self.image_id = image_id
         self.artist_user_id = raw['user']['id']
         self.page_num = 0

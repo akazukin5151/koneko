@@ -354,15 +354,17 @@ class IllustFollowGallery(AbstractGallery):
 
 
 class IllustRelatedGallery(ArtistGallery):
+    # Apart from the main_path and the pixivrequest function,
+    # everything is the same with mode 1
     __doc__ = ArtistGallery.__doc__.replace('Artist Gallery', 'Related Images')
 
     def __init__(self, image_id: int, main_path: 'Path'):
-        """Implements abstractmethod"""
+        """Overrides base: pass in image_id (parent dir) & set main_path"""
         self._image_id = image_id
         super().__init__(main_path / str(image_id) / 'illustrelated')
 
     def _pixivrequest(self):
-        """Implements abstractmethod"""
+        """Overrides base: different method"""
         return api.myapi.illust_related_request(self._image_id, offset=self._data.offset)
 
 

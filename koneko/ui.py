@@ -214,7 +214,11 @@ class AbstractGallery(AbstractUI, ABC):
         download.download_url(idata.download_path, idata.page_urls[0],
                               idata.large_filename)
 
+        os.system('clear')
         lscat.icat(idata.download_path / idata.large_filename)
+        print(f'Page 1/{idata.number_of_pages}')
+
+        idata.start_preview()
 
         prompt.image_prompt(idata)
 

@@ -19,7 +19,6 @@ class AbstractData(ABC):
         self.offset: int
 
         self.next_url: str
-        self.download_path: 'Path'
         self.all_urls: 'list[str]'
         self.all_names: 'list[str]'
 
@@ -30,6 +29,11 @@ class AbstractData(ABC):
     @abstractmethod
     def artist_user_id(self):
         raise NotImplementedError
+
+    @property
+    def download_path(self) -> str:
+        """Get the download path of the current page"""
+        return self.main_path / str(self.page_num)
 
     @property
     def next_offset(self) -> str:
@@ -79,11 +83,6 @@ class GalleryData(AbstractData):
     @property
     def next_url(self) -> str:
         return self.all_pages_cache[str(self.page_num)]['next_url']
-
-    @property
-    def download_path(self) -> str:
-        """Get the download path of the current page"""
-        return self.main_path / str(self.page_num)
 
     @property
     def all_urls(self) -> 'list[str]':
@@ -138,10 +137,6 @@ class UserData(AbstractData):
         """Get the artist user id for a specified post number"""
         return self._iterate_cache(lambda x: x['user']['id'])[post_number]
 
-    @property
-    def download_path(self) -> str:
-        """Get the download path of the current page"""
-        return self.main_path / str(self.page_num)
 
     @cached_property
     def all_urls(self) -> 'list[str]':

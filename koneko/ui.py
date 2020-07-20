@@ -463,19 +463,21 @@ class ToImage(ABC):
     def download_image(self, idata):
         raise NotImplementedError
 
-    def initial_display(self, idata):
+    def setup(self):
+        post_json = self.get_post_json()
+        image_id = self.get_image_id(post_json)
+        return Image(post_json, image_id, self.firstmode)
+
+    def display_initial(self, idata):
         os.system('clear')
         lscat.icat(idata.download_path / idata.large_filename)
         print(f'Page 1/{idata.number_of_pages}')
 
     def start(self):
-        post_json = self.get_post_json()
-        image_id = self.get_image_id(post_json)
-        idata = Image(post_json, image_id, self.firstmode)
-
+        idata = self.setup()
         self.maybe_show_preview(idata)
         self.download_image(idata)
-        self.initial_display(idata)
+        self.display_initial(idata)
         idata.start_preview()
         prompt.image_prompt(idata)
 

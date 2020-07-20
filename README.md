@@ -107,13 +107,15 @@ For more details refer to the [manual](MANUAL.md#Usage). You might also want to 
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.9.3
+### Version 0.10.0
 
 #### Features
 * Browse cache now supports navigating between pages
 * **Breaking**: Removed `image_mode_text_offset` config setting, now does nothing
 * Renewed developer guide in HACKING.md
 * **Breaking**: lscat app: move 'browse cache' and 'specify path' to mode 2 and 3 respectively, moving 'testgallery & 'testuser' to mode 4 and 5 respectively (swapped)
+* Add image mode preview for lscat app
+* Add related images gallery (mode 6): view related and suggested images in image view (mode 2). Press the 'r' key while viewing an image to view related images
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
@@ -126,14 +128,21 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
 
 #### Code maintenance
-* lscat show_instant() now inspects the cls passed in instead of a bool argument
-* "Inlined" some abstract methods in AbstractUI into attributes
-* Consistent public and private methods and attributes again
-* Make all ui.Image methods depend on only data.ImageData like the associated free functions, so those methods can be moved to a subclass of data.ImageData (the new ui.Image class extends IO behaviours from the data class)
-* Pass in path and name to api.download instead of cd-ing into the dir and manually renaming downloads, simplifying a lot of code in the process
-* Replace pure.Map with list comprehensions. Can't force functional programming into Python after all
-* Use funcy.autocurry() instead of partial
-* Split up files.filter_dir()
+* lscat `show_instant()` now inspects the cls passed in instead of a bool argument
+* "Inlined" some abstract methods in `AbstractUI` into attributes
+* Make all `ui.Image` methods depend on only `data.ImageData` like the associated free functions, so those methods can be moved to a subclass of `data.ImageData` (the new ui.Image class extends IO behaviours from the data class)
+* Pass in path and name to `api.download` instead of cd-ing into the dir and manually renaming downloads, simplifying a lot of code in the process
+* Replace `pure.Map` with list comprehensions. Can't force functional programming into Python after all
+* Use `funcy.autocurry()` instead of partial
+* Split up `files.filter_dir()`
+* Use `ws_picker()` in `_pick_dirs_picker()`
+* Add `next_offset` property to AbstractData (moved calculation from ui to data.py)
+* Change list comprehensions assigning to `_` into normal for loops
+* Split up `_parse_and_download()`
+* Improved order of methods in `GalleryData`: now sorted by required methods/properties by the interface/abstract class, and unique methods/properties.
+* Rewrite `UserData` class to be more like `GalleryData`
+* Move download_path() method to `AbstractData`
+* Extract `view_post_mode()` and `view_image()` to ABC
  
 
 # Roadmap
@@ -147,7 +156,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] Handle moving around pages
     - [x] Mode 2 dirs in lscat_app should do something (currently does nothing)
     - [ ] Documentation
-* Go to related works from image view (illust_related)
 * View recommended illusts (illust_recommended)
 
 ## Known bugs

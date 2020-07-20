@@ -1,6 +1,6 @@
 # koneko
 
-[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![commits since](https://img.shields.io/github/commits-since/twenty5151/koneko/latest)](https://GitHub.com/twenty5151/koneko/commit/) [![Coverage](coverage.svg)]() ![master](https://github.com/twenty5151/koneko/workflows/master/badge.svg?branch=master) ![dev](https://github.com/twenty5151/koneko/workflows/dev/badge.svg?branch=dev)
+[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![commits since](https://img.shields.io/github/commits-since/twenty5151/koneko/latest)](https://GitHub.com/twenty5151/koneko/commit/) ![master](https://github.com/twenty5151/koneko/workflows/master/badge.svg?branch=master) ![dev](https://github.com/twenty5151/koneko/workflows/dev/badge.svg?branch=dev)
 
 > Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
 
@@ -111,8 +111,9 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 #### Features
 * Browse cache now supports navigating between pages
-* **Breaking**: Removed `image_mode_text_offset` config setting, now enabled by default
+* **Breaking**: Removed `image_mode_text_offset` config setting, now does nothing
 * Renewed developer guide in HACKING.md
+* **Breaking**: lscat app: move 'browse cache' and 'specify path' to mode 2 and 3 respectively, moving 'testgallery & 'testuser' to mode 4 and 5 respectively (swapped)
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
@@ -120,7 +121,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed reloading in a gallery mode leading to user prompt
 * Browse cache now no longer accepts an invalid directory to display on
 * Fixed experimental image mode previews index errors due to it trying to download more images than possible
-* Almost fixing experimental image mode previews by saving previous cursor position and restoring it later
+* Almost fixing experimental image mode previews by saving previous cursor position and restoring it later; but still a bit unstable
 * Fixed grammar in prompt: "a image command" -> "an image command"
 * Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
 
@@ -142,7 +143,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-* Filter modes in koneko main should go back to main screen on 'q' key
 * Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
     - [x] Handle moving around pages
     - [x] Mode 2 dirs in lscat_app should do something (currently does nothing)

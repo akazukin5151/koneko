@@ -83,10 +83,8 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
 
 
 # Might multiprocessing be faster to bypass urllib's pool limit?
-# 'Cannot pickle generator'
-# essentially the entire lscat needs to be rewritten with multiprocessing in mind
-#with Pool(len(data.all_urls)) as p:
-    #p.map(helper, (data.all_urls, newnames))
+# The lscat generator cannot be pickled, as well as api.myapi
+# essentially everything has to be rewritten with multiprocessing in mind
 
 def _async_filter_and_download(data, newnames, tracker):
     helper = _download_with_tracker(path=data.download_path, tracker=tracker)
@@ -97,9 +95,10 @@ def _async_filter_and_download(data, newnames, tracker):
 
 @autocurry
 def _download_with_tracker(url, img_name, path, tracker) -> 'IO':
-    """Actually downloads one pic given one url, rename if needed."""
+    """Actually downloads one pic given one url"""
     api.myapi.protected_download(url, path, img_name)
-    tracker.update(img_name)
+    if tracker:
+        tracker.update(img_name)
 
 
 # - Wrappers around the core functions for downloading one image

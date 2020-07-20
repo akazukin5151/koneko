@@ -20,9 +20,7 @@ def ws_picker(actions: 'list[str]', title: str, **kwargs) -> Picker:
 
 
 def _pick_dirs_picker(actions: 'list[str]', title: str) -> Picker:
-    picker = Picker(actions, title)
-    picker.register_custom_handler(ord('w'), m.move_up())
-    picker.register_custom_handler(ord('s'), m.move_down())
+    picker = ws_picker(actions, title)
     picker.register_custom_handler(ord('y'), lambda p: (None, 'y'))
     picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
     picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
@@ -37,10 +35,10 @@ def lscat_app_main() -> int:
              'Please select an action')
     actions = (
         '1. Launch koneko configuration assistance',
-        '2. Display KONEKODIR / testgallery',
-        '3. Display KONEKODIR / testuser',
-        '4. Browse a cached dir to display',
-        '5. Display a specified path',
+        '2. Browse a cached dir to display',
+        '3. Display a specified path',
+        '4. Display KONEKODIR / testgallery',
+        '5. Display KONEKODIR / testuser',
         'Quit'
     )
     mypicker = ws_picker(actions, title)

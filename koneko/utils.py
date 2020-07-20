@@ -2,11 +2,11 @@
 If one functionality gets too long, move them into their own module.
 
 Functionalities:
-    - History and logging (33 lines)
-    - Wrapping other functions (40 lines)
-    - Calculations (23 lines)
-    - IO related (33 lines)
-    - lscat related (33 lines)
+    - History and logging
+    - Wrapping other functions
+    - Calculations
+    - IO related
+    - lscat related
 """
 
 import os
@@ -16,7 +16,6 @@ import threading
 from math import ceil
 from pathlib import Path
 from collections import Counter
-from contextlib import contextmanager
 from logging.handlers import RotatingFileHandler
 
 import funcy
@@ -62,17 +61,6 @@ def format_frequent(counter: 'dict[str, int]') -> 'list[str]':
 
 
 # Wrapping other functions
-@contextmanager
-def cd(newdir: Path) -> 'IO':
-    """Change current directory, do something, change back to old directory"""
-    old = os.getcwd()
-    os.chdir(os.path.expanduser(newdir))
-    try:
-        yield
-    finally:
-        os.chdir(old)
-
-
 def _spin(done: 'Event', message: str) -> None:
     for char in itertools.cycle('|/-\\'):  # Infinite loop
         print(message, char, flush=True, end='\r')

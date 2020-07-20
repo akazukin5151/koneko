@@ -63,8 +63,12 @@ class AbstractUI(ABC):
 
     def start(self, main_path: 'Path') -> 'IO':
         # self._data defined here not in __init__, so that reload() will wipe cache
+        # This has to be taken into account before any attempts to make this a subclass of Data
         self._data = self._data_class(1, main_path)
-        self._parse_and_download()
+        if files.dir_not_empty(self._data):
+            self._show_then_fetch()
+        else:
+            self._download_from_scratch()
         self._prefetch()
 
     def _verify_up_to_date(self):
@@ -73,33 +77,27 @@ class AbstractUI(ABC):
         files.remove_dir_if_exist(self._data)
         download.init_download(self._data, self._tracker_class(self._data))
 
-    def _parse_and_download(self) -> 'IO':
-        """If download path not empty, immediately show.
-        Regardless, proceed to parse & download
-        Before fetching, show the dir first. Can only check for 'is dir' and 'not empty'
-        After fetching, double check all files in dir match the cache
-        """
-        if files.dir_not_empty(self._data):
-            lscat.show_instant(self._tracker_class, self._data)
-            self._parse_user_infos()
-            self._verify_up_to_date()
-            self._print_page_info()
-            return True
 
-        # No valid cached images, download all from scratch
+    def _show_then_fetch(self):
+        lscat.show_instant(self._tracker_class, self._data)
+        self._request_then_save()
+        self._verify_up_to_date()
+        self._print_page_info()
+
+    def _download_from_scratch(self) -> 'IO':
         files.remove_dir_if_exist(self._data)
-
-        self._parse_user_infos()
+        self._request_then_save()
         download.init_download(self._data, self._tracker_class(self._data))
         self._print_page_info()
+
 
     def _prefetch(self) -> 'IO':
         """Reassign the thread again and start; as threads can only be started once"""
         self._prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self._prefetch_thread.start()
 
-    def _parse_user_infos(self) -> 'IO':
-        """Parse json and get list of artist names, profile pic urls, and id"""
+    def _request_then_save(self) -> 'IO':
+        """Do request and save it"""
         result = self._pixivrequest()
         self._data.update(result)
 
@@ -110,19 +108,18 @@ class AbstractUI(ABC):
         if not self._data.next_url:  # Last page
             return True
 
-        next_offset = self._data.next_url.split('&')[-1].split('=')[-1]
         # Won't download if not immediately next page, eg
         # p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
-        offset_diffs = int(next_offset) - int(self._data.offset)
+        offset_diffs = int(self._data.next_offset) - int(self._data.offset)
         immediate_next: bool = offset_diffs <= 30
         if not immediate_next:
             return
 
         oldnum = self._data.page_num
-        self._data.offset = next_offset
+        self._data.offset = self._data.next_offset
         self._data.page_num = int(self._data.offset) // 30 + 1
 
-        self._parse_user_infos()
+        self._request_then_save()
         download.init_download(self._data, None)
 
         self._data.page_num = oldnum
@@ -134,12 +131,12 @@ class AbstractUI(ABC):
         self._prefetch_next_page()
 
     def previous_page(self) -> 'IO':
-        if self._data.page_num > 1:
-            self._data.page_num -= 1
-            self._data.offset = int(self._data.offset) - 30
-            self._show_page()
-            return True
-        print('This is the first page!')
+        if self._data.page_num <= 1:
+            print('This is the first page!')
+            return False
+        self._data.page_num -= 1
+        self._data.offset = int(self._data.offset) - 30
+        self._show_page()
 
     def _show_page(self) -> 'IO':
         if not files.dir_not_empty(self._data):
@@ -196,31 +193,8 @@ class AbstractGallery(AbstractUI, ABC):
         raise NotImplementedError
 
     def view_image(self, selected_image_num: int) -> 'IO':
-        """Image mode, from an artist mode (mode 1/5 -> mode 2)
-        Display already downloaded preview (medium-res), downloads large-res and
-        then display that, finally launch the image prompt.
-        Alternative to main.view_post_mode(). It does its own stuff before calling
-        the Image class for the prompt.
-
-        Unlike the other modes, Image does not handle the initial displaying of images
-        This is because coming from a gallery mode, the selected image already has a
-        square-medium preview downloaded, which can be displayed before the download
-        of the large-res completes. Thus, the initial displaying subroutine will be
-        different for a standalone mode or coming from a gallery mode.
-        """
-        post_json = self._data.post_json(selected_image_num)
-        image_id = post_json.id
-        idata = Image(post_json, image_id, False)
-
-        _display_medium_preview(self._data, idata, selected_image_num)
-
-        download.download_url(idata.download_path, idata.page_urls[0],
-                              idata.large_filename)
-
-        lscat.icat(idata.download_path / idata.large_filename)
-
-        prompt.image_prompt(idata)
-
+        """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
+        ViewImage(self._data, selected_image_num).start()
         # Image prompt ends, user presses back
         self._back()
 
@@ -457,41 +431,104 @@ class FollowingUsers(AbstractUsers):
         )
 
 
-def _display_medium_preview(gdata, idata, num: int) -> 'IO':
-    os.system('clear')
-    image = sorted(os.listdir(gdata.download_path))[num]
-    lscat.icat(gdata.main_path / str(gdata.page_num) / image)
-
-
 def view_post_mode(image_id) -> 'IO':
-    """Image mode, from main (start -> mode 2)
-    Fetch all the illust info, download it in the correct directory, then display it.
-    If it is a multi-image post, download the next image
-    Else or otherwise, open image prompt
+    """Image mode, from main (start -> mode 2)"""
+    ViewPostMode(image_id).start()
+
+
+class ToImage(ABC):
+    """
     Unlike the other modes, Image does not handle the initial displaying of images
     This is because coming from a gallery mode, the selected image already has a
     square-medium preview downloaded, which can be displayed before the download
     of the large-res completes. Thus, the initial displaying subroutine will be
     different for a standalone mode or coming from a gallery mode.
     """
-    print('Fetching illust details...')
-    try:
-        post_json = api.myapi.protected_illust_detail(image_id)['illust']
-    except KeyError:
-        print('Work has been deleted or the ID does not exist!')
-        sys.exit(1)
+    def __init__(self):
+        self.firstmode: bool
 
-    idata = Image(post_json, image_id, True)
+    @abstractmethod
+    def get_post_json(self):
+        raise NotImplementedError
 
-    download.download_url(idata.download_path, idata.current_url, idata.image_filename)
+    @abstractmethod
+    def get_image_id(self, post_json):
+        raise NotImplementedError
 
-    lscat.icat(idata.download_path / idata.image_filename)
+    @abstractmethod
+    def maybe_show_preview(self):
+        raise NotImplementedError
 
-    print(f'Page 1/{idata.number_of_pages}')
+    @abstractmethod
+    def download_image(self, idata):
+        raise NotImplementedError
 
-    idata.start_preview()
+    def setup(self):
+        post_json = self.get_post_json()
+        image_id = self.get_image_id(post_json)
+        return Image(post_json, image_id, self.firstmode)
 
-    prompt.image_prompt(idata)
+    def start(self):
+        idata = self.setup()
+        self.maybe_show_preview()
+        self.download_image(idata)
+        idata.display_initial()
+        idata.start_preview()
+        prompt.image_prompt(idata)
+
+
+class ViewImage(ToImage):
+    """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
+    def __init__(self, gdata, selected_image_num):
+        self._gdata = gdata
+        self._selected_image_num = selected_image_num
+        self.firstmode = False
+
+    def get_post_json(self):
+        return self._gdata.post_json(self._selected_image_num)
+
+    def get_image_id(self, post_json):
+        return post_json.id
+
+    def maybe_show_preview(self):
+        os.system('clear')
+        image = sorted(os.listdir(self._gdata.download_path))[self._selected_image_num]
+        lscat.icat(self._gdata.main_path / str(self._gdata.page_num) / image)
+
+    def download_image(self, idata):
+        download.download_url(
+            idata.download_path,
+            idata.page_urls[0],
+            idata.large_filename
+        )
+
+
+class ViewPostMode(ToImage):
+    """Image mode, from main (start -> mode 2)"""
+    def __init__(self, image_id):
+        self._image_id = image_id
+        self.firstmode = True
+
+    def get_post_json(self):
+        print('Fetching illust details...')
+        try:
+            return api.myapi.protected_illust_detail(self._image_id)['illust']
+        except KeyError:
+            print('Work has been deleted or the ID does not exist!')
+            sys.exit(1)
+
+    def get_image_id(self, _):
+        return self._image_id
+
+    def maybe_show_preview(self):
+        return True
+
+    def download_image(self, idata):
+        download.download_url(
+            idata.download_path,
+            idata.current_url,
+            idata.image_filename
+        )
 
 
 class Image(data.ImageData):  # Extends the data class by adding IO actions on top
@@ -513,6 +550,11 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.event = threading.Event()
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
+
+    def display_initial(self):
+        os.system('clear')
+        lscat.icat(self.download_path / self.large_filename)
+        print(f'Page 1/{self.number_of_pages}')
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self.image_id)

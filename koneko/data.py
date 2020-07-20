@@ -131,6 +131,8 @@ class UserData(AbstractData):
         # While python will happily allow you to arbitarily add attributes and methods
         # to the class on the fly, perhaps it is time to rethink the design
         self.next_url = raw['next_url']
+        # The ImageData class doesn't have this problem because its setup was done
+        # by another function -- its ui class was instantiated at the same time as the data
 
     @lru_cache
     def artist_user_id(self, post_number: int) -> str:

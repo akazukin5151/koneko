@@ -193,35 +193,8 @@ class AbstractGallery(AbstractUI, ABC):
         raise NotImplementedError
 
     def view_image(self, selected_image_num: int) -> 'IO':
-        """Image mode, from an artist mode (mode 1/5 -> mode 2)
-        Display already downloaded preview (medium-res), downloads large-res and
-        then display that, finally launch the image prompt.
-        Alternative to main.view_post_mode(). It does its own stuff before calling
-        the Image class for the prompt.
-
-        Unlike the other modes, Image does not handle the initial displaying of images
-        This is because coming from a gallery mode, the selected image already has a
-        square-medium preview downloaded, which can be displayed before the download
-        of the large-res completes. Thus, the initial displaying subroutine will be
-        different for a standalone mode or coming from a gallery mode.
-        """
-        post_json = self._data.post_json(selected_image_num)
-        image_id = post_json.id
-        idata = Image(post_json, image_id, False)
-
-        _display_medium_preview(self._data, idata, selected_image_num)
-
-        download.download_url(idata.download_path, idata.page_urls[0],
-                              idata.large_filename)
-
-        os.system('clear')
-        lscat.icat(idata.download_path / idata.large_filename)
-        print(f'Page 1/{idata.number_of_pages}')
-
-        idata.start_preview()
-
-        prompt.image_prompt(idata)
-
+        """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
+        ViewImage(self._data, selected_image_num).start()
         # Image prompt ends, user presses back
         self._back()
 
@@ -465,34 +438,104 @@ def _display_medium_preview(gdata, idata, num: int) -> 'IO':
 
 
 def view_post_mode(image_id) -> 'IO':
-    """Image mode, from main (start -> mode 2)
-    Fetch all the illust info, download it in the correct directory, then display it.
-    If it is a multi-image post, download the next image
-    Else or otherwise, open image prompt
+    """Image mode, from main (start -> mode 2)"""
+    ViewPostMode(image_id).start()
+
+
+class ToImage(ABC):
+    """
     Unlike the other modes, Image does not handle the initial displaying of images
     This is because coming from a gallery mode, the selected image already has a
     square-medium preview downloaded, which can be displayed before the download
     of the large-res completes. Thus, the initial displaying subroutine will be
     different for a standalone mode or coming from a gallery mode.
     """
-    print('Fetching illust details...')
-    try:
-        post_json = api.myapi.protected_illust_detail(image_id)['illust']
-    except KeyError:
-        print('Work has been deleted or the ID does not exist!')
-        sys.exit(1)
+    def __init__(self):
+        self.firstmode: bool
 
-    idata = Image(post_json, image_id, True)
+    @abstractmethod
+    def get_post_json(self):
+        raise NotImplementedError
 
-    download.download_url(idata.download_path, idata.current_url, idata.image_filename)
+    @abstractmethod
+    def get_image_id(self, post_json):
+        raise NotImplementedError
 
-    lscat.icat(idata.download_path / idata.image_filename)
+    @abstractmethod
+    def maybe_show_preview(self):
+        raise NotImplementedError
 
-    print(f'Page 1/{idata.number_of_pages}')
+    @abstractmethod
+    def download_image(self, idata):
+        raise NotImplementedError
 
-    idata.start_preview()
+    def start(self):
+        post_json = self.get_post_json()
+        image_id = self.get_image_id(post_json)
+        idata = Image(post_json, image_id, self.firstmode)
 
-    prompt.image_prompt(idata)
+        self.maybe_show_preview(idata)
+        self.download_image(idata)
+
+        os.system('clear')
+        lscat.icat(idata.download_path / idata.large_filename)
+        print(f'Page 1/{idata.number_of_pages}')
+
+        idata.start_preview()
+
+        prompt.image_prompt(idata)
+
+
+class ViewImage(ToImage):
+    """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
+    def __init__(self, gdata, selected_image_num):
+        self._gdata = gdata
+        self._selected_image_num = selected_image_num
+        self.firstmode = False
+
+    def get_post_json(self):
+        return self._gdata.post_json(self._selected_image_num)
+
+    def get_image_id(self, post_json):
+        return post_json.id
+
+    def maybe_show_preview(self, idata):
+        _display_medium_preview(self._gdata, idata, self._selected_image_num)
+
+    def download_image(self, idata):
+        download.download_url(
+            idata.download_path,
+            idata.page_urls[0],
+            idata.large_filename
+        )
+
+
+class ViewPostMode(ToImage):
+    """Image mode, from main (start -> mode 2)"""
+    def __init__(self, image_id):
+        self._image_id = image_id
+        self.firstmode = True
+
+    def get_post_json(self):
+        print('Fetching illust details...')
+        try:
+            return api.myapi.protected_illust_detail(self._image_id)['illust']
+        except KeyError:
+            print('Work has been deleted or the ID does not exist!')
+            sys.exit(1)
+
+    def get_image_id(self, _):
+        return self._image_id
+
+    def maybe_show_preview(self, _):
+        return True
+
+    def download_image(self, idata):
+        download.download_url(
+            idata.download_path,
+            idata.current_url,
+            idata.image_filename
+        )
 
 
 class Image(data.ImageData):  # Extends the data class by adding IO actions on top

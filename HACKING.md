@@ -89,33 +89,35 @@ Here are some good tips:
 $ cd ~/.local/share/koneko
 $ tree -d  # (Edited: .koneko and history are files not directories)
 .
-├── cache                     # ├── KONEKODIR
-│   ├── 2232374               # │   ├── Artist pixiv ID                             ├── Mode 1 and 2
-│   │   ├── 1                 # │   │   ├── Page 1                                  │   ├── Mode 1
-│   │   ├── 2                 # │   │   ├── Page 2                                  │   ├── Mode 1
-│   │   └── individual        # │   │   └── Posts with a single image               │   └── Mode 2
-│   │       └── 76695217      # │   │       └── ID of posts with multiple images    │       └── Mode 2
+├── cache                         # ├── KONEKODIR
+│   ├── 2232374                   # │   ├── Artist pixiv ID                             ├── Mode 1 and 2
+│   │   ├── 1                     # │   │   ├── Page 1                                  │   ├── Mode 1
+│   │   ├── 2                     # │   │   ├── Page 2                                  │   ├── Mode 1
+│   │   └── individual            # │   │   └── Posts with a single image               │   └── Mode 2
+│   │       └── 76695217          # │   │       └── ID of posts with multiple images    │       ├── Mode 2
+│   │           └── illustrelated # │   │       └── Related images mode                 │       └── Mode 6
+│   │               └── 1         # │   │           └── Page 1                          │           └── Mode 6
 
-│   ├── following             # │   ├── Following users mode                        ├── Mode 3
-│   │   └── *your_id*         # │   │   └── Your pixiv ID                           │
-│   │       ├── 1             # │   │       ├── Page 1                              │
-│   │       │   └── .koneko   # │   │       │   └── Stores number of artists info   │
-│   │       └── 2             # │   │       └── Page 2                              │
-│   │           └── .koneko   # │   │           └── Stores number of artists info   │
+│   ├── following                 # │   ├── Following users mode                        ├── Mode 3
+│   │   └── *your_id*             # │   │   └── Your pixiv ID                           │
+│   │       ├── 1                 # │   │       ├── Page 1                              │
+│   │       │   └── .koneko       # │   │       │   └── Stores number of artists info   │
+│   │       └── 2                 # │   │       └── Page 2                              │
+│   │           └── .koneko       # │   │           └── Stores number of artists info   │
 
-│   ├── illustfollow          # │   ├── Illust follow mode                          ├── Mode 5
-│   │   ├── 1                 # │   │   ├── Page 1                                  │
-│   │   └── 2                 # │   │   └── Page 2                                  │
+│   ├── illustfollow              # │   ├── Illust follow mode                          ├── Mode 5
+│   │   ├── 1                     # │   │   ├── Page 1                                  │
+│   │   └── 2                     # │   │   └── Page 2                                  │
 
-│   ├── search                # │   ├── Search users mode                           ├── Mode 4
-│   │   └── gomzi             # │   │   └── Search string
-│   │       └── 1             # │   │       └── Page 1
+│   ├── search                    # │   ├── Search users mode                           ├── Mode 4
+│   │   └── gomzi                 # │   │   └── Search string
+│   │       └── 1                 # │   │       └── Page 1
 
-│   ├── history               # │   ├── History file, for frequent "mode"
+│   ├── history                   # │   ├── History file, for frequent "mode"
 
-│   ├── testgallery           # │   ├── (Internal/debugging use)
-│   └── testuser              # │   └── (Internal/debugging use)
-└── pics                      # └── Images for main and info screen
+│   ├── testgallery               # │   ├── (Internal/debugging use)
+│   └── testuser                  # │   └── (Internal/debugging use)
+└── pics                          # └── Images for main and info screen
 ```
 
 

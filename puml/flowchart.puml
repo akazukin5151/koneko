@@ -5,6 +5,7 @@ usecase Image2
 usecase Following_artists3
 usecase Search_artists4
 usecase Illust_following5
+usecase Related_images6
 
 usecase start1 #DeepSkyBlue
 Artist_gallery1 <-[#DeepSkyBlue]right-> start1
@@ -13,6 +14,11 @@ Artist_gallery1 <-[#DeepSkyBlue]-> Image2
 usecase start2 #LawnGreen
 Artist_gallery1 <-[#LawnGreen]-> Image2
 Image2 <-[#LawnGreen]- start2
+Image2 -[#DeepSkyBlue]-> Related_images6
+Image2 -[#LawnGreen]-> Related_images6
+Image2 -[#green]-> Related_images6
+Image2 -[#red]-> Related_images6
+Image2 -[#BlueViolet]-> Related_images6
 
 usecase start3 #green
 Following_artists3 <-[#green]-> Artist_gallery1

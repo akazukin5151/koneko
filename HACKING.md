@@ -125,7 +125,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 ### Flowchart of modes and their connections:
 
-![Flowchart UML](http://plantuml.com:80/plantuml/png/dPDD2y8m38Rl_HM5dZtejfk8YYY2Dy6BY1IDTHWtwGVYltVMhfkrAdWgIzuyUPUcGwMvrEQCX1W5Eww0ZgJEbTuAZWZorlNn-PaBwFdFQObONlD2RBajK8bFBO7BtR6Efmq1qLJaGrsPDKsjZIvb4u3BydGRem4I6A7zphgTtyXS77Ldu6f_oYkb-uNNhZtA5lnQp2H04ONuR0lnFCAq0mOD4ig4XR-Fp094pGud7pCZ0YDVcURYB2M1fPGo2NiIN9IjhE8nBv-alaKQjUjeqS5db3qkPfMN29gyBOUjRmJjuV-I8XpyOcHHN_znwuqBXqE6KEohHtG7)
+![Flowchart UML](http://plantuml.com:80/plantuml/png/dLJBQiCm4BphAmGvvv3OxgcKj9IMGayDz5AA4V564TtOGGz2_hwn8icshCIGax1cTdPsM6kbD9FQx94Ges335D1dgONI9MU884-BSF-nPnoMuVEjGMoEekObimKg2z0QcDpi_7tUAI2Qi_BMLnO1-G9a6gfIj3tKGsV6sblGsIl0OVrtUa4393987-S_VVnN2hxJyoTNEqa_CzremwvBEljan_fT0jH9aO3s92v733j1ZuuDnFDtn46JwpG-JP5GtIQqPhv5Ww1Jl64u6Rsq9ECriCC7F_4sfOBaKOWtDSt1nPb5bdBQZaYYvRELRlJOopLgQ94dxJgrvD8Kj1SZ6IsyhH_cx1TdYegmrSvMaRHrdwp_MU9io0hggdqN_W40)
 
 ### Simplified UML diagram of the classes:
 

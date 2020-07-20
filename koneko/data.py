@@ -111,7 +111,7 @@ class GalleryData(AbstractData):
         return pure.url_given_size(self.post_json(number), 'large')
 
 
-class NewUserData(AbstractData):
+class UserData(AbstractData):
     def __init__(self, page_num: int, main_path: 'Path'):
         self.page_num = page_num
         self.main_path = main_path
@@ -155,8 +155,7 @@ class NewUserData(AbstractData):
 
     @lru_cache
     def _iterate_cache(self, func) -> 'list[str]':
-        return [func(x)
-                for x in self.all_pages_cache[self.page_num]]
+        return [func(x) for x in self.all_pages_cache[self.page_num]]
 
     @cached_property
     def image_urls(self):
@@ -207,61 +206,4 @@ class ImageData:
     @property
     def large_filename(self) -> str:
         return pure.split_backslash_last(self.page_urls[0])
-
-
-class UserData(AbstractData):
-    """Stores data for user views (modes 3 and 4)"""
-    def __init__(self, page_num: int, main_path: 'Path'):
-        self.page_num = page_num
-        self.main_path = main_path
-        self.offset = 0
-
-        # Defined in update()
-        self.next_url: str
-        self.profile_pic_urls: 'list[str]'
-        self.image_urls: 'list[str]'
-        self.ids_cache, self.names_cache = {}, {}
-
-    @property
-    def download_path(self) -> str:
-        return self.main_path / str(self.page_num)
-
-    def update(self, raw: 'Json'):
-        self.next_url = raw['next_url']
-        page = raw['user_previews']
-
-        ids = [x['user']['id'] for x in page]
-        self.ids_cache.update({self.page_num: ids})
-
-        names = [x['user']['name'] for x in page]
-        self.names_cache.update({self.page_num: names})
-
-        self.profile_pic_urls = [x['user']['profile_image_urls']['medium'] for x in page]
-
-        # [page[i]['illusts'][j]['image_urls']['square_medium']
-        self.image_urls = [illust['image_urls']['square_medium']
-                           for post in page
-                           for illust in post['illusts']]
-
-    def artist_user_id(self, selected_user_num: int) -> str:
-        return self.ids_cache[self.page_num][selected_user_num]
-
-    @property
-    def all_urls(self) -> 'list[str]':
-        return self.profile_pic_urls + self.image_urls
-
-    @property
-    def names(self) -> 'list[str]':
-        return self.names_cache[self.page_num]
-
-    @property
-    def all_names(self) -> 'list[str]':
-        preview_names_ext = map(pure.split_backslash_last, self.image_urls)
-        preview_names = [x.split('.')[0] for x in preview_names_ext]
-        return self.names + preview_names
-
-    @property
-    def splitpoint(self) -> int:
-        """Number of artists. The number where artists stop and previews start"""
-        return len(self.profile_pic_urls)
 

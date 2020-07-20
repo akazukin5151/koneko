@@ -431,7 +431,6 @@ class FollowingUsers(AbstractUsers):
         )
 
 
-
 def view_post_mode(image_id) -> 'IO':
     """Image mode, from main (start -> mode 2)"""
     ViewPostMode(image_id).start()
@@ -464,6 +463,11 @@ class ToImage(ABC):
     def download_image(self, idata):
         raise NotImplementedError
 
+    def initial_display(self, idata):
+        os.system('clear')
+        lscat.icat(idata.download_path / idata.large_filename)
+        print(f'Page 1/{idata.number_of_pages}')
+
     def start(self):
         post_json = self.get_post_json()
         image_id = self.get_image_id(post_json)
@@ -471,13 +475,8 @@ class ToImage(ABC):
 
         self.maybe_show_preview(idata)
         self.download_image(idata)
-
-        os.system('clear')
-        lscat.icat(idata.download_path / idata.large_filename)
-        print(f'Page 1/{idata.number_of_pages}')
-
+        self.initial_display(idata)
         idata.start_preview()
-
         prompt.image_prompt(idata)
 
 

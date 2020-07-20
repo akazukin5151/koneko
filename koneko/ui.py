@@ -431,11 +431,6 @@ class FollowingUsers(AbstractUsers):
         )
 
 
-def _display_medium_preview(gdata, idata, num: int) -> 'IO':
-    os.system('clear')
-    image = sorted(os.listdir(gdata.download_path))[num]
-    lscat.icat(gdata.main_path / str(gdata.page_num) / image)
-
 
 def view_post_mode(image_id) -> 'IO':
     """Image mode, from main (start -> mode 2)"""
@@ -499,8 +494,10 @@ class ViewImage(ToImage):
     def get_image_id(self, post_json):
         return post_json.id
 
-    def maybe_show_preview(self, idata):
-        _display_medium_preview(self._gdata, idata, self._selected_image_num)
+    def maybe_show_preview(self):
+        os.system('clear')
+        image = sorted(os.listdir(self._gdata.download_path))[self._selected_image_num]
+        lscat.icat(self._gdata.main_path / str(self._gdata.page_num) / image)
 
     def download_image(self, idata):
         download.download_url(

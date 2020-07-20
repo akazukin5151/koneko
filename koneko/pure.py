@@ -14,21 +14,15 @@ def split_backslash_last(string: str) -> str:
     return string.split('/')[-1]
 
 
-def generate_filepath(filename: str) -> Path:
+def _generate_filepath(filename: str) -> Path:
     return Path('~').expanduser() / 'Downloads' / filename
 
 
-def prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
+def _prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
     """old_name_with_ext can be `test.png`, but new_name is `abcd`"""
     img_ext = old_name_with_ext.split('.')[-1]
     number_prefix = str(number).rjust(3, '0')
     new_file_name = f'{number_prefix}_{new_name}.{img_ext}'
-    return new_file_name
-
-
-def prefix_artist_name(name: str, number: int) -> str:
-    number_prefix = str(number).rjust(2, '0')
-    new_file_name = f"{number_prefix}\n{' ' * 19}{name}"
     return new_file_name
 
 
@@ -100,7 +94,7 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
         urls,
         len,
         range,
-        lambda r: map(prefix_filename, oldnames_with_ext, newnames, r),
+        lambda r: map(_prefix_filename, oldnames_with_ext, newnames, r),
         list
     )
 
@@ -109,7 +103,7 @@ def full_img_details(url: str, png=False) -> (str, str, Path):
     # Example of an image that needs to be downloaded in png: 77803142
     url = change_url_to_full(url, png=png)
     filename = split_backslash_last(url)
-    filepath = generate_filepath(filename)
+    filepath = _generate_filepath(filename)
     return url, filename, filepath
 
 

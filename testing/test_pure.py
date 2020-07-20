@@ -28,19 +28,14 @@ def test_split_backslash_last():
 
 def test_generate_filepath():
     assert (
-        pure.generate_filepath('78823485_p0.jpg')
+        pure._generate_filepath('78823485_p0.jpg')
         == Path('~/Downloads/78823485_p0.jpg').expanduser()
     )
 
 
 def test_prefix_filename():
-    assert pure.prefix_filename('old.jpg', 'new', 2) == '002_new.jpg'
-    assert pure.prefix_filename('old.jpg', 'new', 10) == '010_new.jpg'
-
-
-def test_prefix_artist_name():
-    assert pure.prefix_artist_name('name1', 2) == f"02\n{' ' * 19}name1"
-    assert pure.prefix_artist_name('name2', 10) == f"10\n{' ' * 19}name2"
+    assert pure._prefix_filename('old.jpg', 'new', 2) == '002_new.jpg'
+    assert pure._prefix_filename('old.jpg', 'new', 10) == '010_new.jpg'
 
 
 def test_url_given_size():

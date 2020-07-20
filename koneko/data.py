@@ -122,6 +122,15 @@ class UserData(AbstractData):
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
         self.all_pages_cache[self.page_num] = raw['user_previews']
+        # This shows the limitations of the current data class design
+        # When this class is instantiated, there is basically no data in
+        # Only when a fetch occurs, it is updated with the cache and next_url
+        # Only then, does the other methods work.
+        # It is essentially two classes, one is a fancy tuple of
+        # (page_num, main_path, offset);
+        # the other class is the cache with all its methods
+        # While python will happily allow you to arbitarily add attributes and methods
+        # to the class on the fly, perhaps it is time to rethink the design
         self.next_url = raw['next_url']
 
     @lru_cache

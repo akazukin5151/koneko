@@ -66,14 +66,14 @@ class GalleryData(AbstractData):
         self.all_pages_cache = {}
         self.offset = 0
 
+    # Required
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
         self.all_pages_cache[str(self.page_num)] = raw
 
-    @property
-    def current_illusts(self) -> 'Json':
-        """Get the illusts json for this page"""
-        return self.all_pages_cache[str(self.page_num)]['illusts']
+    def artist_user_id(self, post_number: int) -> str:
+        """Get the artist user id for a specified post number"""
+        return self.post_json(post_number)['user']['id']
 
     @property
     def next_url(self) -> str:
@@ -84,13 +84,23 @@ class GalleryData(AbstractData):
         """Get the download path of the current page"""
         return self.main_path / str(self.page_num)
 
+    @property
+    def all_urls(self) -> 'list[str]':
+        return pure.medium_urls(self.current_illusts)
+
+    @property
+    def all_names(self) -> 'list[str]':
+        return pure.post_titles_in_page(self.current_illusts)
+
+    # Unique
+    @property
+    def current_illusts(self) -> 'Json':
+        """Get the illusts json for this page"""
+        return self.all_pages_cache[str(self.page_num)]['illusts']
+
     def post_json(self, post_number: int) -> 'Json':
         """Get the post json for a specified post number"""
         return self.current_illusts[post_number]
-
-    def artist_user_id(self, post_number: int) -> str:
-        """Get the artist user id for a specified post number"""
-        return self.post_json(post_number)['user']['id']
 
     def image_id(self, post_number: int) -> str:
         """Get the image id for a specified specified post number"""

@@ -353,6 +353,47 @@ class IllustFollowGallery(AbstractGallery):
             'view ', colors.m, 'anual\n']))
 
 
+class IllustRelatedGallery(ArtistGallery):
+    """
+    Related Images Gallery commands: (No need to press enter)
+    Using coordinates, where {x} is the row and {y} is the column
+        {x}{y}             -- display the image on row {x} and column {y}
+        o{x}{y}            -- open pixiv image/post in browser
+        d{x}{y}            -- download image in large resolution
+
+    Using image number, where {number} is the nth image in order (see examples)
+        i{number}          -- display the image
+        O{number}          -- open pixiv image/post in browser.
+        D{number}          -- download image in large resolution.
+
+        n                  -- view the next page
+        p                  -- view the previous page
+        r                  -- delete all cached images, re-download and reload view
+        b                  -- go back to previous mode (either 3, 4, 5, or main screen)
+        h                  -- show keybindings
+        m                  -- show this manual
+        q                  -- quit (with confirmation)
+
+    Examples:
+        i09   --->  Display the ninth image in image view (must have leading 0)
+        i10   --->  Display the tenth image in image view
+        O29   --->  Open the last image's post in browser
+        D00   --->  Download the first image, in large resolution
+
+        25    --->  Display the image on column 2, row 5 (index starts at 1)
+        d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
+        o25   --->  Download the image on column 2, row 5 (index starts at 1)
+    """
+    def __init__(self, image_id: int, main_path: 'Path'):
+        """Implements abstractmethod"""
+        self._image_id = image_id
+        super().__init__(main_path / str(image_id) / 'illustrelated')
+
+    def _pixivrequest(self):
+        """Implements abstractmethod"""
+        return api.myapi.illust_related_request(self._image_id, offset=self._data.offset)
+
+
 class AbstractUsers(AbstractUI, ABC):
     """
     User view commands (No need to press enter):
@@ -540,6 +581,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         d -- download this image in full resolution
         o -- open this post in browser
         f -- show this image in full resolution
+        r -- view related images
 
         h -- show keybindings
         m -- show this manual
@@ -634,6 +676,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             mode = ArtistGallery(self.artist_user_id)
             prompt.gallery_like_prompt(mode)
         # Else: image prompt and class ends, goes back to previous mode
+
+    def view_related_images(self):
+        mode = IllustRelatedGallery(self.image_id, self.download_path)
+        prompt.gallery_like_prompt(mode)
 
     def start_preview(self):
         self.loc = TERM.get_location()

@@ -78,6 +78,13 @@ class APIHandler:
         self._await_login()
         return self._api.illust_follow(restrict=restrict, offset=offset)
 
+    @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
+    @utils.spinner('')
+    def illust_related_request(self, image_id, offset):
+        """Mode 6"""
+        self._await_login()
+        return self._api.illust_related(illust_id=image_id, offset=offset)
+
     # Download
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     def protected_download(self, url, path, name):

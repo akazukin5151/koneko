@@ -31,6 +31,7 @@ See the [manual](MANUAL.md) for more details
 3. View artists you are following ([ex](https://www.pixiv.net/bookmark.php?type=user))
 4. Search for an artist ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
 5. View new illustrations from all the artists you are following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
+6. View recommended illustrations (now called discovery) ([ex](https://www.pixiv.net/discovery))
 * Both gallery and image views can:
     * Download an image([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download) in full resolution
     * Open post in browser

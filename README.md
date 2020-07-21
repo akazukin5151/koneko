@@ -133,6 +133,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Add image mode preview for lscat app
 * Add related images gallery (mode 15): view related and suggested images in image view (mode 2). Press the 'r' key while viewing an image to view related images
 * Add illust_recommended_mode (mode 6): discover recommended illustrations
+* Access browse cache from koneko main; clear cache is now inside browse cache
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
@@ -166,17 +167,13 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 # Roadmap
 
-* In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
-    * Make sure the diagrams in HACKING.md is up-to-date
-* `q` cli command to go to frequents
-* Access browse cache from koneko main, move clear cache to be inside browse cache
-
 ## Features
 
-* Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
-    - [x] Handle moving around pages
-    - [x] Mode 2 dirs in lscat_app should do something (currently does nothing)
-    - [ ] Documentation
+* In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
+    * Make sure the diagrams in HACKING.md is up-to-date
+    * Offline mode: Using `lscat_app` as a base for offline mode, rather than `koneko`
+        - Handle moving around pages
+* `q` cli command to go to frequents
 
 ## Known bugs
 

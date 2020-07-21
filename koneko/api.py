@@ -104,7 +104,7 @@ class APIHandler:
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @utils.spinner('')
     def illust_related_request(self, image_id, offset):
-        """Mode 6"""
+        """Mode 15 (1.5 * 10 so it's an int)"""
         self._await_login()
         return self._api.illust_related(illust_id=image_id, offset=offset)
 

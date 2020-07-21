@@ -111,13 +111,13 @@ def pick_dir() -> 'path':
     path = KONEKODIR
     # base is immutable
     basetitle = (
-        'Select a directory to view\n'
-        "Press 'y' to display the current directory\n"
-        "Press 'b' to move up a directory\n"
-        "Press 'f' to filter out modes\n"
-        "Press 'd' to delete the current directory\n"
-        "Press 'c' to clear the entire cache\n"
-        "Press 'q' to exit"
+        'Select a directory to view, or press:\n'
+        "y: display the current directory\n"
+        "b: move up a directory\n"
+        "f: filter out modes\n"
+        "d: delete the current directory\n"
+        "c: clear the entire cache\n"
+        "q: exit"
     )
     actions = files.filter_history(path)
     return _pick_dir_loop(path, basetitle, actions, [])

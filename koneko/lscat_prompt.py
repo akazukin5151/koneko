@@ -36,9 +36,11 @@ class AbstractLoop(ABC):
                     self.show_func()
                     self.middle()
                     print(f'Page {self.current_page} / {self.max_pages}')
-                    print("Press 'n' to go to next page, "
-                            "'p' to go to the previous page, "
-                            "and 'q' to quit")
+                    print(
+                        "n: go to next page, "
+                        "p: go to previous page, "
+                        "q: quit"
+                    )
 
                 ans = TERM.inkey()
                 print(ans)

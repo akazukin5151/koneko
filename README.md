@@ -175,7 +175,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] Handle moving around pages
     - [x] Mode 2 dirs in lscat_app should do something (currently does nothing)
     - [ ] Documentation
-* View recommended illusts (illust_recommended)
 
 ## Known bugs
 

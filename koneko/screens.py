@@ -1,6 +1,5 @@
 import os
 import shutil
-from subprocess import check_output
 
 import pixcat
 
@@ -33,12 +32,6 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
     ).thumbnail(550).show(
         align='left', y=0
     )
-
-    cache_size = check_output(
-        f'du -hs --apparent-size {KONEKODIR} | cut -f1',
-        shell=True
-    ).decode('utf-8').rstrip()
-    print(f'\nCurrent cache size: {cache_size}')
 
     command = input('Enter a command: ')
     return command

@@ -5,7 +5,7 @@ from shutil import rmtree
 from pick import Picker
 from placeholder import m
 
-from koneko import files, screens, assistants, KONEKODIR
+from koneko import utils, files, screens, assistants, KONEKODIR
 
 
 # Constants
@@ -110,6 +110,7 @@ def ask_assistant() -> 'IO[list[int]]':
 def pick_dir() -> 'path':
     path = KONEKODIR
     # base is immutable
+    cache_size = utils.get_cache_size()
     basetitle = (
         'Select a directory to view, or press:\n'
         "y: display the current directory\n"
@@ -117,7 +118,8 @@ def pick_dir() -> 'path':
         "f: filter out modes\n"
         "d: delete the current directory\n"
         "c: clear the entire cache\n"
-        "q: exit"
+        "q: exit\n"
+        f"Current cache size: {cache_size}"
     )
     actions = files.filter_history(path)
     return _pick_dir_loop(path, basetitle, actions, [])

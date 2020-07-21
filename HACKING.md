@@ -109,6 +109,9 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 │   │   ├── 1                     # │   │   ├── Page 1                                  │
 │   │   └── 2                     # │   │   └── Page 2                                  │
 
+│   ├── recommended               # │   ├── Search users mode                           ├── Mode 6
+│   │   └── 1                     # │   │   └── Page 1
+
 │   ├── search                    # │   ├── Search users mode                           ├── Mode 4
 │   │   └── gomzi                 # │   │   └── Search string
 │   │       └── 1                 # │   │       └── Page 1

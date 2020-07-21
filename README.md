@@ -131,7 +131,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Renewed developer guide in HACKING.md
 * **Breaking**: lscat app: move 'browse cache' and 'specify path' to mode 2 and 3 respectively, moving 'testgallery & 'testuser' to mode 4 and 5 respectively (swapped)
 * Add image mode preview for lscat app
-* Add related images gallery (mode 6): view related and suggested images in image view (mode 2). Press the 'r' key while viewing an image to view related images
+* Add related images gallery (mode 15): view related and suggested images in image view (mode 2). Press the 'r' key while viewing an image to view related images
+* Add illust_recommended_mode (mode 6): discover recommended illustrations
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
@@ -143,6 +144,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed grammar in prompt: "a image command" -> "an image command"
 * Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
 * **Fixed logging in with a new session every time by caching the login token.**
+* Stop prefetch if `next_offset` is invalid
 
 #### Code maintenance
 * lscat `show_instant()` now inspects the cls passed in instead of a bool argument

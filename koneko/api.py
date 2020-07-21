@@ -1,27 +1,31 @@
 """Handles all Pixiv API interactions, eg async login, requests"""
 
-import queue
 import threading
 
 import funcy
 from pixivpy3 import PixivError, AppPixivAPI
 
-from koneko import utils
+from koneko import utils, KONEKODIR
 
 
 class APIHandler:
     """Singleton that handles all the API interactions in the program"""
     def __init__(self):
-        self._api_queue = queue.Queue()
         self._api_thread = threading.Thread(target=self._login)
+        self._token = None
+        self._api = AppPixivAPI()  # Object to login and request on
+        self._token_dir = KONEKODIR.parent / 'token'
+
         # Set in self.start() (because singleton is instantiated before config)
         self._credentials: 'dict[str, str]'
-        # Set in self._await_login()
-        self._api: 'AppPixivAPI'  # Object to login and request on
 
     @funcy.once
     def start(self, credentials):
         """Start logging in. The only setup entry point that is public"""
+        if self._token_dir.is_file():
+            with open(self._token_dir, 'r') as f:
+                self._token = f.read()
+
         self._credentials = credentials
         self._api_thread.start()
 
@@ -29,21 +33,48 @@ class APIHandler:
     def _await_login(self):
         """Wait for login to finish, then assign PixivAPI session to API"""
         self._api_thread.join()
-        self._api = self._api_queue.get()
+
 
     def _login(self):
         """Logins to pixiv in the background, using credentials from config file"""
-        api = AppPixivAPI()
+        login_with_creds = True
+
+        if self._token:  # Token is set if file found in self.start()
+            login_with_creds = self._login_with_token()
+
+        if login_with_creds:  # If no token, or token login failed
+            response = self._login_with_creds()
+
+            if response:
+                self._token = response['response']['refresh_token']
+                with open(self._token_dir, 'w') as f:
+                    f.write(self._token)
+
+    def _login_with_token(self):
+        """Tries to login with saved token to avoid pixiv emails
+        Return value answers the question 'should I login with credentials?'
+        Returns False on successful login with token, True otherwise
+        """
         try:
-            api.login(self._credentials['Username'], self._credentials['Password'])
+            self._api.auth(refresh_token=self._token)
+        except PixivError as e:
+            return True
+        return False
+
+
+    def _login_with_creds(self):
+        try:
+            return self._api.login(
+                self._credentials['Username'],
+                self._credentials['Password']
+            )
+
         except PixivError as e:
             print('Login failed! Please correct your credentials in '
                   '~/.config/koneko/config.ini')
             print(e)
             print("Press 'q' and enter to exit")
-            return
 
-        self._api_queue.put(api)
 
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))

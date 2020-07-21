@@ -37,12 +37,12 @@ class APIHandler:
 
     def _login(self):
         """Logins to pixiv in the background, using credentials from config file"""
-        login_with_creds = True
+        no_tokens = True
 
         if self._token:  # Token is set if file found in self.start()
-            login_with_creds = self._login_with_token()
+            token_success = self._login_with_token()
 
-        if login_with_creds:  # If no token, or token login failed
+        if no_tokens and not token_success:
             response = self._login_with_creds()
 
             if response:
@@ -50,16 +50,15 @@ class APIHandler:
                 with open(self._token_dir, 'w') as f:
                     f.write(self._token)
 
-    def _login_with_token(self):
+    def _login_with_token(self) -> bool:
         """Tries to login with saved token to avoid pixiv emails
-        Return value answers the question 'should I login with credentials?'
-        Returns False on successful login with token, True otherwise
+        Returns True on successful login with token, False otherwise
         """
         try:
             self._api.auth(refresh_token=self._token)
         except PixivError as e:
-            return True
-        return False
+            return False
+        return True
 
 
     def _login_with_creds(self):

@@ -149,6 +149,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 # Roadmap
 
 * Make sure the diagrams in HACKING.md is up-to-date
+* `q` cli command to go to frequents
+* Access browse cache from koneko main, move clear cache to be inside browse cache
 * In-depth usage documentation?
 
 ## Features

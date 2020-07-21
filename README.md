@@ -126,6 +126,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Almost fixing experimental image mode previews by saving previous cursor position and restoring it later; but still a bit unstable
 * Fixed grammar in prompt: "a image command" -> "an image command"
 * Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
+* **Fixed logging in with a new session every time by caching the login token.**
 
 #### Code maintenance
 * lscat `show_instant()` now inspects the cls passed in instead of a bool argument
@@ -163,14 +164,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
 * In the logs, urllib3 warns that `Connection pool is full, discarding connection: i.pximg.net`. See [customising pool behaviour](https://urllib3.readthedocs.io/en/latest/advanced-usage.html#customizing-pool-behavior) from urllib3.
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
-* Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below
 
 # FAQ
-* Pixiv keeps emailing me saying I've logged in, every time I use this app!
-
-That's because cookies aren't stored so you log in everytime with a new session. Looking at [PixivUtil's cookie implementation](https://github.com/Nandaka/PixivUtil2/blob/master/PixivBrowserFactory.py), it would be easier to base this app on PixivUtil for downloads, than to write it myself (currently, it's based on the [pixivpy](https://github.com/upbit/pixivpy/) api). The problems with this, other than being a huge time and effort investment, is that koneko uses info from the requests, such as number of pages.
-I'd like to fix this but I'd rather not use mechanize but I don't know how to do it either way.
-
 * I'm having problems with lscat
 
 For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.

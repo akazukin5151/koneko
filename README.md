@@ -83,24 +83,36 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
 </details>
 
 # Usage
-Launch with `koneko`. There are five modes of operation:
+Launch with `koneko`. There are six modes of operation:
 1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
 2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
 3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))
 4. Search for artist/user ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
 5. View newest illustrations from artists you're following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
+6. View recommended illustrations (now called 'discovery') ([ex](https://www.pixiv.net/discovery))
 
-Enter digits 1-5 to proceed. If prompted, paste in an appropriate pixiv ID or url. See below for url examples.
+Enter digits 1-6 to proceed. If prompted, paste in an appropriate pixiv ID or url. See below for url examples.
 
 Alternatively, you can supply a pixiv url as a command line argument, bypassing the first interactive prompt. The pixiv url must be either the url of the artist's page, or a pixiv post. Example:
 
 ```sh
-koneko https://www.pixiv.net/en/users/2232374 # Mode 1
-koneko https://www.pixiv.net/en/artworks/78823485 # Mode 2
-koneko f https://www.pixiv.net/en/users/2232374 # Mode 3
-koneko "raika9" # Mode 4
-koneko 5 # Mode 5
+# Launch to main
+koneko
+
+# No mode specified, can only reach modes 1, 2, and 4
+koneko https://www.pixiv.net/en/users/2232374         # Mode 1
+koneko https://www.pixiv.net/en/artworks/78823485     # Mode 2
+koneko "raika9"                                       # Mode 4
+
+# Mode specified
+koneko a 2232374    # Mode 1
+koneko i 78823485   # Mode 2
+koneko f 2232374    # Mode 3
+koneko s "gomzi"    # Mode 4
+koneko n            # Mode 5
+koneko r            # Mode 6
 ```
+
 For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
 ## Upcoming changelog (in dev branch)

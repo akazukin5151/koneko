@@ -9,6 +9,7 @@ Usage:
   koneko [4|s] <searchstr>
   koneko [5|n]
   koneko [6|r]
+  koneko [q]
   koneko (-h | --help)
   koneko (-v | --version)
 
@@ -85,6 +86,9 @@ def parse_no_mode(url_or_str: str, your_id):
     # Assume you won't search for '6' or 'r'
     elif url_or_str == '6' or url_or_str == 'r':
         return main.illust_recommended_mode()
+
+    elif url_or_str == 'q':
+        return main.frequent()
 
     return main.SearchUsersModeLoop(url_or_str).start()
 

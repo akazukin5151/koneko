@@ -134,6 +134,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Add related images gallery (mode 15): view related and suggested images in image view (mode 2). Press the 'r' key while viewing an image to view related images
 * Add illust_recommended_mode (mode 6): discover recommended illustrations
 * Access browse cache from koneko main; clear cache is now inside browse cache
+* Use `koneko q` to view frequents and launch their mode
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
@@ -173,7 +174,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * Make sure the diagrams in HACKING.md is up-to-date
     * Offline mode: Using `lscat_app` as a base for offline mode, rather than `koneko`
         - Handle moving around pages
-* `q` cli command to go to frequents
 
 ## Known bugs
 

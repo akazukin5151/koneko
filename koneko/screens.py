@@ -17,6 +17,7 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         '3. View following artists',
         '4. Search for artists',
         '5. View illustrations of all following artists',
+        '6. View recommended illustrations',
         'f. Frequent modes and user inputs', '',
         '?. Info',
         'm. Manual',

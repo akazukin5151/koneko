@@ -356,7 +356,7 @@ class IllustFollowGallery(AbstractGallery):
 class IllustRelatedGallery(ArtistGallery):
     # Apart from the main_path and the pixivrequest function,
     # everything is the same with mode 1
-    __doc__ = ArtistGallery.__doc__.replace('Artist Gallery', 'Related Images')
+    __doc__ = ArtistGallery.__doc__.replace('Artist Gallery', 'Related illusts')
 
     def __init__(self, image_id: int, main_path: 'Path'):
         """Overrides base: pass in image_id (parent dir) & set main_path"""
@@ -366,6 +366,20 @@ class IllustRelatedGallery(ArtistGallery):
     def _pixivrequest(self):
         """Overrides base: different method"""
         return api.myapi.illust_related_request(self._image_id, offset=self._data.offset)
+
+
+class IllustRecommendedGallery(ArtistGallery):
+    # Apart from the main_path and the pixivrequest function,
+    # everything is the same with mode 1
+    __doc__ = ArtistGallery.__doc__.replace('Artist Gallery', 'Recommended illusts')
+
+    def __init__(self):
+        """Overrides base: set main_path"""
+        super().__init__(KONEKODIR / 'recommended')
+
+    def _pixivrequest(self):
+        """Overrides base: different method"""
+        return api.myapi.illust_recommended_request(offset=self._data.offset)
 
 
 class AbstractUsers(AbstractUI, ABC):

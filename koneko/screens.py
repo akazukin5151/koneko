@@ -21,7 +21,7 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         'f. Frequent modes and user inputs', '',
         '?. Info',
         'm. Manual',
-        'c. Clear koneko cache',
+        'b. Browse cache (offline)',
         'q. Quit',
     )
     if printmessage:

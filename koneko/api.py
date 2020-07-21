@@ -5,27 +5,23 @@ import threading
 import funcy
 from pixivpy3 import PixivError, AppPixivAPI
 
-from koneko import utils, KONEKODIR
+from koneko import files, utils, KONEKODIR
 
 
 class APIHandler:
     """Singleton that handles all the API interactions in the program"""
     def __init__(self):
         self._api_thread = threading.Thread(target=self._login)
-        self._token = None
-        self._api = AppPixivAPI()  # Object to login and request on
         self._token_dir = KONEKODIR.parent / 'token'
+        self._token = files.read_token_file(self._token_dir)
 
+        self._api = AppPixivAPI()  # Object to login and request on
         # Set in self.start() (because singleton is instantiated before config)
         self._credentials: 'dict[str, str]'
 
     @funcy.once
     def start(self, credentials):
         """Start logging in. The only setup entry point that is public"""
-        if self._token_dir.is_file():
-            with open(self._token_dir, 'r') as f:
-                self._token = f.read()
-
         self._credentials = credentials
         self._api_thread.start()
 
@@ -37,18 +33,15 @@ class APIHandler:
 
     def _login(self):
         """Logins to pixiv in the background, using credentials from config file"""
-        no_tokens = True
-
         if self._token:  # Token is set if file found in self.start()
             token_success = self._login_with_token()
 
-        if no_tokens and not token_success:
+        if not self._token or not token_success:
             response = self._login_with_creds()
-
             if response:
                 self._token = response['response']['refresh_token']
-                with open(self._token_dir, 'w') as f:
-                    f.write(self._token)
+                files.write_token_file(self._token_dir, self._token)
+
 
     def _login_with_token(self) -> bool:
         """Tries to login with saved token to avoid pixiv emails

@@ -12,8 +12,8 @@ class APIHandler:
     """Singleton that handles all the API interactions in the program"""
     def __init__(self):
         self._api_thread = threading.Thread(target=self._login)
-        self._token_dir = KONEKODIR.parent / 'token'
-        self._token = files.read_token_file(self._token_dir)
+        self._token_file = KONEKODIR.parent / 'token'
+        self._token = files.read_token_file(self._token_file)
 
         self._api = AppPixivAPI()  # Object to login and request on
         # Set in self.start() (because singleton is instantiated before config)
@@ -40,7 +40,7 @@ class APIHandler:
             response = self._login_with_creds()
             if response:
                 self._token = response['response']['refresh_token']
-                files.write_token_file(self._token_dir, self._token)
+                files.write_token_file(self._token_file, self._token)
 
 
     def _login_with_token(self) -> bool:
@@ -54,7 +54,7 @@ class APIHandler:
         return True
 
 
-    def _login_with_creds(self):
+    def _login_with_creds(self) -> 'Optional[dict[dict[str]]]':
         try:
             return self._api.login(
                 self._credentials['Username'],

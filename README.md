@@ -28,10 +28,12 @@ See the [manual](MANUAL.md) for more details
 2. Image view ([ex](https://www.pixiv.net/en/artworks/78823485))
     * View an image in large resolution
     * Browse through different images in a multi-image post.
+    * View related images suggested by pixiv
 3. View artists you are following ([ex](https://www.pixiv.net/bookmark.php?type=user))
 4. Search for an artist ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
 5. View new illustrations from all the artists you are following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
 6. View recommended illustrations (now called discovery) ([ex](https://www.pixiv.net/discovery))
+
 * Both gallery and image views can:
     * Download an image([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download) in full resolution
     * Open post in browser
@@ -87,6 +89,7 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
 Launch with `koneko`. There are six modes of operation:
 1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
 2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
+    - View related images suggested by pixiv (ex: scroll down from the above example)
 3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))
 4. Search for artist/user ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
 5. View newest illustrations from artists you're following ([ex](https://www.pixiv.net/bookmark_new_illust.php))

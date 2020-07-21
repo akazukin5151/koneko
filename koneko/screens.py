@@ -64,7 +64,7 @@ def show_man_loop() -> 'IO':
 
 
 @utils.catch_ctrl_c
-def clear_cache_loop() -> 'IO':
+def clear_cache_loop() -> 'IO[bool]':
     print('Do you want to remove all cached images?')
     print('This will not remove images you explicitly downloaded to ~/Downloads.')
     print(f'Directory to be deleted: {KONEKODIR}')
@@ -73,11 +73,11 @@ def clear_cache_loop() -> 'IO':
         if help_command == 'y':
             shutil.rmtree(KONEKODIR)
             os.system('clear')
-            break
+            return True
         else:
             print('Operation aborted!')
             os.system('clear')
-            break
+            return False
 
 
 @utils.catch_ctrl_c

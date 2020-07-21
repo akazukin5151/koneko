@@ -174,6 +174,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * Make sure the diagrams in HACKING.md is up-to-date
     * Offline mode: Using `lscat_app` as a base for offline mode, rather than `koneko`
         - Handle moving around pages
+* Option to save username, but prompt for password (and not save it) every time
 
 ## Known bugs
 

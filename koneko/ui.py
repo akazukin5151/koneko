@@ -373,6 +373,7 @@ class IllustRelatedGallery(ArtistGallery):
 class IllustRecommendedGallery(ArtistGallery):
     # Apart from the main_path and the pixivrequest function,
     # everything is the same with mode 1
+    # Note that self._data.next_offset seems to be always zero, meaning this is one-page only
     __doc__ = ArtistGallery.__doc__.replace('Artist Gallery', 'Recommended illusts')
 
     def __init__(self):

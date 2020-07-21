@@ -8,6 +8,7 @@ Usage:
   koneko (3|f) <link_or_id>
   koneko [4|s] <searchstr>
   koneko [5|n]
+  koneko [6|r]
   koneko (-h | --help)
   koneko (-v | --version)
 
@@ -23,6 +24,7 @@ Optional arguments (for specifying a mode):
   3 f  Mode 3 (Following artists)
   4 s  Mode 4 (Search for artists)
   5 n  Mode 5 (Newest works from following artists ("illust follow"))
+  6 r  Mode 6 (Recommended illustrations)
 
 Required arguments if a mode is specified:
   <link>        Pixiv url, auto detect mode. Only works for modes 1, 2, and 4
@@ -79,6 +81,10 @@ def parse_no_mode(url_or_str: str, your_id):
     # Assume you won't search for '5' or 'n'
     elif url_or_str == '5' or url_or_str == 'n':
         return main.illust_follow_mode()
+
+    # Assume you won't search for '6' or 'r'
+    elif url_or_str == '6' or url_or_str == 'r':
+        return main.illust_recommended_mode()
 
     return main.SearchUsersModeLoop(url_or_str).start()
 

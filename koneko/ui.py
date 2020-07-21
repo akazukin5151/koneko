@@ -108,6 +108,8 @@ class AbstractUI(ABC):
         if not self._data.next_url:  # Last page
             return True
 
+        if not self._data.next_offset.isdigit():
+            return True
         # Won't download if not immediately next page, eg
         # p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
         offset_diffs = int(self._data.next_offset) - int(self._data.offset)

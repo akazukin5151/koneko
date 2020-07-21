@@ -15,7 +15,18 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
-from koneko import ui, api, cli, pure, utils, config, prompt, screens, picker, lscat_app
+from koneko import (
+    ui,
+    api,
+    cli,
+    pure,
+    utils,
+    config,
+    prompt,
+    screens,
+    picker,
+    lscat_app
+ )
 
 
 def main():

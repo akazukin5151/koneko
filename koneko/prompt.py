@@ -8,8 +8,8 @@ Structure:
 
 import sys
 
-from koneko import ui, pure, utils, printer, download, TERM
 from koneko.pure import all_isdigit
+from koneko import ui, pure, utils, printer, download, TERM
 
 
 # Common prompt code

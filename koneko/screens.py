@@ -25,15 +25,15 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
     )
     if printmessage:
         for message in messages:
-            print(' ' * 27, message)
+            print(' ' * 30, message)
 
     pixcat.Image(
         KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(550).show(
+    ).thumbnail(600).show(
         align='left', y=0
     )
 
-    command = input('Enter a command: ')
+    command = input('\n\nEnter a command: ')
     return command
 
 

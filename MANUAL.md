@@ -8,6 +8,7 @@
     * [Mode f/3 and s/4](#mode-f3-and-s4)
     * [Mode n/5](#mode-n5)
     * [Mode r/6](#mode-r6)
+    * [lscat app](#lscat-app)
 * [Configuration](#Configuration)
     * [In general](#in-general)
     * [Image](#image-configuration)
@@ -235,6 +236,47 @@ Required arguments if a mode is specified:
 Options:
   (-h | --help)     Show this help
   (-v | --version)  Show version number
+```
+
+## lscat app
+
+1. Configuration assistant: Interactively guides you to setting up your own config.
+2. Browse and manage the cache, filter dirs by mode, and view the illustrations/images offline, with similar but reduced functionality
+3. Display a specified path. Auto-detects which mode it is, providing that it is a valid dir.
+4. Displays the 'testgallery' dir in mode 1, offline. For internal developer use.
+5. Displays the 'testuser' dir in mode 3/4, offline. For internal developer use.
+
+* FYI: KONEKODIR is currently set to be `~/.local/share/koneko/cache`. The parent folder also contains everything else you might want to delete in the even of uninstalling the app
+* For developers: simply copy a "page dir" inside a pixiv ID into testgallery (eg, `cp -r ~/.local/share/koneko/cache/123/1 ~/.local/share/koneko/cache/testgallery`) for mode 4 to work;
+* ...and a "page dir" inside 'following' (eg, `cp -r ~/.local/share/koneko/cache/following/123/1 ~/.local/share/koneko/cache/testuser`) for mode 5 to work.
+
+
+```
+lscat interactive app
+
+Usage:
+  lscat
+  lscat (1|c) [<actions> ...]
+  lscat (2|b)
+  lscat (3|p) [<path>]
+  lscat (4|g)
+  lscat (5|u)
+
+Optional arguments (for specifying a mode):
+  1 c  Koneko configuration assistance
+  2 b  Browse a cached dir to display
+  3 p  Display a specified path
+  4 g  Display KONEKODIR / testgallery
+  5 u  Display KONEKODIR / testuser
+
+Possible configuration assistants:
+  1  Thumbnail size
+  2  x-padding
+  3  y-padding
+  4  Page spacing
+  5  Gallery print spacing
+  6  User mode print info x-position
+  a  All of the above
 ```
 
 # Configuration

@@ -181,7 +181,7 @@ When test installing with pip, don't forget to use `pip install .` or `python se
 
 Test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` is now automated.
 
-Bump version info in `__init__.py`, `setup.py`, `README.md`, and `CONTRIBUTING.md`
+Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
 
 ```sh
 python setup.py sdist bdist_wheel

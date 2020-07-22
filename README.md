@@ -83,9 +83,9 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
  ```
 </details>
 
-# Usage
+# Usage and manual
 
-See the [manual](MANUAL.md) for more details
+See the [manual](MANUAL.md) here
 
 
 ## Upcoming changelog (in dev branch)
@@ -187,10 +187,6 @@ python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade
 ```
-
-# Manual
-
-For usage, see the [usage section](MANUAL.md#Usage). For configuration, see the [configuration section](MANUAL.md#Configuration)
 
 # Trackers avoided
 <details>

@@ -104,6 +104,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Add illust_recommended_mode (mode 6): discover recommended illustrations
 * Access browse cache from koneko main; clear cache is now inside browse cache
 * Use `koneko q` to view frequents and launch their mode
+* Revamped user guide/manual
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory

@@ -39,10 +39,11 @@ In other words, the adapter organises code, while the models and view does the a
         <li>config *</li>
         <li>download</li>
         <li>files</li>
-        <li>picker</li>
+        <li>utils *</li>
     </ul></td>
     <td><ul>
         <li>config *</li>
+        <li>picker †</li>
         <li>printer</li>
         <li>screens</li>
         <li>utils</li>
@@ -53,8 +54,8 @@ In other words, the adapter organises code, while the models and view does the a
     <td>Organizes work</td>
     <td></td>
     <td><ul>
-        <li>assistants</li>
-        <li>prompt</li>
+        <li>assistants †</li>
+        <li>prompt †</li>
     </ul></td>
     <td><ul>
         <li>lscat</li>
@@ -72,7 +73,8 @@ In other words, the adapter organises code, while the models and view does the a
 The overall code is neither OOP nor functional: the only communication between all modules is through function returns, not through 'notifying' different objects. The only (major?) exception is that `downloads.py` will directly trigger a callback to `lscat.py`.
 
 Now, this paints a rosy picture but in reality, there was no initial planning so the code was originally not written towards any structure or pattern. What still needs work is:
-* The config contains a functional core, inbound IO, and outbound IO. Better split them up
+* The config contains a functional core, inbound IO, and outbound IO.
+* †: technically both inbound and outbound, but main purpose is to provide a view for the user and catch user input
 
 Here are some good tips:
 * "The way to figure out the separation is by doing as much as you can without mutation, and then encapsulating the mutation separately" (Gary Bernhardt)

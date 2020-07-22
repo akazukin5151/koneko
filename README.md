@@ -22,21 +22,19 @@ Requires [kitty](https://github.com/kovidgoyal/kitty). It uses the magical `kitt
 # Features
 See the [manual](MANUAL.md) for more details
 
-1. Artist illustrations gallery ([ex](https://www.pixiv.net/bookmark.php?type=user))
-    * Enter the post's coordinates to open it in image view. Coordinates are in the form `xy` where x is column and y is row.
-    * Next and previous pages
-2. Image view ([ex](https://www.pixiv.net/en/artworks/78823485))
-    * View an image in large resolution
-    * Browse through different images in a multi-image post.
-    * View related images suggested by pixiv
-3. View artists you are following ([ex](https://www.pixiv.net/bookmark.php?type=user))
-4. Search for an artist ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
+1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
+2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
+    - View related images suggested by pixiv (ex: scroll down from the above example)
+3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))
+4. Search for an artist/user ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
 5. View new illustrations from all the artists you are following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
-6. View recommended illustrations (now called discovery) ([ex](https://www.pixiv.net/discovery))
+6. View recommended illustrations (now called 'discovery') ([ex](https://www.pixiv.net/discovery))
 
-* Both gallery and image views can:
-    * Download an image([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download) in full resolution
-    * Open post in browser
+
+* Navigate between next and previous pages/images
+* Download images ([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download) in full resolution
+* Open post in browser
+* Browse an offline cache
 
 
 # Rationale
@@ -86,38 +84,9 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
 </details>
 
 # Usage
-Launch with `koneko`. There are six modes of operation:
-1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
-2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
-    - View related images suggested by pixiv (ex: scroll down from the above example)
-3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))
-4. Search for artist/user ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
-5. View newest illustrations from artists you're following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
-6. View recommended illustrations (now called 'discovery') ([ex](https://www.pixiv.net/discovery))
 
-Enter digits 1-6 to proceed. If prompted, paste in an appropriate pixiv ID or url. See below for url examples.
+See the [manual](MANUAL.md) for more details
 
-Alternatively, you can supply a pixiv url as a command line argument, bypassing the first interactive prompt. The pixiv url must be either the url of the artist's page, or a pixiv post. Example:
-
-```sh
-# Launch to main
-koneko
-
-# No mode specified, can only reach modes 1, 2, and 4
-koneko https://www.pixiv.net/en/users/2232374         # Mode 1
-koneko https://www.pixiv.net/en/artworks/78823485     # Mode 2
-koneko "raika9"                                       # Mode 4
-
-# Mode specified
-koneko a 2232374    # Mode 1
-koneko i 78823485   # Mode 2
-koneko f 2232374    # Mode 3
-koneko s "gomzi"    # Mode 4
-koneko n            # Mode 5
-koneko r            # Mode 6
-```
-
-For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
 ## Upcoming changelog (in dev branch)
 

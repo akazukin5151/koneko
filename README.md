@@ -19,7 +19,7 @@ Requires [kitty](https://github.com/kovidgoyal/kitty). It uses the magical `kitt
 **Why the name Koneko?** Koneko (こねこ) means kitten, which is what `icat` is, a kitty `+kitten`
 
 
-# Features
+# Features (what?)
 See the [manual](MANUAL.md) for more details
 
 1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
@@ -37,7 +37,7 @@ See the [manual](MANUAL.md) for more details
 * Browse an offline cache
 
 
-# Rationale
+# Why?
 * Terminal user interfaces are minimalist, fast, and doesn't load Javascript that slows down your entire browser or track you
     * Image loading is *so* much faster, especially if you don't delete the cache
 
@@ -55,7 +55,7 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 * I use arch btw
 
 
-# Installation
+# Installation (how?)
 See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
 0. Install [kitty](https://github.com/kovidgoyal/kitty)

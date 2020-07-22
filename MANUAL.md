@@ -3,11 +3,11 @@
 * [Usage](#Usage)
     * [Initial setup](#initial-setup)
     * [Command line usage](#command-line-usage)
-    * [Mode a/1](#mode-a-1)
-    * [Mode i/2](#mode-i-2)
-    * [Mode f/3 and s/4](#mode-f-3-and-s-4)
-    * [Mode n/5](#mode-n-5)
-    * [Mode r/6](#mode-r-6)
+    * [Mode a/1](#mode-a1)
+    * [Mode i/2](#mode-i2)
+    * [Mode f/3 and s/4](#mode-f3-and-s4)
+    * [Mode n/5](#mode-n5)
+    * [Mode r/6](#mode-r6)
 * [Configuration](#Configuration)
     * [In general](#in-general)
     * [Image](#image-configuration)
@@ -60,7 +60,7 @@ Enter digits 1-6 to proceed. If prompted, paste in an appropriate pixiv ID or ur
     * For example, `i17` means "view the 18th post".
 * Press `n` and `p` to navigate between next and previous pages respectively
 * You can open a post or download an image using their indices, by using `O` or `D` respectively (capitalised)
-* Press `b` to go back to the main screen. You're done! Please proceed to the [mode i/2](#mode-i-2) tutorial
+* Press `b` to go back to the main screen. You're done! Please proceed to the [mode i/2](#mode-i2) tutorial
 
 ```
 Artist Gallery commands: (No need to press enter)
@@ -98,7 +98,7 @@ Examples:
 ![Image_view](pics/image_view.png)
 
 * Press `r` to view other images related to this post
-    * This mode is functionally identical to [mode a/1](#mode-a-1)
+    * This mode is functionally identical to [mode a/1](#mode-a1)
 
 ```
 Image view commands (No need to press enter):
@@ -173,7 +173,7 @@ Examples:
 
 ## Mode r/6
 
-* This mode is functionally identical to [mode a/1](#mode-a-1)
+* This mode is functionally identical to [mode a/1](#mode-a1)
 
 
 ## Command line usage

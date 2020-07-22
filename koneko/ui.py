@@ -388,7 +388,7 @@ class IllustRecommendedGallery(ArtistGallery):
 class AbstractUsers(AbstractUI, ABC):
     """
     User view commands (No need to press enter):
-        {x}{y}             -- display artist illusts on column {x} and row {y}
+        {n}                -- display illustrations of the nth user
         n                  -- view next page
         p                  -- view previous page
         r                  -- delete all cached images, re-download and reload view

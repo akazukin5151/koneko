@@ -8,8 +8,8 @@ Structure:
 
 import sys
 
-from koneko import ui, pure, utils, printer, download, TERM
 from koneko.pure import all_isdigit
+from koneko import ui, pure, utils, printer, download, TERM
 
 
 # Common prompt code
@@ -139,6 +139,7 @@ def image_prompt(image):
         'n': image.next_image,
         'p': image.previous_image,
         'f': image.show_full_res,
+        'r': image.view_related_images,
         'h': printer.image_help,
         'q': ask_quit,
         'm': lambda: print(image.__doc__)

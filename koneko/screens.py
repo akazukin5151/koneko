@@ -1,6 +1,5 @@
 import os
 import shutil
-from subprocess import check_output
 
 import pixcat
 
@@ -17,29 +16,24 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         '3. View following artists',
         '4. Search for artists',
         '5. View illustrations of all following artists',
+        '6. View recommended illustrations',
         'f. Frequent modes and user inputs', '',
         '?. Info',
         'm. Manual',
-        'c. Clear koneko cache',
+        'b. Browse cache (offline)',
         'q. Quit',
     )
     if printmessage:
         for message in messages:
-            print(' ' * 27, message)
+            print(' ' * 30, message)
 
     pixcat.Image(
         KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(550).show(
+    ).thumbnail(600).show(
         align='left', y=0
     )
 
-    cache_size = check_output(
-        f'du -hs --apparent-size {KONEKODIR} | cut -f1',
-        shell=True
-    ).decode('utf-8').rstrip()
-    print(f'\nCurrent cache size: {cache_size}')
-
-    command = input('Enter a command: ')
+    command = input('\n\nEnter a command: ')
     return command
 
 
@@ -63,7 +57,7 @@ def show_man_loop() -> 'IO':
 
 
 @utils.catch_ctrl_c
-def clear_cache_loop() -> 'IO':
+def clear_cache_loop() -> 'IO[bool]':
     print('Do you want to remove all cached images?')
     print('This will not remove images you explicitly downloaded to ~/Downloads.')
     print(f'Directory to be deleted: {KONEKODIR}')
@@ -72,11 +66,11 @@ def clear_cache_loop() -> 'IO':
         if help_command == 'y':
             shutil.rmtree(KONEKODIR)
             os.system('clear')
-            break
+            return True
         else:
             print('Operation aborted!')
             os.system('clear')
-            break
+            return False
 
 
 @utils.catch_ctrl_c

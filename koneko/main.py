@@ -15,7 +15,18 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
-from koneko import ui, api, cli, pure, utils, config, prompt, screens, picker
+from koneko import (
+    ui,
+    api,
+    cli,
+    pure,
+    utils,
+    config,
+    prompt,
+    screens,
+    picker,
+    lscat_app
+ )
 
 
 def main():
@@ -50,10 +61,11 @@ def main_loop(_, your_id: str):
         '3': FollowingUserModeLoop(your_id).start,
         '4': SearchUsersModeLoop('').start,
         '5': illust_follow_mode,
+        '6': illust_recommended_mode,
         'f': frequent,
         '?': screens.info_screen_loop,
         'm': screens.show_man_loop,
-        'c': screens.clear_cache_loop,
+        'b': lscat_app.browse_cache,
     }
 
     while True:
@@ -253,6 +265,13 @@ def illust_follow_mode():
     mode = ui.IllustFollowGallery()
     prompt.gallery_like_prompt(mode)
     # After backing
+    main()
+
+
+def illust_recommended_mode():
+    """Immediately goes to ui.IllustRecommendedGallery()"""
+    mode = ui.IllustRecommendedGallery()
+    prompt.gallery_like_prompt(mode)
     main()
 
 

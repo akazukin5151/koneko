@@ -16,6 +16,7 @@ import threading
 from math import ceil
 from pathlib import Path
 from collections import Counter
+from subprocess import check_output
 from logging.handlers import RotatingFileHandler
 
 import funcy
@@ -152,6 +153,13 @@ def handle_missing_pics() -> 'IO':
         os.system(f'curl -s {baseurl}{pic} -o {basedir}/{pic}')
 
     os.system('clear')
+
+
+def get_cache_size():
+    return check_output(
+        f'du -hs --apparent-size {KONEKODIR} | cut -f1',
+        shell=True
+    ).decode('utf-8').rstrip()
 
 
 # Lscat related

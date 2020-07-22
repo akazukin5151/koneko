@@ -19,24 +19,25 @@ Requires [kitty](https://github.com/kovidgoyal/kitty). It uses the magical `kitt
 **Why the name Koneko?** Koneko (こねこ) means kitten, which is what `icat` is, a kitty `+kitten`
 
 
-# Features
+# Features (what?)
 See the [manual](MANUAL.md) for more details
 
-1. Artist illustrations gallery ([ex](https://www.pixiv.net/bookmark.php?type=user))
-    * Enter the post's coordinates to open it in image view. Coordinates are in the form `xy` where x is column and y is row.
-    * Next and previous pages
-2. Image view ([ex](https://www.pixiv.net/en/artworks/78823485))
-    * View an image in large resolution
-    * Browse through different images in a multi-image post.
-3. View artists you are following ([ex](https://www.pixiv.net/bookmark.php?type=user))
-4. Search for an artist ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
+1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
+2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
+    - View related images suggested by pixiv (ex: scroll down from the above example)
+3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))
+4. Search for an artist/user ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
 5. View new illustrations from all the artists you are following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
-* Both gallery and image views can:
-    * Download an image([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download) in full resolution
-    * Open post in browser
+6. View recommended illustrations (now called 'discovery') ([ex](https://www.pixiv.net/discovery))
 
 
-# Rationale
+* Navigate between next and previous pages/images
+* Download images ([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download) in full resolution
+* Open post in browser
+* Browse an offline cache
+
+
+# Why?
 * Terminal user interfaces are minimalist, fast, and doesn't load Javascript that slows down your entire browser or track you
     * Image loading is *so* much faster, especially if you don't delete the cache
 
@@ -54,7 +55,7 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 * I use arch btw
 
 
-# Installation
+# Installation (how?)
 See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
 0. Install [kitty](https://github.com/kovidgoyal/kitty)
@@ -82,38 +83,28 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
  ```
 </details>
 
-# Usage
-Launch with `koneko`. There are five modes of operation:
-1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
-2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
-3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))
-4. Search for artist/user ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
-5. View newest illustrations from artists you're following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
+# Usage and manual
 
-Enter digits 1-5 to proceed. If prompted, paste in an appropriate pixiv ID or url. See below for url examples.
+See the [manual](MANUAL.md) here
 
-Alternatively, you can supply a pixiv url as a command line argument, bypassing the first interactive prompt. The pixiv url must be either the url of the artist's page, or a pixiv post. Example:
-
-```sh
-koneko https://www.pixiv.net/en/users/2232374 # Mode 1
-koneko https://www.pixiv.net/en/artworks/78823485 # Mode 2
-koneko f https://www.pixiv.net/en/users/2232374 # Mode 3
-koneko "raika9" # Mode 4
-koneko 5 # Mode 5
-```
-For more details refer to the [manual](MANUAL.md#Usage). You might also want to look at [how to configure](MANUAL.md#Configuration) the display settings according to your terminal size.
 
 ## Upcoming changelog (in dev branch)
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.9.3
+### Version 0.10.0
 
 #### Features
 * Browse cache now supports navigating between pages
 * **Breaking**: Removed `image_mode_text_offset` config setting, now does nothing
 * Renewed developer guide in HACKING.md
 * **Breaking**: lscat app: move 'browse cache' and 'specify path' to mode 2 and 3 respectively, moving 'testgallery & 'testuser' to mode 4 and 5 respectively (swapped)
+* Add image mode preview for lscat app
+* Add related images gallery (mode 15): view related and suggested images in image view (mode 2). Press the 'r' key while viewing an image to view related images
+* Add illust_recommended_mode (mode 6): discover recommended illustrations
+* Access browse cache from koneko main; clear cache is now inside browse cache
+* Use `koneko q` to view frequents and launch their mode
+* Revamped user guide/manual
 
 #### Bug fixes
 * Fixed browse cache crashing on empty directory
@@ -124,45 +115,44 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Almost fixing experimental image mode previews by saving previous cursor position and restoring it later; but still a bit unstable
 * Fixed grammar in prompt: "a image command" -> "an image command"
 * Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
+* **Fixed logging in with a new session every time by caching the login token.**
+* Stop prefetch if `next_offset` is invalid
 
 #### Code maintenance
-* lscat show_instant() now inspects the cls passed in instead of a bool argument
-* "Inlined" some abstract methods in AbstractUI into attributes
-* Consistent public and private methods and attributes again
-* Make all ui.Image methods depend on only data.ImageData like the associated free functions, so those methods can be moved to a subclass of data.ImageData (the new ui.Image class extends IO behaviours from the data class)
-* Pass in path and name to api.download instead of cd-ing into the dir and manually renaming downloads, simplifying a lot of code in the process
-* Replace pure.Map with list comprehensions. Can't force functional programming into Python after all
-* Use funcy.autocurry() instead of partial
-* Split up files.filter_dir()
+* lscat `show_instant()` now inspects the cls passed in instead of a bool argument
+* "Inlined" some abstract methods in `AbstractUI` into attributes
+* Make all `ui.Image` methods depend on only `data.ImageData` like the associated free functions, so those methods can be moved to a subclass of `data.ImageData` (the new ui.Image class extends IO behaviours from the data class)
+* Pass in path and name to `api.download` instead of cd-ing into the dir and manually renaming downloads, simplifying a lot of code in the process
+* Replace `pure.Map` with list comprehensions. Can't force functional programming into Python after all
+* Use `funcy.autocurry()` instead of partial
+* Split up `files.filter_dir()`
+* Use `ws_picker()` in `_pick_dirs_picker()`
+* Add `next_offset` property to AbstractData (moved calculation from ui to data.py)
+* Change list comprehensions assigning to `_` into normal for loops
+* Split up `_parse_and_download()`
+* Improved order of methods in `GalleryData`: now sorted by required methods/properties by the interface/abstract class, and unique methods/properties.
+* Rewrite `UserData` class to be more like `GalleryData`
+* Move download_path() method to `AbstractData`
+* Extract `view_post_mode()` and `view_image()` to ABC
  
 
 # Roadmap
 
-* Make sure the diagrams in HACKING.md is up-to-date
-* In-depth usage documentation?
-
 ## Features
 
-* Offline mode: Use `lscat_app` as a base for offline mode, rather than `koneko`
-    - [x] Handle moving around pages
-    - [x] Mode 2 dirs in lscat_app should do something (currently does nothing)
-    - [ ] Documentation
-* Go to related works from image view (illust_related)
-* View recommended illusts (illust_recommended)
+* In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
+    * Make sure the diagrams in HACKING.md is up-to-date
+    * Offline mode: Using `lscat_app` as a base for offline mode, rather than `koneko`
+        - Handle moving around pages
+* Option to save username, but prompt for password (and not save it) every time
 
 ## Known bugs
 
 * Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
 * In the logs, urllib3 warns that `Connection pool is full, discarding connection: i.pximg.net`. See [customising pool behaviour](https://urllib3.readthedocs.io/en/latest/advanced-usage.html#customizing-pool-behavior) from urllib3.
-* There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay.
-* Does not cache the login cookies, so it logins to pixiv everytime, which might cause pixiv to send you emails. See below
+* There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay. Directly running the script using `python koneko/main.py` or `python koneko/lscat_app.py` is faster as well. Seems like it's a delay in going to `miniconda/lib/python3.8/site-packages/koneko.egg-link` (installed with `python setup.py develop`)?
 
 # FAQ
-* Pixiv keeps emailing me saying I've logged in, every time I use this app!
-
-That's because cookies aren't stored so you log in everytime with a new session. Looking at [PixivUtil's cookie implementation](https://github.com/Nandaka/PixivUtil2/blob/master/PixivBrowserFactory.py), it would be easier to base this app on PixivUtil for downloads, than to write it myself (currently, it's based on the [pixivpy](https://github.com/upbit/pixivpy/) api). The problems with this, other than being a huge time and effort investment, is that koneko uses info from the requests, such as number of pages.
-I'd like to fix this but I'd rather not use mechanize but I don't know how to do it either way.
-
 * I'm having problems with lscat
 
 For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
@@ -198,10 +188,6 @@ python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade
 ```
-
-# Manual
-
-For usage, see the [usage section](MANUAL.md#Usage). For configuration, see the [configuration section](MANUAL.md#Configuration)
 
 # Trackers avoided
 <details>

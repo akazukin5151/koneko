@@ -89,33 +89,38 @@ Here are some good tips:
 $ cd ~/.local/share/koneko
 $ tree -d  # (Edited: .koneko and history are files not directories)
 .
-├── cache                     # ├── KONEKODIR
-│   ├── 2232374               # │   ├── Artist pixiv ID                             ├── Mode 1 and 2
-│   │   ├── 1                 # │   │   ├── Page 1                                  │   ├── Mode 1
-│   │   ├── 2                 # │   │   ├── Page 2                                  │   ├── Mode 1
-│   │   └── individual        # │   │   └── Posts with a single image               │   └── Mode 2
-│   │       └── 76695217      # │   │       └── ID of posts with multiple images    │       └── Mode 2
+├── cache                         # ├── KONEKODIR
+│   ├── 2232374                   # │   ├── Artist pixiv ID                             ├── Mode 1 and 2
+│   │   ├── 1                     # │   │   ├── Page 1                                  │   ├── Mode 1
+│   │   ├── 2                     # │   │   ├── Page 2                                  │   ├── Mode 1
+│   │   └── individual            # │   │   └── Posts with a single image               │   └── Mode 2
+│   │       └── 76695217          # │   │       └── ID of posts with multiple images    │       ├── Mode 2
+│   │           └── illustrelated # │   │       └── Related images mode                 │       └── Mode 6
+│   │               └── 1         # │   │           └── Page 1                          │           └── Mode 6
 
-│   ├── following             # │   ├── Following users mode                        ├── Mode 3
-│   │   └── *your_id*         # │   │   └── Your pixiv ID                           │
-│   │       ├── 1             # │   │       ├── Page 1                              │
-│   │       │   └── .koneko   # │   │       │   └── Stores number of artists info   │
-│   │       └── 2             # │   │       └── Page 2                              │
-│   │           └── .koneko   # │   │           └── Stores number of artists info   │
+│   ├── following                 # │   ├── Following users mode                        ├── Mode 3
+│   │   └── *your_id*             # │   │   └── Your pixiv ID                           │
+│   │       ├── 1                 # │   │       ├── Page 1                              │
+│   │       │   └── .koneko       # │   │       │   └── Stores number of artists info   │
+│   │       └── 2                 # │   │       └── Page 2                              │
+│   │           └── .koneko       # │   │           └── Stores number of artists info   │
 
-│   ├── illustfollow          # │   ├── Illust follow mode                          ├── Mode 5
-│   │   ├── 1                 # │   │   ├── Page 1                                  │
-│   │   └── 2                 # │   │   └── Page 2                                  │
+│   ├── illustfollow              # │   ├── Illust follow mode                          ├── Mode 5
+│   │   ├── 1                     # │   │   ├── Page 1                                  │
+│   │   └── 2                     # │   │   └── Page 2                                  │
 
-│   ├── search                # │   ├── Search users mode                           ├── Mode 4
-│   │   └── gomzi             # │   │   └── Search string
-│   │       └── 1             # │   │       └── Page 1
+│   ├── recommended               # │   ├── Search users mode                           ├── Mode 6
+│   │   └── 1                     # │   │   └── Page 1
 
-│   ├── history               # │   ├── History file, for frequent "mode"
+│   ├── search                    # │   ├── Search users mode                           ├── Mode 4
+│   │   └── gomzi                 # │   │   └── Search string
+│   │       └── 1                 # │   │       └── Page 1
 
-│   ├── testgallery           # │   ├── (Internal/debugging use)
-│   └── testuser              # │   └── (Internal/debugging use)
-└── pics                      # └── Images for main and info screen
+│   ├── history                   # │   ├── History file, for frequent "mode"
+
+│   ├── testgallery               # │   ├── (Internal/debugging use)
+│   └── testuser                  # │   └── (Internal/debugging use)
+└── pics                          # └── Images for main and info screen
 ```
 
 
@@ -123,7 +128,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 ### Flowchart of modes and their connections:
 
-![Flowchart UML](http://plantuml.com:80/plantuml/png/dPDD2y8m38Rl_HM5dZtejfk8YYY2Dy6BY1IDTHWtwGVYltVMhfkrAdWgIzuyUPUcGwMvrEQCX1W5Eww0ZgJEbTuAZWZorlNn-PaBwFdFQObONlD2RBajK8bFBO7BtR6Efmq1qLJaGrsPDKsjZIvb4u3BydGRem4I6A7zphgTtyXS77Ldu6f_oYkb-uNNhZtA5lnQp2H04ONuR0lnFCAq0mOD4ig4XR-Fp094pGud7pCZ0YDVcURYB2M1fPGo2NiIN9IjhE8nBv-alaKQjUjeqS5db3qkPfMN29gyBOUjRmJjuV-I8XpyOcHHN_znwuqBXqE6KEohHtG7)
+![Flowchart UML](http://plantuml.com:80/plantuml/png/bPLFYy8m4CNl-HG1pnxyUn9nNLXPTc5XFIuYeHrhQDf8qhBuxRU9IMsQiR97Ex-ycNbzgHjTCLNLXI14vxoyCCKAMcj8c8RLYgtNMvRacP9rcRvA8HNzvDcvskVNhQW1EyAn8mNi5429yQUO_pYpd6EiZjb4yK9BLBcCwI-Ld7cAmGg3MPcXEoeGCRwJ8YN4CVH5LLnNnum90UeweTRBjlfUi0ocrBhLFdoJGiXVNcP7PW_h6RNsjC0UM3E_hywfDUIkAKJTT3nvbGMr5hJrRn2iWlJ8JMyzCMMxHmT8P550cKAwfDOHGk93uv-HsVGmNhijxZlRA4teA8X8P4GZq0KEolner6wdd_EF6azDOnyqNCLLEnB-HOHb9qXy6HcXRqo0TleCSBc9-HF6nVi9TOir2lLCcj5RMuA5hJjJpq3Kq1PsPWvgrXTdwwmtqfpwBKaKyD21_an3UDjkZexUKKN3jA3EL89Sgy1n7wGXJC2fSkCiq77-9-TlJD-FS8MbMS5-mSABRNNCy_3cBHzYqMq9Id7YDes4-KFv0m00)
 
 ### Simplified UML diagram of the classes:
 

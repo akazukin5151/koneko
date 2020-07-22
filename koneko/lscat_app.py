@@ -32,7 +32,15 @@ from collections import namedtuple
 
 from docopt import docopt
 
-from koneko import lscat, config, picker, printer, assistants, lscat_prompt, KONEKODIR
+from koneko import (
+    lscat,
+    config,
+    picker,
+    printer,
+    KONEKODIR,
+    assistants,
+    lscat_prompt,
+)
 
 
 # Small 'functions'

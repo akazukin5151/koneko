@@ -8,7 +8,17 @@ from abc import ABC, abstractmethod
 
 from pixcat import Image
 
-from koneko import pure, utils, lscat, lscat_app, config, picker, printer, TERM, KONEKODIR
+from koneko import (
+    pure,
+    TERM,
+    utils,
+    lscat,
+    config,
+    picker,
+    printer,
+    lscat_app,
+    KONEKODIR,
+)
 
 
 # Constants

@@ -23,7 +23,19 @@ def verify_full_download(filepath: Path) -> 'IO[bool]':
     return True
 
 
+def write_token_file(token_dir, token) -> 'IO':
+    with open(token_dir, 'w') as f:
+        f.write(token)
+
+
 # Inbound IO
+def read_token_file(token_dir) -> 'Optional[str]':
+    if token_dir.is_file():
+        with open(token_dir, 'r') as f:
+            return f.read()
+    return None
+
+
 def read_invis(data) -> 'IO[int]':
     with open(data.download_path / '.koneko', 'r') as f:
         return int(f.read())

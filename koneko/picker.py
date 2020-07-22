@@ -1,10 +1,11 @@
 import os
+import sys
 from shutil import rmtree
 
 from pick import Picker
 from placeholder import m
 
-from koneko import files, assistants, KONEKODIR
+from koneko import utils, files, screens, assistants, KONEKODIR
 
 
 # Constants
@@ -25,6 +26,7 @@ def _pick_dirs_picker(actions: 'list[str]', title: str) -> Picker:
     picker.register_custom_handler(ord('b'), lambda p: (None, 'b'))
     picker.register_custom_handler(ord('f'), lambda p: (None, 'f'))
     picker.register_custom_handler(ord('d'), lambda p: (None, 'd'))
+    picker.register_custom_handler(ord('c'), lambda p: (None, 'c'))
     picker.register_custom_handler(ord('q'), lambda p: (None, 'q'))
     return picker
 
@@ -108,13 +110,16 @@ def ask_assistant() -> 'IO[list[int]]':
 def pick_dir() -> 'path':
     path = KONEKODIR
     # base is immutable
+    cache_size = utils.get_cache_size()
     basetitle = (
-        'Select a directory to view\n'
-        "Press 'y' to display the current directory\n"
-        "Press 'b' to move up a directory\n"
-        "Press 'd' to delete the current directory\n"
-        "Press 'f' to filter out modes\n"
-        "Press 'q' to exit"
+        'Select a directory to view, or press:\n'
+        "y: display the current directory\n"
+        "b: move up a directory\n"
+        "f: filter out modes\n"
+        "d: delete the current directory\n"
+        "c: clear the entire cache\n"
+        "q: exit\n"
+        f"Current cache size: {cache_size}"
     )
     actions = files.filter_history(path)
     return _pick_dir_loop(path, basetitle, actions, [])
@@ -140,6 +145,9 @@ def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
         elif ans == 'f':
             title, actions, modes = handle_filter(path, basetitle)
             continue
+
+        elif ans == 'c':
+            handle_clear()
 
         elif isinstance(ans, int):
             path, modes = handle_cd(path, actions[ans], modes)
@@ -196,3 +204,7 @@ def actions_from_dir(path: 'path', modes: 'list[str]') -> 'list[str]':
 
 def try_filter_dir(modes: 'list[str]') -> 'list[str]':
     return sorted(files.filter_dir(modes)) or [EMPTY_FILTER_WARNING]
+
+def handle_clear():
+    if screens.clear_cache_loop():
+        sys.exit(0)

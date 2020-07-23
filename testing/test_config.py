@@ -104,3 +104,8 @@ def test_gallery_print_spacing_config(tmp_path, use_test_cfg_path):
 
 def test_gallery_print_spacing_config_default(use_test_cfg_path):
     assert config.gallery_print_spacing_config() == ['9', '17', '17', '17', '17']
+
+
+def test_check_image_preview(tmp_path, use_test_cfg_path):
+    setup_test_config(tmp_path)
+    assert config.check_image_preview() is False

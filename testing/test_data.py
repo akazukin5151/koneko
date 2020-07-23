@@ -35,6 +35,14 @@ def user_updated():
     return data
 
 
+def test_next_offset_gdata():
+    gdata = gallery_updated()
+    assert gdata.next_offset == '30'
+
+def test_next_offset_udata():
+    udata = user_updated()
+    assert udata.next_offset == '30'
+
 def test_urls_as_names_gdata():
     gdata = gallery()
     gdata.update(mode1)

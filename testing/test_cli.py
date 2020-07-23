@@ -79,6 +79,28 @@ def test_mode5(monkeypatch, mode):
     assert cli.launch_mode(args, True)
     assert mock.call_args_list == [call()]
 
+
+@pytest.mark.parametrize('mode', ('6', 'r'))
+def test_mode6(monkeypatch, mode):
+    mock = Mock()
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode]))
+    monkeypatch.setattr('koneko.cli.main.illust_recommended_mode', mock)
+
+    args = cli.handle_vh()
+    assert cli.launch_mode(args, True)
+    assert mock.call_args_list == [call()]
+
+
+def test_frequent(monkeypatch):
+    mock = Mock()
+    monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'q']))
+    monkeypatch.setattr('koneko.cli.main.frequent', mock)
+
+    args = cli.handle_vh()
+    assert cli.launch_mode(args, True)
+    assert mock.call_args_list == [call()]
+
+
 @pytest.mark.parametrize('arg', ('-v', '--version'))
 def test_version(monkeypatch, arg):
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))

@@ -42,12 +42,7 @@ def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
 
     fakedata = FakeData(Path('testing/files/'))
     lscat.show_instant(FakeTracker, fakedata)
-    # First one works for me, but second one works for github
     assert set(showed) == {
-        'test_config.ini', '004_祝！！！.jpg', 'mode3.json',
-        'mode1.json', 'not_an_image.txt', '008_77803142_p0.png',
-        '017_ミコニャン.jpg', 'mode2.json'
-    } or set(showed) == {
         '004_祝！！！.jpg', 'mode3.json',
         'mode1.json', 'not_an_image.txt', '008_77803142_p0.png',
         '017_ミコニャン.jpg', 'mode2.json'

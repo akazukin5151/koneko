@@ -213,3 +213,37 @@ def test_generate_users(monkeypatch):
     assert xcoords == [2, 39, 57, 75] * 30
     assert ycoords == [0] * 120
 
+
+def test_generate_previews(monkeypatch):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
+    monkeypatch.setattr('koneko.Terminal.width', 100)
+    monkeypatch.setattr('koneko.Terminal.height', 20)
+
+    test_pics = [f"12345_p{idx}_master1200.jpg"
+                 for idx in list(range(10))]
+
+    gen = lscat.generate_users(Path('.'))  # Path doesn't matter
+    gen.send(None)
+
+    # No need to shuffle, tracker already shuffles
+    for pic in test_pics:
+        gen.send(pic)
+
+    # One for .thumbnail() and one for .show(), so total is 30+30
+    thumb_calls = [x for x in mocked_pixcat.mock_calls if x[1]]
+    thumb_calls_args = [x[1] for x in thumb_calls]
+    assert len(mocked_pixcat.mock_calls) == 20  # Ten images * 2 because thumbnail + show == twice
+    assert len(thumb_calls) == 10  # Ten images
+    # Default thumbnail size
+    assert thumb_calls_args == [(310,)] * 10
+
+    show_calls = [x for x in mocked_pixcat.mock_calls if not x[1]]
+    kwargs = [x[2] for x in show_calls]
+    align = [x['align'] for x in kwargs]
+    xcoords = [x['x'] for x in kwargs]
+    ycoords = [x['y'] for x in kwargs]
+    assert align == ['left'] * 10  # Ten images
+    assert xcoords == [2, 39, 57, 75] * 2 + [2, 39]  # Total len == 10
+    assert ycoords == [0] * 10  # Ten images
+

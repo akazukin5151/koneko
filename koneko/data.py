@@ -4,8 +4,8 @@ Despite GalleryData and UserData having lots of shared attributes/properties/met
 there isn't much shared functionality, so there's nothing to extract to an abstract
 base class
 """
-from functools import lru_cache, cached_property
 from abc import ABC, abstractmethod
+from functools import lru_cache, cached_property
 
 from koneko import pure, KONEKODIR
 

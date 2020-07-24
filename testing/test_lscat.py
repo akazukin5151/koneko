@@ -152,6 +152,7 @@ def test_generate_page(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
+    monkeypatch.setattr('koneko.config.gallery_page_spacing_config', lambda: 1)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(30))]
@@ -182,7 +183,7 @@ def test_generate_page(monkeypatch, capsys):
     assert ycoords == [0, 0, 0, 0, 0, 9, 9, 9, 9, 9] * 3
 
     captured = capsys.readouterr()
-    assert captured.out == '\n' * 66
+    assert captured.out == '\n\n\n\n'
 
 
 def test_generate_users(monkeypatch, capsys):
@@ -190,6 +191,7 @@ def test_generate_users(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
+    monkeypatch.setattr('koneko.config.users_page_spacing_config', lambda: 1)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]
@@ -219,26 +221,11 @@ def test_generate_users(monkeypatch, capsys):
     assert ycoords == [0] * 120  # 120 images
 
     captured = capsys.readouterr()
-    assert captured.out[:100] == (
-        ' ' * 18
-        + '00\n'
-        + ' ' * 18
-        + 'test'
-        + '\n' * 31
-        + ' ' * 18
-        + '04\n'
-        + ' ' * 5
-    )
+    assert captured.out[0:100] == '                  00\n                  test\n\n\n                  04\n                  test\n\n\n        '
 
-    assert captured.out[500:600] == (
-        '\n' * 18
-        + ' ' * 18
-        + '28\n'
-        + ' ' * 18
-        + 'test\n'
-        + '\n' * 30
-        + ' ' * 8
-    )
+    assert captured.out[500:600] == 'est\n\n\n                  44\n                  test\n\n\n                  48\n                  test\n\n\n  '
+
+    assert captured.out[:100] == '                  00\n                  test\n\n\n                  04\n                  test\n\n\n        '
 
 
 def test_generate_previews(monkeypatch):

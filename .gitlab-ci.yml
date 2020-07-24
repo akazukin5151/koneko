@@ -44,7 +44,7 @@ test:
   stage: test
   script:
     - pip install pytest
-    - pytest testing/ -vvvv -l -s
+    - pytest -vvvv -l -s
 
 run:
   stage: run

@@ -44,7 +44,7 @@ jobs:
         flake8 . --count --exit-zero --select=F821,F722 --show-source
     - name: Test with pytest
       run: |
-        pytest testing/ -vvvv -l -s
+        pytest -vvvv -l -s
     - name: Try launching the application
       run: |
         python testing/run.py

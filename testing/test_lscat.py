@@ -10,9 +10,6 @@ import pytest
 from koneko import lscat, pure
 from conftest import setup_test_config
 
-# Lmao python
-sys.path.append('testing')
-
 
 FakeData = namedtuple('data', ('download_path',))
 

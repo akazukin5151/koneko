@@ -11,9 +11,6 @@ import pytest
 
 from koneko import main, utils
 
-# Lmao python
-sys.path.append('testing')
-
 from conftest import CustomExit, raises_customexit
 
 

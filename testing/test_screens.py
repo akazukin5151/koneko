@@ -5,9 +5,6 @@ import pytest
 
 from koneko import screens
 
-# Lmao python
-sys.path.append('testing')
-
 
 @pytest.fixture()
 def turn_off_print(monkeypatch):

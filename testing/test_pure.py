@@ -4,11 +4,8 @@ from pathlib import Path
 
 from koneko import pure
 
-# Lmao python
-sys.path.append('testing')
-
 # Imports the current_page (dict) stored in disk
-from page_json import page_json  # isort:skip
+from testing.page_json import page_json  # isort:skip
 
 page_illusts = page_json['illusts']
 

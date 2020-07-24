@@ -4,8 +4,6 @@ from pathlib import Path
 
 from koneko import KONEKODIR, data
 
-# Lmao python
-sys.path.append('testing')
 
 with open('testing/files/mode1.json', 'r') as json_file:
     mode1 = json.load(json_file)

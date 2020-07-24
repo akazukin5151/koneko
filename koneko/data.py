@@ -10,13 +10,13 @@ from koneko import pure, KONEKODIR
 class AbstractData(ABC):
     """Note that these (sub)classes methods will fail if update() is not called."""
 
-    @abstractmethod
-    def __init__(self):
-        # Defined in child classes, can be attribute or property
-        self.page_num: int
-        self.main_path: 'Path'
-        self.offset: int
+    def __init__(self, page_num: int, main_path: 'Path'):
+        self.page_num = page_num
+        self.main_path = main_path
+        self.all_pages_cache = {}
+        self.offset = 0
 
+        # Must be defined in child classes, can be attribute or property
         self.next_url: str
         self.all_urls: 'list[str]'
         self.all_names: 'list[str]'
@@ -64,12 +64,6 @@ class GalleryData(AbstractData):
             ...
         next_url                (next JSON url)         self.next_url
     """
-    def __init__(self, page_num: int, main_path: 'Path'):
-        self.page_num = page_num
-        self.main_path = main_path
-        self.all_pages_cache = {}
-        self.offset = 0
-
     # Required
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
@@ -110,12 +104,6 @@ class GalleryData(AbstractData):
 
 
 class UserData(AbstractData):
-    def __init__(self, page_num: int, main_path: 'Path'):
-        self.page_num = page_num
-        self.main_path = main_path
-        self.all_pages_cache = {}
-        self.offset = 0
-
     # Required
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""

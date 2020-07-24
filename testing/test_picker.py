@@ -83,11 +83,6 @@ def test_ask_assistant(monkeypatch):
     monkeypatch.setattr('koneko.picker.Picker.start', lambda x: [(None, 1), (None, 2)])
     assert picker.ask_assistant() == [2, 3]
 
-    import os
-    from sys import platform
-    print(platform)
-    print(os.system('du -hs'))
-
 
 def test_pick_dir_y(monkeypatch, patch_filter_history):
     # Just to test the branch is reachable

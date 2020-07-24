@@ -14,6 +14,7 @@ import logging
 import itertools
 import threading
 from math import ceil
+from sys import platform
 from pathlib import Path
 from collections import Counter
 from subprocess import check_output
@@ -156,8 +157,13 @@ def handle_missing_pics() -> 'IO':
 
 
 def get_cache_size():
+    if platform == 'linux':
+        extra = '--apparent-size'
+    elif platform == 'darwin':
+        extra = ''
+
     return check_output(
-        f'du -hs --apparent-size {KONEKODIR} | cut -f1',
+        f'du -hs {extra} {KONEKODIR} | cut -f1',
         shell=True
     ).decode('utf-8').rstrip()
 

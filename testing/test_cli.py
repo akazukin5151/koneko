@@ -2,7 +2,7 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from koneko import cli
+from koneko import cli, __version__
 
 
 def capture_logging_in(capsys):
@@ -68,7 +68,7 @@ def test_mode3_no_input(monkeypatch, args, capsys):
 
 
 @pytest.mark.parametrize('args', (['4', 'searchstring'], ['searchstring']))
-def test_mode4(monkeypatch, args):
+def test_mode4(monkeypatch, args, capsys):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
     monkeypatch.setattr('koneko.cli.main.SearchUsersModeLoop', mock)
@@ -77,9 +77,10 @@ def test_mode4(monkeypatch, args):
     assert cli.launch_mode(args, True)
     assert mock.call_args_list == [call('searchstring')]
     assert mock.mock_calls == [call('searchstring'), call().start()]
+    capture_logging_in(capsys)
 
 @pytest.mark.parametrize('mode', ('5', 'n'))
-def test_mode5(monkeypatch, mode):
+def test_mode5(monkeypatch, mode, capsys):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode]))
     monkeypatch.setattr('koneko.cli.main.illust_follow_mode', mock)
@@ -87,10 +88,11 @@ def test_mode5(monkeypatch, mode):
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
     assert mock.call_args_list == [call()]
+    capture_logging_in(capsys)
 
 
 @pytest.mark.parametrize('mode', ('6', 'r'))
-def test_mode6(monkeypatch, mode):
+def test_mode6(monkeypatch, mode, capsys):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', mode]))
     monkeypatch.setattr('koneko.cli.main.illust_recommended_mode', mock)
@@ -98,6 +100,7 @@ def test_mode6(monkeypatch, mode):
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
     assert mock.call_args_list == [call()]
+    capture_logging_in(capsys)
 
 
 def test_frequent(monkeypatch):
@@ -111,9 +114,11 @@ def test_frequent(monkeypatch):
 
 
 @pytest.mark.parametrize('arg', ('-v', '--version'))
-def test_version(monkeypatch, arg):
+def test_version(monkeypatch, arg, capsys):
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', arg]))
     assert cli.handle_vh() is False
+    captured = capsys.readouterr()
+    assert captured.out == f'{__version__}\n'
 
 @pytest.mark.parametrize('arg', ('-h', '--help'))
 def test_help(monkeypatch, arg, capsys):

@@ -76,8 +76,8 @@ def test_gallery_init():
 def test_gallery_update():
     gdata = gallery()
     gdata.update(mode1)
-    assert list(gdata.all_pages_cache.keys()) == ['1']
-    assert gdata.all_pages_cache['1'] == mode1
+    assert list(gdata.all_pages_cache.keys()) == [1]
+    assert gdata.all_pages_cache[1] == mode1
 
 def test_gallery_download_path():
     gdata = gallery_updated()

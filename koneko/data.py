@@ -73,7 +73,7 @@ class GalleryData(AbstractData):
     # Required
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
-        self.all_pages_cache[str(self.page_num)] = raw
+        self.all_pages_cache[self.page_num] = raw
 
     def artist_user_id(self, post_number: int) -> str:
         """Get the artist user id for a specified post number"""
@@ -81,7 +81,7 @@ class GalleryData(AbstractData):
 
     @property
     def next_url(self) -> str:
-        return self.all_pages_cache[str(self.page_num)]['next_url']
+        return self.all_pages_cache[self.page_num]['next_url']
 
     @property
     def all_urls(self) -> 'list[str]':
@@ -95,7 +95,7 @@ class GalleryData(AbstractData):
     @property
     def current_illusts(self) -> 'Json':
         """Get the illusts json for this page"""
-        return self.all_pages_cache[str(self.page_num)]['illusts']
+        return self.all_pages_cache[self.page_num]['illusts']
 
     def post_json(self, post_number: int) -> 'Json':
         """Get the post json for a specified post number"""

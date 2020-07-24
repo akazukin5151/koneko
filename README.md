@@ -92,48 +92,20 @@ See the [manual](MANUAL.md) here
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.10.0
+### Version 0.10.1
 
 #### Features
-* Browse cache now supports navigating between pages
-* **Breaking**: Removed `image_mode_text_offset` config setting, now does nothing
-* Renewed developer guide in HACKING.md
-* **Breaking**: lscat app: move 'browse cache' and 'specify path' to mode 2 and 3 respectively, moving 'testgallery & 'testuser' to mode 4 and 5 respectively (swapped)
-* Add image mode preview for lscat app
-* Add related images gallery (mode 15): view related and suggested images in image view (mode 2). Press the 'r' key while viewing an image to view related images
-* Add illust_recommended_mode (mode 6): discover recommended illustrations
-* Access browse cache from koneko main; clear cache is now inside browse cache
-* Use `koneko q` to view frequents and launch their mode
-* Revamped user guide/manual
 
 #### Bug fixes
-* Fixed browse cache crashing on empty directory
-* Fixed docs: mode 5 cannot go back to main screen
-* Fixed reloading in a gallery mode leading to user prompt
-* Browse cache now no longer accepts an invalid directory to display on
-* Fixed experimental image mode previews index errors due to it trying to download more images than possible
-* Almost fixing experimental image mode previews by saving previous cursor position and restoring it later; but still a bit unstable
-* Fixed grammar in prompt: "a image command" -> "an image command"
-* Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
-* **Fixed logging in with a new session every time by caching the login token.**
-* Stop prefetch if `next_offset` is invalid
+* Fix inconsistent 'page' / 'image' in ui.Image
+* Fixed `du` not working in macOS
+* Fixed `xdg-open` not present in macOS, use `open` in that case instead
 
 #### Code maintenance
-* lscat `show_instant()` now inspects the cls passed in instead of a bool argument
-* "Inlined" some abstract methods in `AbstractUI` into attributes
-* Make all `ui.Image` methods depend on only `data.ImageData` like the associated free functions, so those methods can be moved to a subclass of `data.ImageData` (the new ui.Image class extends IO behaviours from the data class)
-* Pass in path and name to `api.download` instead of cd-ing into the dir and manually renaming downloads, simplifying a lot of code in the process
-* Replace `pure.Map` with list comprehensions. Can't force functional programming into Python after all
-* Use `funcy.autocurry()` instead of partial
-* Split up `files.filter_dir()`
-* Use `ws_picker()` in `_pick_dirs_picker()`
-* Add `next_offset` property to AbstractData (moved calculation from ui to data.py)
-* Change list comprehensions assigning to `_` into normal for loops
-* Split up `_parse_and_download()`
-* Improved order of methods in `GalleryData`: now sorted by required methods/properties by the interface/abstract class, and unique methods/properties.
-* Rewrite `UserData` class to be more like `GalleryData`
-* Move download_path() method to `AbstractData`
-* Extract `view_post_mode()` and `view_image()` to ABC
+* Added more tests
+* Use int page_num for gallery data cache keys
+* Extract duplicated init method in gdata and udata to ABC
+* Remove sys path modifications by changing pytest command & conftest path. No need to run pytest with the `-s` argument. There is a `conftest.py` symlink in root, pointing to the original path in `testing/`
  
 
 # Roadmap

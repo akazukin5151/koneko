@@ -13,28 +13,34 @@ from conftest import CustomExit, raises_customexit
 def customexit_to_quit(monkeypatch):
     monkeypatch.setattr('koneko.prompt.sys.exit', raises_customexit)
 
+def ask_quit_capture(capsys):
+    captured = capsys.readouterr()
+    assert captured.out == '\nAre you sure you want to exit?\n'
 
-def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit):
+def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit, capsys):
     # Does not call the 'class'
     fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(True,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     assert not prompt.ask_quit()
+    ask_quit_capture(capsys)
 
 
-def test_ask_quit_enter(monkeypatch, patch_cbreak, customexit_to_quit):
+def test_ask_quit_enter(monkeypatch, patch_cbreak, customexit_to_quit, capsys):
     fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()
+    ask_quit_capture(capsys)
 
 
 @pytest.mark.parametrize('letter', ['y', 'q', '', 'h'])
-def test_ask_quit_letter(monkeypatch, patch_cbreak, customexit_to_quit, letter):
+def test_ask_quit_letter(monkeypatch, patch_cbreak, customexit_to_quit, letter, capsys):
     fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
     fake_inkey.__call__ = lambda x: letter
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()
+    ask_quit_capture(capsys)
 
 
 class FakeInKey(ABC):

@@ -79,15 +79,22 @@ def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, pat
     assert captured.out == '\x1b[5A\x1b[K\x1b[1B\x1b[K\x1b[1A                  000\n                  Example artist\n\x1b[2A\n\n\n\n'
 
 
-def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc):
+def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     monkeypatch.setattr('koneko.utils.show_single_x', lambda *a, **k: Mock())
     # Default
     assert assistants.xpadding_assistant(310) == (0, 0)
 
-def test_ypadding_assistant(monkeypatch, patch_cbreak, disable_print_doc):
+    captured = capsys.readouterr()
+    assert captured.out == '\r                    \rimage width = 0\x1b[K\x1b[1A\r                    \rx spacing = 0'
+
+
+def test_ypadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     monkeypatch.setattr('koneko.utils.show_single_x', lambda *a, **k: Mock())
     monkeypatch.setattr('koneko.utils.show_single_y', lambda *a, **k: Mock())
     # Default
     assert assistants.ypadding_assistant(310) == (0, 0)
+
+    captured = capsys.readouterr()
+    assert captured.out == '\r                    \rimage height = 0\x1b[K\x1b[1A\r                    \ry spacing = 0'

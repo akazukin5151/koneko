@@ -147,7 +147,7 @@ def test_TrackDownloadsImage(monkeypatch):
     assert mocked_generator.mock_calls == mock_calls
 
 
-def test_generate_page(monkeypatch):
+def test_generate_page(monkeypatch, capsys):
     mocked_pixcat = Mock()
     monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
     monkeypatch.setattr('koneko.Terminal.width', 100)
@@ -181,7 +181,11 @@ def test_generate_page(monkeypatch):
     assert xcoords == [2, 20, 38, 56, 74] * 6
     assert ycoords == [0, 0, 0, 0, 0, 9, 9, 9, 9, 9] * 3
 
-def test_generate_users(monkeypatch):
+    captured = capsys.readouterr()
+    assert captured.out == '\n' * 66
+
+
+def test_generate_users(monkeypatch, capsys):
     mocked_pixcat = Mock()
     monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
     monkeypatch.setattr('koneko.Terminal.width', 100)
@@ -213,6 +217,28 @@ def test_generate_users(monkeypatch):
     assert align == ['left'] * 120  # 120 images
     assert xcoords == [2, 39, 57, 75] * 30  # total len == 120
     assert ycoords == [0] * 120  # 120 images
+
+    captured = capsys.readouterr()
+    assert captured.out[:100] == (
+        ' ' * 18
+        + '00\n'
+        + ' ' * 18
+        + 'test'
+        + '\n' * 31
+        + ' ' * 18
+        + '04\n'
+        + ' ' * 5
+    )
+
+    assert captured.out[500:600] == (
+        '\n' * 18
+        + ' ' * 18
+        + '28\n'
+        + ' ' * 18
+        + 'test\n'
+        + '\n' * 30
+        + ' ' * 8
+    )
 
 
 def test_generate_previews(monkeypatch):

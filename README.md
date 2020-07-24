@@ -172,7 +172,7 @@ Tips:
 See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Unit tests
-Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don't be surprised if it fails
+Run `pytest testing/ -vvvv -l`. Add `--inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
 
 ## Build and upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)

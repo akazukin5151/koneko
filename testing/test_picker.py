@@ -86,7 +86,7 @@ def test_ask_assistant(monkeypatch):
     import os
     from sys import platform
     print(platform)
-    print(os.system('du --help'))
+    print(os.system('\du --help'))
 
 
 def test_pick_dir_y(monkeypatch, patch_filter_history):

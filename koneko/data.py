@@ -36,7 +36,7 @@ class AbstractData(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def artist_user_id(self):
+    def artist_user_id(self) -> str:
         raise NotImplementedError
 
     @property
@@ -141,7 +141,7 @@ class UserData(AbstractData):
         return self._iterate_cache(lambda x: x['user']['name'])
 
     @cached_property
-    def profile_pic_urls(self):
+    def profile_pic_urls(self) -> 'list[str]':
         return self._iterate_cache(lambda x: x['user']['profile_image_urls']['medium'])
 
     @lru_cache
@@ -149,7 +149,7 @@ class UserData(AbstractData):
         return [func(x) for x in self.all_pages_cache[self.page_num]]
 
     @cached_property
-    def image_urls(self):
+    def image_urls(self) -> 'list[str]':
         return [illust['image_urls']['square_medium']
                 for post in self.all_pages_cache[self.page_num]
                 for illust in post['illusts']]

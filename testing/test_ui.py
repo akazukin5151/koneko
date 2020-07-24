@@ -111,7 +111,7 @@ def test_next_image(monkeypatch, capsys):
     assert not ui.Image.next_image(data)
 
     captured = capsys.readouterr()
-    assert captured.out == 'This is the only page in the post!\n'
+    assert captured.out == 'This is the only image in the post!\n'
 
     # Last image
     data.page_urls = 'fake'
@@ -140,7 +140,7 @@ def test_previous_image(monkeypatch, capsys):
     assert not ui.Image.previous_image(data)
 
     captured = capsys.readouterr()
-    assert captured.out == 'This is the only page in the post!\n'
+    assert captured.out == 'This is the only image in the post!\n'
 
     # First image
     data.page_urls = 'fake'

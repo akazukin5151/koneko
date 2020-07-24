@@ -605,7 +605,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def next_image(self) -> 'IO':
         if not self.page_urls:
-            print('This is the only page in the post!')
+            print('This is the only image in the post!')
             return False
         elif self.page_num + 1 == self.number_of_pages:
             print('This is the last image in the post!')
@@ -617,7 +617,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def previous_image(self) -> 'IO':
         if not self.page_urls:
-            print('This is the only page in the post!')
+            print('This is the only image in the post!')
             return False
         elif self.page_num == 0:
             print('This is the first image in the post!')

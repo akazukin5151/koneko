@@ -85,7 +85,7 @@ def test_ask_assistant(monkeypatch):
 
     import os
     from sys import platform
-    print(platform.system())
+    print(platform)
     print(os.system('du --help'))
 
 

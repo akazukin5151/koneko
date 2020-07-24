@@ -8,7 +8,17 @@ from koneko import pure, KONEKODIR
 
 
 class AbstractData(ABC):
-    """Note that these (sub)classes methods will fail if update() is not called."""
+    """
+    Note that these (sub)classes methods will fail if update() is not called first.
+    When this class is instantiated, there is basically no data inside
+    Only when a fetch occurs, it is updated with the cache and next_url
+    Only then, does the other methods work.
+    It is essentially two classes, one is a fancy tuple of
+    (page_num, main_path, offset);
+    the other class is the cache with all its methods
+    The ImageData class doesn't have this problem because its setup was done
+    by another function -- its ui class was instantiated at the same time as the data
+    """
 
     def __init__(self, page_num: int, main_path: 'Path'):
         self.page_num = page_num
@@ -108,22 +118,12 @@ class UserData(AbstractData):
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
         self.all_pages_cache[self.page_num] = raw['user_previews']
-        # This shows the limitations of the current data class design
-        # When this class is instantiated, there is basically no data inside
-        # Only when a fetch occurs, it is updated with the cache and next_url
-        # Only then, does the other methods work.
-        # It is essentially two classes, one is a fancy tuple of
-        # (page_num, main_path, offset);
-        # the other class is the cache with all its methods
-        # The ImageData class doesn't have this problem because its setup was done
-        # by another function -- its ui class was instantiated at the same time as the data
         self.next_url = raw['next_url']
 
     @lru_cache
     def artist_user_id(self, post_number: int) -> str:
         """Get the artist user id for a specified post number"""
         return self._iterate_cache(lambda x: x['user']['id'])[post_number]
-
 
     @cached_property
     def all_urls(self) -> 'list[str]':

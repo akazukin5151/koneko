@@ -116,11 +116,7 @@ def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak, capsys):
         def __call__(self):
             return Keystroke(ucs='1', code=1, name='1')
 
-    class FakeInKey2(FakeInKey):
-        def __call__(self):
-            return Keystroke(ucs='2', code=1, name='2')
-
-    fake_inkey = iter([FakeInKey1(), FakeInKey2()])
+    fake_inkey = iter([FakeInKey1()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
@@ -219,11 +215,7 @@ def test_user_prompt_seq(monkeypatch, patch_cbreak, capsys):
         def __call__(self):
             return Keystroke(ucs='1', code=1, name='1')
 
-    class FakeInKey2(FakeInKey):
-        def __call__(self):
-            return Keystroke(ucs='2', code=1, name='2')
-
-    fake_inkey = iter([FakeInKey1(), FakeInKey2()])
+    fake_inkey = iter([FakeInKey1()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
     with pytest.raises(CustomExit):
         assert prompt.user_prompt(fakeuser)

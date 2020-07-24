@@ -103,7 +103,7 @@ def test_mode6(monkeypatch, mode, capsys):
     capture_logging_in(capsys)
 
 
-def test_frequent(monkeypatch):
+def test_frequent(monkeypatch, capsys):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko', 'q']))
     monkeypatch.setattr('koneko.cli.main.frequent', mock)
@@ -111,6 +111,7 @@ def test_frequent(monkeypatch):
     args = cli.handle_vh()
     assert cli.launch_mode(args, True)
     assert mock.call_args_list == [call()]
+    capture_logging_in(capsys)
 
 
 @pytest.mark.parametrize('arg', ('-v', '--version'))
@@ -119,6 +120,7 @@ def test_version(monkeypatch, arg, capsys):
     assert cli.handle_vh() is False
     captured = capsys.readouterr()
     assert captured.out == f'{__version__}\n'
+
 
 @pytest.mark.parametrize('arg', ('-h', '--help'))
 def test_help(monkeypatch, arg, capsys):

@@ -64,7 +64,7 @@ class AbstractUI(ABC):
     def start(self, main_path: 'Path') -> 'IO':
         # self._data defined here not in __init__, so that reload() will wipe cache
         # This has to be taken into account before any attempts to make this a subclass of Data
-        self._data = self._data_class(1, main_path)
+        self._data = self._data_class(main_path)
         if files.dir_not_empty(self._data):
             self._show_then_fetch()
         else:
@@ -605,7 +605,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def next_image(self) -> 'IO':
         if not self.page_urls:
-            print('This is the only page in the post!')
+            print('This is the only image in the post!')
             return False
         elif self.page_num + 1 == self.number_of_pages:
             print('This is the last image in the post!')
@@ -617,7 +617,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def previous_image(self) -> 'IO':
         if not self.page_urls:
-            print('This is the only page in the post!')
+            print('This is the only image in the post!')
             return False
         elif self.page_num == 0:
             print('This is the first image in the post!')

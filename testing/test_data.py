@@ -4,8 +4,6 @@ from pathlib import Path
 
 from koneko import KONEKODIR, data
 
-# Lmao python
-sys.path.append('testing')
 
 with open('testing/files/mode1.json', 'r') as json_file:
     mode1 = json.load(json_file)
@@ -16,7 +14,7 @@ with open('testing/files/mode3.json', 'r') as json_file:
 
 
 def gallery():
-    return data.GalleryData(1, KONEKODIR / '2232374')
+    return data.GalleryData(KONEKODIR / '2232374')
 
 def gallery_updated():
     data = gallery()
@@ -27,13 +25,21 @@ def image():
     return data.ImageData(mode2['illust'], '76695217')
 
 def user():
-    return data.UserData(1, KONEKODIR / 'following/2232374')
+    return data.UserData(KONEKODIR / 'following/2232374')
 
 def user_updated():
     data = user()
     data.update(mode3)
     return data
 
+
+def test_next_offset_gdata():
+    gdata = gallery_updated()
+    assert gdata.next_offset == '30'
+
+def test_next_offset_udata():
+    udata = user_updated()
+    assert udata.next_offset == '30'
 
 def test_urls_as_names_gdata():
     gdata = gallery()
@@ -68,8 +74,8 @@ def test_gallery_init():
 def test_gallery_update():
     gdata = gallery()
     gdata.update(mode1)
-    assert list(gdata.all_pages_cache.keys()) == ['1']
-    assert gdata.all_pages_cache['1'] == mode1
+    assert list(gdata.all_pages_cache.keys()) == [1]
+    assert gdata.all_pages_cache[1] == mode1
 
 def test_gallery_download_path():
     gdata = gallery_updated()

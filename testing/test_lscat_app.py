@@ -96,7 +96,7 @@ def test_browse_cache_image(monkeypatch, tmp_path, argv):
     assert mock.mock_calls == [call(path, 'somefile'), call().start()]
 
 
-def test_display_path_cli_invalid_quits(monkeypatch):
+def test_display_path_cli_invalid_quits(monkeypatch, capsys):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '3', 'notapath'])
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 2)
@@ -105,6 +105,8 @@ def test_display_path_cli_invalid_quits(monkeypatch):
 
     with pytest.raises(CustomExit):
         lscat_app.main()
+    captured = capsys.readouterr()
+    assert captured.out == 'Invalid path!\n'
 
 
 def test_display_path_cli_complete(monkeypatch, tmp_path):

@@ -7,6 +7,16 @@ import pytest
 from koneko import files, KONEKODIR
 
 
+def test_write_read_token_file(tmp_path):
+    token_dir = tmp_path / 'token'
+    files.write_token_file(token_dir, 'example_token')
+    assert files.read_token_file(token_dir) == 'example_token'
+
+
+def test_read_token_file_no_token(tmp_path):
+    assert files.read_token_file(tmp_path) is None
+
+
 def test_find_mode2_dirs(tmp_path, monkeypatch):
     monkeypatch.setattr('koneko.files.KONEKODIR', tmp_path)
     (tmp_path / '1234' / 'individual').mkdir(parents=True)

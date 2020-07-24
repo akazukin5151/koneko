@@ -13,28 +13,34 @@ from conftest import CustomExit, raises_customexit
 def customexit_to_quit(monkeypatch):
     monkeypatch.setattr('koneko.prompt.sys.exit', raises_customexit)
 
+def ask_quit_capture(capsys):
+    captured = capsys.readouterr()
+    assert captured.out == '\nAre you sure you want to exit?\n'
 
-def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit):
+def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit, capsys):
     # Does not call the 'class'
     fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(True,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     assert not prompt.ask_quit()
+    ask_quit_capture(capsys)
 
 
-def test_ask_quit_enter(monkeypatch, patch_cbreak, customexit_to_quit):
+def test_ask_quit_enter(monkeypatch, patch_cbreak, customexit_to_quit, capsys):
     fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()
+    ask_quit_capture(capsys)
 
 
 @pytest.mark.parametrize('letter', ['y', 'q', '', 'h'])
-def test_ask_quit_letter(monkeypatch, patch_cbreak, customexit_to_quit, letter):
+def test_ask_quit_letter(monkeypatch, patch_cbreak, customexit_to_quit, letter, capsys):
     fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
     fake_inkey.__call__ = lambda x: letter
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()
+    ask_quit_capture(capsys)
 
 
 class FakeInKey(ABC):
@@ -59,7 +65,7 @@ fakegallery.view_image  = exit_mock
 
 
 @pytest.mark.parametrize('letter', ['n', 'h', 'b', 'r'])
-def test_gallery_like_prompt(monkeypatch, patch_cbreak, letter):
+def test_gallery_like_prompt(monkeypatch, patch_cbreak, letter, capsys):
     class FakeInKeyNew(FakeInKey):
         def __call__(self):
             return Keystroke(ucs=letter, code=1, name=letter)
@@ -70,8 +76,11 @@ def test_gallery_like_prompt(monkeypatch, patch_cbreak, letter):
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
 
+    captured = capsys.readouterr()
+    assert captured.out == f'Enter a gallery view command:\n{letter}'
 
-def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
+
+def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak, capsys):
     class FakeInKeyPrev(FakeInKey):
         def __call__(self):
             return Keystroke(ucs='p', code=1, name='p')
@@ -83,8 +92,11 @@ def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak):
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
 
+    captured = capsys.readouterr()
+    assert captured.out == f'Enter a gallery view command:\np'
 
-def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak):
+
+def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak, capsys):
     class FakeInKeyQuit(FakeInKey):
         def __call__(self):
             return Keystroke(ucs='q', code=1, name='quit')
@@ -95,20 +107,22 @@ def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak):
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
 
+    captured = capsys.readouterr()
+    assert captured.out == f'Enter a gallery view command:\nq'
 
-def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak):
+
+def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak, capsys):
     class FakeInKey1(FakeInKey):
         def __call__(self):
             return Keystroke(ucs='1', code=1, name='1')
 
-    class FakeInKey2(FakeInKey):
-        def __call__(self):
-            return Keystroke(ucs='2', code=1, name='2')
-
-    fake_inkey = iter([FakeInKey1(), FakeInKey2()])
+    fake_inkey = iter([FakeInKey1()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
     with pytest.raises(CustomExit):
         assert prompt.gallery_like_prompt(fakegallery)
+
+    captured = capsys.readouterr()
+    assert captured.out == f'Enter a gallery view command:\n11'
 
 # Doesn't work for some reason, but sequencable_keys did trigger
 #def test_gallery_like_prompt_3_seq(monkeypatch, patch_cbreak):
@@ -141,7 +155,7 @@ fakeimage.show_full_res= exit_mock
 fakeimage.leave = exit_mock
 
 @pytest.mark.parametrize('letter', ('a', 'b', 'q', 'o', 'd', 'n', 'p', 'f'))
-def test_image_prompt(monkeypatch, patch_cbreak, letter):
+def test_image_prompt(monkeypatch, patch_cbreak, letter, capsys):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     class FakeInKeyNew(FakeInKey):
         def __call__(self):
@@ -151,6 +165,9 @@ def test_image_prompt(monkeypatch, patch_cbreak, letter):
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.image_prompt(fakeimage)
+
+    captured = capsys.readouterr()
+    assert captured.out == f'Enter an image view command:\n{letter}'
 
 # Again, multiple key seqs doesn't work
 #def test_image_prompt_seq(monkeypatch, patch_cbreak):
@@ -177,7 +194,7 @@ fakeuser.reload = exit_mock
 fakeuser.go_artist_mode = exit_mock
 
 @pytest.mark.parametrize('letter', ('n', 'r', 'p', 'q'))
-def test_user_prompt(monkeypatch, patch_cbreak, letter):
+def test_user_prompt(monkeypatch, patch_cbreak, letter, capsys):
     monkeypatch.setattr('koneko.prompt.ask_quit', raises_customexit)
     monkeypatch.setattr('koneko.ui.AbstractUsers.previous_page', raises_customexit)
     class FakeInKeyNew(FakeInKey):
@@ -189,16 +206,19 @@ def test_user_prompt(monkeypatch, patch_cbreak, letter):
     with pytest.raises(CustomExit):
         assert prompt.user_prompt(fakeuser)
 
-def test_user_prompt_seq(monkeypatch, patch_cbreak):
+    captured = capsys.readouterr()
+    assert captured.out == f'Enter a user view command:\n{letter}'
+
+
+def test_user_prompt_seq(monkeypatch, patch_cbreak, capsys):
     class FakeInKey1(FakeInKey):
         def __call__(self):
             return Keystroke(ucs='1', code=1, name='1')
 
-    class FakeInKey2(FakeInKey):
-        def __call__(self):
-            return Keystroke(ucs='2', code=1, name='2')
-
-    fake_inkey = iter([FakeInKey1(), FakeInKey2()])
+    fake_inkey = iter([FakeInKey1()])
     monkeypatch.setattr('koneko.prompt.TERM.inkey', next(fake_inkey))
     with pytest.raises(CustomExit):
         assert prompt.user_prompt(fakeuser)
+
+    captured = capsys.readouterr()
+    assert captured.out == 'Enter a user view command:\n11'

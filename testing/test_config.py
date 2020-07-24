@@ -58,7 +58,7 @@ def test_begin_config_exists(monkeypatch, tmp_path, use_test_cfg_path):
     assert type(creds) is configparser.SectionProxy
 
 
-def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path):
+def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path, capsys):
     """Config path does not exist, user saves their ID"""
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'y', 'myid'])
@@ -77,8 +77,11 @@ def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path):
     assert config.get_settings('Credentials', 'username') == Success('myusername')
     assert config.get_settings('Credentials', 'password') == Success('mypassword')
 
+    captured = capsys.readouterr()
+    assert captured.out == '\nPlease enter your password:\n\nDo you want to save your pixiv ID? It will be more convenient\nto view artists you are following\n'
 
-def test_begin_config_nonexistant_no_id(monkeypatch, tmp_path, use_test_cfg_path):
+
+def test_begin_config_nonexistant_no_id(monkeypatch, tmp_path, use_test_cfg_path, capsys):
     """Config path does not exist, user does not save their ID"""
     # It asks for multiple inputs: username, whether to save user id, user id
     responses = iter(['myusername', 'n'])
@@ -97,6 +100,9 @@ def test_begin_config_nonexistant_no_id(monkeypatch, tmp_path, use_test_cfg_path
     assert config.get_settings('Credentials', 'username') == Success('myusername')
     assert config.get_settings('Credentials', 'password') == Success('mypassword')
 
+    captured = capsys.readouterr()
+    assert captured.out == '\nPlease enter your password:\n\nDo you want to save your pixiv ID? It will be more convenient\nto view artists you are following\n'
+
 
 def test_gallery_print_spacing_config(tmp_path, use_test_cfg_path):
     setup_test_config(tmp_path)
@@ -104,3 +110,8 @@ def test_gallery_print_spacing_config(tmp_path, use_test_cfg_path):
 
 def test_gallery_print_spacing_config_default(use_test_cfg_path):
     assert config.gallery_print_spacing_config() == ['9', '17', '17', '17', '17']
+
+
+def test_check_image_preview(tmp_path, use_test_cfg_path):
+    setup_test_config(tmp_path)
+    assert config.check_image_preview() is False

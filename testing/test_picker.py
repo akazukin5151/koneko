@@ -99,13 +99,15 @@ def test_pick_dir_b(monkeypatch, patch_filter_history):
     with pytest.raises(CustomExit):
         picker.pick_dir()
 
-def test_pick_dir_d(monkeypatch, patch_filter_history):
+def test_pick_dir_d(monkeypatch, patch_filter_history, capsys):
     # Just to test the branch is reachable
     monkeypatch.setattr('koneko.picker.Picker.start', lambda x: (None, 'd'))
     monkeypatch.setattr('koneko.picker.actions_from_dir', raises_customexit)
     monkeypatch.setattr('builtins.input', lambda x: 'n')
     with pytest.raises(CustomExit):
         picker.pick_dir()
+    captured = capsys.readouterr()
+    assert captured.out == f'Are you sure you want to delete {KONEKODIR}?\n'
 
 
 def test_pick_dir_f(monkeypatch, patch_filter_history):
@@ -121,7 +123,7 @@ def test_handle_back():
     assert picker.handle_back(KONEKODIR / '1234') == KONEKODIR
 
 
-def test_handle_delete(monkeypatch, tmp_path):
+def test_handle_delete(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr('builtins.input', lambda x: 'n')
     assert picker.handle_delete(tmp_path) == tmp_path
     assert tmp_path.is_dir()
@@ -129,6 +131,8 @@ def test_handle_delete(monkeypatch, tmp_path):
     monkeypatch.setattr('builtins.input', lambda x: 'y')
     assert picker.handle_delete(tmp_path) == tmp_path.parent
     assert not tmp_path.is_dir()
+    captured = capsys.readouterr()
+    assert captured.out == f'Are you sure you want to delete {tmp_path}?\n' * 2
 
 
 def test_handle_filter_clear(monkeypatch, tmp_path):

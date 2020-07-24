@@ -92,48 +92,20 @@ See the [manual](MANUAL.md) here
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.10.0
+### Version 0.10.1
 
 #### Features
-* Browse cache now supports navigating between pages
-* **Breaking**: Removed `image_mode_text_offset` config setting, now does nothing
-* Renewed developer guide in HACKING.md
-* **Breaking**: lscat app: move 'browse cache' and 'specify path' to mode 2 and 3 respectively, moving 'testgallery & 'testuser' to mode 4 and 5 respectively (swapped)
-* Add image mode preview for lscat app
-* Add related images gallery (mode 15): view related and suggested images in image view (mode 2). Press the 'r' key while viewing an image to view related images
-* Add illust_recommended_mode (mode 6): discover recommended illustrations
-* Access browse cache from koneko main; clear cache is now inside browse cache
-* Use `koneko q` to view frequents and launch their mode
-* Revamped user guide/manual
 
 #### Bug fixes
-* Fixed browse cache crashing on empty directory
-* Fixed docs: mode 5 cannot go back to main screen
-* Fixed reloading in a gallery mode leading to user prompt
-* Browse cache now no longer accepts an invalid directory to display on
-* Fixed experimental image mode previews index errors due to it trying to download more images than possible
-* Almost fixing experimental image mode previews by saving previous cursor position and restoring it later; but still a bit unstable
-* Fixed grammar in prompt: "a image command" -> "an image command"
-* Improved stability (eg weird race conditions, files downloaded in wrong places) by not cd-ing into directories
-* **Fixed logging in with a new session every time by caching the login token.**
-* Stop prefetch if `next_offset` is invalid
+* Fix inconsistent 'page' / 'image' in ui.Image
+* Fixed `du` not working in macOS
+* Fixed `xdg-open` not present in macOS, use `open` in that case instead
 
 #### Code maintenance
-* lscat `show_instant()` now inspects the cls passed in instead of a bool argument
-* "Inlined" some abstract methods in `AbstractUI` into attributes
-* Make all `ui.Image` methods depend on only `data.ImageData` like the associated free functions, so those methods can be moved to a subclass of `data.ImageData` (the new ui.Image class extends IO behaviours from the data class)
-* Pass in path and name to `api.download` instead of cd-ing into the dir and manually renaming downloads, simplifying a lot of code in the process
-* Replace `pure.Map` with list comprehensions. Can't force functional programming into Python after all
-* Use `funcy.autocurry()` instead of partial
-* Split up `files.filter_dir()`
-* Use `ws_picker()` in `_pick_dirs_picker()`
-* Add `next_offset` property to AbstractData (moved calculation from ui to data.py)
-* Change list comprehensions assigning to `_` into normal for loops
-* Split up `_parse_and_download()`
-* Improved order of methods in `GalleryData`: now sorted by required methods/properties by the interface/abstract class, and unique methods/properties.
-* Rewrite `UserData` class to be more like `GalleryData`
-* Move download_path() method to `AbstractData`
-* Extract `view_post_mode()` and `view_image()` to ABC
+* Added more tests
+* Use int page_num for gallery data cache keys
+* Extract duplicated init method in gdata and udata to ABC
+* Remove sys path modifications by changing pytest command & conftest path. No need to run pytest with the `-s` argument. There is a `conftest.py` symlink in root, pointing to the original path in `testing/`
  
 
 # Roadmap
@@ -142,14 +114,12 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date
-    * Offline mode: Using `lscat_app` as a base for offline mode, rather than `koneko`
-        - Handle moving around pages
 * Option to save username, but prompt for password (and not save it) every time
 
 ## Known bugs
 
-* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
 * In the logs, urllib3 warns that `Connection pool is full, discarding connection: i.pximg.net`. See [customising pool behaviour](https://urllib3.readthedocs.io/en/latest/advanced-usage.html#customizing-pool-behavior) from urllib3.
+* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay. Directly running the script using `python koneko/main.py` or `python koneko/lscat_app.py` is faster as well. Seems like it's a delay in going to `miniconda/lib/python3.8/site-packages/koneko.egg-link` (installed with `python setup.py develop`)?
 
 # FAQ
@@ -174,7 +144,7 @@ Tips:
 See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Unit tests
-Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don't be surprised if it fails
+Run `pytest testing/ -vvvv -l`. Add `--inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
 
 ## Build and upload to PyPI
 When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)

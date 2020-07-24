@@ -1,7 +1,7 @@
 import os
 import sys
-from abc import ABC, abstractmethod
 from collections import namedtuple
+from abc import ABC, abstractmethod
 
 from koneko import lscat, TERM, printer
 

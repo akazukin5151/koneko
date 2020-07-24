@@ -6,10 +6,7 @@ import pytest
 
 from koneko import utils
 
-# Lmao python
-sys.path.append('testing')
-
-from page_json import page_json  # isort:skip
+from testing.page_json import page_json  # isort:skip
 
 page_illusts = page_json['illusts']
 

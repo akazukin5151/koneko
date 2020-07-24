@@ -19,11 +19,14 @@ class FakeData:
 
 data = FakeData
 
-def test_open_link_coords(monkeypatch):
+def test_open_link_coords(monkeypatch, capsys):
     monkeypatch.setattr('koneko.ui.os.system', lambda x: True)
     utils.open_link_coords(data, 1, 2)
 
-def test_download_image_coords(monkeypatch):
+    captured = capsys.readouterr()
+    assert captured.out == 'Opened https://www.pixiv.net/artworks/1 in browser!\n'
+
+def test_download_image_coords(monkeypatch, capsys):
     # Should belong to test_download.py now
     monkeypatch.setattr('koneko.api.myapi.protected_download', lambda x: True)
     monkeypatch.setattr('koneko.files.verify_full_download', lambda x: True)
@@ -33,6 +36,10 @@ def test_download_image_coords(monkeypatch):
     responses = iter([False, True])
     monkeypatch.setattr('koneko.files.verify_full_download', lambda x: next(responses))
     download.download_image_coords(data, 1, 2)
+
+    captured = capsys.readouterr()
+    assert captured.out == f'Image downloaded at {Path("~/Downloads/fake").expanduser()}\n' * 2
+
 
 def test_previous_page_gallery(monkeypatch):
     monkeypatch.setattr('koneko.files.dir_not_empty', lambda x: True)
@@ -54,7 +61,8 @@ def test_previous_page_gallery(monkeypatch):
     gallery._data.download_path = 'fake'
     ui.AbstractGallery.previous_page(gallery)
 
-def test_previous_page_users(monkeypatch):
+
+def test_previous_page_users(monkeypatch, capsys):
     monkeypatch.setattr('koneko.files.dir_not_empty', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
 
@@ -79,6 +87,10 @@ def test_previous_page_users(monkeypatch):
     assert not ui.AbstractUsers.previous_page(gallery)
     assert gallery._data.offset == 60
 
+    captured = capsys.readouterr()
+    assert captured.out == 'This is the first page!\n'
+
+
 def test_show_full_res(monkeypatch):
     monkeypatch.setattr('koneko.download.download_url', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
@@ -86,7 +98,7 @@ def test_show_full_res(monkeypatch):
     data.download_path = Path('fake')
     ui.Image.show_full_res(data)
 
-def test_next_image(monkeypatch):
+def test_next_image(monkeypatch, capsys):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
     monkeypatch.setattr('koneko.ui.Image.start_preview', lambda *a: True)
@@ -97,6 +109,9 @@ def test_next_image(monkeypatch):
     # Only image
     data.number_of_pages = 1
     assert not ui.Image.next_image(data)
+
+    captured = capsys.readouterr()
+    assert captured.out == 'This is the only image in the post!\n'
 
     # Last image
     data.page_urls = 'fake'
@@ -108,7 +123,11 @@ def test_next_image(monkeypatch):
     data.number_of_pages = 10
     ui.Image.next_image(data)
 
-def test_previous_image(monkeypatch):
+    captured = capsys.readouterr()
+    assert captured.out == 'This is the last image in the post!\n'
+
+
+def test_previous_image(monkeypatch, capsys):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
     monkeypatch.setattr('koneko.ui.Image.start_preview', lambda *a: True)
@@ -120,6 +139,9 @@ def test_previous_image(monkeypatch):
     data.number_of_pages = 1
     assert not ui.Image.previous_image(data)
 
+    captured = capsys.readouterr()
+    assert captured.out == 'This is the only image in the post!\n'
+
     # First image
     data.page_urls = 'fake'
     data.page_num = 0
@@ -130,6 +152,10 @@ def test_previous_image(monkeypatch):
     data.number_of_pages = 10
     data.page_num = 2
     ui.Image.previous_image(data)
+
+    captured = capsys.readouterr()
+    assert captured.out == 'This is the first image in the post!\n'
+
 
 def test_prefetch_next_image(monkeypatch):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)

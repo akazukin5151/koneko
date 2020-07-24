@@ -1,23 +1,32 @@
 """Stores json data from the api. Acts as frontend to access data in a single line.
 Functionally pure, no side effects (but stores state)
-Despite GalleryData and UserData having lots of shared attributes/properties/methods,
-there isn't much shared functionality, so there's nothing to extract to an abstract
-base class
 """
-from functools import lru_cache, cached_property
 from abc import ABC, abstractmethod
+from functools import lru_cache, cached_property
 
 from koneko import pure, KONEKODIR
 
 
 class AbstractData(ABC):
-    @abstractmethod
-    def __init__(self):
-        # Defined in child classes, can be attribute or property
-        self.page_num: int
-        self.main_path: 'Path'
-        self.offset: int
+    """
+    Note that these (sub)classes methods will fail if update() is not called first.
+    When this class is instantiated, there is basically no data inside
+    Only when a fetch occurs, it is updated with the cache and next_url
+    Only then, does the other methods work.
+    It is essentially two classes, one is a fancy tuple of
+    (page_num, main_path, offset);
+    the other class is the cache with all its methods
+    The ImageData class doesn't have this problem because its setup was done
+    by another function -- its ui class was instantiated at the same time as the data
+    """
 
+    def __init__(self, main_path: 'Path'):
+        self.main_path = main_path
+        self.offset = 0
+        self.page_num = 1
+        self.all_pages_cache: 'dict[int, Json]' = {}
+
+        # Must be defined in child classes, can be attribute or property
         self.next_url: str
         self.all_urls: 'list[str]'
         self.all_names: 'list[str]'
@@ -27,7 +36,7 @@ class AbstractData(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def artist_user_id(self):
+    def artist_user_id(self) -> str:
         raise NotImplementedError
 
     @property
@@ -65,16 +74,10 @@ class GalleryData(AbstractData):
             ...
         next_url                (next JSON url)         self.next_url
     """
-    def __init__(self, page_num: int, main_path: 'Path'):
-        self.page_num = page_num
-        self.main_path = main_path
-        self.all_pages_cache = {}
-        self.offset = 0
-
     # Required
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
-        self.all_pages_cache[str(self.page_num)] = raw
+        self.all_pages_cache[self.page_num] = raw
 
     def artist_user_id(self, post_number: int) -> str:
         """Get the artist user id for a specified post number"""
@@ -82,7 +85,7 @@ class GalleryData(AbstractData):
 
     @property
     def next_url(self) -> str:
-        return self.all_pages_cache[str(self.page_num)]['next_url']
+        return self.all_pages_cache[self.page_num]['next_url']
 
     @property
     def all_urls(self) -> 'list[str]':
@@ -96,7 +99,7 @@ class GalleryData(AbstractData):
     @property
     def current_illusts(self) -> 'Json':
         """Get the illusts json for this page"""
-        return self.all_pages_cache[str(self.page_num)]['illusts']
+        return self.all_pages_cache[self.page_num]['illusts']
 
     def post_json(self, post_number: int) -> 'Json':
         """Get the post json for a specified post number"""
@@ -111,34 +114,16 @@ class GalleryData(AbstractData):
 
 
 class UserData(AbstractData):
-    def __init__(self, page_num: int, main_path: 'Path'):
-        self.page_num = page_num
-        self.main_path = main_path
-        self.all_pages_cache = {}
-        self.offset = 0
-
     # Required
     def update(self, raw: 'Json'):
         """Adds newly requested raw json into the cache"""
         self.all_pages_cache[self.page_num] = raw['user_previews']
-        # This shows the limitations of the current data class design
-        # When this class is instantiated, there is basically no data in
-        # Only when a fetch occurs, it is updated with the cache and next_url
-        # Only then, does the other methods work.
-        # It is essentially two classes, one is a fancy tuple of
-        # (page_num, main_path, offset);
-        # the other class is the cache with all its methods
-        # While python will happily allow you to arbitarily add attributes and methods
-        # to the class on the fly, perhaps it is time to rethink the design
         self.next_url = raw['next_url']
-        # The ImageData class doesn't have this problem because its setup was done
-        # by another function -- its ui class was instantiated at the same time as the data
 
     @lru_cache
     def artist_user_id(self, post_number: int) -> str:
         """Get the artist user id for a specified post number"""
         return self._iterate_cache(lambda x: x['user']['id'])[post_number]
-
 
     @cached_property
     def all_urls(self) -> 'list[str]':
@@ -156,7 +141,7 @@ class UserData(AbstractData):
         return self._iterate_cache(lambda x: x['user']['name'])
 
     @cached_property
-    def profile_pic_urls(self):
+    def profile_pic_urls(self) -> 'list[str]':
         return self._iterate_cache(lambda x: x['user']['profile_image_urls']['medium'])
 
     @lru_cache
@@ -164,7 +149,7 @@ class UserData(AbstractData):
         return [func(x) for x in self.all_pages_cache[self.page_num]]
 
     @cached_property
-    def image_urls(self):
+    def image_urls(self) -> 'list[str]':
         return [illust['image_urls']['square_medium']
                 for post in self.all_pages_cache[self.page_num]
                 for illust in post['illusts']]

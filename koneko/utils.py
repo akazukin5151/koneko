@@ -14,6 +14,7 @@ import logging
 import itertools
 import threading
 from math import ceil
+from sys import platform
 from pathlib import Path
 from collections import Counter
 from subprocess import check_output
@@ -122,7 +123,8 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
 # IO related
 def open_in_browser(image_id) -> 'IO':
     link = f'https://www.pixiv.net/artworks/{image_id}'
-    os.system(f'xdg-open {link}')
+    opener = 'open' if platform == 'darwin' else 'xdg-open'
+    os.system(f'{opener} {link}')
     print(f'Opened {link} in browser!')
 
 
@@ -156,8 +158,9 @@ def handle_missing_pics() -> 'IO':
 
 
 def get_cache_size():
+    extra = '' if platform == 'darwin' else '--apparent-size'
     return check_output(
-        f'du -hs --apparent-size {KONEKODIR} | cut -f1',
+        f'du -hs {extra} {KONEKODIR} | cut -f1',
         shell=True
     ).decode('utf-8').rstrip()
 

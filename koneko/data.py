@@ -24,7 +24,7 @@ class AbstractData(ABC):
         self.main_path = main_path
         self.offset = 0
         self.page_num = 1
-        self.all_pages_cache = {}
+        self.all_pages_cache: 'dict[int, Json]' = {}
 
         # Must be defined in child classes, can be attribute or property
         self.next_url: str

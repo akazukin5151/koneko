@@ -20,11 +20,11 @@ class AbstractData(ABC):
     by another function -- its ui class was instantiated at the same time as the data
     """
 
-    def __init__(self, page_num: int, main_path: 'Path'):
-        self.page_num = page_num
+    def __init__(self, main_path: 'Path'):
         self.main_path = main_path
-        self.all_pages_cache = {}
         self.offset = 0
+        self.page_num = 1
+        self.all_pages_cache = {}
 
         # Must be defined in child classes, can be attribute or property
         self.next_url: str

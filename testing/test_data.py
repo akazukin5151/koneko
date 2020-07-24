@@ -16,7 +16,7 @@ with open('testing/files/mode3.json', 'r') as json_file:
 
 
 def gallery():
-    return data.GalleryData(1, KONEKODIR / '2232374')
+    return data.GalleryData(KONEKODIR / '2232374')
 
 def gallery_updated():
     data = gallery()
@@ -27,7 +27,7 @@ def image():
     return data.ImageData(mode2['illust'], '76695217')
 
 def user():
-    return data.UserData(1, KONEKODIR / 'following/2232374')
+    return data.UserData(KONEKODIR / 'following/2232374')
 
 def user_updated():
     data = user()

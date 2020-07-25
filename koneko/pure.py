@@ -20,9 +20,10 @@ def _generate_filepath(filename: str) -> Path:
 
 def _prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
     """old_name_with_ext can be `test.png`, but new_name is `abcd`"""
+    santised_name = new_name.replace('/', '')
     img_ext = old_name_with_ext.split('.')[-1]
     number_prefix = str(number).rjust(3, '0')
-    new_file_name = f'{number_prefix}_{new_name}.{img_ext}'
+    new_file_name = f'{number_prefix}_{santised_name}.{img_ext}'
     return new_file_name
 
 

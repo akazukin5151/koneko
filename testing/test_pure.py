@@ -33,6 +33,7 @@ def test_generate_filepath():
 def test_prefix_filename():
     assert pure._prefix_filename('old.jpg', 'new', 2) == '002_new.jpg'
     assert pure._prefix_filename('old.jpg', 'new', 10) == '010_new.jpg'
+    assert pure._prefix_filename('old.jpg', 'tricky/new/name', 23) == '023_trickynewname.jpg'
 
 
 def test_url_given_size():

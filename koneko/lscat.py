@@ -36,7 +36,7 @@ def icat(path: str) -> 'IO':
     Image(path).show()
 
 
-def show_instant(cls, data) -> 'IO':
+def show_instant(cls: 'lscat.<class>', data: 'data.<class>') -> 'IO':
     tracker = cls(data)
     # Filter out invisible files
     # (used to save splitpoint and total_imgs without requesting)
@@ -91,7 +91,7 @@ class AbstractTracker(ABC):
 
 class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
-    def __init__(self, data):
+    def __init__(self, data: 'data.<class>'):
         self.orders = list(range(30))
         self.generator = generate_page(data.download_path)
         super().__init__()
@@ -99,7 +99,7 @@ class TrackDownloads(AbstractTracker):
 
 class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
-    def __init__(self, data):
+    def __init__(self, data: 'data.<class>'):
         print_info = config.check_print_info()
 
         # Tries to access splitpoint attribute in the data instance
@@ -117,7 +117,7 @@ class TrackDownloadsUsers(AbstractTracker):
         super().__init__()
 
 
-def generate_page(path) -> 'IO':
+def generate_page(path: 'Path') -> 'IO':
     """Given number, calculate its coordinates and display it, then yield"""
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
@@ -144,7 +144,7 @@ def generate_page(path) -> 'IO':
         )
 
 
-def generate_users(path, print_info=True) -> 'IO':
+def generate_users(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
     page_spacing = config.users_page_spacing_config()
@@ -188,7 +188,7 @@ class TrackDownloadsImage(AbstractTracker):
         self.generator.send(new)
 
 
-def generate_previews(path, min_num) -> 'IO':
+def generate_previews(path: 'Path', min_num: int) -> 'IO':
     """Experimental"""
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()

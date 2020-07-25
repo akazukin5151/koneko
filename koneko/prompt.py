@@ -13,7 +13,7 @@ from koneko import ui, pure, utils, printer, download, TERM
 
 
 # Common prompt code
-def ask_quit():
+def ask_quit() -> 'IO':
     """Ask for quit confirmation, no need to press enter"""
     print('\nAre you sure you want to exit?')
     with TERM.cbreak():
@@ -202,7 +202,7 @@ def user_prompt(user):
 
 
 # Actions dispatcher
-def open_or_download(gallery, keyseqs: 'list[str]'):
+def open_or_download(gallery, keyseqs: 'list[str]') -> 'IO':
     letter = keyseqs[0]
     first_num, second_num = keyseqs[-2:]
     if letter == 'o':
@@ -220,7 +220,7 @@ def open_or_download(gallery, keyseqs: 'list[str]'):
         download.download_image_num(gallery._data, selected_image_num)
 
 
-def goto_image(gallery, image_num: int):
+def goto_image(gallery, image_num: int) -> 'IO':
     if image_num is False:
         print('Invalid number!')
         gallery_like_prompt(gallery)  # Go back to while loop

@@ -145,7 +145,7 @@ class UserData(AbstractData):
         return self._iterate_cache(lambda x: x['user']['profile_image_urls']['medium'])
 
     @lru_cache
-    def _iterate_cache(self, func) -> 'list[str]':
+    def _iterate_cache(self, func: 'fn(x: Json) -> str') -> 'list[str]':
         return [func(x) for x in self.all_pages_cache[self.page_num]]
 
     @cached_property

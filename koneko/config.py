@@ -114,13 +114,13 @@ def gallery_print_spacing_config() -> 'list[str]':
 
 
 
-def credentials_from_config(config_object, config_path) -> ('config', str):
+def credentials_from_config(config_object, config_path) -> 'IO[(config, str)]':
     credentials = get_config_section('Credentials').unwrap()
     your_id = credentials.get('ID', '')
     return credentials, your_id
 
 # Technically frontend
-def begin_config() -> ('IO[config]', str):
+def begin_config() -> 'IO[(config, str)]':
     os.system('clear')
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     config_object = ConfigParser()
@@ -129,7 +129,7 @@ def begin_config() -> ('IO[config]', str):
     return init_config(config_object, config_path)
 
 
-def init_config(config_object, config_path) -> ('IO[config]', str):
+def init_config(config_object, config_path) -> 'IO[(config, str)]':
     # Identical to `_ask_your_id(_ask_credentials(config_object))`
     config_object, your_id = flow(
         config_object,
@@ -150,7 +150,7 @@ def _ask_credentials(config_object) -> 'IO[config]':
     return config_object
 
 
-def _ask_your_id(config_object) -> ('IO[config]', str):
+def _ask_your_id(config_object) -> 'IO[(config, str)]':
     print('\nDo you want to save your pixiv ID? It will be more convenient')
     print('to view artists you are following')
     ans = input()

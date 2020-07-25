@@ -48,7 +48,7 @@ FakeData = namedtuple('data', ('download_path',))
 
 
 # Main functions that organise work
-def main():
+def main() -> 'IO':
     if len(sys.argv) == 1:
         _main()
 
@@ -70,7 +70,7 @@ def main():
         display_user()
 
 
-def _main():
+def _main() -> 'IO':
     ans = picker.lscat_app_main()
 
     case = {
@@ -86,17 +86,17 @@ def _main():
         func()
 
 
-def display_gallery():
+def display_gallery() -> 'IO':
     data = FakeData(KONEKODIR / 'testgallery')
     lscat.show_instant(lscat.TrackDownloads, data)
 
 
-def display_user():
+def display_user() -> 'IO':
     data = FakeData(KONEKODIR / 'testuser')
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
 
 
-def display_path(path=None):
+def display_path(path=None) -> 'IO':
     if not path:
         path = input('Please paste in your path:\n')
 
@@ -108,7 +108,7 @@ def display_path(path=None):
     lscat.show_instant(lscat.TrackDownloads, data)
 
 
-def browse_cache():
+def browse_cache() -> 'IO':
     path = picker.pick_dir()
     data = FakeData(path)
 
@@ -120,7 +120,7 @@ def browse_cache():
         lscat_prompt.GalleryUserLoop(data, lscat.TrackDownloads).start()
 
 
-def config_assistance(actions: 'Optional[list[int]]' = None):
+def config_assistance(actions: 'Optional[list[int]]' = None) -> 'IO':
     """Some assistants return a new setting, which should be propagated
     to other assistants.
     """

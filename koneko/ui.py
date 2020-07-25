@@ -71,14 +71,14 @@ class AbstractUI(ABC):
             self._download_from_scratch()
         self._prefetch()
 
-    def _verify_up_to_date(self):
+    def _verify_up_to_date(self) -> 'IO':
         if files.dir_not_empty(self._data):
             return True
         files.remove_dir_if_exist(self._data)
         download.init_download(self._data, self._tracker_class(self._data))
 
 
-    def _show_then_fetch(self):
+    def _show_then_fetch(self) -> 'IO':
         lscat.show_instant(self._tracker_class, self._data)
         self._request_then_save()
         self._verify_up_to_date()
@@ -245,7 +245,7 @@ class ArtistGallery(AbstractGallery):
         self._artist_user_id = artist_user_id
         super().__init__(KONEKODIR / str(artist_user_id))
 
-    def _pixivrequest(self):
+    def _pixivrequest(self) -> 'IO':
         """Implements abstractmethod: use the user-given id for request"""
         return api.myapi.artist_gallery(self._artist_user_id, self._data.offset)
 
@@ -261,7 +261,7 @@ class ArtistGallery(AbstractGallery):
             prompt.gallery_like_prompt(self)  # Go back to while loop
 
     @staticmethod
-    def help():
+    def help() -> 'IO':
         """Implements abstractmethod"""
         print('')
         print(''.join(
@@ -306,7 +306,7 @@ class IllustFollowGallery(AbstractGallery):
         """Implements abstractmethod"""
         super().__init__(KONEKODIR / 'illustfollow')
 
-    def _pixivrequest(self):
+    def _pixivrequest(self) -> 'IO':
         """Implements abstractmethod, publicity is private for now
         (might be configurable in the future)
         """
@@ -343,7 +343,7 @@ class IllustFollowGallery(AbstractGallery):
             self.go_artist_gallery_num(pure.concat_seqs_to_int(keyseqs, 1))
 
     @staticmethod
-    def help():
+    def help() -> 'IO':
         """Implements abstractmethod"""
         print('')
         print(''.join(colors.base1 + [
@@ -365,7 +365,7 @@ class IllustRelatedGallery(ArtistGallery):
         self._image_id = image_id
         super().__init__(main_path / str(image_id) / 'illustrelated')
 
-    def _pixivrequest(self):
+    def _pixivrequest(self) -> 'IO':
         """Overrides base: different method"""
         return api.myapi.illust_related_request(self._image_id, offset=self._data.offset)
 
@@ -380,7 +380,7 @@ class IllustRecommendedGallery(ArtistGallery):
         """Overrides base: set main_path"""
         super().__init__(KONEKODIR / 'recommended')
 
-    def _pixivrequest(self):
+    def _pixivrequest(self) -> 'IO':
         """Overrides base: different method"""
         return api.myapi.illust_recommended_request(offset=self._data.offset)
 
@@ -410,7 +410,7 @@ class AbstractUsers(AbstractUI, ABC):
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
 
-    def _print_page_info(self):
+    def _print_page_info(self) -> 'IO':
         """Implements abstractmethod: Indicate current page number"""
         print(f'Page {self._data.page_num}')
 
@@ -439,7 +439,7 @@ class SearchUsers(AbstractUsers):
         self.user = user  # This is only used for pixivrequest
         super().__init__(KONEKODIR / 'search' / user)
 
-    def _pixivrequest(self):
+    def _pixivrequest(self) -> 'IO':
         return api.myapi.search_user_request(self.user, self._data.offset)
 
 
@@ -457,7 +457,7 @@ class FollowingUsers(AbstractUsers):
         self.your_id = your_id
         super().__init__(KONEKODIR / 'following' / your_id)
 
-    def _pixivrequest(self):
+    def _pixivrequest(self) -> 'IO':
         return api.myapi.following_user_request(
             self.your_id, self._publicity, self._data.offset
         )
@@ -484,15 +484,15 @@ class ToImage(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_image_id(self, post_json):
+    def get_image_id(self, post_json: 'Json') -> str:
         raise NotImplementedError
 
     @abstractmethod
-    def maybe_show_preview(self):
+    def maybe_show_preview(self) -> 'Maybe[IO]':
         raise NotImplementedError
 
     @abstractmethod
-    def download_image(self, idata):
+    def download_image(self, idata) -> 'IO':
         raise NotImplementedError
 
     def setup(self):
@@ -519,15 +519,15 @@ class ViewImage(ToImage):
     def get_post_json(self):
         return self._gdata.post_json(self._selected_image_num)
 
-    def get_image_id(self, post_json):
+    def get_image_id(self, post_json) -> str:
         return post_json.id
 
-    def maybe_show_preview(self):
+    def maybe_show_preview(self) -> 'IO':
         os.system('clear')
         image = sorted(os.listdir(self._gdata.download_path))[self._selected_image_num]
         lscat.icat(self._gdata.main_path / str(self._gdata.page_num) / image)
 
-    def download_image(self, idata):
+    def download_image(self, idata) -> 'IO':
         download.download_url(
             idata.download_path,
             idata.page_urls[0],
@@ -541,7 +541,7 @@ class ViewPostMode(ToImage):
         self._image_id = image_id
         self.firstmode = True
 
-    def get_post_json(self):
+    def get_post_json(self) -> 'IO':
         print('Fetching illust details...')
         try:
             return api.myapi.protected_illust_detail(self._image_id)['illust']
@@ -549,13 +549,13 @@ class ViewPostMode(ToImage):
             print('Work has been deleted or the ID does not exist!')
             sys.exit(1)
 
-    def get_image_id(self, _):
+    def get_image_id(self, _) -> str:
         return self._image_id
 
-    def maybe_show_preview(self):
+    def maybe_show_preview(self) -> 'None':
         return True
 
-    def download_image(self, idata):
+    def download_image(self, idata) -> 'IO':
         download.download_url(
             idata.download_path,
             idata.current_url,
@@ -584,7 +584,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
 
-    def display_initial(self):
+    def display_initial(self) -> 'IO':
         os.system('clear')
         lscat.icat(self.download_path / self.large_filename)
         print(f'Page 1/{self.number_of_pages}')
@@ -626,7 +626,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.page_num -= 1
         self.jump_to_image(self.page_num + 1)
 
-    def jump_to_image(self, selected_image_num: int):
+    def jump_to_image(self, selected_image_num: int) -> 'IO':
         self.event.set()
         if selected_image_num <= 0 or selected_image_num > len(self.page_urls):
             print('Invalid number!')
@@ -636,7 +636,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.page_num = selected_image_num - 1
         self._jump()
 
-    def _jump(self):
+    def _jump(self) -> 'IO':
         """Downloads next image if not downloaded, display it, prefetch next"""
         # FIXME: thread might download to the user's current dir.
         # Pass in path to api.download as planned
@@ -653,7 +653,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         print(f'Page {self.page_num+1}/{self.number_of_pages}')
         self.start_preview()
 
-    def _prefetch_next_image(self):
+    def _prefetch_next_image(self) -> 'IO':
         with funcy.suppress(IndexError):
             next_img_url = self.next_img_url
         if next_img_url:
@@ -672,7 +672,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         mode = IllustRelatedGallery(self.image_id, self.download_path)
         prompt.gallery_like_prompt(mode)
 
-    def start_preview(self):
+    def start_preview(self) -> 'IO':
         self.loc = TERM.get_location()
         if config.check_image_preview() and self.number_of_pages > 1:
             self.event = threading.Event()  # Reset event, in case if it's set

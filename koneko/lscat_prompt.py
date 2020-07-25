@@ -17,18 +17,18 @@ class AbstractLoop(ABC):
         self.current_page: int
 
     @abstractmethod
-    def show_func(self):
+    def show_func(self) -> 'IO':
         raise NotImplementedError
 
     @abstractmethod
-    def middle(self):
+    def middle(self) -> 'Maybe[IO]':
         raise NotImplementedError
 
     @abstractmethod
-    def end_func(self):
+    def end_func(self) -> 'Any':
         raise NotImplementedError
 
-    def start(self):
+    def start(self) -> 'IO':
         show_images = True
         with TERM.cbreak():
             while True:
@@ -88,10 +88,10 @@ class GalleryUserLoop(AbstractLoop):
              if x.isdigit()]
         )
 
-    def show_func(self):
+    def show_func(self) -> 'IO':
         lscat.show_instant(self.cls, self.data)
 
-    def middle(self):
+    def middle(self) -> None:
         return True
 
     def end_func(self):
@@ -112,17 +112,18 @@ class ImageLoop(AbstractLoop):
         self.current_page = 0
         self.max_pages = len(self.all_images) - 1
 
-    def show_func(self):
+    def show_func(self) -> 'IO':
         lscat.icat(self.root / self.image)
 
     def end_func(self):
         self.image = self.all_images[self.current_page]
 
-    def update_tracker(self):
+    def update_tracker(self) -> 'IO':
+        """Unique"""
         data = self.FakeData(self.root, self.current_page)
         return lscat.TrackDownloadsImage(data)
 
-    def middle(self):
+    def middle(self) -> 'IO':
         if len(self.all_images) > 1:
             tracker = self.update_tracker()
             loc = TERM.get_location()

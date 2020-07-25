@@ -14,12 +14,15 @@ from conftest import setup_test_config
 FakeData = namedtuple('data', ('download_path',))
 
 
-def test_icat():
+def test_icat(monkeypatch):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
     try:
         lscat.icat('./testing/files/004_祝！！！.jpg')
     except OSError:
         # Github doesn't connect to terminal
-        pass
+        return True
+    assert mocked_pixcat.mock_calls == mocked_pixcat.method_calls == [call.show()]
 
 
 def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):

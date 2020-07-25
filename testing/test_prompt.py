@@ -1,6 +1,6 @@
-from unittest.mock import Mock
 from collections import namedtuple
 from abc import ABC, abstractmethod
+from unittest.mock import Mock, call
 
 import pytest
 from blessed.keyboard import Keystroke
@@ -222,3 +222,60 @@ def test_user_prompt_seq(monkeypatch, patch_cbreak, capsys):
 
     captured = capsys.readouterr()
     assert captured.out == 'Enter a user view command:\n11'
+
+
+def test_open_or_download_open_coords(monkeypatch):
+    mocked_func = Mock()
+    mocked_gallery = Mock()
+    monkeypatch.setattr('koneko.utils.open_link_coords', mocked_func)
+    prompt.open_or_download(mocked_gallery, ['o', '2', '3'])
+    assert mocked_func.call_args_list == [call(mocked_gallery._data, 2, 3)]
+
+
+def test_open_or_download_open_num(monkeypatch):
+    mocked_func = Mock()
+    mocked_gallery = Mock()
+    monkeypatch.setattr('koneko.utils.open_link_num', mocked_func)
+    prompt.open_or_download(mocked_gallery, ['O', '2', '3'])
+    assert mocked_func.call_args_list == [call(mocked_gallery._data, 23)]
+
+
+def test_open_or_download_download_coords(monkeypatch):
+    mocked_func = Mock()
+    mocked_gallery = Mock()
+    monkeypatch.setattr('koneko.download.download_image_coords', mocked_func)
+    prompt.open_or_download(mocked_gallery, ['d', '2', '3'])
+    assert mocked_func.call_args_list == [call(mocked_gallery._data, 2, 3)]
+
+
+def test_open_or_download_download_num(monkeypatch):
+    mocked_func = Mock()
+    mocked_gallery = Mock()
+    monkeypatch.setattr('koneko.download.download_image_num', mocked_func)
+    prompt.open_or_download(mocked_gallery, ['D', '2', '3'])
+    assert mocked_func.call_args_list == [call(mocked_gallery._data, 23)]
+
+
+def test_goto_image_invalid(monkeypatch, capsys):
+    mocked_func = Mock()
+    mocked_gallery = Mock()
+    monkeypatch.setattr('koneko.prompt.gallery_like_prompt', mocked_func)
+    prompt.goto_image(mocked_gallery, False)
+    assert mocked_func.call_args_list == [call(mocked_gallery)]
+    captured = capsys.readouterr()
+    assert captured.out == 'Invalid number!\n'
+
+
+def test_goto_image_valid(monkeypatch):
+    mocked_gallery = Mock()
+    mocked_gallery.view_image = Mock()
+    prompt.goto_image(mocked_gallery, 2)
+    assert mocked_gallery.view_image.call_args_list == [call(2)]
+
+
+def test_goto_image_zero_is_valid(monkeypatch):
+    mocked_gallery = Mock()
+    mocked_gallery.view_image = Mock()
+    prompt.goto_image(mocked_gallery, 0)
+    assert mocked_gallery.view_image.call_args_list == [call(0)]
+

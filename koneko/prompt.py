@@ -9,7 +9,7 @@ Structure:
 import sys
 
 from koneko.pure import all_isdigit
-from koneko import ui, pure, utils, printer, download, TERM
+from koneko import pure, utils, printer, download, TERM
 
 
 # Common prompt code
@@ -179,7 +179,7 @@ def user_prompt(user):
         'p': user.previous_page,
         'h': printer.user_help,
         'q': ask_quit,
-        'm': lambda: print(ui.AbstractUsers.__doc__)
+        'm': lambda: print(user.__class__.__bases__[0].__doc__)
     }
 
     with TERM.cbreak():

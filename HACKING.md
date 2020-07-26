@@ -180,14 +180,9 @@ $ pipdeptree -v
 $ pipdeptree --graph-output png -p koneko > dependencies.png
 ```
 
-## Imports
+## Internal imports analysis
 
-1. `pyreverse koneko/*.py -o png`
-2. Count the type of each arrow in each module box:
-    * Imported by another module (arrow pointing towards box): +1
-    * Imports another module (arrow pointing away from box): -1
-3. Raw score = sum
-5. Proportion = imported / abs(imported + dependents)
+See [import-analyzer](https://github.com/twenty5151/import-analyzer/)
 
 * Larger score means it is a dependency of other modules more
     * "A dependency of a lot of modules"
@@ -218,4 +213,4 @@ $ pipdeptree --graph-output png -p koneko > dependencies.png
 | main.py         |            2 |              7 |      -5 |           22 |
 | ui.py           |            2 |             12 |     -10 |           14 |
 | lscat_app.py    |            1 |              7 |      -6 |           12 |
-| \_\_main\_\_.py     |            0 |              5 |      -5 |            0 |
+| \_\_main\_\_.py |            0 |              5 |      -5 |            0 |

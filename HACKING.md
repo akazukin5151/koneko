@@ -214,8 +214,8 @@ $ pipdeptree --graph-output png -p koneko > dependencies.png
 | screens.py      | + 2 | - 4 | = - 2 |             |      | 33%
 | download.py     | + 2 | - 6 | = - 4 |             |      | 25%
 | prompt.py       | + 2 | - 6 | = - 4 |             |      | 25%
-| lscat_prompt.py | + 1 | - 3 | = - 2 |             |      | 20%
 | lscat_app.py    | + 2 | - 7 | = - 5 |             |      | 22%
+| lscat_prompt.py | + 1 | - 3 | = - 2 |             |      | 20%
 | ui.py           | + 3 | -12 | = - 9 |             |      | 20%
 | assistants.py   | + 2 | - 8 | = - 6 |             |      | 20%
 | main.py         | + 1 | -11 | = -10 | cli         | -11  | 0%

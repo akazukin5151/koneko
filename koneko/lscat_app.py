@@ -37,14 +37,11 @@ from koneko import (
     config,
     picker,
     printer,
+    FakeData,
     KONEKODIR,
     assistants,
     lscat_prompt,
 )
-
-
-# Small 'functions'
-FakeData = namedtuple('data', ('download_path',))
 
 
 # Main functions that organise work

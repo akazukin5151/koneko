@@ -16,7 +16,7 @@ from koneko import (
     config,
     picker,
     printer,
-    lscat_app,
+    FakeData,
     KONEKODIR,
 )
 
@@ -394,7 +394,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[i
     # Setup variables
     if ans == 'y':
         _path = picker.pick_dir()
-        _data = lscat_app.FakeData(_path)
+        _data = FakeData(_path)
         lscat.show_instant(lscat.TrackDownloads, _data)
         ncols = config.ncols_config()  # Default fallback, on user choice
     else:

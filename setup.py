@@ -44,7 +44,7 @@ setup(
     tests_require=['pytest~=5.4'],
     entry_points={
         'console_scripts': [
-            'koneko=koneko.main:main',
+            'koneko=koneko.__main__:_main',
             'lscat=koneko.lscat_app:main'
         ]
     },

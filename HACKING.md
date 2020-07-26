@@ -187,7 +187,6 @@ $ pipdeptree --graph-output png -p koneko > dependencies.png
     * Imported by another module (arrow pointing towards box): +1
     * Imports another module (arrow pointing away from box): -1
 3. Raw score = sum
-4. New score = -1 for each circular dependency
 5. Proportion = imported / abs(imported + dependents)
 
 * Larger score means it is a dependency of other modules more
@@ -197,25 +196,25 @@ $ pipdeptree --graph-output png -p koneko > dependencies.png
 * High proportion means most connections to other modules are its dependents
 * Low proportion means most connections to other modules are its dependencies
 
-| Module | Imported by another module | Dependent on another module | Raw score | Circular dependencies | New score | Proportion
-| ----------------|-----|-----|-------|-------------|------| ---
-| \_\_init\_\_.py | +17 | - 0 | =  17 |             |      | 100%
-| pure.py         | +10 | - 0 | =  10 |             |      | 100%
-| colors.py       | + 2 | - 0 | =   2 |             |      | 100%
-| config.py       | + 6 | - 1 | =   5 |             |      | 86%
-| files.py        | + 5 | - 1 | =   4 |             |      | 83%
-| printer.py      | + 7 | - 2 | =   5 |             |      | 78%
-| utils.py        | + 8 | - 4 | =   4 |             |      | 67%
-| api.py          | + 3 | - 2 | =   1 |             |      | 60%
-| data.py         | + 2 | - 2 | =   0 |             |      | 50%
-| lscat.py        | + 4 | - 4 | =   0 |             |      | 50%
-| picker.py       | + 3 | - 4 | = - 1 |             |      | 43%
-| cli.py          | + 2 | - 3 | = - 1 | main        |  -2  | 40%
-| screens.py      | + 2 | - 4 | = - 2 |             |      | 33%
-| download.py     | + 2 | - 6 | = - 4 |             |      | 25%
-| prompt.py       | + 2 | - 6 | = - 4 |             |      | 25%
-| lscat_app.py    | + 2 | - 7 | = - 5 |             |      | 22%
-| lscat_prompt.py | + 1 | - 3 | = - 2 |             |      | 20%
-| ui.py           | + 3 | -12 | = - 9 |             |      | 20%
-| assistants.py   | + 2 | - 8 | = - 6 |             |      | 20%
-| main.py         | + 1 | -11 | = -10 | cli         | -11  | 0%
+| Module | Imported by another module | Dependent on another module | Raw score | Proportion
+| ----------------|-----|-----|-------|------|
+| \_\_init\_\_.py | +17 | - 0 | =  17 | 100%
+| pure.py         | +10 | - 0 | =  10 | 100%
+| colors.py       | + 2 | - 0 | =   2 | 100%
+| config.py       | + 6 | - 1 | =   5 | 86%
+| files.py        | + 5 | - 1 | =   4 | 83%
+| printer.py      | + 7 | - 2 | =   5 | 78%
+| utils.py        | + 8 | - 4 | =   4 | 67%
+| api.py          | + 3 | - 2 | =   1 | 60%
+| data.py         | + 2 | - 2 | =   0 | 50%
+| lscat.py        | + 4 | - 4 | =   0 | 50%
+| picker.py       | + 3 | - 4 | = - 1 | 43%
+| cli.py          | + 2 | - 3 | = - 1 | 40%
+| screens.py      | + 2 | - 4 | = - 2 | 33%
+| download.py     | + 2 | - 6 | = - 4 | 25%
+| prompt.py       | + 2 | - 6 | = - 4 | 25%
+| lscat_app.py    | + 2 | - 7 | = - 5 | 22%
+| lscat_prompt.py | + 1 | - 3 | = - 2 | 20%
+| ui.py           | + 3 | -12 | = - 9 | 20%
+| assistants.py   | + 2 | - 8 | = - 6 | 20%
+| main.py         | + 1 | -11 | = -10 | 1%

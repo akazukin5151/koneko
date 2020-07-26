@@ -92,36 +92,20 @@ See the [manual](MANUAL.md) here
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.10.1
-
-* Two new examples of koneko being applied to another site:
-    * [koneko-twitter](https://github.com/twenty5151/koneko-twitter)
-    * [koneko-gelbooru](https://github.com/twenty5151/koneko-gelbooru/)
+### Version 0.10.2
 
 #### Features
 
 #### Bug fixes
-* Fixed inconsistent 'page' / 'image' in ui.Image
-* Fixed `du` not working in macOS
-* Fixed `xdg-open` not present in macOS, use `open` in that case instead
-* Fixed bug where artist name with '/' isn't downloaded
-* Fixed users mode prefetching page 1 again
 
 #### Code maintenance
-* Added more tests
-* Use int page_num for gallery data cache keys
-* Extract duplicated init method in gdata and udata to ABC
-* Remove sys path modifications by changing pytest command & conftest path. No need to run pytest with the `-s` argument. There is a `conftest.py` symlink in root, pointing to the original path in `testing/`
-* Fixed tests sometimes showing a (pixcat) image: mock and assert pixcat in lscat.icat()
-* Use default github gitignore for python
- 
-
-# Roadmap
-
 * Remove circular imports
     - [x] prompt importing ui
     - [x] assistants importing lscat_app
-    - [ ] cli importing main (or the other way around)
+    - [x] cli importing main (or the other way around)
+ 
+
+# Roadmap
 
 ## Features
 

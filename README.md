@@ -120,7 +120,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Remove circular imports
     - [x] prompt importing ui
-    - [ ] assistants importing lscat_app
+    - [x] assistants importing lscat_app
     - [ ] cli importing main (or the other way around)
 
 ## Features

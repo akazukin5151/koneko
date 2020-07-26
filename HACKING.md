@@ -84,7 +84,7 @@ It is possible to adapt koneko to work with sites other than pixiv:
     * At the very least, only the `api` and `data` modules need to be replaced.
     * The config already handles username and passwords, but you can add something like an API key or OTP auth
     * The navigation routes (eg pages, prompt handling) are in `ui.py`, while the starting dispatch logic is in `main.py`
-    * See the [koneko-twitter](https://github.com/twenty5151/koneko-twitter) repo for a rough example
+    * See the [koneko-twitter](https://github.com/twenty5151/koneko-twitter) and [koneko-gelbooru](https://github.com/twenty5151/koneko-gelbooru/) repos for some rough examples
 
 
 ## Cache directory structure

@@ -218,4 +218,4 @@ $ pipdeptree --graph-output png -p koneko > dependencies.png
 | main.py         |            2 |              7 |      -5 |           22 |
 | ui.py           |            2 |             12 |     -10 |           14 |
 | lscat_app.py    |            1 |              7 |      -6 |           12 |
-| __main__.py     |            0 |              5 |      -5 |            0 |
+| \_\_main\_\_.py     |            0 |              5 |      -5 |            0 |

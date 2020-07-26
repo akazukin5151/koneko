@@ -118,6 +118,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 # Roadmap
 
+* Remove circular imports
+
 ## Features
 
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers

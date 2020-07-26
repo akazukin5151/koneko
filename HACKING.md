@@ -201,21 +201,21 @@ $ pipdeptree --graph-output png -p koneko > dependencies.png
 | ----------------|-----|-----|-------|-------------|------| ---
 | \_\_init\_\_.py | +17 | - 0 | =  17 |             |      | 100%
 | pure.py         | +10 | - 0 | =  10 |             |      | 100%
+| colors.py       | + 2 | - 0 | =   2 |             |      | 100%
 | config.py       | + 6 | - 1 | =   5 |             |      | 86%
+| files.py        | + 5 | - 1 | =   4 |             |      | 83%
 | printer.py      | + 7 | - 2 | =   5 |             |      | 78%
 | utils.py        | + 8 | - 4 | =   4 |             |      | 67%
-| files.py        | + 5 | - 1 | =   4 |             |      | 83%
-| colors.py       | + 2 | - 0 | =   2 |             |      | 100%
 | api.py          | + 3 | - 2 | =   1 |             |      | 60%
 | data.py         | + 2 | - 2 | =   0 |             |      | 50%
 | lscat.py        | + 4 | - 4 | =   0 |             |      | 50%
 | picker.py       | + 3 | - 4 | = - 1 |             |      | 43%
 | cli.py          | + 2 | - 3 | = - 1 | main        |  -2  | 40%
 | screens.py      | + 2 | - 4 | = - 2 |             |      | 33%
-| lscat_prompt.py | + 1 | - 3 | = - 2 |             |      | 20%
 | download.py     | + 2 | - 6 | = - 4 |             |      | 25%
+| lscat_prompt.py | + 1 | - 3 | = - 2 |             |      | 20%
 | prompt.py       | + 2 | - 6 | = - 4 | ui          | - 5  | 17%
+| ui.py           | + 3 | -12 | = - 9 | prompt      | -10  | 17%
 | lscat_app.py    | + 2 | - 7 | = - 5 | assistants  | - 6  | 14%
 | assistants.py   | + 2 | - 8 | = - 6 | lscat_app   | - 7  | 13%
-| ui.py           | + 3 | -12 | = - 9 | prompt      | -10  | 17%
 | main.py         | + 1 | -11 | = -10 | cli         | -11  | 0%

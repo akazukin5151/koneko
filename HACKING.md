@@ -180,3 +180,37 @@ $ pipdeptree -v
 $ pipdeptree --graph-output png -p koneko > dependencies.png
 ```
 
+## Imports
+
+1. `pyreverse koneko/*.py -o png`
+2. Count the type of each arrow in each module box:
+    * Imported by another module (arrow pointing towards box): +1
+    * Imports another module (arrow pointing away from box): -1
+
+* Larger number means it is a dependency of other modules more
+    * "A dependency of a lot of modules"
+* Smaller number means it depends on other modules more
+    * "Depends on a lot of modules"
+
+| Module | Imported by another module | Dependent on another module | Raw score | Circular dependencies | New score
+| ----------------|-----|-----|-------|-------------|-----
+| \_\_init\_\_.py | +17 | - 0 | =  17 |             |
+| pure.py         | +10 | - 0 | =  10 |             |
+| config.py       | + 6 | - 1 | =   5 |             |
+| printer.py      | + 7 | - 2 | =   5 |             |
+| utils.py        | + 8 | - 4 | =   4 |             |
+| files.py        | + 5 | - 1 | =   4 |             |
+| colors.py       | + 2 | - 0 | =   2 |             |
+| api.py          | + 3 | - 2 | =   1 |             |
+| data.py         | + 2 | - 2 | =   0 |             |
+| lscat.py        | + 4 | - 4 | =   0 |             |
+| picker.py       | + 3 | - 4 | = - 1 |             |
+| cli.py          | + 2 | - 3 | = - 1 | main        |  0
+| screens.py      | + 2 | - 4 | = - 2 |             |
+| lscat_prompt.py | + 1 | - 3 | = - 2 |             |
+| download.py     | + 2 | - 6 | = - 4 |             |
+| prompt.py       | + 2 | - 6 | = - 4 | ui          | - 5
+| lscat_app.py    | + 2 | - 7 | = - 5 | assistants  | - 6
+| assistants.py   | + 2 | - 8 | = - 6 | lscat_app   | - 7
+| ui.py           | + 3 | -12 | = - 9 | prompt      | -10
+| main.py         | + 1 | -11 | = -10 | cli         | -11

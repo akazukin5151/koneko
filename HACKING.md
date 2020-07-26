@@ -196,25 +196,26 @@ $ pipdeptree --graph-output png -p koneko > dependencies.png
 * High proportion means most connections to other modules are its dependents
 * Low proportion means most connections to other modules are its dependencies
 
-| Module | Imported by another module | Dependent on another module | Raw score | Proportion
-| ----------------|-----|-----|-------|------|
-| \_\_init\_\_.py | +17 | - 0 | =  17 | 100%
-| pure.py         | +10 | - 0 | =  10 | 100%
-| colors.py       | + 2 | - 0 | =   2 | 100%
-| config.py       | + 6 | - 1 | =   5 | 86%
-| files.py        | + 5 | - 1 | =   4 | 83%
-| printer.py      | + 7 | - 2 | =   5 | 78%
-| utils.py        | + 8 | - 4 | =   4 | 67%
-| api.py          | + 3 | - 2 | =   1 | 60%
-| data.py         | + 2 | - 2 | =   0 | 50%
-| lscat.py        | + 4 | - 4 | =   0 | 50%
-| picker.py       | + 3 | - 4 | = - 1 | 43%
-| cli.py          | + 2 | - 3 | = - 1 | 40%
-| screens.py      | + 2 | - 4 | = - 2 | 33%
-| download.py     | + 2 | - 6 | = - 4 | 25%
-| prompt.py       | + 2 | - 6 | = - 4 | 25%
-| lscat_app.py    | + 2 | - 7 | = - 5 | 22%
-| lscat_prompt.py | + 1 | - 3 | = - 2 | 20%
-| ui.py           | + 3 | -12 | = - 9 | 20%
-| assistants.py   | + 2 | - 8 | = - 6 | 20%
-| main.py         | + 1 | -11 | = -10 | 1%
+|                 |   Dependents |   Dependencies |   Score |   Proportion |
+|:----------------|-------------:|---------------:|--------:|-------------:|
+| pure.py         |           10 |              0 |      10 |          100 |
+| colors.py       |            2 |              0 |       2 |          100 |
+| \_\_init\_\_.py |           14 |              0 |      14 |          100 |
+| files.py        |            5 |              1 |       4 |           83 |
+| printer.py      |            7 |              2 |       5 |           78 |
+| utils.py        |            9 |              3 |       6 |           75 |
+| config.py       |            5 |              2 |       3 |           71 |
+| lscat.py        |            6 |              4 |       2 |           60 |
+| api.py          |            3 |              3 |       0 |           50 |
+| cli.py          |            2 |              3 |      -1 |           40 |
+| prompt.py       |            3 |              5 |      -2 |           38 |
+| picker.py       |            3 |              5 |      -2 |           38 |
+| data.py         |            1 |              2 |      -1 |           33 |
+| screens.py      |            2 |              4 |      -2 |           33 |
+| download.py     |            2 |              4 |      -2 |           33 |
+| lscat_prompt.py |            1 |              3 |      -2 |           25 |
+| assistants.py   |            2 |              7 |      -5 |           22 |
+| main.py         |            2 |              7 |      -5 |           22 |
+| ui.py           |            2 |             12 |     -10 |           14 |
+| lscat_app.py    |            1 |              7 |      -6 |           12 |
+| __main__.py     |            0 |              5 |      -5 |            0 |

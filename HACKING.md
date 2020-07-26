@@ -184,12 +184,12 @@ $ pipdeptree --graph-output png -p koneko > dependencies.png
 
 See [import-analyzer](https://github.com/twenty5151/import-analyzer/)
 
-* Larger score means it is a dependency of other modules more
+* A larger score means it is a dependency of other modules more
     * "A dependency of a lot of modules"
-* Smaller score means it depends on other modules more
+* A smaller score means it depends on other modules more
     * "Depends on a lot of modules"
-* High proportion means most connections to other modules are its dependents
-* Low proportion means most connections to other modules are its dependencies
+* A high proportion means most connections to other modules are its dependents
+* A low proportion means most connections to other modules are its dependencies
 
 |                 |   Dependents |   Dependencies |   Score |   Proportion |
 |:----------------|-------------:|---------------:|--------:|-------------:|

@@ -54,7 +54,7 @@ class APIHandler:
         return True
 
 
-    def _login_with_creds(self) -> 'Optional[dict[dict[str]]]':
+    def _login_with_creds(self) -> 'Optional[dict[str, dict[str]]]':
         try:
             return self._api.login(
                 self._credentials['Username'],
@@ -71,53 +71,53 @@ class APIHandler:
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @utils.spinner('')
-    def artist_gallery(self, artist_user_id, offset):
+    def artist_gallery(self, artist_user_id, offset) -> 'Json':
         """Mode 1"""
         self._await_login()
         return self._api.user_illusts(artist_user_id, offset=offset)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    def protected_illust_detail(self, image_id):
+    def protected_illust_detail(self, image_id) -> 'Json':
         """Mode 2"""
         self._await_login()
         return self._api.illust_detail(image_id)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    def following_user_request(self, user_id, publicity, offset):
+    def following_user_request(self, user_id, publicity, offset) -> 'Json':
         """Mode 3"""
         self._await_login()
         return self._api.user_following(user_id, restrict=publicity, offset=offset)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    def search_user_request(self, searchstr, offset):
+    def search_user_request(self, searchstr, offset) -> 'Json':
         """Mode 4"""
         self._await_login()
         return self._api.search_user(searchstr, offset=offset)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @utils.spinner('')
-    def illust_follow_request(self, restrict, offset):
+    def illust_follow_request(self, restrict, offset) -> 'Json':
         """Mode 5"""
         self._await_login()
         return self._api.illust_follow(restrict=restrict, offset=offset)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @utils.spinner('')
-    def illust_related_request(self, image_id, offset):
+    def illust_related_request(self, image_id, offset) -> 'Json':
         """Mode 15 (1.5 * 10 so it's an int)"""
         self._await_login()
         return self._api.illust_related(illust_id=image_id, offset=offset)
 
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
     @utils.spinner('')
-    def illust_recommended_request(self, offset):
+    def illust_recommended_request(self, offset) -> 'Json':
         """Mode 6"""
         self._await_login()
         return self._api.illust_recommended(offset=offset)
 
     # Download
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))
-    def protected_download(self, url, path, name):
+    def protected_download(self, url, path, name) -> 'IO':
         """Protect api download function with funcy.retry so it doesn't crash"""
         self._await_login()
         self._api.download(url, path=path, name=name)

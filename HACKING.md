@@ -78,11 +78,13 @@ Now, this paints a rosy picture but in reality, there was no initial planning so
 
 Here are some good tips:
 * "The way to figure out the separation is by doing as much as you can without mutation, and then encapsulating the mutation separately" (Gary Bernhardt)
-* "Create your application to work without either a UI or a database so you can run automated regression-tests against the application, work when the database becomes unavailable, and **link applications together without any user involvement**" ([Alistair Cockburn](https://github.com/jschairb/sandbox/wiki/HexagonalArchitecture)) (Emphasis mine; it is possible to adapt koneko to work with sites other than pixiv)
-    * At the very least, only the api and download modules need to be replaced.
-    * `data.py` will need to be adapted to your new API structure.
+* "Create your application to work without either a UI or a database so you can run automated regression-tests against the application, work when the database becomes unavailable, and **link applications together without any user involvement**" ([Alistair Cockburn](https://github.com/jschairb/sandbox/wiki/HexagonalArchitecture)) (Emphasis mine)
+
+It is possible to adapt koneko to work with sites other than pixiv:
+    * At the very least, only the `api` and `data` modules need to be replaced.
     * The config already handles username and passwords, but you can add something like an API key or OTP auth
     * The navigation routes (eg pages, prompt handling) are in `ui.py`, while the starting dispatch logic is in `main.py`
+    * See the [koneko-twitter](https://github.com/twenty5151/koneko-twitter) and [koneko-gelbooru](https://github.com/twenty5151/koneko-gelbooru/) repos for some rough examples
 
 
 ## Cache directory structure

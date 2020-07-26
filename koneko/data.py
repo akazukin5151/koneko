@@ -2,7 +2,7 @@
 Functionally pure, no side effects (but stores state)
 """
 from abc import ABC, abstractmethod
-from functools import lru_cache, cached_property
+from functools import lru_cache
 
 from koneko import pure, KONEKODIR
 
@@ -125,37 +125,36 @@ class UserData(AbstractData):
         """Get the artist user id for a specified post number"""
         return self._iterate_cache(lambda x: x['user']['id'])[post_number]
 
-    @cached_property
+    @property
     def all_urls(self) -> 'list[str]':
         return self.profile_pic_urls + self.image_urls
 
-    @cached_property
+    @property
     def all_names(self) -> 'list[str]':
         preview_names_ext = map(pure.split_backslash_last, self.image_urls)
         preview_names = [x.split('.')[0] for x in preview_names_ext]
         return self.names + preview_names
 
     # Unique
-    @cached_property
+    @property
     def names(self) -> 'list[str]':
         return self._iterate_cache(lambda x: x['user']['name'])
 
-    @cached_property
+    @property
     def profile_pic_urls(self) -> 'list[str]':
         return self._iterate_cache(lambda x: x['user']['profile_image_urls']['medium'])
 
-    @lru_cache
-    def _iterate_cache(self, func) -> 'list[str]':
+    def _iterate_cache(self, func: 'fn(x: Json) -> str') -> 'list[str]':
         return [func(x) for x in self.all_pages_cache[self.page_num]]
 
-    @cached_property
+    @property
     def image_urls(self) -> 'list[str]':
         return [illust['image_urls']['square_medium']
                 for post in self.all_pages_cache[self.page_num]
                 for illust in post['illusts']]
 
 
-    @cached_property
+    @property
     def splitpoint(self) -> int:
         """Number of artists. The number where artists stop and previews start"""
         return len(self.profile_pic_urls)

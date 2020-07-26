@@ -31,7 +31,7 @@ def _pick_dirs_picker(actions: 'list[str]', title: str) -> Picker:
     return picker
 
 
-def lscat_app_main() -> int:
+def lscat_app_main() -> 'IO[int]':
     os.system('clear')
     title = ('Welcome to the lscat interactive script\n'
              'Please select an action')
@@ -107,7 +107,7 @@ def ask_assistant() -> 'IO[list[int]]':
     return _multiselect_picker(actions, title, to_str=False)
 
 
-def pick_dir() -> 'path':
+def pick_dir() -> 'Path':
     path = KONEKODIR
     # base is immutable
     cache_size = utils.get_cache_size()
@@ -125,7 +125,7 @@ def pick_dir() -> 'path':
     return _pick_dir_loop(path, basetitle, actions, [])
 
 
-def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
+def _pick_dir_loop(path: 'Path', basetitle: str, actions, modes: 'list[str]') -> 'Path':
     title = basetitle
 
     while True:
@@ -155,13 +155,13 @@ def _pick_dir_loop(path, basetitle, actions, modes) -> 'path':
         actions = actions_from_dir(path, modes)
 
 
-def handle_back(path: 'path') -> 'path':
+def handle_back(path: 'Path') -> 'Path':
     if path != KONEKODIR:
         return path.parent
     return path
 
 
-def handle_delete(path: 'path') -> 'IO[path]':
+def handle_delete(path: 'Path') -> 'IO[Path]':
     print(f'Are you sure you want to delete {path}?')
     confirm = input("Enter 'y' to confirm\n")
     if confirm == 'y':
@@ -170,7 +170,7 @@ def handle_delete(path: 'path') -> 'IO[path]':
     return path
 
 
-def handle_filter(path: 'path', basetitle: str) -> (str, 'list[str]', 'list[str]'):
+def handle_filter(path: 'Path', basetitle: str) -> (str, 'list[str]', 'list[str]'):
     modes = select_modes_filter(True)
     if '6' in modes:
         # Clear all filters
@@ -182,7 +182,7 @@ def handle_filter(path: 'path', basetitle: str) -> (str, 'list[str]', 'list[str]
     return title, actions, modes
 
 
-def handle_cd(path, selected_dir: 'path', modes: 'list[str]') -> ('path', 'list[str]'):
+def handle_cd(path, selected_dir: 'Path', modes: 'list[str]') -> ('Path', 'list[str]'):
     if selected_dir == EMPTY_FILTER_WARNING:
         return KONEKODIR, []
     elif (newpath := path / selected_dir).is_dir():
@@ -190,7 +190,7 @@ def handle_cd(path, selected_dir: 'path', modes: 'list[str]') -> ('path', 'list[
     return path, modes
 
 
-def actions_from_dir(path: 'path', modes: 'list[str]') -> 'list[str]':
+def actions_from_dir(path: 'Path', modes: 'list[str]') -> 'list[str]':
     if path == KONEKODIR and modes:  # Filter active
         return try_filter_dir(modes)
     if ('2' in modes
@@ -205,6 +205,6 @@ def actions_from_dir(path: 'path', modes: 'list[str]') -> 'list[str]':
 def try_filter_dir(modes: 'list[str]') -> 'list[str]':
     return sorted(files.filter_dir(modes)) or [EMPTY_FILTER_WARNING]
 
-def handle_clear():
+def handle_clear() -> 'IO':
     if screens.clear_cache_loop():
         sys.exit(0)

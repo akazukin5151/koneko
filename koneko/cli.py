@@ -56,7 +56,7 @@ def handle_vh() -> 'Optional[dict]':
     return args
 
 
-def launch_mode(args, your_id):
+def launch_mode(args: 'docopt.Dict[str, str]', your_id: str):
     print('Logging in...')
 
     if (url_or_str := args['<link>']):
@@ -68,7 +68,7 @@ def launch_mode(args, your_id):
     return parse_mode_given(args)
 
 
-def parse_no_mode(url_or_str: str, your_id):
+def parse_no_mode(url_or_str: str, your_id: str):
     if 'users' in url_or_str:
         return main.ArtistModeLoop(pure.process_user_url(url_or_str)).start()
 
@@ -93,7 +93,7 @@ def parse_no_mode(url_or_str: str, your_id):
     return main.SearchUsersModeLoop(url_or_str).start()
 
 
-def parse_mode_given(args: 'dict') -> (str, str):
+def parse_mode_given(args: 'docopt.Dict[str, str]'):
     url_or_id = args['<link_or_id>']
 
     if args['1'] or args['a']:

@@ -100,7 +100,7 @@ def filter_modes_allowed(modes: 'list[str]') -> 'set[str]':
     return allowed_names
 
 
-def filter_modes_predicate(modes: 'list[str]', allowed_names: 'set[str]') -> 'func(str) -> bool':
+def filter_modes_predicate(modes: 'list[str]', allowed_names: 'set[str]') -> 'fn(str) -> bool':
     """Pure"""
     if '1' in modes:
         return lambda d: d.isdigit() or d in allowed_names

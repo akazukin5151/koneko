@@ -28,7 +28,7 @@ from koneko.config import ncols_config, xcoords_config
 
 
 # History and logging
-def setup_history_log():
+def setup_history_log() -> 'logging.Logger':
     logger = logging.getLogger('history')
     handler = RotatingFileHandler(KONEKODIR / 'history', maxBytes=1e6, backupCount=3)
     formatter = logging.Formatter('%(message)s')
@@ -121,7 +121,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
 
 
 # IO related
-def open_in_browser(image_id) -> 'IO':
+def open_in_browser(image_id: str) -> 'IO':
     link = f'https://www.pixiv.net/artworks/{image_id}'
     opener = 'open' if platform == 'darwin' else 'xdg-open'
     os.system(f'{opener} {link}')
@@ -137,7 +137,7 @@ def open_link_coords(data, first_num, second_num) -> 'IO':
         open_link_num(data, selected_image_num)
 
 
-def open_link_num(data, number) -> 'IO':
+def open_link_num(data, number: int) -> 'IO':
     # Update current_page_illusts, in case if you're in another page
     open_in_browser(data.image_id(number))
 
@@ -157,7 +157,7 @@ def handle_missing_pics() -> 'IO':
     os.system('clear')
 
 
-def get_cache_size():
+def get_cache_size() -> str:
     extra = '' if platform == 'darwin' else '--apparent-size'
     return check_output(
         f'du -hs {extra} {KONEKODIR} | cut -f1',

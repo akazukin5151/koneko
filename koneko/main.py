@@ -29,7 +29,7 @@ from koneko import (
  )
 
 
-def main():
+def main() -> 'IO':
     """Read config file, start login, process any cli arguments, go to main loop"""
     if not (args := cli.handle_vh()):
         sys.exit(0)
@@ -52,7 +52,7 @@ def main():
         main_loop(args, your_id)
 
 
-def main_loop(_, your_id: str):
+def main_loop(_, your_id: str) -> 'IO':
     """Ask for a mode and launch it (mode might ask for more info), for no cli args"""
     printmessage = True
     case = {
@@ -112,16 +112,16 @@ class AbstractLoop(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _go_to_mode(self):
+    def _go_to_mode(self) -> 'IO':
         """Define self.mode here"""
         raise NotImplementedError
 
     @abstractmethod
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a hard-coded string of the current mode number"""
         raise NotImplementedError
 
-    def start(self):
+    def start(self) -> 'IO':
         """Ask for further info if not provided, then proceed to mode"""
         while True:
             if not self._user_input:
@@ -144,7 +144,7 @@ class AbstractLoop(ABC):
         """Process self._raw_answer here into self._user_input"""
         self._user_input = pure.process_user_url(self._raw_answer)
 
-    def _validate_input(self) -> 'bool':
+    def _validate_input(self) -> bool:
         if self._user_input == '!freq':
             return True
 
@@ -154,7 +154,7 @@ class AbstractLoop(ABC):
             return False
         return True
 
-    def _save_history(self):
+    def _save_history(self) -> 'IO':
         if self._user_input != '!freq':
             logger = utils.setup_history_log()
             logger.info(str(self) + ': ' + self._user_input)
@@ -167,7 +167,7 @@ class ArtistModeLoop(AbstractLoop):
         """Implements abstractmethod: prompt for artist ID or url"""
         self._raw_answer = input('Enter artist ID or url:\n')
 
-    def _go_to_mode(self):
+    def _go_to_mode(self) -> 'IO':
         """Implements abstractmethod: go to mode 1"""
         os.system('clear')
         self.mode = ui.ArtistGallery(self._user_input)
@@ -175,7 +175,7 @@ class ArtistModeLoop(AbstractLoop):
         # This is the entry mode, user goes back but there is nothing to catch it
         main()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Implements abstractmethod: return string of mode number"""
         return '1'
 
@@ -191,14 +191,14 @@ class ViewPostModeLoop(AbstractLoop):
         """Overrides base method for different processor function"""
         self._user_input = pure.process_artwork_url(self._raw_answer)
 
-    def _go_to_mode(self):
+    def _go_to_mode(self) -> 'IO':
         """Implements abstractmethod: Go to mode 2"""
         os.system('clear')
         ui.view_post_mode(self._user_input)
         # After backing
         main()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Implements abstractmethod: return string of mode number"""
         return '2'
 
@@ -213,14 +213,14 @@ class FollowingUserModeLoop(AbstractLoop):
         """Implements abstractmethod: prompt for artist ID or url"""
         self._raw_answer = input('Enter your pixiv ID or url: ')
 
-    def _go_to_mode(self):
+    def _go_to_mode(self) -> 'IO':
         """Implements abstractmethod: Go to mode 3"""
         os.system('clear')
         self.mode = ui.FollowingUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
 
-    def start(self, your_id=None):
+    def start(self, your_id=None) -> 'IO':
         """Complements base method: If ID not given, ask if config ID should be used,
         or enter a custom ID
         """
@@ -228,7 +228,7 @@ class FollowingUserModeLoop(AbstractLoop):
             self._user_input = ask_your_id(your_id)
         super().start()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Implements abstractmethod: return string of mode number"""
         return '3'
 
@@ -248,19 +248,19 @@ class SearchUsersModeLoop(AbstractLoop):
         """Overrides base method: all inputs are valid"""
         return True
 
-    def _go_to_mode(self):
+    def _go_to_mode(self) -> 'IO':
         """Implements abstractmethod: Go to mode 4"""
         os.system('clear')
         self.mode = ui.SearchUsers(self._user_input)
         prompt.user_prompt(self.mode)
         main()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Implements abstractmethod: return string of mode number"""
         return '4'
 
 
-def illust_follow_mode():
+def illust_follow_mode() -> 'IO':
     """Immediately goes to ui.IllustFollowGallery()"""
     mode = ui.IllustFollowGallery()
     prompt.gallery_like_prompt(mode)
@@ -268,26 +268,26 @@ def illust_follow_mode():
     main()
 
 
-def illust_recommended_mode():
+def illust_recommended_mode() -> 'IO':
     """Immediately goes to ui.IllustRecommendedGallery()"""
     mode = ui.IllustRecommendedGallery()
     prompt.gallery_like_prompt(mode)
     main()
 
 
-def frequent_modes(modes):
+def frequent_modes(modes: 'list[str]') -> 'IO':
     history = utils.frequent_history_modes(modes)
     actions = utils.format_frequent(history)
     _frequent(actions, history)
 
 
-def frequent():
+def frequent() -> 'IO':
     history = utils.frequent_history()
     actions = utils.format_frequent(history)
     _frequent(actions, history)
 
 
-def _frequent(actions, history):
+def _frequent(actions: 'list[str]', history: 'dict[str, int]') -> 'IO':
     idx = picker.frequent_modes_picker(actions)
     if idx == 'f':
         return frequent_modes(picker.select_modes_filter())
@@ -306,7 +306,7 @@ def _frequent(actions, history):
         func()
 
 
-def ask_your_id(your_id):
+def ask_your_id(your_id: str):
     if your_id:  # your_id stored in config file
         ans = input('Do you want to use the Pixiv ID saved in your config? [Y/n]\n')
         if ans in {'y', ''}:

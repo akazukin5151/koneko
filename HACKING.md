@@ -2,24 +2,24 @@
 
 # Contents
 
-- 'Functional core, imperative shell' + MVA?
-- Cache directory structure
-- UML diagrams
-    - Flowchart of modes and their connections
-    - Simplified UML diagram of the classes
-        - api.py
-        - download.py
-        - Image Adjuster in assistants.py
-        - lscat.py and data.py
-        - main.py to prompt.py
-        - main.py to ui.py
-        - ui.py
-    - Actor-ish model of the ui.AbstractUI class
-    - Actor-ish model of the ui.Gallery classes (extending AbstractUI)
-    - Actor-ish model of the ui.User classes (extending AbstractUI)
-    - Actor-ish model of the ui.Image class
-- Dependencies
-- Internal imports analysis
+- ['Functional core, imperative shell' + MVA?](#functional-core-imperative-shell--mva)
+- [Cache directory structure](#cache-directory-structure)
+- [UML diagrams](#uml-diagrams)
+    - [Flowchart of modes and their connections](#flowchart-of-modes-and-their-connections)
+    - [Simplified UML diagram of the classes](#simplified-uml-diagram-of-the-classes)
+        - [api.py](#apipy)
+        - [download.py](#downloadpy)
+        - [Image Adjuster in assistants.py](#image-adjuster-in-assistantspy)
+        - [lscat.py and data.py](#lscatpy-and-datapy)
+        - [main.py to prompt.py](#mainpy-to-promptpy)
+        - [main.py to ui.py](#mainpy-to-uipy)
+        - [ui.py](#uipy)
+    - [Actor-ish model of the ui.AbstractUI class](#actor-ish-model-of-the-uiabstractui-class)
+    - [Actor-ish model of the ui.Gallery classes (extending AbstractUI)](#actor-ish-model-of-the-uigallery-classes-extending-abstractui)
+    - [Actor-ish model of the ui.User classes (extending AbstractUI)](#actor-ish-model-of-the-uiuser-classes-extending-abstractui)
+    - [Actor-ish model of the ui.Image class](#actor-ish-model-of-the-uiimage-class)
+- [Dependencies](#dependencies)
+- [Internal imports analysis](#internal-imports-analysis)
 
 # 'Functional core, imperative shell' + MVA?
 
@@ -149,7 +149,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 # UML diagrams
 
-## Flowchart of modes and their connections:
+## Flowchart of modes and their connections
 
 ![Flowchart UML](http://plantuml.com:80/plantuml/png/bPLFYy8m4CNl-HG1pnxyUn9nNLXPTc5XFIuYeHrhQDf8qhBuxRU9IMsQiR97Ex-ycNbzgHjTCLNLXI14vxoyCCKAMcj8c8RLYgtNMvRacP9rcRvA8HNzvDcvskVNhQW1EyAn8mNi5429yQUO_pYpd6EiZjb4yK9BLBcCwI-Ld7cAmGg3MPcXEoeGCRwJ8YN4CVH5LLnNnum90UeweTRBjlfUi0ocrBhLFdoJGiXVNcP7PW_h6RNsjC0UM3E_hywfDUIkAKJTT3nvbGMr5hJrRn2iWlJ8JMyzCMMxHmT8P550cKAwfDOHGk93uv-HsVGmNhijxZlRA4teA8X8P4GZq0KEolner6wdd_EF6azDOnyqNCLLEnB-HOHb9qXy6HcXRqo0TleCSBc9-HF6nVi9TOir2lLCcj5RMuA5hJjJpq3Kq1PsPWvgrXTdwwmtqfpwBKaKyD21_an3UDjkZexUKKN3jA3EL89Sgy1n7wGXJC2fSkCiq77-9-TlJD-FS8MbMS5-mSABRNNCy_3cBHzYqMq9Id7YDes4-KFv0m00)
 

@@ -14,7 +14,7 @@
         - [main.py to prompt.py](#mainpy-to-promptpy)
         - [main.py to ui.py](#mainpy-to-uipy)
         - [ui.py](#uipy)
-    - [Actor-ish models of ui classes](#actor-ish-model-of-ui-classes)
+    - [Actor-ish models of ui classes](#actor-ish-models-of-ui-classes)
         - [ui.AbstractUI](#uiabstractui)
         - [ui.Gallery classes (extending AbstractUI)](#uigallery-classes-extending-abstractui)
         - [ui.User classes (extending AbstractUI)](#uiuser-classes-extending-abstractui)

@@ -145,13 +145,13 @@ See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 Run `pytest testing/ -vvvv -l`. Add `--inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
 
 ## Build and upload to PyPI
-When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
-
-Test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` is now automated.
-
-Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
+1. Review github action logs to make sure nothing is wrong
+2. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
+3. Run:
 
 ```sh
+# Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
+java -jar ~/Applications/plantuml.jar puml/classes -o puml/classes/render
 python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade

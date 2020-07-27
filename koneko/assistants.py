@@ -31,11 +31,6 @@ def copy_image() -> Image:
     return copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
 
 
-def check_quit(ans: str):
-    if ans == 'q':
-        sys.exit(0)
-
-
 def thumbnail_size_assistant() -> 'IO[int]':
     """=== Thumbnail size ===
     This will display an image whose thumbnail size can be varied
@@ -54,7 +49,7 @@ def thumbnail_size_assistant() -> 'IO[int]':
             image.thumbnail(size).show(align='left', x=0, y=0)
 
             ans = TERM.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
             if ans in PLUS:
                 size += 20
@@ -166,7 +161,7 @@ class _AbstractImageAdjuster(ABC):
                     self.hide_show_print()
 
                 ans = TERM.inkey()
-                check_quit(ans)
+                utils.check_quit(ans)
 
                 if ans.code == ENTER and self.image:
                     self.maybe_erase()
@@ -412,7 +407,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[i
             printer.update_gallery_info(spacings, ncols, current_selection)
 
             ans = TERM.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
             if ans in PLUS and pure.line_width(spacings, ncols) < TERM.width:
                 spacings[current_selection] += 1
@@ -457,7 +452,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
             printer.update_user_info(spacing)
 
             ans = TERM.inkey()
-            check_quit(ans)
+            utils.check_quit(ans)
 
             if ans in PLUS:
                 spacing += 1

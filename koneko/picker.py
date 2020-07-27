@@ -5,7 +5,7 @@ from shutil import rmtree
 from pick import Picker
 from placeholder import m
 
-from koneko import utils, files, screens, assistants, KONEKODIR
+from koneko import utils, files, screens, KONEKODIR
 
 
 # Constants
@@ -131,7 +131,7 @@ def _pick_dir_loop(path: 'Path', basetitle: str, actions, modes: 'list[str]') ->
     while True:
         picker = _pick_dirs_picker(actions, title)
         _, ans = picker.start()
-        assistants.check_quit(ans)
+        utils.check_quit(ans)
 
         if ans == 'y' and files.path_valid(path):
             return path

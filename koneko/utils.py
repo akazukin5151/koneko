@@ -165,6 +165,11 @@ def get_cache_size() -> str:
     ).decode('utf-8').rstrip()
 
 
+def check_quit(ans: str):
+    if ans == 'q':
+        sys.exit(0)
+
+
 # Lscat related
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
     # Must make a copy before using this reference

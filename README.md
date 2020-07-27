@@ -92,29 +92,19 @@ See the [manual](MANUAL.md) here
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.10.1
-
-* Two new examples of koneko being applied to another site:
-    * [koneko-twitter](https://github.com/twenty5151/koneko-twitter)
-    * [koneko-gelbooru](https://github.com/twenty5151/koneko-gelbooru/)
+### Version 0.10.2
 
 #### Features
 
 #### Bug fixes
-* Fixed inconsistent 'page' / 'image' in ui.Image
-* Fixed `du` not working in macOS
-* Fixed `xdg-open` not present in macOS, use `open` in that case instead
-* Fixed bug where artist name with '/' isn't downloaded
-* Fixed users mode prefetching page 1 again
 
 #### Code maintenance
-* Added more tests
-* Use int page_num for gallery data cache keys
-* Extract duplicated init method in gdata and udata to ABC
-* Remove sys path modifications by changing pytest command & conftest path. No need to run pytest with the `-s` argument. There is a `conftest.py` symlink in root, pointing to the original path in `testing/`
-* Fixed tests sometimes showing a (pixcat) image: mock and assert pixcat in lscat.icat()
-* Use default github gitignore for python
- 
+* Remove circular imports
+    - [x] prompt importing ui
+    - [x] assistants importing lscat_app
+    - [x] main importing cli
+    - [x] picker importing assistants
+* Updated and improved diagrams in HACKING.md
 
 # Roadmap
 
@@ -138,10 +128,11 @@ For the best experience use the terminal in full screen, unless your screen is b
 You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
 
 # Contributing
-* Fork it
-* Edit the files on your fork/branch
-* Run tests with `pytest testing/ -vvvv -l -s` (`--inte` for integration tests)
-* Submit a pull request
+1. Fork it
+2. Run tests with `pytest testing/ -vvvv -l`
+3. Make your changes
+4. Run tests again (add `-s --inte` for integration tests if you want)
+5. Submit a pull request
 
 Tips: 
 * See [HACKING.md](HACKING.md) to understand the code.
@@ -152,16 +143,18 @@ Tips:
 See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Unit tests
-Run `pytest testing/ -vvvv -l`. Add `--inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
+Run `pytest testing/ -vvvv -l`. Add `-s --inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
 
 ## Build and upload to PyPI
-When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
 
-Test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` is now automated.
-
-Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
+0. Run integration tests locally
+1. Review github action logs to make sure nothing is wrong
+2. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
+3. Run:
 
 ```sh
+# Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
+java -jar ~/Applications/plantuml.jar puml/classes -o render
 python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade

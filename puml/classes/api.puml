@@ -1,0 +1,22 @@
+@startuml
+
+title api
+
+class api.APIHandler << (S,#FF7700) Singleton >> {
+    ..Initial login..
+    - api
+    - token
+    - credentials
+    +start()
+    ..Requests..
+    +artist_gallery()
+    +protected_illust_detail()
+    +following_user_request()
+    +search_user_request()
+    +illust_follow_request()
+    +illust_recommended_request()
+    +illust_related_request()
+    +protected_download()
+}
+
+@enduml

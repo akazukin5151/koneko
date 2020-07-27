@@ -17,39 +17,13 @@ from abc import ABC, abstractmethod
 
 from koneko import (
     ui,
-    api,
-    cli,
     pure,
     utils,
-    config,
     prompt,
     screens,
     picker,
     lscat_app
  )
-
-
-def main() -> 'IO':
-    """Read config file, start login, process any cli arguments, go to main loop"""
-    if not (args := cli.handle_vh()):
-        sys.exit(0)
-
-    credentials, your_id = config.begin_config()
-
-    utils.handle_missing_pics()
-
-    api.myapi.start(credentials)
-
-    if len(sys.argv) != 1:
-        func = cli.launch_mode
-    else:
-        func = main_loop
-
-    try:
-        func(args, your_id)
-    except KeyboardInterrupt:
-        os.system('clear')
-        main_loop(args, your_id)
 
 
 def main_loop(_, your_id: str) -> 'IO':
@@ -315,6 +289,3 @@ def ask_your_id(your_id: str):
     # If your_id not stored, or if ans is no, or if id provided, via cli
     return ''
 
-
-if __name__ == '__main__':
-    main()

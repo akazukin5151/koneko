@@ -10,6 +10,7 @@ Functionalities:
 """
 
 import os
+import sys
 import logging
 import itertools
 import threading
@@ -163,6 +164,11 @@ def get_cache_size() -> str:
         f'du -hs {extra} {KONEKODIR} | cut -f1',
         shell=True
     ).decode('utf-8').rstrip()
+
+
+def check_quit(ans: str):
+    if ans == 'q':
+        sys.exit(0)
 
 
 # Lscat related

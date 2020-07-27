@@ -3,11 +3,8 @@ import sys
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
-from koneko import lscat, TERM, printer
+from koneko import lscat, TERM, printer, FakeData
 
-
-# Duplicated due to circular import
-FakeData = namedtuple('data', ('download_path',))
 
 class AbstractLoop(ABC):
     @abstractmethod

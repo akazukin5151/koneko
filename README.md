@@ -153,7 +153,7 @@ Run `pytest testing/ -vvvv -l`. Add `-s --inte` for integration testing, but don
 
 ```sh
 # Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
-java -jar ~/Applications/plantuml.jar puml/classes -o puml/classes/render
+java -jar ~/Applications/plantuml.jar puml/classes -o render
 python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade

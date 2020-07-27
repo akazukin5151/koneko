@@ -1,0 +1,193 @@
+@startuml
+
+title ui
+set namespaceSeparator none
+
+abstract class ui.AbstractUI <<(A, red)>>{
+    ..Required attribute..
+    - {abstract} prompt
+    - {abstract} data_class
+    - {abstract} tracker_class
+    ..Required behaviour..
+    -{abstract}pixivrequest()
+    -{abstract}maybe_join_thread()
+    -{abstract}print_page_info()
+    ..Common behaviour..
+    +start()
+    +next_page()
+    +previous_page()
+    +reload()
+}
+
+abstract class ui.AbstractGallery <<(A, red)>>{
+    ..Implements..
+    - prompt
+    - data_class
+    - tracker_class
+    -maybe_join_thread()
+    -print_page_info()
+    ..Unique..
+    +view_image()
+    -_back()
+    ..Required behaviours..
+    +{abstract}handle_prompt()
+    +{abstract}{static}help()
+}
+
+class ui.ArtistGallery <<(C, cyan)>>{
+    ..Implements..
+    -_pixivrequest()
+    +handle_prompt()
+    +{static}help()
+    ..Unique..
+    - _artist_user_id
+}
+
+class ui.IllustRecommendedGallery <<(C, cyan)>>{
+    ..Overrides..
+    -_pixivrequest()
+}
+
+class ui.IllustRelatedGallery <<(C, cyan)>>{
+    ..Overrides..
+    -_pixivrequest()
+    ..Unique..
+    - _image_id
+}
+
+class ui.IllustFollowGallery <<(C, cyan)>>{
+    ..Implements..
+    -_pixivrequest()
+    +handle_prompt()
+    +{static}help()
+    ..Unique..
+    +go_artist_gallery_coords()
+    +go_artist_gallery_num()
+}
+
+ui.AbstractUI <|-- ui.AbstractGallery
+
+ui.AbstractGallery <-- ui.IllustFollowGallery
+
+ui.AbstractGallery <-- ui.ArtistGallery
+
+ui.ArtistGallery <-- ui.IllustRecommendedGallery
+ui.ArtistGallery <-- ui.IllustRelatedGallery
+
+main.ArtistModeLoop *-up- ui.ArtistGallery
+main.illust_follow_mode *-up-- ui.IllustFollowGallery
+main.illust_recommended_mode *-up- ui.IllustRecommendedGallery
+
+
+abstract class ui.AbstractUsers <<(A, red)>>{
+    ..Implements..
+    - prompt
+    - data_class
+    - tracker_class
+    -maybe_join_thread()
+    -print_page_info()
+    ..Unique..
+    +go_artist_mode()
+}
+
+class ui.FollowingUsers <<(C, cyan)>> {
+    ..Implements..
+    -_pixivrequest()
+    ..Unique..
+    - user
+    - your_id
+}
+
+class ui.SearchUsers <<(C, cyan)>> {
+    ..Implements..
+    -_pixivrequest()
+    ..Unique..
+    - user
+}
+
+ui.AbstractUI <|-- ui.AbstractUsers
+ui.AbstractUsers <-- ui.FollowingUsers
+ui.AbstractUsers <-- ui.SearchUsers
+main.FollowingUsersModeLoop *-up-- ui.FollowingUsers
+main.SearchUsersModeLoop *-up-- ui.SearchUsers
+
+
+
+abstract class ui.ToImage <<(A, red)>>{
+    ..Required attribute..
+    + firstmode
+    ..Required behaviours..
+    +{abstract}get_post_json()
+    +{abstract}get_image_id()
+    +{abstract}maybe_show_preview()
+    +{abstract}download_image()
+    ..Common behaviours..
+    +setup()
+    +start()
+}
+
+class ui.ViewImage <<(U, DeepSkyBlue)>>{
+    ..Implements..
+    + firstmode
+    +get_post_json()
+    +get_image_id()
+    +maybe_show_preview()
+    +download_image()
+    ..Unique..
+    - gdata
+    - selected_image_num
+
+}
+
+class ui.ViewPostMode <<(U, DeepSkyBlue)>>{
+    ..Implements..
+    + firstmode
+    +get_post_json()
+    +get_image_id()
+    +maybe_show_preview()
+    +download_image()
+    ..Unique..
+    - image_id
+}
+
+ui.ViewImage -up-> ui.ToImage
+ui.ViewPostMode -up-> ui.ToImage
+
+class ui.Image <<(C, cyan)>>{
+    + event
+    + loc
+    +display_initial()
+    +open_image()
+    +download_image()
+    +show_full_res()
+    +next_image()
+    +previous_image()
+    +jump_to_page()
+    +leave()
+    +view_related_images()
+    +start_preview()
+    +preview()
+    -_jump()
+    -_prefetch_next_page()
+}
+
+main.ViewPostModeLoop ..right.> ui.ViewPostMode
+
+ui.ViewPostMode ..> ui.Image
+ui.ViewImage ..> ui.Image
+ui.ViewImage <.left. ui.AbstractGallery
+
+ui.Image ..> ui.IllustRelatedGallery
+
+
+
+ui.AbstractGallery *.up. data.GalleryData
+ui.AbstractUsers *.up. data.UserData
+ui.Image -left-> data.ImageData
+
+ui.ViewPostMode -right[hidden]-> ui.ViewImage
+
+ui.AbstractUsers *.up. lscat.TrackDownloadsUser
+ui.AbstractGallery *.up. lscat.TrackDownloads
+
+@enduml

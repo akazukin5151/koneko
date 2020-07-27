@@ -142,9 +142,11 @@ Tips:
 See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Unit tests
-Run `pytest testing/ -vvvv -l`. Add `--inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
+Run `pytest testing/ -vvvv -l`. Add `-s --inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
 
 ## Build and upload to PyPI
+
+0. Run integration tests locally
 1. Review github action logs to make sure nothing is wrong
 2. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
 3. Run:

@@ -128,10 +128,11 @@ For the best experience use the terminal in full screen, unless your screen is b
 You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
 
 # Contributing
-* Fork it
-* Edit the files on your fork/branch
-* Run tests with `pytest testing/ -vvvv -l -s` (`--inte` for integration tests)
-* Submit a pull request
+1. Fork it
+2. Run tests with `pytest testing/ -vvvv -l`
+3. Make your changes
+4. Run tests again (add `-s --inte` for integration tests if you want)
+5. Submit a pull request
 
 Tips: 
 * See [HACKING.md](HACKING.md) to understand the code.

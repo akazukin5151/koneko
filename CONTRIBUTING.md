@@ -1,8 +1,9 @@
 # Contributing
-* Fork it
-* Edit the files on your fork/branch
-* Run tests with `pytest testing/ -vvvv -l -s` (`--inte` for integration tests)
-* Submit a pull request
+1. Fork it
+2. Run tests with `pytest testing/ -vvvv -l`
+3. Make your changes
+4. Run tests again (add `-s --inte` for integration tests if you want)
+5. Submit a pull request
 
 Tips: 
 * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
@@ -73,16 +74,18 @@ koneko
 ```
 
 ## Unit tests
-Run `pytest testing/ -vvvv -l -s`. Add `--inte` for integration testing, but don't be surprised if it fails
+Run `pytest testing/ -vvvv -l`. Add `-s --inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
 
 ## Build and upload to PyPI
-When test installing with pip, don't forget to use `pip install .` or `python setup.py install`, not `pip install koneko` (which will grab from latest stable version). (Yes, I made the same mistake again)
 
-**Warning:** ~~you~~ *must* test installing with `pip install .`, `python setup.py install`, `python setup.py develop`, and `python -m koneko.main` (but now it's automated).
-
-Bump version info in `__init__.py`, `setup.py`, and `README.md`
+0. Run integration tests locally
+1. Review github action logs to make sure nothing is wrong
+2. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
+3. Run:
 
 ```sh
+# Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
+java -jar ~/Applications/plantuml.jar puml/classes -o render
 python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade

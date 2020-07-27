@@ -202,15 +202,15 @@ See [import-analyzer](https://github.com/twenty5151/import-analyzer/)
 | config.py       |            5 |              2 |       3 |           71 |
 | lscat.py        |            6 |              4 |       2 |           60 |
 | api.py          |            3 |              3 |       0 |           50 |
+| picker.py       |            3 |              4 |      -1 |           43 |
 | cli.py          |            2 |              3 |      -1 |           40 |
 | prompt.py       |            3 |              5 |      -2 |           38 |
-| picker.py       |            3 |              5 |      -2 |           38 |
 | data.py         |            1 |              2 |      -1 |           33 |
 | screens.py      |            2 |              4 |      -2 |           33 |
 | download.py     |            2 |              4 |      -2 |           33 |
 | lscat_prompt.py |            1 |              3 |      -2 |           25 |
-| assistants.py   |            2 |              7 |      -5 |           22 |
 | main.py         |            2 |              7 |      -5 |           22 |
 | ui.py           |            2 |             12 |     -10 |           14 |
+| assistants.py   |            1 |              7 |      -6 |           12 |
 | lscat_app.py    |            1 |              7 |      -6 |           12 |
 | \_\_main\_\_.py |            0 |              5 |      -5 |            0 |

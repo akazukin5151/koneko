@@ -104,7 +104,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] assistants importing lscat_app
     - [x] main importing cli
     - [x] picker importing assistants
- 
+* Updated and improved diagrams in HACKING.md
 
 # Roadmap
 

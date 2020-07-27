@@ -14,12 +14,13 @@
         - [main.py to prompt.py](#mainpy-to-promptpy)
         - [main.py to ui.py](#mainpy-to-uipy)
         - [ui.py](#uipy)
-    - [Actor-ish model of the ui.AbstractUI class](#actor-ish-model-of-the-uiabstractui-class)
-    - [Actor-ish model of the ui.Gallery classes (extending AbstractUI)](#actor-ish-model-of-the-uigallery-classes-extending-abstractui)
-    - [Actor-ish model of the ui.User classes (extending AbstractUI)](#actor-ish-model-of-the-uiuser-classes-extending-abstractui)
-    - [Actor-ish model of the ui.Image class](#actor-ish-model-of-the-uiimage-class)
+    - [Actor-ish models of ui classes](#actor-ish-model-of-ui-classes)
+        - [ui.AbstractUI](#uiabstractui)
+        - [ui.Gallery classes (extending AbstractUI)](#uigallery-classes-extending-abstractui)
+        - [ui.User classes (extending AbstractUI)](#uiuser-classes-extending-abstractui)
+        - [ui.Image](#uiimage)
 - [Dependencies](#dependencies)
-- [Internal imports analysis](#internal-imports-analysis)
+- [Internal imports](#internal-imports)
 
 # 'Functional core, imperative shell' + MVA?
 
@@ -185,21 +186,23 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 ![ui UML](puml/classes/render/ui.png)
 
 
-## Actor-ish model of the ui.AbstractUI class
+
+## Actor-ish models of ui classes
+### ui.AbstractUI
   
 ![AbstractUI UML](http://plantuml.com:80/plantuml/png/VLLDRzim3BthLt2t1aqFQRQBWNGjsai7h0rQz6oeDfCGaILFajC6o_xx95bs_94c9uQFugCUIVdMMAvjLGXcoGg4ktTZDS_isoDS52f70xCfpAVmVGe_9emvH6buCwWPMopWjui0Wm8pIqh2Oi4y15StK15SNYQ30EQyLmxqGGdScIsiNBRA7w6yveCPA2dsavWeP4fWIP-qSp4ivvQ_SuFW3PPfv3RQFlLDC1CeECcqv7OJlRoig-4Vd6mgr9hanUI89V3hzVa9DFwfq5YcqLPQDZvJAccmb_xLQU24QR5OXZ0Pjp4msEwAUGvUpgtJAsPG7r8edYVm42sWWg_HU6bf5wuJ0TOORS9mYKSV3jSkJE8ufC5dDLuVQoL_85CAlgyfONOUlluw-poouxZeioddtID7lThefIPfWUHAiRLMLGcbnXNQR4DopS3zZcq8MaZyj6cbHS1Yttg-VlzxRUuSwRUwppDkTmSVDxDqrmmHOsMyzvHYAFDcvfPQ5QLbXyCXhDUJkqh8U6Ap0hRqR3q5ezucJjNKAUWaDRMcTTL-eRgwrjmjwLBZZbHblY8k8vvwtArHBFqiSPFx1OD8uwGw0ErInWT28-nL1QRI-BDp8e5x9LUa2zu-AaslxWLo3Lo8K9r9Cvvji2dn1SDZPy0_D6rDpoNAE9xZkeuW6unUSARKjcxutv_47FuAajj_trgs_jQVOEm735dzN4S2Rmx7iB7IkfeTQbeHUbrFl2udHh4p2hTkBFrdWR7_)
   
-## Actor-ish model of the ui.Gallery classes (extending AbstractUI)
+### ui.Gallery classes (extending AbstractUI)
 
 ![Gallery UML](http://plantuml.com:80/plantuml/png/RL71QiCm3BthAtHCA3liq4iWeuD2Fw1iLwFL9dWuLh0LIY0VFzjnM3TwilJq93q_dQ9Ga7bq85QSmGivPyA28siJiSaFlY9vZSSMW6x20J-Y2G1zZv_MtD6ED1Xi1aRXckIk5liUCXDVtd2sU3Xq3tn8IC87JKAbD74KzHtPGp0o1_y0PCuNHOCsHt0BXcHFjZ4bxl2Qn2NHlvrRDOley6pZv6Y9V_Phldl7f8k4yvuKHXFRAcLNL60r1HudQLfOrnMA2nV6PA6DKlvTFJiYUxSyCs5WjT5L9gP1_wserJcrAQltxS_HzuBMessIJiRhV4-07m00)
 
 
-## Actor-ish model of the ui.User classes (extending AbstractUI)
+### ui.User classes (extending AbstractUI)
   
 ![User UML](http://plantuml.com:80/plantuml/png/TOun2iCm40JxUyMMDYPLKWKKdCelI2q4Ee90jk1qAW9wl2KbRTgPMTWrgnCjUoGD6Xclp98nxSaphaY2sqn4nc1BQ678Yk6CePxYya09M9Oxtib-0zk3QQR6c_LEtV0_MThA1a_2MkJuGv-3RYv6bW_LMjk7bG_VVnAT)
 
 
-## Actor-ish model of the ui.Image class
+### ui.Image
 
 ![Image UML](http://plantuml.com:80/plantuml/png/bLHDJyCm3BtdLvWRQ73XMAbeIBk0n3PfshaAZJiYkYJ4ITd4-Eya_Tf71nezLCvxp-wp7NLCZbldroLpqfK8Jsk-GdZH0XbBqpe0mX9p9xM2D6KyTzh2aj2o-8Ax1_0IHgEaqTwpS0fOv19uf7SeWjn7fHG76GdCvKPM4MmIk6cgF2zcKx3uuP4Si-YyLHr6HYj29hZZhvmmv8QeJQ_Z11R17D9Usv12VwfISv70f8r0nZufTYChxh2NC853hBKnaMHAlgKc-HQCbSg5aoeqs-rszS1c1bN3ns6TJ6XFTYKZWWA-IgdUlw_wAiSsprGw5WpQxAAifhCAhImaYkkRVpNSsvdYnlrgHGKoCu4BrKzzSDggFElTa95AeRtOHYpNtwM_fh-osXkOMopGvM-rfNOo49w36x9tBDUhpDko5hJB6E0NjnF5G_iHFTVMYQS4baOS2h3T6p5KWrs49YkfFO4vlmxJyjrABhsxu_2j-1jWFm00)
 
@@ -216,7 +219,7 @@ $ pipdeptree -v
 $ pipdeptree --graph-output png -p koneko > dependencies.png
 ```
 
-# Internal imports analysis
+# Internal imports
 
 See [import-analyzer](https://github.com/twenty5151/import-analyzer/)
 

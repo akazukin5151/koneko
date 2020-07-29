@@ -212,3 +212,62 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
         )
 
 
+def ueberzug_display(canvas, path, x, y, width, height, FIT_CONTAIN, VISIBLE):
+    canvas.create_placement(
+        path,
+        path=path,
+        x=x,
+        y=y,
+        width=width,
+        height=height,
+        scaler=FIT_CONTAIN.value,
+        visibility=VISIBLE
+    )
+
+
+def generate_page_ueberzug(path: 'Path') -> 'IO':
+    """Temporarily try it out by renaming it to generate_page
+    (overwriting the previous definition), and run `lscat 4`
+    """
+    try:
+        import ueberzug.lib.v0 as ueberzug
+        from ueberzug.lib.v0 import ScalerOption
+        from ueberzug.lib.v0 import Visibility
+    except ImportError as e:
+        raise ImportError("Install with `pip install ueberzug`") from e
+
+    left_shifts = config.xcoords_config()
+    rowspaces = config.ycoords_config()
+    number_of_cols = config.ncols_config()
+    number_of_rows = config.nrows_config()
+    thumbnail_size = config.thumbnail_size_config()
+    size = thumbnail_size / 20
+    canvas = ueberzug.Canvas()
+
+    os.system('clear')
+    canvas.__enter__()
+    while True:
+        image = yield
+
+        number = int(image.split('_')[0])
+        x = number % number_of_cols
+        y = number // number_of_cols
+
+        # Ueberzug doesn't respond to scroll events,
+        # so cut off all images not in this 'page' (page as in scrolling to a new view)
+        if number >= number_of_cols * number_of_rows:
+            # Break raises StopIteration error as tracker will continue sending
+            continue
+
+        ueberzug_display(
+            canvas,
+            str(path / image),
+            left_shifts[x],
+            rowspaces[y % number_of_rows],
+            size,
+            size,
+            ScalerOption.FIT_CONTAIN,
+            Visibility.VISIBLE
+        )
+    # Note that once the program exits, all displayed images will be cleared
+

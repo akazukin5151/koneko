@@ -42,6 +42,7 @@ setup(
         'placeholder~=1.1',
     ],
     tests_require=['pytest>=5.4,<7.0'],
+    extras_require={'ueberzug': ['ueberzug~=18.1']},
     entry_points={
         'console_scripts': [
             'koneko=koneko.__main__:_main',

@@ -48,10 +48,10 @@ def main_loop(_, your_id: str) -> 'IO':
         func = case.get(main_command, None)
 
         if main_command == '3':
-            func(your_id)
+            return func(your_id)
 
         elif func:
-            func()
+            return func()
 
         elif main_command == 'q':
             answer = input('Are you sure you want to exit? [Y/n]:\n')
@@ -110,9 +110,9 @@ class AbstractLoop(ABC):
             self._save_history()
 
             if self._user_input == '!freq':
-                frequent_modes([str(self)])
+                return frequent_modes([str(self)])
             else:
-                self._go_to_mode()
+                return self._go_to_mode()
 
     def _process_raw_answer(self) -> str:
         """Process self._raw_answer here into self._user_input"""
@@ -146,8 +146,6 @@ class ArtistModeLoop(AbstractLoop):
         os.system('clear')
         self.mode = ui.ArtistGallery(self._user_input)
         prompt.gallery_like_prompt(self.mode)
-        # This is the entry mode, user goes back but there is nothing to catch it
-        main()
 
     def __str__(self) -> str:
         """Implements abstractmethod: return string of mode number"""
@@ -169,8 +167,6 @@ class ViewPostModeLoop(AbstractLoop):
         """Implements abstractmethod: Go to mode 2"""
         os.system('clear')
         ui.view_post_mode(self._user_input)
-        # After backing
-        main()
 
     def __str__(self) -> str:
         """Implements abstractmethod: return string of mode number"""
@@ -192,7 +188,6 @@ class FollowingUserModeLoop(AbstractLoop):
         os.system('clear')
         self.mode = ui.FollowingUsers(self._user_input)
         prompt.user_prompt(self.mode)
-        main()
 
     def start(self, your_id=None) -> 'IO':
         """Complements base method: If ID not given, ask if config ID should be used,
@@ -227,7 +222,6 @@ class SearchUsersModeLoop(AbstractLoop):
         os.system('clear')
         self.mode = ui.SearchUsers(self._user_input)
         prompt.user_prompt(self.mode)
-        main()
 
     def __str__(self) -> str:
         """Implements abstractmethod: return string of mode number"""
@@ -238,15 +232,12 @@ def illust_follow_mode() -> 'IO':
     """Immediately goes to ui.IllustFollowGallery()"""
     mode = ui.IllustFollowGallery()
     prompt.gallery_like_prompt(mode)
-    # After backing
-    main()
 
 
 def illust_recommended_mode() -> 'IO':
     """Immediately goes to ui.IllustRecommendedGallery()"""
     mode = ui.IllustRecommendedGallery()
     prompt.gallery_like_prompt(mode)
-    main()
 
 
 def frequent_modes(modes: 'list[str]') -> 'IO':

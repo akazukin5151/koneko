@@ -22,8 +22,8 @@ class lscat.TrackDownloadsUser {
 lscat.AbstractTracker <-- lscat.TrackDownloadsUser
 lscat.AbstractTracker <-- lscat.TrackDownloads
 
-ui.AbstractUsers .down.* lscat.TrackDownloadsUser
-ui.AbstractGallery .down.* lscat.TrackDownloads
+ui.AbstractUsers *.up. lscat.TrackDownloadsUser
+ui.AbstractGallery *.up. lscat.TrackDownloads
 
 
 abstract class data.AbstractData <<(A, red)>>{
@@ -89,9 +89,9 @@ class data.ImageData {
     + large_filename
 }
 
-data.GalleryData *-up- ui.AbstractGallery
+data.GalleryData -down-* ui.AbstractGallery
 data.ImageData <-up- ui.Image
-data.UserData *-up- ui.AbstractUsers
+data.UserData -down-* ui.AbstractUsers
 
 data.GalleryData <-- data.AbstractData
 data.UserData <-- data.AbstractData

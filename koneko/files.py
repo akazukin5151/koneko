@@ -101,7 +101,6 @@ def filter_modes_allowed(modes: 'list[str]') -> 'set[str]':
 
 
 def filter_modes_predicate(modes: 'list[str]', allowed_names: 'set[str]') -> 'fn(str) -> bool':
-    """Pure"""
     if '1' in modes:
         return lambda d: d.isdigit() or d in allowed_names
     elif '2' in modes:
@@ -116,6 +115,7 @@ def find_mode2_dirs() -> 'list[str]':
 
 
 def valid_mode1(path: 'Path') -> bool:
+    """Pure"""
     return (
         path.parent.parent == KONEKODIR
         and path.name.isdigit()
@@ -125,7 +125,7 @@ def valid_mode1(path: 'Path') -> bool:
     )
 
 
-def valid_mode2(path: 'Path') -> bool:
+def valid_mode2(path: 'Path') -> 'IO[bool]':
     # If the 'individual' dir only contains files, it is valid
     return (
         path.parent.name == 'individual'
@@ -137,14 +137,17 @@ def valid_mode2(path: 'Path') -> bool:
 
 
 def valid_mode3(path: 'Path') -> bool:
+    """Pure"""
     return path.parent.parent.name == 'following'
 
 
 def valid_mode4(path: 'Path') -> bool:
+    """Pure"""
     return path.parent.parent.name == 'search'
 
 
 def valid_mode5(path: 'Path') -> bool:
+    """Pure"""
     return path.parent.name == 'illustfollow'
 
 

@@ -62,9 +62,9 @@ class YPadding {
     + find_dim_func
 }
 
-AbstractImageAdjuster <|-up- AbstractPadding
-AbstractPadding <|-up- XPadding
-AbstractPadding <|-up- YPadding
+AbstractImageAdjuster <|-- AbstractPadding
+AbstractPadding <|-- XPadding
+AbstractPadding <|-- YPadding
 
 abstract class FindImageDimension <<(A, red)>>{
     ..Implements..
@@ -94,8 +94,11 @@ class FindImageHeight {
     +maybe_move_up()
 }
 
-AbstractImageAdjuster <|-up- FindImageDimension
-FindImageDimension <|-up- FindImageWidth
-FindImageDimension <|-up- FindImageHeight
+AbstractImageAdjuster <|-- FindImageDimension
+FindImageDimension <|-- FindImageWidth
+FindImageDimension <|-- FindImageHeight
+
+FindImageHeight --* YPadding
+FindImageWidth --* XPadding
 
 @enduml

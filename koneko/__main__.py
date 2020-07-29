@@ -20,11 +20,16 @@ def _main() -> 'IO':
     else:
         func = main.main_loop
 
-    try:
-        func(args, your_id)
-    except KeyboardInterrupt:
+    while True:
+        try:
+            func(args, your_id)
+        except KeyboardInterrupt:
+            args_to_pass = args
+        else:
+            args_to_pass = None
+
         os.system('clear')
-        main.main_loop(args, your_id)
+        main.main_loop(None, your_id)
 
 
 if __name__ == '__main__':

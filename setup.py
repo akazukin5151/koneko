@@ -41,7 +41,7 @@ setup(
         'returns~=0.14',
         'placeholder~=1.1',
     ],
-    tests_require=['pytest~=5.4'],
+    tests_require=['pytest>=5.4,<7.0'],
     entry_points={
         'console_scripts': [
             'koneko=koneko.__main__:_main',

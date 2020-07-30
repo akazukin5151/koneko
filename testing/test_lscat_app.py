@@ -122,7 +122,7 @@ def test_display_path_cli_complete(monkeypatch, tmp_path):
     assert mock.mock_calls == mock.call_args_list == [
         call(
             lscat.TrackDownloads,
-            FakeData(str(tmp_path)),
+            FakeData(tmp_path),
         )
     ]
 
@@ -140,7 +140,7 @@ def test_display_path_cli_incomplete(monkeypatch, tmp_path):
     assert mock.mock_calls == mock.call_args_list == [
         call(
             lscat.TrackDownloads,
-            FakeData(str(tmp_path)),
+            FakeData(tmp_path),
         )
     ]
 

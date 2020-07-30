@@ -101,7 +101,11 @@ def max_images():
     return config.ncols_config() * config.nrows_config()
 
 def max_images_user():
+    """Calculates the maximum number of images that can fit in single terminal page
+    For User Modes, there are 3 previews + 1 artist image, hence always 4 columns
+    """
     return 4 * config.nrows_config()
+
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
     """Takes prompt input key seqs, find the selected image number.

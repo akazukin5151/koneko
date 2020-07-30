@@ -115,6 +115,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] Read config and decide whether to use icat or ueberzug at runtime
         - [x] Gallery mode
         - [x] Users mode
+        - [ ] Image mode
     - [ ] Add option to prevent display scrolling and use up/down keys to view more images
         - [x] Add option to config
         - [ ] Respond to the config option

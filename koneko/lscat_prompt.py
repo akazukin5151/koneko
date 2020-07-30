@@ -98,10 +98,13 @@ class AbstractLoop(ABC):
                 elif ans == 'q':
                     sys.exit(0)
 
-                elif ans.name == 'KEY_DOWN':
+                elif ans.name == 'KEY_DOWN' and counter + 1 < self.max_scrolls:
                     counter += 1
-                elif ans.name == 'KEY_UP':
+                    show_images = True
+
+                elif ans.name == 'KEY_UP' and counter > 0:
                     counter -= 1
+                    show_images = True
 
                 else:
                     print('Invalid input!')
@@ -128,10 +131,13 @@ class GalleryUserLoop(AbstractLoop):
         self.scrollable = config.use_ueberzug() or not config.scroll_display()
 
         # TODO: use classmethod
+        number_of_images = len(os.listdir(data.download_path))
         if cls is lscat.TrackDownloads:
             self.end = utils.max_images()
+            self.max_scrolls = number_of_images // self.end + 1
         else:
             self.end = utils.max_images_user()
+            self.max_scrolls = number_of_images // self.end
         self.myslice = slice(None, self.end)
 
 

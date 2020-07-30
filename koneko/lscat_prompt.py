@@ -48,7 +48,6 @@ class AbstractLoop(ABC):
     def start(self) -> 'IO':
         show_images = True
         counter = 0
-        end = utils.max_images()
 
         with TERM.cbreak():
             while True:
@@ -96,7 +95,7 @@ class AbstractLoop(ABC):
                     show_images = False
 
                 if show_images:
-                    self.myslice = slice(end*counter, end*(counter+1))
+                    self.myslice = slice(self.end*counter, self.end*(counter+1))
                     self.end_func()
 
 
@@ -117,9 +116,10 @@ class GalleryUserLoop(AbstractLoop):
 
         # TODO: use classmethod
         if cls is lscat.TrackDownloads:
-            self.myslice = slice(None, utils.max_images())
+            self.end = utils.max_images()
         else:
-            self.myslice = slice(None, utils.max_images_user())
+            self.end = utils.max_images_user()
+        self.myslice = slice(None, self.end)
 
 
     def show_func(self) -> 'IO':

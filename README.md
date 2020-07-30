@@ -113,6 +113,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Ueberzug support to work with other terminals
     - [x] Get the ueberzug API working
     - [ ] Read config and decide whether to use icat or ueberzug at runtime
+        - [x] Gallery mode
+        - [ ] Users mode
     - [ ] Add option to prevent display scrolling and use up/down keys to view more images
         * "Display scrolling" means lscat will print newlines to scroll down and display more images
         * The number of images in a terminal page is number_of_cols * number_of_rows

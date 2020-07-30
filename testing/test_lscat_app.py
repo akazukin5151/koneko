@@ -12,6 +12,7 @@ def test_display_gallery(monkeypatch, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
 

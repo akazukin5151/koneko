@@ -6,6 +6,26 @@ from abc import ABC, abstractmethod
 from koneko import utils, lscat, config, TERM, printer, FakeData
 
 
+def scroll_prompt(cls, data, end):
+    # TODO: integrate to koneko prompt (currently only works for lscat app)
+    counter = 0
+    with TERM.cbreak():
+        while True:
+            myslice = slice(end*counter, end*(counter+1))
+            lscat.handle_scroll(cls, data, myslice)
+
+            ans = TERM.inkey()
+            # FIXME: bounds checking
+            if ans == 'q':
+                sys.exit(0)
+
+            elif ans.name == 'KEY_DOWN':
+                counter += 1
+
+            elif ans.name == 'KEY_UP':
+                counter -= 1
+
+
 class AbstractLoop(ABC):
     @abstractmethod
     def __init__(self):

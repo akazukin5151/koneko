@@ -84,26 +84,10 @@ def _main() -> 'IO':
         func()
 
 
-def scroll_prompt(cls, data, end):
-    # TODO: integrate to koneko prompt (currently only works for lscat app)
-    counter = 0
-    while True:
-        myslice = slice(end*counter, end*(counter+1))
-        lscat.handle_scroll(cls, data, myslice)
-
-        ans = input()
-        # FIXME: bounds checking
-        if ans == 'q':
-            sys.exit(0)
-        elif ans == 'd':
-            counter += 1
-        elif ans == 'a':
-            counter -= 1
-
 def display_gallery() -> 'IO':
     data = FakeData(KONEKODIR / 'testgallery')
     if config.use_ueberzug() or config.scroll_display():
-        scroll_prompt(lscat.TrackDownloads, data, utils.max_images())
+        lscat_prompt.scroll_prompt(lscat.TrackDownloads, data, utils.max_images())
         input()  # On program exit all images are cleared
     else:
         lscat.show_instant(lscat.TrackDownloads, data)
@@ -112,7 +96,7 @@ def display_gallery() -> 'IO':
 def display_user() -> 'IO':
     data = FakeData(KONEKODIR / 'testuser')
     if config.use_ueberzug() or config.scroll_display():
-        scroll_prompt(lscat.TrackDownloadsUsers, data, utils.max_images_user())
+        lscat_prompt.scroll_prompt(lscat.TrackDownloadsUsers, data, utils.max_images_user())
         input()  # On program exit all images are cleared
     else:
         lscat.show_instant(lscat.TrackDownloadsUsers, data)

@@ -86,7 +86,7 @@ def _main() -> 'IO':
 
 def display_gallery() -> 'IO':
     data = FakeData(KONEKODIR / 'testgallery')
-    if config.use_ueberzug() or config.scroll_display():
+    if config.use_ueberzug() or not config.scroll_display():
         lscat_prompt.scroll_prompt(lscat.TrackDownloads, data, utils.max_images())
         input()  # On program exit all images are cleared
     else:
@@ -95,7 +95,7 @@ def display_gallery() -> 'IO':
 
 def display_user() -> 'IO':
     data = FakeData(KONEKODIR / 'testuser')
-    if config.use_ueberzug() or config.scroll_display():
+    if config.use_ueberzug() or not config.scroll_display():
         lscat_prompt.scroll_prompt(lscat.TrackDownloadsUsers, data, utils.max_images_user())
         input()  # On program exit all images are cleared
     else:

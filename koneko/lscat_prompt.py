@@ -112,7 +112,7 @@ class GalleryUserLoop(AbstractLoop):
             [x for x in os.listdir(data.download_path.parent)
              if x.isdigit()]
         )
-        self.scrollable = config.use_ueberzug() or config.scroll_display()
+        self.scrollable = config.use_ueberzug() or not config.scroll_display()
 
         # TODO: use classmethod
         if cls is lscat.TrackDownloads:

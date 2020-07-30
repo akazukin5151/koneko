@@ -8,22 +8,35 @@ from koneko import utils, lscat, config, TERM, printer, FakeData
 
 def scroll_prompt(cls, data, end):
     # TODO: integrate to koneko prompt (currently only works for lscat app)
+    show = True
     counter = 0
+    number_of_images = len(os.listdir(data.download_path))
+    max_scrolls = number_of_images // end + 1
+    if cls is lscat.TrackDownloadsUsers:
+        max_scrolls -= 1
+
     with TERM.cbreak():
         while True:
-            myslice = slice(end*counter, end*(counter+1))
-            lscat.handle_scroll(cls, data, myslice)
+            if show:
+                myslice = slice(end*counter, end*(counter+1))
+                lscat.handle_scroll(cls, data, myslice)
 
             ans = TERM.inkey()
-            # FIXME: bounds checking
+            # TODO: extract out all check quit things in the entire codebase
             if ans == 'q':
                 sys.exit(0)
 
-            elif ans.name == 'KEY_DOWN':
+            elif ans.name == 'KEY_DOWN' and counter + 1 < max_scrolls:
                 counter += 1
+                show = True
 
-            elif ans.name == 'KEY_UP':
+            elif ans.name == 'KEY_UP' and counter > 0:
                 counter -= 1
+                show = True
+
+            else:
+                print('Out of bounds!')
+                show = False
 
 
 class AbstractLoop(ABC):

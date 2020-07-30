@@ -24,7 +24,7 @@ from logging.handlers import RotatingFileHandler
 import funcy
 from pixcat import Image
 
-from koneko import pure, printer, TERM, KONEKODIR
+from koneko import pure, config, printer, TERM, KONEKODIR
 from koneko.config import ncols_config, xcoords_config
 
 
@@ -96,6 +96,13 @@ def catch_ctrl_c(func: 'func[T]') -> 'T':
 
 
 # Calculations
+def max_images():
+    """Calculates the maximum number of images that can fit in single terminal page"""
+    return config.ncols_config() * config.nrows_config()
+
+def max_images_user():
+    return 4 * config.nrows_config()
+
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
     """Takes prompt input key seqs, find the selected image number.
     If find_number_map() returns None, prompt.goto_image() will catch it.

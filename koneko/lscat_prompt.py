@@ -3,7 +3,7 @@ import sys
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
-from koneko import lscat, TERM, printer, FakeData
+from koneko import utils, lscat, config, TERM, printer, FakeData
 
 
 class AbstractLoop(ABC):
@@ -27,6 +27,9 @@ class AbstractLoop(ABC):
 
     def start(self) -> 'IO':
         show_images = True
+        counter = 0
+        end = utils.max_images()
+
         with TERM.cbreak():
             while True:
                 if show_images:
@@ -63,11 +66,17 @@ class AbstractLoop(ABC):
                 elif ans == 'q':
                     sys.exit(0)
 
+                elif ans.name == 'KEY_DOWN':
+                    counter += 1
+                elif ans.name == 'KEY_UP':
+                    counter -= 1
+
                 else:
                     print('Invalid input!')
                     show_images = False
 
                 if show_images:
+                    self.myslice = slice(end*counter, end*(counter+1))
                     self.end_func()
 
 
@@ -84,9 +93,20 @@ class GalleryUserLoop(AbstractLoop):
             [x for x in os.listdir(data.download_path.parent)
              if x.isdigit()]
         )
+        self.scrollable = config.use_ueberzug() or config.scroll_display()
+
+        # TODO: use classmethod
+        if cls is lscat.TrackDownloads:
+            self.myslice = slice(None, utils.max_images())
+        else:
+            self.myslice = slice(None, utils.max_images_user())
+
 
     def show_func(self) -> 'IO':
-        lscat.show_instant(self.cls, self.data)
+        if self.scrollable:
+            lscat.handle_scroll(self.cls, self.data, self.myslice)
+        else:
+            lscat.show_instant(self.cls, self.data)
 
     def middle(self) -> None:
         return True

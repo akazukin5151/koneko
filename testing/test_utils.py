@@ -62,3 +62,9 @@ def test_history(monkeypatch, tmp_path):
 
 def test_handle_missing_pics():
     utils.handle_missing_pics()
+
+
+def test_max_images(monkeypatch):
+    monkeypatch.setattr('koneko.config.nrows_config', lambda: 2)
+    monkeypatch.setattr('koneko.config.ncols_config', lambda: 5)
+    assert utils.max_images() == 10

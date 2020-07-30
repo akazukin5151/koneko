@@ -36,6 +36,14 @@ def icat(path: str) -> 'IO':
     Image(path).show()
 
 
+def handle_scroll(cls, data, myslice):
+    tracker = cls(data)
+    tracker.orders = tracker.orders[myslice]
+    for x in sorted(os.listdir(data.download_path)):
+        if not x.startswith('.'):
+            tracker.update(x)
+
+
 def show_instant(cls: 'lscat.<class>', data: 'data.<class>') -> 'IO':
     tracker = cls(data)
     # Filter out invisible files
@@ -76,6 +84,9 @@ class AbstractTracker(ABC):
         yet. According to the given orders list, if the next image to be displayed
         is in the list, display it, then look for the next next image and repeat.
         """
+        if not self.orders:
+            return
+
         next_num = self.orders[0]
 
         if next_num in self._numlist:
@@ -249,9 +260,9 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
 
         # Ueberzug doesn't respond to scroll events,
         # so cut off all images not in this 'page' (page as in scrolling to a new view)
-        if number >= number_of_cols * number_of_rows:
+        #if number >= number_of_cols * number_of_rows:
             # Break raises StopIteration error as tracker will continue sending
-            continue
+            #continue
 
         canvas.create_placement(
             str(path / image),

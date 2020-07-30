@@ -116,7 +116,10 @@ class TrackDownloadsUsers(AbstractTracker):
         # splitpoint * 3 + splitpoint == splitpoint * 4
         self.orders = pure.generate_orders(splitpoint * 4, splitpoint)
 
-        self.generator = generate_users(data.download_path, print_info)
+        if config.use_ueberzug():
+            self.generator = generate_users_ueberzug(data.download_path, print_info)
+        else:
+            self.generator = generate_users(data.download_path, print_info)
         super().__init__()
 
 
@@ -262,3 +265,68 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
         )
     # Note that once the program exits, all displayed images will be cleared
 
+
+#def generate_users(path: 'Path', print_info=True) -> 'IO':
+def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
+    try:
+        import ueberzug.lib.v0 as ueberzug
+        from ueberzug.lib.v0 import ScalerOption
+        from ueberzug.lib.v0 import Visibility
+    except ImportError as e:
+        raise ImportError("Install with `pip install ueberzug`") from e
+
+    preview_xcoords = config.xcoords_config(offset=1)[-3:]
+    message_xcoord, padding = config.get_gen_users_settings()
+    page_spacing = config.users_page_spacing_config()
+    thumbnail_size = config.thumbnail_size_config()
+    size = thumbnail_size / 20
+    canvas = ueberzug.Canvas()
+
+    number_of_cols = config.ncols_config()
+    number_of_rows = config.nrows_config()
+    rowspaces = config.ycoords_config()
+
+    os.system('clear')
+    canvas.__enter__()
+    i = 0
+    while True:   # for i in range(number_of_rows) will raise StopIteration
+        a_img = yield
+        artist_name = a_img.split('.')[0].split('_')[-1]
+        number = a_img.split('_')[0][1:]
+
+        if i >= number_of_rows:
+            continue
+
+        if print_info:
+            print(' ' * message_xcoord, number, '\n',
+                  ' ' * message_xcoord, artist_name,
+                  sep='')
+
+        # Display artist profile pic
+        canvas.create_placement(
+            str(path / a_img),
+            path=str(path / a_img),
+            x=padding,
+            y=rowspaces[i % number_of_rows],
+            width=size,
+            height=size,
+            scaler=ScalerOption.FIT_CONTAIN.value,
+            visibility=Visibility.VISIBLE
+        )
+
+        # Display the three previews
+        j = 0                   # Always resets for every artist
+        while j < 3:            # Every artist has only 3 previews
+            p_img = yield       # Wait for preview pic
+            canvas.create_placement(
+                str(path / p_img),
+                path=str(path / p_img),
+                x=preview_xcoords[j],
+                y=rowspaces[i % number_of_rows],
+                width=size,
+                height=size,
+                scaler=ScalerOption.FIT_CONTAIN.value,
+                visibility=Visibility.VISIBLE
+            )
+            j += 1
+        i += 1

@@ -93,6 +93,8 @@ def display_gallery() -> 'IO':
 def display_user() -> 'IO':
     data = FakeData(KONEKODIR / 'testuser')
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
+    if config.use_ueberzug():
+        input()  # On program exit all images are cleared
 
 
 def display_path(path=None) -> 'IO':

@@ -105,7 +105,7 @@ def display_path(path=None) -> 'IO':
         print('Invalid path!')
         sys.exit(1)
 
-    data = FakeData(path)
+    data = FakeData(Path(path))
     lscat.show_instant(lscat.TrackDownloads, data)
 
 

@@ -7,5 +7,4 @@ funcy~=1.14
 returns~=0.14
 placeholder~=1.1
 
-ueberzug~=18.1
 pytest~=6.0

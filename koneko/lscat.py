@@ -93,7 +93,7 @@ class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
     def __init__(self, data: 'data.<class>'):
         self.orders = list(range(30))
-        if config.use_ueberzug:
+        if config.use_ueberzug():
             self.generator = generate_page_ueberzug(data.download_path)
         else:
             self.generator = generate_page(data.download_path)

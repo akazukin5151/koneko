@@ -118,6 +118,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] Add option to prevent display scrolling and use up/down keys to view more images
         - [x] Add option to config
         - [ ] Respond to the config option
+            - [x] In lscat app
+            - [ ] In koneko app
         * "Display scrolling" means lscat will print newlines to scroll down and display more images
         * The number of images in a terminal page is number_of_cols * number_of_rows
         * As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed

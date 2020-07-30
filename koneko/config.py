@@ -60,6 +60,10 @@ def check_print_info() -> bool:
     return get_bool_config('misc', 'print_info', True)
 
 
+def use_ueberzug() -> bool:
+    return get_bool_config('experimental', 'use_ueberzug', False)
+
+
 def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, int):
     settings = get_config_section('lscat')
     return (

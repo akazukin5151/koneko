@@ -47,21 +47,22 @@ def unsafe_get_bool_config(section, setting: str, fallback: bool) -> 'IOResult[b
 
 # While not pure (as reading config is IO), they will always return a default on fail
 def get_bool_config(section: str, setting: str, fallback: bool) -> bool:
-    """Reads requested section and setting, returning the fallback on failure."""
+    """Reads requested section and setting, returning the fallback on failure
+    (setting not found)
+    """
     return unsafe_get_bool_config(section, setting, fallback).value_or(fallback)
-
 
 def check_image_preview() -> bool:
     return get_bool_config('experimental', 'image_mode_previews', False)
 
-
 def check_print_info() -> bool:
-    """For a Failure (setting not found), return True by default"""
     return get_bool_config('misc', 'print_info', True)
-
 
 def use_ueberzug() -> bool:
     return get_bool_config('experimental', 'use_ueberzug', False)
+
+def scroll_display() -> bool:
+    return get_bool_config('experimental', 'scroll_display', True)
 
 
 def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, int):

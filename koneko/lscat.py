@@ -212,18 +212,6 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
         )
 
 
-def ueberzug_display(canvas, path, x, y, width, height, FIT_CONTAIN, VISIBLE):
-    canvas.create_placement(
-        path,
-        path=path,
-        x=x,
-        y=y,
-        width=width,
-        height=height,
-        scaler=FIT_CONTAIN.value,
-        visibility=VISIBLE
-    )
-
 
 def generate_page_ueberzug(path: 'Path') -> 'IO':
     """Temporarily try it out by renaming it to generate_page
@@ -259,15 +247,15 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
             # Break raises StopIteration error as tracker will continue sending
             continue
 
-        ueberzug_display(
-            canvas,
+        canvas.create_placement(
             str(path / image),
-            left_shifts[x],
-            rowspaces[y % number_of_rows],
-            size,
-            size,
-            ScalerOption.FIT_CONTAIN,
-            Visibility.VISIBLE
+            path=str(path / image),
+            x=left_shifts[x],
+            y=rowspaces[y % number_of_rows],
+            width=size,
+            height=size,
+            scaler=ScalerOption.FIT_CONTAIN.value,
+            visibility=Visibility.VISIBLE
         )
     # Note that once the program exits, all displayed images will be cleared
 

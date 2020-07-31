@@ -219,12 +219,11 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
         Image(path / a_img).thumbnail(thumbnail_size).show(align='left', x=padding, y=0)
 
         # Display the three previews
-        i = 0                   # Always resets for every artist
-        while i < 3:            # Every artist has only 3 previews
-            p_img = yield       # Wait for preview pic
-            Image(path / p_img).thumbnail(thumbnail_size).show(align='left', y=0,
-                                                        x=preview_xcoords[i])
-            i += 1
+        for i in range(3):
+            p_img = yield
+            Image(path / p_img).thumbnail(thumbnail_size).show(
+                align='left', y=0, x=preview_xcoords[i]
+            )
 
 
 class TrackDownloadsImage(AbstractTracker):
@@ -272,10 +271,6 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
 
 
 def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
-    """Temporarily try it out by renaming it to generate_page
-    (overwriting the previous definition), and run `lscat 4`
-    """
-
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
@@ -302,7 +297,6 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
 
 
 def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
-
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
     page_spacing = config.users_page_spacing_config()
@@ -346,9 +340,8 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
         )
 
         # Display the three previews
-        j = 0                   # Always resets for every artist
-        while j < 3:            # Every artist has only 3 previews
-            p_img = yield       # Wait for preview pic
+        for j in range(3):
+            p_img = yield
             ueberzug_display(
                 canvas,
                 path / p_img,
@@ -356,7 +349,6 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
                 rowspaces[i % number_of_rows],
                 size
             )
-            j += 1
         i += 1
 
 

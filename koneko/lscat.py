@@ -23,7 +23,7 @@ from abc import ABC
 from pixcat import Image
 from returns.result import safe
 
-from koneko import pure, files, config, printer
+from koneko import pure, utils, files, config, printer
 
 
 def icat(path: str) -> 'IO':
@@ -37,12 +37,8 @@ def icat(path: str) -> 'IO':
 
 
 def ueberzug(path):
-    try:
-        import ueberzug.lib.v0 as ueberzug
-        from ueberzug.lib.v0 import Visibility
-    except ImportError as e:
-        raise ImportError("Install with `pip install ueberzug`") from e
-
+    ueberzug = utils.try_import_ueberzug()
+    Visibility = utils.try_import_ueberzug_module('Visibility')
     canvas = ueberzug.Canvas()
     canvas.__enter__()
     canvas.create_placement(
@@ -125,14 +121,9 @@ class TrackDownloads(AbstractTracker):
     def __init__(self, data: 'data.<class>'):
         self.orders = list(range(30))
         if config.use_ueberzug():
-            try:
-                import ueberzug.lib.v0 as ueberzug
-            except ImportError as e:
-                raise ImportError("Install with `pip install ueberzug`") from e
-
+            ueberzug = utils.try_import_ueberzug()
             self.canvas = ueberzug.Canvas()
             self.generator = generate_page_ueberzug(data.download_path, self.canvas)
-
         else:
             self.canvas = None
             self.generator = generate_page(data.download_path)
@@ -156,10 +147,7 @@ class TrackDownloadsUsers(AbstractTracker):
         self.orders = pure.generate_orders(splitpoint * 4, splitpoint)
 
         if config.use_ueberzug():
-            try:
-                import ueberzug.lib.v0 as ueberzug
-            except ImportError as e:
-                raise ImportError("Install with `pip install ueberzug`") from e
+            ueberzug = utils.try_import_ueberzug()
             self.canvas = ueberzug.Canvas()
             self.generator = generate_users_ueberzug(data.download_path, self.canvas, print_info)
         else:
@@ -271,11 +259,8 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
     """Temporarily try it out by renaming it to generate_page
     (overwriting the previous definition), and run `lscat 4`
     """
-    try:
-        from ueberzug.lib.v0 import ScalerOption
-        from ueberzug.lib.v0 import Visibility
-    except ImportError as e:
-        raise ImportError("Install with `pip install ueberzug`") from e
+    ScalerOption = utils.try_import_ueberzug_module('ScalerOption')
+    Visibility = utils.try_import_ueberzug_module('Visibility')
 
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
@@ -307,11 +292,8 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
 
 #def generate_users(path: 'Path', print_info=True) -> 'IO':
 def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
-    try:
-        from ueberzug.lib.v0 import ScalerOption
-        from ueberzug.lib.v0 import Visibility
-    except ImportError as e:
-        raise ImportError("Install with `pip install ueberzug`") from e
+    ScalerOption = utils.try_import_ueberzug_module('ScalerOption')
+    Visibility = utils.try_import_ueberzug_module('Visibility')
 
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
@@ -371,12 +353,9 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
 
 #def generate_previews(path: 'Path', min_num: int) -> 'IO':
 def generate_previews_ueberzug(path: 'Path', min_num: int) -> 'IO':
-    try:
-        import ueberzug.lib.v0 as ueberzug
-        from ueberzug.lib.v0 import ScalerOption
-        from ueberzug.lib.v0 import Visibility
-    except ImportError as e:
-        raise ImportError("Install with `pip install ueberzug`") from e
+    ueberzug = utils.try_import_ueberzug()
+    ScalerOption = utils.try_import_ueberzug_module('ScalerOption')
+    Visibility = utils.try_import_ueberzug_module('Visibility')
 
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()

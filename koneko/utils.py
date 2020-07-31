@@ -216,3 +216,15 @@ def hide_if_exist(image: Image) -> 'IO':
         image.hide()
         printer.move_cursor_up(1)
 
+
+def try_import_ueberzug():
+    try:
+        import ueberzug.lib.v0 as ueberzug
+    except ImportError as e:
+        raise ImportError("Install with `pip install ueberzug`") from e
+    return ueberzug
+
+
+def try_import_ueberzug_module(module):
+    toexec = "try_import_ueberzug()." + module
+    return eval(toexec)

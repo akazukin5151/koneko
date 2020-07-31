@@ -315,14 +315,15 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
 
     os.system('clear')
     canvas.__enter__()
-    for i in range(number_of_rows):
+    for row in range(number_of_rows):
+        ycoord = row % number_of_rows
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
 
         if print_info:
             print(
-                '\n' * msg_rows[i % number_of_rows],
+                '\n' * msg_rows[ycoord],
                 ' ' * message_xcoord, number, '\n',
                 ' ' * message_xcoord, artist_name,
                 sep=''
@@ -333,7 +334,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
             canvas,
             path / a_img,
             padding,
-            rowspaces[i % number_of_rows],
+            rowspaces[ycoord],
             size
         )
 
@@ -343,7 +344,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
                 canvas,
                 path / (yield),
                 preview_xcoords[j],
-                rowspaces[i % number_of_rows],
+                rowspaces[ycoord],
                 size
             )
 
@@ -359,12 +360,12 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
     size = thumbnail_size / 20
 
     canvas.__enter__()
-    for i in range(10):
+    for preview_num in range(4):  # Max 4 previews
         image = yield
 
         number = int(image.split('_')[1].replace('p', '')) - min_num
         y = number % 2
-        if i < 2:
+        if preview_num < 2:
             x = 0
         else:
             x = 1

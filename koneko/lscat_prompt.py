@@ -197,15 +197,15 @@ class ImageLoop(AbstractLoop):
         if self.response:
             self.response.__exit__()
 
-    def update_tracker(self) -> 'IO':
-        """Unique"""
-        data = self.FakeData(self.root, self.current_page)
-        return lscat.TrackDownloadsImage(data)
-
     def maybe_show_preview(self) -> 'IO':
         if len(self.all_images) > 1:
-            tracker = self.update_tracker()
+            tracker = self._update_tracker()
             loc = TERM.get_location()
             for image in self.all_images[self.current_page + 1:][:4]:
                 tracker.update(image)
             printer.move_cursor_xy(loc[0], loc[1])
+
+    def _update_tracker(self) -> 'IO':
+        """Unique"""
+        data = self.FakeData(self.root, self.current_page)
+        return lscat.TrackDownloadsImage(data)

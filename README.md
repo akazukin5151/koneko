@@ -127,7 +127,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         * The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
         * Images displayed with icat will respond to terminal scroll events, but not ueberzug, so if ueberzug is enabled, this option will always be enabled as well.
     - [ ] Refine
-        - [ ] Hide images when scrolling
+        - [x] Hide images when scrolling
         - [ ] Center align image mode
         - [ ] Fix print_info
         - [ ] Better loops, extract common code to functions or even ABCs

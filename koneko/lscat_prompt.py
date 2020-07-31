@@ -10,6 +10,7 @@ def scroll_prompt(cls, data, end):
     # TODO: integrate to koneko prompt (currently only works for lscat app)
     show = True
     counter = 0
+    canvas = None
     number_of_images = len(os.listdir(data.download_path))
     max_scrolls = number_of_images // end + 1
     if cls is lscat.TrackDownloadsUsers:
@@ -18,8 +19,10 @@ def scroll_prompt(cls, data, end):
     with TERM.cbreak():
         while True:
             if show:
+                if canvas:
+                    canvas.__exit__()
                 myslice = slice(end*counter, end*(counter+1))
-                lscat.handle_scroll(cls, data, myslice)
+                canvas = lscat.handle_scroll(cls, data, myslice)
 
             ans = TERM.inkey()
             # TODO: extract out all check quit things in the entire codebase

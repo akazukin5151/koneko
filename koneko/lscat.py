@@ -35,6 +35,7 @@ def icat(path: str) -> 'IO':
     #os.system(f'kitty +kitten icat --silent {args}')
     Image(path).show()
 
+
 def ueberzug(path):
     try:
         import ueberzug.lib.v0 as ueberzug
@@ -60,6 +61,7 @@ def handle_scroll(cls, data, myslice):
     for x in sorted(os.listdir(data.download_path)):
         if not x.startswith('.'):
             tracker.update(x)
+    return tracker.canvas
 
 
 def show_instant(cls: 'lscat.<class>', data: 'data.<class>') -> 'IO':
@@ -123,8 +125,16 @@ class TrackDownloads(AbstractTracker):
     def __init__(self, data: 'data.<class>'):
         self.orders = list(range(30))
         if config.use_ueberzug():
-            self.generator = generate_page_ueberzug(data.download_path)
+            try:
+                import ueberzug.lib.v0 as ueberzug
+            except ImportError as e:
+                raise ImportError("Install with `pip install ueberzug`") from e
+
+            self.canvas = ueberzug.Canvas()
+            self.generator = generate_page_ueberzug(data.download_path, self.canvas)
+
         else:
+            self.canvas = None
             self.generator = generate_page(data.download_path)
         super().__init__()
 
@@ -146,8 +156,14 @@ class TrackDownloadsUsers(AbstractTracker):
         self.orders = pure.generate_orders(splitpoint * 4, splitpoint)
 
         if config.use_ueberzug():
-            self.generator = generate_users_ueberzug(data.download_path, print_info)
+            try:
+                import ueberzug.lib.v0 as ueberzug
+            except ImportError as e:
+                raise ImportError("Install with `pip install ueberzug`") from e
+            self.canvas = ueberzug.Canvas()
+            self.generator = generate_users_ueberzug(data.download_path, self.canvas, print_info)
         else:
+            self.canvas = None
             self.generator = generate_users(data.download_path, print_info)
         super().__init__()
 
@@ -251,12 +267,11 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
 
 
 
-def generate_page_ueberzug(path: 'Path') -> 'IO':
+def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
     """Temporarily try it out by renaming it to generate_page
     (overwriting the previous definition), and run `lscat 4`
     """
     try:
-        import ueberzug.lib.v0 as ueberzug
         from ueberzug.lib.v0 import ScalerOption
         from ueberzug.lib.v0 import Visibility
     except ImportError as e:
@@ -268,7 +283,6 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
     number_of_rows = config.nrows_config()
     thumbnail_size = config.thumbnail_size_config()
     size = thumbnail_size / 20
-    canvas = ueberzug.Canvas()
 
     os.system('clear')
     canvas.__enter__()
@@ -278,12 +292,6 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
         number = int(image.split('_')[0])
         x = number % number_of_cols
         y = number // number_of_cols
-
-        # Ueberzug doesn't respond to scroll events,
-        # so cut off all images not in this 'page' (page as in scrolling to a new view)
-        #if number >= number_of_cols * number_of_rows:
-            # Break raises StopIteration error as tracker will continue sending
-            #continue
 
         canvas.create_placement(
             str(path / image),
@@ -295,13 +303,11 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
             scaler=ScalerOption.FIT_CONTAIN.value,
             visibility=Visibility.VISIBLE
         )
-    # Note that once the program exits, all displayed images will be cleared
 
 
 #def generate_users(path: 'Path', print_info=True) -> 'IO':
-def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
+def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
     try:
-        import ueberzug.lib.v0 as ueberzug
         from ueberzug.lib.v0 import ScalerOption
         from ueberzug.lib.v0 import Visibility
     except ImportError as e:
@@ -312,7 +318,6 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     page_spacing = config.users_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
     size = thumbnail_size / 20
-    canvas = ueberzug.Canvas()
 
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()

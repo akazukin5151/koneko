@@ -177,7 +177,8 @@ class ImageLoop(AbstractLoop):
 
     def end_func(self):
         self.image = self.all_images[self.current_page]
-        self.response.__exit__()
+        if self.response:
+            self.response.__exit__()
 
     def update_tracker(self) -> 'IO':
         """Unique"""

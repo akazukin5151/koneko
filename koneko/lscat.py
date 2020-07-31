@@ -215,7 +215,10 @@ class TrackDownloadsImage(AbstractTracker):
     def __init__(self, data):
         min_num = data.page_num + 1
         self.orders = list(range(min_num, 30))
-        self.generator = generate_previews(data.download_path, min_num)
+        if config.use_ueberzug():
+            self.generator = generate_previews_ueberzug(data.download_path, min_num)
+        else:
+            self.generator = generate_previews(data.download_path, min_num)
         super().__init__()
 
     def update(self, new: str):
@@ -359,3 +362,44 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
             )
             j += 1
         i += 1
+
+
+#def generate_previews(path: 'Path', min_num: int) -> 'IO':
+def generate_previews_ueberzug(path: 'Path', min_num: int) -> 'IO':
+    try:
+        import ueberzug.lib.v0 as ueberzug
+        from ueberzug.lib.v0 import ScalerOption
+        from ueberzug.lib.v0 import Visibility
+    except ImportError as e:
+        raise ImportError("Install with `pip install ueberzug`") from e
+
+    rowspaces = config.ycoords_config()
+    left_shifts = config.xcoords_config()
+    _xcoords = (left_shifts[0], left_shifts[-1])
+    thumbnail_size = config.thumbnail_size_config()
+    size = thumbnail_size / 20
+    canvas = ueberzug.Canvas()
+
+    i = 0
+    canvas.__enter__()
+    while True:
+        image = yield
+        i += 1
+
+        number = int(image.split('_')[1].replace('p', '')) - min_num
+        y = number % 2
+        if i <= 2:
+            x = 0
+        else:
+            x = 1
+
+        canvas.create_placement(
+            str(path / image),
+            path=str(path / image),
+            x=_xcoords[x],
+            y=rowspaces[y],
+            width=size,
+            height=size,
+            scaler=ScalerOption.FIT_CONTAIN.value,
+            visibility=Visibility.VISIBLE
+        )

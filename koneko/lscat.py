@@ -35,6 +35,24 @@ def icat(path: str) -> 'IO':
     #os.system(f'kitty +kitten icat --silent {args}')
     Image(path).show()
 
+def ueberzug(path):
+    try:
+        import ueberzug.lib.v0 as ueberzug
+        from ueberzug.lib.v0 import Visibility
+    except ImportError as e:
+        raise ImportError("Install with `pip install ueberzug`") from e
+
+    canvas = ueberzug.Canvas()
+    canvas.__enter__()
+    canvas.create_placement(
+        str(path),
+        path=str(path),
+        x=0,  # FIXME: center align
+        y=0,
+        visibility=Visibility.VISIBLE
+    )
+    return canvas
+
 
 def handle_scroll(cls, data, myslice):
     tracker = cls(data)

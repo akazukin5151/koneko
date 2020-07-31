@@ -60,12 +60,12 @@ class AbstractLoop(ABC):
 
     def start(self) -> 'IO':
         show_images = True
-        counter = 0
+        self.counter = 0
 
         with TERM.cbreak():
             while True:
                 if show_images:
-                    self.show_func()
+                    self.response = self.show_func()
                     self.middle()
                     print(f'Page {self.current_page} / {self.max_pages}')
                     print(
@@ -98,12 +98,12 @@ class AbstractLoop(ABC):
                 elif ans == 'q':
                     sys.exit(0)
 
-                elif ans.name == 'KEY_DOWN' and counter + 1 < self.max_scrolls:
-                    counter += 1
+                elif ans.name == 'KEY_DOWN' and self.counter + 1 < self.max_scrolls:
+                    self.counter += 1
                     show_images = True
 
-                elif ans.name == 'KEY_UP' and counter > 0:
-                    counter -= 1
+                elif ans.name == 'KEY_UP' and self.counter > 0:
+                    self.counter -= 1
                     show_images = True
 
                 else:
@@ -111,7 +111,6 @@ class AbstractLoop(ABC):
                     show_images = False
 
                 if show_images:
-                    self.myslice = slice(self.end*counter, self.end*(counter+1))
                     self.end_func()
 
 
@@ -151,12 +150,14 @@ class GalleryUserLoop(AbstractLoop):
         return True
 
     def end_func(self):
+        self.myslice = slice(self.end*self.counter, self.end*(self.counter+1))
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
 
 class ImageLoop(AbstractLoop):
     def __init__(self, root, image):
         # Unique
+        self.use_ueberzug = config.use_ueberzug()
         self.root = root
         self.image = image
         self.all_images = sorted(os.listdir(root))
@@ -169,10 +170,14 @@ class ImageLoop(AbstractLoop):
         self.max_pages = len(self.all_images) - 1
 
     def show_func(self) -> 'IO':
-        lscat.icat(self.root / self.image)
+        if self.use_ueberzug:
+            return lscat.ueberzug(self.root / self.image)
+        else:
+            lscat.icat(self.root / self.image)
 
     def end_func(self):
         self.image = self.all_images[self.current_page]
+        self.response.__exit__()
 
     def update_tracker(self) -> 'IO':
         """Unique"""

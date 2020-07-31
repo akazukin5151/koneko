@@ -39,7 +39,6 @@ def icat(path: str) -> 'IO':
 
 def ueberzug(path):
     ueberzug = utils.try_import_ueberzug()
-    Visibility = utils.try_import_ueberzug_module('Visibility')
     canvas = ueberzug.Canvas()
     canvas.__enter__()
     canvas.create_placement(
@@ -47,7 +46,7 @@ def ueberzug(path):
         path=str(path),
         x=config.ueberzug_center_spaces(),
         y=0,
-        visibility=Visibility.VISIBLE
+        visibility=utils.try_get_VISIBLE()
     )
     return canvas
 
@@ -60,8 +59,8 @@ def ueberzug_display(canvas, img_path, x, y, size):
         y=y,
         width=size,
         height=size,
-        scaler=utils.try_import_ueberzug_module('ScalerOption').FIT_CONTAIN.value,
-        visibility=utils.try_import_ueberzug_module('Visibility').VISIBLE
+        scaler=utils.try_get_FIT_CONTAIN(),
+        visibility=utils.try_get_VISIBLE(),
     )
 
 

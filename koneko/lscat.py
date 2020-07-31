@@ -44,7 +44,7 @@ def ueberzug(path):
     canvas.create_placement(
         str(path),
         path=str(path),
-        x=0,  # FIXME: center align
+        x=config.ueberzug_center_spaces(),
         y=0,
         visibility=Visibility.VISIBLE
     )

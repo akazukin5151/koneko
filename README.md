@@ -129,6 +129,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] Refine
         - [x] Hide images when scrolling
         - [ ] Center align image mode
+            - [x] Add config
+            - [ ] Update configuration assistant
         - [ ] Fix print_info
         - [ ] Better loops, extract common code to functions or even ABCs
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers

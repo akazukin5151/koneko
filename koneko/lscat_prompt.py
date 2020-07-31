@@ -49,6 +49,8 @@ class AbstractLoop(ABC):
         self.condition: int
         self.current_page: int
         self.scrollable: bool
+        # Defined in start
+        self.counter: int
 
     @abstractmethod
     def show_func(self) -> 'IO':
@@ -127,7 +129,7 @@ class GalleryUserLoop(AbstractLoop):
         self.cls = cls
         self.data = data
         # Unique, defined in classmethods
-        self.end: int
+        self.max_images: int
         self.max_scrolls: int
         self.myslice: slice
 
@@ -144,18 +146,18 @@ class GalleryUserLoop(AbstractLoop):
     def for_gallery(cls, data, tracker):
         result = cls(data, tracker)
         number_of_images = len(os.listdir(data.download_path))
-        result.end = utils.max_images()
-        result.max_scrolls = number_of_images // result.end + 1
-        result.myslice = slice(None, result.end)
+        result.max_images = utils.max_images()
+        result.max_scrolls = number_of_images // result.max_images + 1
+        result.myslice = slice(None, result.max_images)
         return result
 
     @classmethod
     def for_user(cls, data, tracker):
         result = cls(data, tracker)
         number_of_images = len(os.listdir(data.download_path))
-        result.end = utils.max_images_user()
-        result.max_scrolls = number_of_images // result.end
-        result.myslice = slice(None, result.end)
+        result.max_images = utils.max_images_user()
+        result.max_scrolls = number_of_images // result.max_images
+        result.myslice = slice(None, result.max_images)
         return result
 
 
@@ -166,7 +168,7 @@ class GalleryUserLoop(AbstractLoop):
             lscat.show_instant(self.cls, self.data)
 
     def end_func(self):
-        self.myslice = slice(self.end*self.counter, self.end*(self.counter+1))
+        self.myslice = slice(self.max_images*self.counter, self.max_images*(self.counter+1))
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
 

@@ -182,7 +182,9 @@ class ImageLoop(AbstractLoop):
         if len(self.all_images) > 1:
             self.FakeData = namedtuple('data', ('download_path', 'page_num'))
         # Defined in self.show_func()
-        self.canvas: 'ueberzug.Canvas'
+        self.canvas: 'Optional[ueberzug.Canvas]' = None
+        # Defined in self.maybe_show_preview()
+        self.preview_canvas: 'Optional[ueberzug.Canvas]' = None
 
         # Base ABC
         self.condition = 0

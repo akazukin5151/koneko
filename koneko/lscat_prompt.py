@@ -148,7 +148,6 @@ class GalleryUserLoop(AbstractLoop):
         number_of_images = len(os.listdir(data.download_path))
         result.max_images = utils.max_images()
         result.max_scrolls = number_of_images // result.max_images + 1
-        result.myslice = slice(None, result.max_images)
         return result
 
     @classmethod
@@ -157,18 +156,17 @@ class GalleryUserLoop(AbstractLoop):
         number_of_images = len(os.listdir(data.download_path))
         result.max_images = utils.max_images_user()
         result.max_scrolls = number_of_images // result.max_images
-        result.myslice = slice(None, result.max_images)
         return result
 
 
     def show_func(self) -> 'IO':
         if self.scrollable:
+            self.myslice = slice(self.max_images*self.counter, self.max_images*(self.counter+1))
             lscat.handle_scroll(self.cls, self.data, self.myslice)
         else:
             lscat.show_instant(self.cls, self.data)
 
     def end_func(self):
-        self.myslice = slice(self.max_images*self.counter, self.max_images*(self.counter+1))
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
 

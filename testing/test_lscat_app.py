@@ -57,11 +57,11 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
 
     lscat_app.main()
     assert mock.mock_calls == [
-        call.for_user(
+        call.for_gallery(
             FakeData(tmp_path),
             lscat.TrackDownloads,
         ),
-        call.for_user().start()
+        call.for_gallery().start()
     ]
 
 
@@ -77,11 +77,11 @@ def test_browse_cache_invis(monkeypatch, tmp_path, argv):
 
     lscat_app.main()
     assert mock.mock_calls == [
-        call.for_gallery(
+        call.for_user(
             FakeData(tmp_path),
             lscat.TrackDownloadsUsers,
         ),
-        call.for_gallery().start()
+        call.for_user().start()
     ]
 
 

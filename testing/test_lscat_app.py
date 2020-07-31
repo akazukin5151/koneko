@@ -18,6 +18,7 @@ def test_display_gallery(monkeypatch, argv):
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
 
     lscat_app.main()
+
     assert mock.mock_calls == mock.call_args_list == [
         call(
             lscat.TrackDownloads,
@@ -56,11 +57,11 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
 
     lscat_app.main()
     assert mock.mock_calls == [
-        call(
+        call.for_user(
             FakeData(tmp_path),
             lscat.TrackDownloads,
         ),
-        call().start()
+        call.for_user().start()
     ]
 
 
@@ -76,11 +77,11 @@ def test_browse_cache_invis(monkeypatch, tmp_path, argv):
 
     lscat_app.main()
     assert mock.mock_calls == [
-        call(
+        call.for_gallery(
             FakeData(tmp_path),
             lscat.TrackDownloadsUsers,
         ),
-        call().start()
+        call.for_gallery().start()
     ]
 
 

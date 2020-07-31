@@ -122,6 +122,11 @@ class GalleryUserLoop(AbstractLoop):
         # Unique
         self.cls = cls
         self.data = data
+        self.scrollable = config.use_ueberzug() or not config.scroll_display()
+        # Unique, defined in classmethods
+        self.end: int
+        self.max_scrolls: int
+        self.myslice: slice
 
         # Base ABC
         self.condition = 1
@@ -130,17 +135,24 @@ class GalleryUserLoop(AbstractLoop):
             [x for x in os.listdir(data.download_path.parent)
              if x.isdigit()]
         )
-        self.scrollable = config.use_ueberzug() or not config.scroll_display()
 
-        # TODO: use classmethod
+    @classmethod
+    def for_gallery(cls, data, tracker):
+        result = cls(data, tracker)
         number_of_images = len(os.listdir(data.download_path))
-        if cls is lscat.TrackDownloads:
-            self.end = utils.max_images()
-            self.max_scrolls = number_of_images // self.end + 1
-        else:
-            self.end = utils.max_images_user()
-            self.max_scrolls = number_of_images // self.end
-        self.myslice = slice(None, self.end)
+        result.end = utils.max_images()
+        result.max_scrolls = number_of_images // result.end + 1
+        result.myslice = slice(None, result.end)
+        return result
+
+    @classmethod
+    def for_user(cls, data, tracker):
+        result = cls(data, tracker)
+        number_of_images = len(os.listdir(data.download_path))
+        result.end = utils.max_images_user()
+        result.max_scrolls = number_of_images // result.end
+        result.myslice = slice(None, result.end)
+        return result
 
 
     def show_func(self) -> 'IO':

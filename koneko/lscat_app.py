@@ -119,11 +119,11 @@ def browse_cache() -> 'IO':
     data = FakeData(path)
 
     if '.koneko' in os.listdir(path):
-        lscat_prompt.GalleryUserLoop(data, lscat.TrackDownloadsUsers).start()
+        lscat_prompt.GalleryUserLoop.for_gallery(data, lscat.TrackDownloadsUsers).start()
     elif 'individual' in str(path):
         lscat_prompt.ImageLoop(path, sorted(os.listdir(path))[0]).start()
     else:
-        lscat_prompt.GalleryUserLoop(data, lscat.TrackDownloads).start()
+        lscat_prompt.GalleryUserLoop.for_user(data, lscat.TrackDownloads).start()
 
 
 def config_assistance(actions: 'Optional[list[int]]' = None) -> 'IO':

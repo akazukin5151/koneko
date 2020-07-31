@@ -118,6 +118,10 @@ def gallery_print_spacing_config() -> 'list[str]':
     ).value_or(['9', '17', '17', '17', '17'])
 
 
+def ueberzug_center_spaces() -> int:
+    settings = get_config_section('experimental')
+    return settings.map(m.getint('ueberzug_center_spaces', fallback=20)).value_or(20)
+
 
 def credentials_from_config(config_object, config_path) -> 'IO[(config, str)]':
     credentials = get_config_section('Credentials').unwrap()

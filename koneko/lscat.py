@@ -220,8 +220,11 @@ class TrackDownloadsImage(AbstractTracker):
         min_num = data.page_num + 1
         self.orders = list(range(min_num, 30))
         if config.use_ueberzug():
-            self.generator = generate_previews_ueberzug(data.download_path, min_num)
+            ueberzug = utils.try_import_ueberzug()
+            self.canvas = ueberzug.Canvas()
+            self.generator = generate_previews_ueberzug(data.download_path, min_num, self.canvas)
         else:
+            self.canvas = None
             self.generator = generate_previews(data.download_path, min_num)
         super().__init__()
 
@@ -352,7 +355,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
 
 
 #def generate_previews(path: 'Path', min_num: int) -> 'IO':
-def generate_previews_ueberzug(path: 'Path', min_num: int) -> 'IO':
+def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
     ueberzug = utils.try_import_ueberzug()
     ScalerOption = utils.try_import_ueberzug_module('ScalerOption')
     Visibility = utils.try_import_ueberzug_module('Visibility')
@@ -362,7 +365,6 @@ def generate_previews_ueberzug(path: 'Path', min_num: int) -> 'IO':
     _xcoords = (left_shifts[0], left_shifts[-1])
     thumbnail_size = config.thumbnail_size_config()
     size = thumbnail_size / 20
-    canvas = ueberzug.Canvas()
 
     i = 0
     canvas.__enter__()

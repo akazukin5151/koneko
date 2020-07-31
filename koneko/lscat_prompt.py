@@ -200,6 +200,8 @@ class ImageLoop(AbstractLoop):
         self.image = self.all_images[self.current_page]
         if self.canvas:
             self.canvas.__exit__()
+        if self.preview_canvas:
+            self.preview_canvas.__exit__()
 
     def maybe_show_preview(self) -> 'IO':
         if len(self.all_images) > 1:
@@ -208,6 +210,7 @@ class ImageLoop(AbstractLoop):
             for image in self.all_images[self.current_page + 1:][:4]:
                 tracker.update(image)
             printer.move_cursor_xy(loc[0], loc[1])
+            self.preview_canvas = tracker.canvas
 
     def _update_tracker(self) -> 'IO':
         """Unique"""

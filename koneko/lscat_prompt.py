@@ -70,7 +70,7 @@ class AbstractLoop(ABC):
         with TERM.cbreak():
             while True:
                 if show_images:
-                    self.response = self.show_func()
+                    self.show_func()
                     self.maybe_show_preview()
                     print(f'Page {self.current_page} / {self.max_pages}')
                     print(
@@ -181,6 +181,8 @@ class ImageLoop(AbstractLoop):
         self.all_images = sorted(os.listdir(root))
         if len(self.all_images) > 1:
             self.FakeData = namedtuple('data', ('download_path', 'page_num'))
+        # Defined in self.show_func()
+        self.canvas: 'ueberzug.Canvas'
 
         # Base ABC
         self.condition = 0
@@ -190,14 +192,14 @@ class ImageLoop(AbstractLoop):
 
     def show_func(self) -> 'IO':
         if self.use_ueberzug:
-            return lscat.ueberzug(self.root / self.image)
+            self.canvas = lscat.ueberzug(self.root / self.image)
         else:
             lscat.icat(self.root / self.image)
 
     def end_func(self):
         self.image = self.all_images[self.current_page]
-        if self.response:
-            self.response.__exit__()
+        if self.canvas:
+            self.canvas.__exit__()
 
     def maybe_show_preview(self) -> 'IO':
         if len(self.all_images) > 1:

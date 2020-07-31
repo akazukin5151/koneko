@@ -51,10 +51,9 @@ class AbstractUI(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
     def _maybe_join_thread(self) -> None:
         """Run any procedure before prefetching (either in background or not)"""
-        raise NotImplementedError
+        return True
 
     @abstractmethod
     def _print_page_info(self) -> None:
@@ -166,10 +165,6 @@ class AbstractGallery(AbstractUI, ABC):
         self._data_class = data.GalleryData
         self._tracker_class = lscat.TrackDownloads
         super().__init__(main_path)
-
-    def _maybe_join_thread(self):
-        """Implements abstractmethod: No action needed"""
-        return True
 
     def _print_page_info(self):
         """Implements abstractmethod: Indicate which posts are multi-image and
@@ -406,7 +401,7 @@ class AbstractUsers(AbstractUI, ABC):
         super().__init__(main_path)
 
     def _maybe_join_thread(self):
-        """Implements abstractmethod: Wait for parse_thread to join (if any)"""
+        """Overrides abstractmethod: Wait for parse_thread to join (if any)"""
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
 
@@ -487,9 +482,8 @@ class ToImage(ABC):
     def get_image_id(self, post_json: 'Json') -> str:
         raise NotImplementedError
 
-    @abstractmethod
     def maybe_show_preview(self) -> 'Maybe[IO]':
-        raise NotImplementedError
+        return True
 
     @abstractmethod
     def download_image(self, idata) -> 'IO':
@@ -551,9 +545,6 @@ class ViewPostMode(ToImage):
 
     def get_image_id(self, _) -> str:
         return self._image_id
-
-    def maybe_show_preview(self) -> 'None':
-        return True
 
     def download_image(self, idata) -> 'IO':
         download.download_url(

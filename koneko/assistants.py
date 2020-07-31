@@ -109,17 +109,14 @@ class _AbstractImageAdjuster(ABC):
         """Report the result to be returned to the user by writing to stdout"""
         raise NotImplementedError
 
-    @abstractmethod
     def maybe_move_up(self) -> 'IO':
-        raise NotImplementedError
+        return True
 
-    @abstractmethod
     def maybe_move_down(self) -> 'IO':
-        raise NotImplementedError
+        return True
 
-    @abstractmethod
     def maybe_erase(self) -> 'IO':
-        raise NotImplementedError
+        return True
 
     @abstractmethod
     def show_func_args(self) -> Image:
@@ -189,10 +186,6 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
         self.default_x: int
         self.find_dim_func: 'func'
 
-    def maybe_erase(self) -> None:
-        """Implements abstractmethod: No action needed"""
-        return True
-
     def return_tup(self) -> (int, int):
         """Implements abstractmethod"""
         return self.spaces, self.width_or_height
@@ -231,14 +224,6 @@ class _XPadding(_AbstractPadding):
         """Implements abstractmethod"""
         printer.write(f'x spacing = {self.spaces}')
 
-    def maybe_move_down(self, *a) -> None:
-        """Implements abstractmethod: No action needed"""
-        return True
-
-    def maybe_move_up(self) -> None:
-        """Implements abstractmethod: No action needed"""
-        return True
-
     def show_func_args(self) -> Image:
         """Implements abstractmethod: First argument is unique"""
         return self.show_func(
@@ -265,11 +250,11 @@ class _YPadding(_AbstractPadding):
         printer.write(f'y spacing = {self.spaces}')
 
     def maybe_move_down(self) -> 'IO':
-        """Implements abstractmethod"""
+        """Overrides base method: move cursor down"""
         printer.move_cursor_down(self.width_or_height)
 
     def maybe_move_up(self) -> 'IO':
-        """Implements abstractmethod"""
+        """Overrides base method: move cursor up"""
         printer.move_cursor_up(self.spaces)
 
     def show_func_args(self) -> Image:
@@ -294,12 +279,8 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
         """Implements abstractmethod"""
         printer.write(f'image {self.side_label} = {self.spaces - self.start_spaces}')
 
-    def maybe_move_down(self) -> None:
-        """Implements abstractmethod: No action needed"""
-        return True
-
     def maybe_erase(self) -> 'IO':
-        """Implements abstractmethod"""
+        """Overrides base method: erase line"""
         printer.erase_line()
 
     def show_func_args(self) -> Image:
@@ -323,10 +304,6 @@ class _FindImageWidth(_FindImageDimension):
         self.start_spaces = config.xcoords_config()[0]
         super().__init__()
 
-    def maybe_move_up(self) -> None:
-        """Implements abstractmethod: No action needed"""
-        return True
-
 
 class _FindImageHeight(_FindImageDimension):
     def __init__(self, thumbnail_size):
@@ -337,7 +314,7 @@ class _FindImageHeight(_FindImageDimension):
         super().__init__()
 
     def maybe_move_up(self) -> 'IO':
-        """Implements abstractmethod"""
+        """Overrides base method: move cursor up"""
         printer.move_cursor_up(self.spaces)
 
 

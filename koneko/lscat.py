@@ -315,8 +315,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
 
     os.system('clear')
     canvas.__enter__()
-    i = 0
-    while True:   # for i in range(number_of_rows) will raise StopIteration
+    for i in range(number_of_rows):
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
@@ -347,7 +346,9 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
                 rowspaces[i % number_of_rows],
                 size
             )
-        i += 1
+
+    while True:  # Prevent StopIteration errors
+        yield
 
 
 def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
@@ -357,15 +358,13 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
     thumbnail_size = config.thumbnail_size_config()
     size = thumbnail_size / 20
 
-    i = 0
     canvas.__enter__()
-    while True:
+    for i in range(10):
         image = yield
-        i += 1
 
         number = int(image.split('_')[1].replace('p', '')) - min_num
         y = number % 2
-        if i <= 2:
+        if i < 2:
             x = 0
         else:
             x = 1
@@ -377,3 +376,6 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
             rowspaces[y],
             size
         )
+
+    while True:  # Prevent StopIteration errors
+        yield

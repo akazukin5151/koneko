@@ -115,7 +115,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] Read config and decide whether to use icat or ueberzug at runtime
         - [x] Gallery mode
         - [x] Users mode
-        - [ ] Image mode
+        - [x] Image mode
     - [ ] Add option to prevent display scrolling and use up/down keys to view more images
         - [x] Add option to config
         - [ ] Respond to the config option
@@ -127,6 +127,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         * The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
         * Images displayed with icat will respond to terminal scroll events, but not ueberzug, so if ueberzug is enabled, this option will always be enabled as well.
     - [ ] Refine
+        - [ ] Hide images when scrolling
+        - [ ] Center align image mode
         - [ ] Fix print_info
         - [ ] Better loops, extract common code to functions or even ABCs
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers

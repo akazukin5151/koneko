@@ -48,6 +48,7 @@ class AbstractLoop(ABC):
         self.max_pages: int
         self.condition: int
         self.current_page: int
+        self.scrollable: bool
 
     @abstractmethod
     def show_func(self) -> 'IO':
@@ -101,11 +102,15 @@ class AbstractLoop(ABC):
                 elif ans == 'q':
                     sys.exit(0)
 
-                elif ans.name == 'KEY_DOWN' and self.counter + 1 < self.max_scrolls:
+                elif (ans.name == 'KEY_DOWN'
+                        and self.scrollable
+                        and self.counter + 1 < self.max_scrolls):
                     self.counter += 1
                     show_images = True
 
-                elif ans.name == 'KEY_UP' and self.counter > 0:
+                elif (ans.name == 'KEY_UP'
+                        and self.scrollable
+                        and self.counter > 0):
                     self.counter -= 1
                     show_images = True
 
@@ -122,7 +127,6 @@ class GalleryUserLoop(AbstractLoop):
         # Unique
         self.cls = cls
         self.data = data
-        self.scrollable = config.use_ueberzug() or not config.scroll_display()
         # Unique, defined in classmethods
         self.end: int
         self.max_scrolls: int
@@ -131,6 +135,7 @@ class GalleryUserLoop(AbstractLoop):
         # Base ABC
         self.condition = 1
         self.current_page = int(data.download_path.name)
+        self.scrollable = config.use_ueberzug() or not config.scroll_display()
         self.max_pages = len(
             [x for x in os.listdir(data.download_path.parent)
              if x.isdigit()]
@@ -183,6 +188,7 @@ class ImageLoop(AbstractLoop):
         self.condition = 0
         self.current_page = 0
         self.max_pages = len(self.all_images) - 1
+        self.scrollable = False
 
     def show_func(self) -> 'IO':
         if self.use_ueberzug:

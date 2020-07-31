@@ -54,9 +54,8 @@ class AbstractLoop(ABC):
     def show_func(self) -> 'IO':
         raise NotImplementedError
 
-    @abstractmethod
-    def middle(self) -> 'Maybe[IO]':
-        raise NotImplementedError
+    def maybe_show_preview(self) -> 'Maybe[IO]':
+        return True
 
     @abstractmethod
     def end_func(self) -> 'Any':
@@ -70,7 +69,7 @@ class AbstractLoop(ABC):
             while True:
                 if show_images:
                     self.response = self.show_func()
-                    self.middle()
+                    self.maybe_show_preview()
                     print(f'Page {self.current_page} / {self.max_pages}')
                     print(
                         "n: go to next page, "
@@ -166,9 +165,6 @@ class GalleryUserLoop(AbstractLoop):
         else:
             lscat.show_instant(self.cls, self.data)
 
-    def middle(self) -> None:
-        return True
-
     def end_func(self):
         self.myslice = slice(self.end*self.counter, self.end*(self.counter+1))
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
@@ -206,7 +202,7 @@ class ImageLoop(AbstractLoop):
         data = self.FakeData(self.root, self.current_page)
         return lscat.TrackDownloadsImage(data)
 
-    def middle(self) -> 'IO':
+    def maybe_show_preview(self) -> 'IO':
         if len(self.all_images) > 1:
             tracker = self.update_tracker()
             loc = TERM.get_location()

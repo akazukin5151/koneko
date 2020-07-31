@@ -52,6 +52,19 @@ def ueberzug(path):
     return canvas
 
 
+def ueberzug_display(canvas, img_path, x, y, size):
+    canvas.create_placement(
+        str(img_path),
+        path=str(img_path),
+        x=x,
+        y=y,
+        width=size,
+        height=size,
+        scaler=utils.try_import_ueberzug_module('ScalerOption').FIT_CONTAIN.value,
+        visibility=utils.try_import_ueberzug_module('Visibility').VISIBLE
+    )
+
+
 def handle_scroll(cls, data, myslice):
     tracker = cls(data)
     tracker.orders = tracker.orders[myslice]
@@ -263,8 +276,6 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
     """Temporarily try it out by renaming it to generate_page
     (overwriting the previous definition), and run `lscat 4`
     """
-    ScalerOption = utils.try_import_ueberzug_module('ScalerOption')
-    Visibility = utils.try_import_ueberzug_module('Visibility')
 
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
@@ -282,21 +293,16 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
         x = number % number_of_cols
         y = number // number_of_cols
 
-        canvas.create_placement(
-            str(path / image),
-            path=str(path / image),
-            x=left_shifts[x],
-            y=rowspaces[y % number_of_rows],
-            width=size,
-            height=size,
-            scaler=ScalerOption.FIT_CONTAIN.value,
-            visibility=Visibility.VISIBLE
+        ueberzug_display(
+            canvas,
+            path / image,
+            left_shifts[x],
+            rowspaces[y % number_of_rows],
+            size
         )
 
 
 def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
-    ScalerOption = utils.try_import_ueberzug_module('ScalerOption')
-    Visibility = utils.try_import_ueberzug_module('Visibility')
 
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
@@ -332,40 +338,30 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
             )
 
         # Display artist profile pic
-        canvas.create_placement(
-            str(path / a_img),
-            path=str(path / a_img),
-            x=padding,
-            y=rowspaces[i % number_of_rows],
-            width=size,
-            height=size,
-            scaler=ScalerOption.FIT_CONTAIN.value,
-            visibility=Visibility.VISIBLE
+        ueberzug_display(
+            canvas,
+            path / a_img,
+            padding,
+            rowspaces[i % number_of_rows],
+            size
         )
 
         # Display the three previews
         j = 0                   # Always resets for every artist
         while j < 3:            # Every artist has only 3 previews
             p_img = yield       # Wait for preview pic
-            canvas.create_placement(
-                str(path / p_img),
-                path=str(path / p_img),
-                x=preview_xcoords[j],
-                y=rowspaces[i % number_of_rows],
-                width=size,
-                height=size,
-                scaler=ScalerOption.FIT_CONTAIN.value,
-                visibility=Visibility.VISIBLE
+            ueberzug_display(
+                canvas,
+                path / p_img,
+                preview_xcoords[j],
+                rowspaces[i % number_of_rows],
+                size
             )
             j += 1
         i += 1
 
 
 def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
-    ueberzug = utils.try_import_ueberzug()
-    ScalerOption = utils.try_import_ueberzug_module('ScalerOption')
-    Visibility = utils.try_import_ueberzug_module('Visibility')
-
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
@@ -385,13 +381,10 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
         else:
             x = 1
 
-        canvas.create_placement(
-            str(path / image),
-            path=str(path / image),
-            x=_xcoords[x],
-            y=rowspaces[y],
-            width=size,
-            height=size,
-            scaler=ScalerOption.FIT_CONTAIN.value,
-            visibility=Visibility.VISIBLE
+        ueberzug_display(
+            canvas,
+            path / image,
+            _xcoords[x],
+            rowspaces[y],
+            size
         )

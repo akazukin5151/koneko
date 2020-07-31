@@ -293,7 +293,6 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
         )
 
 
-#def generate_users(path: 'Path', print_info=True) -> 'IO':
 def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
     ScalerOption = utils.try_import_ueberzug_module('ScalerOption')
     Visibility = utils.try_import_ueberzug_module('Visibility')
@@ -315,9 +314,6 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = a_img.split('_')[0][1:]
-
-        if i >= number_of_rows:
-            continue
 
         if print_info:
             print(' ' * message_xcoord, number, '\n',
@@ -354,7 +350,6 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
         i += 1
 
 
-#def generate_previews(path: 'Path', min_num: int) -> 'IO':
 def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
     ueberzug = utils.try_import_ueberzug()
     ScalerOption = utils.try_import_ueberzug_module('ScalerOption')

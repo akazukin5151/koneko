@@ -220,8 +220,7 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
 
         # Display the three previews
         for i in range(3):
-            p_img = yield
-            Image(path / p_img).thumbnail(thumbnail_size).show(
+            Image(path / (yield)).thumbnail(thumbnail_size).show(
                 align='left', y=0, x=preview_xcoords[i]
             )
 
@@ -341,10 +340,9 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
 
         # Display the three previews
         for j in range(3):
-            p_img = yield
             ueberzug_display(
                 canvas,
-                path / p_img,
+                path / (yield),
                 preview_xcoords[j],
                 rowspaces[i % number_of_rows],
                 size

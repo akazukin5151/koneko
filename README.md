@@ -131,7 +131,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [ ] Center align image mode
             - [x] Add config
             - [ ] Update configuration assistant
-        - [ ] Fix print_info
+        - [x] Fix print_info
         - [ ] Better loops, extract common code to functions or even ABCs
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date

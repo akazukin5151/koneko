@@ -1,6 +1,7 @@
 """Small functions that are pure and side effect free, mainly doing calculations"""
 
 import re
+import itertools
 from math import floor
 from pathlib import Path
 
@@ -156,6 +157,11 @@ def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':
     order = [x + artists_count - 1 - floor(x / 4) for x in range(total_pics)]
     order[0::4] = range(artists_count)
     return order
+
+
+def take(n, iterable):
+    "Return first n items of the iterable as a list"
+    return list(itertools.islice(iterable, n))
 
 
 # For lscat_app

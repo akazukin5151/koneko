@@ -17,6 +17,7 @@ TLDR if you want to write your own renderer (with icat or not), the API is:
 """
 
 import os
+import itertools
 import threading
 from abc import ABC
 
@@ -306,6 +307,13 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
     rowspaces = config.ycoords_config()
+    msg_rows = pure.take(
+        number_of_rows,
+        itertools.chain(
+            [rowspaces[0]],
+            itertools.cycle([rowspaces[1]])
+        )
+    )
 
     os.system('clear')
     canvas.__enter__()
@@ -316,9 +324,12 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
         number = a_img.split('_')[0][1:]
 
         if print_info:
-            print(' ' * message_xcoord, number, '\n',
-                  ' ' * message_xcoord, artist_name,
-                  sep='')
+            print(
+                '\n' * msg_rows[i % number_of_rows],
+                ' ' * message_xcoord, number, '\n',
+                ' ' * message_xcoord, artist_name,
+                sep=''
+            )
 
         # Display artist profile pic
         canvas.create_placement(

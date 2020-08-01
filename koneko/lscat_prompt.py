@@ -21,7 +21,7 @@ def scroll_prompt(cls, data, max_images):
             if show:
                 if canvas:
                     canvas.__exit__()
-                myslice = slice(max_images*terminal_page, max_images*(terminal_page+1))
+                myslice = utils.slice_images(max_images, terminal_page)
                 canvas = lscat.handle_scroll(cls, data, myslice)
 
             ans = TERM.inkey()
@@ -157,7 +157,7 @@ class GalleryUserLoop(AbstractLoop):
 
     def show_func(self) -> 'IO':
         if self.scrollable:
-            self.myslice = slice(self.max_images*self.terminal_page, self.max_images*(self.terminal_page+1))
+            self.myslice = utils.slice_images(self.max_images, self.terminal_page)
             self.canvas = lscat.handle_scroll(self.cls, self.data, self.myslice)
         else:
             lscat.show_instant(self.cls, self.data)

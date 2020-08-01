@@ -94,9 +94,9 @@ def display_user() -> 'IO':
     _display_core(lscat.TrackDownloadsUsers, data, utils.max_images_user())
 
 
-def _display_core(tracker, data, end):
+def _display_core(tracker, data, max_images):
     if config.use_ueberzug() or not config.scroll_display():
-        lscat_prompt.scroll_prompt(tracker, data, end)
+        lscat_prompt.scroll_prompt(tracker, data, max_images)
         input()  # On program exit all images are cleared
     else:
         lscat.show_instant(tracker, data)

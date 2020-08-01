@@ -25,7 +25,6 @@ def scroll_prompt(cls, data, max_images):
                 canvas = lscat.handle_scroll(cls, data, myslice)
 
             ans = TERM.inkey()
-            # TODO: extract out all check quit things in the entire codebase
             utils.quit_on_q(ans)
 
             if ans.name == 'KEY_DOWN' and terminal_page + 1 < max_scrolls:

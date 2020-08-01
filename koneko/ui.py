@@ -75,21 +75,6 @@ class AbstractUI(ABC):
             self._download_from_scratch()
         self._prefetch()
 
-    def _verify_up_to_date(self) -> 'IO':
-        if files.dir_not_empty(self._data):
-            return True
-        files.remove_dir_if_exist(self._data)
-        tracker = self._tracker_class(self._data)
-        download.init_download(self._data, tracker)
-        self.canvas = tracker.canvas
-
-
-    def _show_then_fetch(self) -> 'IO':
-        self.scroll_or_show()
-        self._request_then_save()
-        self._verify_up_to_date()
-        self._print_page_info()
-
     def _download_from_scratch(self) -> 'IO':
         files.remove_dir_if_exist(self._data)
         self._request_then_save()
@@ -97,6 +82,20 @@ class AbstractUI(ABC):
         download.init_download(self._data, tracker)
         self.canvas = tracker.canvas
         self._print_page_info()
+
+    def _show_then_fetch(self) -> 'IO':
+        self.scroll_or_show()
+        self._request_then_save()
+        self._verify_up_to_date()
+        self._print_page_info()
+
+    def _verify_up_to_date(self) -> 'IO':
+        if files.dir_not_empty(self._data):
+            return True
+        files.remove_dir_if_exist(self._data)
+        tracker = self._tracker_class(self._data)
+        download.init_download(self._data, tracker)
+        self.canvas = tracker.canvas
 
 
     def _prefetch(self) -> 'IO':

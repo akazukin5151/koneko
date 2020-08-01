@@ -130,7 +130,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
                         - [x] doesn't hide images in the first terminal page
                         - [ ] BUG: if scrolling while prefetching, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
                     - [x] Image mode
-                - [ ] Everywhere else (main screen, info screen, etc)
+                - [x] Everywhere else (main screen, info screen, etc)
                 - [ ] Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)
         * "Display scrolling" means lscat will print newlines to scroll down and display more images
         * The number of images in a terminal page is number_of_cols * number_of_rows

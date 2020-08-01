@@ -615,11 +615,12 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.display_func = lscat.ueberzug if config.use_ueberzug() else lscat.icat
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
+        self.canvas: 'Optional[ueberzug.Canvas]' = None
         self.preview_canvas: 'Optional[ueberzug.Canvas]' = None
 
     def display_initial(self) -> 'IO':
         os.system('clear')
-        lscat.icat(self.download_path / self.large_filename)
+        self.canvas = self.display_func(self.download_path / self.large_filename)
         print(f'Page 1/{self.number_of_pages}')
 
     def open_image(self) -> 'IO':
@@ -680,10 +681,12 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             )
 
         os.system('clear')
+        if self.canvas:
+            self.canvas.__exit__()
         if self.preview_canvas:
             self.preview_canvas.__exit__()
 
-        self.display_func(self.filepath)
+        self.canvas = self.display_func(self.filepath)
 
         print(f'Page {self.page_num+1}/{self.number_of_pages}')
         self.start_preview()

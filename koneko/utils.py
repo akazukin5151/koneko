@@ -242,3 +242,7 @@ def try_get_FIT_CONTAIN():
 
 def try_get_VISIBLE():
     return try_import_ueberzug_module('Visibility').VISIBLE
+
+def exit_if_exist(canvas):
+    if canvas:
+        canvas.__exit__()

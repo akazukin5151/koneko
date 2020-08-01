@@ -41,8 +41,7 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
     canvas = display(KONEKODIR.parent / 'pics' / '71471144_p0.png', 600, 600)
 
     command = input('\n\nEnter a command: ')
-    if canvas:
-        canvas.__exit__()
+    utils.exit_if_exist(canvas)
     return command
 
 
@@ -113,6 +112,5 @@ def info_screen_loop() -> 'IO':
         help_command = input('\nEnter any key to return: ')
         if help_command or help_command == '':
             os.system('clear')
-            if canvas:
-                canvas.__exit__()
+            utils.exit_if_exist(canvas)
             break

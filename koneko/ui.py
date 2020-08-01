@@ -167,8 +167,7 @@ class AbstractUI(ABC):
         self._show_page()
 
     def handle_scroll(self):
-        if self.canvas:
-            self.canvas.__exit__()
+        utils.exit_if_exist(self.canvas)
         myslice = utils.slice_images(self._max_images, self.terminal_page)
         self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
 
@@ -685,10 +684,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             )
 
         os.system('clear')
-        if self.canvas:
-            self.canvas.__exit__()
-        if self.preview_canvas:
-            self.preview_canvas.__exit__()
+        utils.exit_if_exist(self.canvas)
+        utils.exit_if_exist(self.preview_canvas)
 
         self.canvas = self.display_func(self.filepath)
 

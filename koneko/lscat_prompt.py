@@ -19,8 +19,7 @@ def scroll_prompt(cls, data, max_images):
     with TERM.cbreak():
         while True:
             if show:
-                if canvas:
-                    canvas.__exit__()
+                utils.exit_if_exist(canvas)
                 myslice = utils.slice_images(max_images, terminal_page)
                 canvas = lscat.handle_scroll(cls, data, myslice)
 
@@ -162,8 +161,7 @@ class GalleryUserLoop(AbstractLoop):
             lscat.show_instant(self.cls, self.data)
 
     def max_images_func(self):
-        if self.canvas:
-            self.canvas.__exit__()
+        utils.exit_if_exist(self.canvas)
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
 
@@ -195,10 +193,8 @@ class ImageLoop(AbstractLoop):
 
     def max_images_func(self):
         self.image = self.all_images[self.current_page]
-        if self.canvas:
-            self.canvas.__exit__()
-        if self.preview_canvas:
-            self.preview_canvas.__exit__()
+        utils.exit_if_exist(self.canvas)
+        utils.exit_if_exist(self.preview_canvas)
 
     def maybe_show_preview(self) -> 'IO':
         if len(self.all_images) > 1:

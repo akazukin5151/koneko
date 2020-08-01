@@ -47,6 +47,11 @@ def common(
         func()
         return keyseqs
 
+    func = case.get(command.name, None)
+    if func:
+        func()
+        return keyseqs
+
     # Wait for the rest of the sequence
     elif command.isdigit() or command in allowed_keys:
         keyseqs.append(command)
@@ -86,7 +91,9 @@ def gallery_like_prompt(gallery):
         'p': gallery.previous_page,
         'h': gallery.help,
         'q': ask_quit,
-        'm': lambda: print('', gallery.__doc__)
+        'm': lambda: print('', gallery.__doc__),
+        'KEY_DOWN': gallery.scroll_down,
+        'KEY_UP': gallery.scroll_up,
     }
 
     with TERM.cbreak():
@@ -179,7 +186,9 @@ def user_prompt(user):
         'p': user.previous_page,
         'h': printer.user_help,
         'q': ask_quit,
-        'm': lambda: print(user.__class__.__bases__[0].__doc__)
+        'm': lambda: print(user.__class__.__bases__[0].__doc__),
+        'KEY_DOWN': user.scroll_down,
+        'KEY_UP': user.scroll_up,
     }
 
     with TERM.cbreak():

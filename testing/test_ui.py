@@ -49,6 +49,8 @@ def test_previous_page_gallery(monkeypatch):
         def __init__(self):
             self._data = data
             self._tracker_class = Mock()
+            self.canvas = None
+            self.scrollable = False
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
         def _print_page_info(self, *a):
@@ -70,6 +72,8 @@ def test_previous_page_users(monkeypatch, capsys):
         def __init__(self):
             self._data = data
             self._tracker_class = Mock()
+            self.canvas = None
+            self.scrollable = False
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
         def _print_page_info(self, *a):

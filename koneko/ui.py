@@ -32,6 +32,7 @@ class AbstractUI(ABC):
         declare the data attribute as appropriate.
         Main path includes any user input (eg, artist user id or search string)
         """
+        self._max_images: int
         # Reference to the appropriate class or function
         self._prompt: 'prompt.<function>'
         self._data_class: 'data.<class>'
@@ -39,9 +40,12 @@ class AbstractUI(ABC):
 
         # Attribute defined in self.start()
         self._data: 'data.<class>'  # Instantiated data class, not reference
+        self.canvas: 'Optional[ueberzug.Canvas]' = None
         # Attribute defined in self.prefetch_thread()
         self._prefetch_thread: threading.Thread
 
+        self.scrollable = config.use_ueberzug() or not config.scroll_display()
+        self.terminal_page = 0
         self.start(main_path)
 
     @abstractmethod
@@ -78,7 +82,11 @@ class AbstractUI(ABC):
 
 
     def _show_then_fetch(self) -> 'IO':
-        lscat.show_instant(self._tracker_class, self._data)
+        if self.scrollable:
+            myslice = slice(0, self._max_images)
+            self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
+        else:
+            lscat.show_instant(self._tracker_class, self._data)
         self._request_then_save()
         self._verify_up_to_date()
         self._print_page_info()
@@ -128,6 +136,7 @@ class AbstractUI(ABC):
     def next_page(self) -> 'IO':
         self._prefetch_thread.join()
         self._data.page_num += 1
+        self.terminal_page = 0
         self._show_page()
         self._prefetch_next_page()
 
@@ -136,7 +145,16 @@ class AbstractUI(ABC):
             print('This is the first page!')
             return False
         self._data.page_num -= 1
+        self.terminal_page = 0
         self._data.offset = int(self._data.offset) - 30
+        self._show_page()
+
+    def scroll_up(self):
+        self.terminal_page -= 1
+        self._show_page()
+
+    def scroll_down(self):
+        self.terminal_page += 1
         self._show_page()
 
     def _show_page(self) -> 'IO':
@@ -144,7 +162,15 @@ class AbstractUI(ABC):
             print('This is the last page!')
             self._data.page_num -= 1
             return False
-        lscat.show_instant(self._tracker_class, self._data)
+
+        if self.canvas:
+            self.canvas.__exit__()
+
+        if self.scrollable:
+            myslice = slice(self._max_images*self.terminal_page, self._max_images*(self.terminal_page+1))
+            self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
+        else:
+            lscat.show_instant(self._tracker_class, self._data)
         self._print_page_info()
 
     def reload(self) -> 'IO':
@@ -164,6 +190,7 @@ class AbstractGallery(AbstractUI, ABC):
         self._prompt = prompt.gallery_like_prompt
         self._data_class = data.GalleryData
         self._tracker_class = lscat.TrackDownloads
+        self._max_images = utils.max_images()
         super().__init__(main_path)
 
     def _print_page_info(self):
@@ -398,6 +425,7 @@ class AbstractUsers(AbstractUI, ABC):
         self._prompt = prompt.user_prompt
         self._data_class = data.UserData
         self._tracker_class = lscat.TrackDownloadsUsers
+        self._max_images = utils.max_images_user()
         super().__init__(main_path)
 
     def _maybe_join_thread(self):

@@ -28,7 +28,7 @@ def scroll_prompt(cls, data, end):
             # TODO: extract out all check quit things in the entire codebase
             utils.quit_on_q(ans)
 
-            elif ans.name == 'KEY_DOWN' and counter + 1 < max_scrolls:
+            if ans.name == 'KEY_DOWN' and counter + 1 < max_scrolls:
                 counter += 1
                 show = True
 

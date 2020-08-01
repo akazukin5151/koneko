@@ -113,9 +113,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Ueberzug support to work with other terminals
     - [x] Get the ueberzug API working
     - [x] Read config and decide whether to use icat or ueberzug at runtime
-        - [x] Gallery mode
-        - [x] Users mode
-        - [x] Image mode
     - [ ] Add option to prevent display scrolling and use up/down keys to view more images
         - [x] Add option to config
         - [ ] Respond to the config option
@@ -124,9 +121,16 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
                 - [ ] Display path
             - [ ] In koneko app
                 - [x] For already downloaded images
-                - [x] For mode i/2
-                    - [x] FIXME: hide old images
+                    - [x] Gallery mode
+                    - [x] Users mode
+                    - [x] Image mode
+                        - [x] FIXME: hide old images
                 - [ ] For showing images as they download
+                    - [ ] Gallery mode (doesn't hide old images)
+                    - [ ] Users mode
+                        - [ ] doesn't hide the first terminal page
+                        - [ ] if scrolling while prefetching, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
+                    - [x] Image mode
                 - [ ] Everywhere else (main screen, info screen, etc)
         * "Display scrolling" means lscat will print newlines to scroll down and display more images
         * The number of images in a terminal page is number_of_cols * number_of_rows

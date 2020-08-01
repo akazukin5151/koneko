@@ -615,6 +615,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.display_func = lscat.ueberzug if config.use_ueberzug() else lscat.icat
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
+        self.preview_canvas: 'Optional[ueberzug.Canvas]' = None
 
     def display_initial(self) -> 'IO':
         os.system('clear')
@@ -679,6 +680,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             )
 
         os.system('clear')
+        if self.preview_canvas:
+            self.preview_canvas.__exit__()
 
         self.display_func(self.filepath)
 
@@ -733,6 +736,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
             if i == 4:  # Last pic
                 printer.move_cursor_xy(self.loc[0], self.loc[1])
+
+            self.preview_canvas = tracker.canvas
 
             i += 1
 

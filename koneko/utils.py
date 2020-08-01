@@ -112,6 +112,9 @@ def max_terminal_scrolls(data, is_gallery_mode: bool) -> int:
         return number_of_images // max_images() + 1
     return number_of_images // max_images_user()
 
+def slice_images(max_images: int, terminal_page: int) -> slice:
+    return slice(max_images * terminal_page, max_images * (terminal_page + 1))
+
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
     """Takes prompt input key seqs, find the selected image number.

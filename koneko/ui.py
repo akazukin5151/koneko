@@ -46,7 +46,7 @@ class AbstractUI(ABC):
         self._prefetch_thread: threading.Thread
 
         self.scrollable = config.use_ueberzug() or not config.scroll_display()
-        self.terminal_page = 0
+        self.terminal_page = 0  # starts at zero so the first slice has start=0
         self.start(main_path)
 
     @abstractmethod
@@ -84,8 +84,7 @@ class AbstractUI(ABC):
 
     def _show_then_fetch(self) -> 'IO':
         if self.scrollable:
-            myslice = slice(0, self._max_images)
-            self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
+            self.handle_scroll()
         else:
             lscat.show_instant(self._tracker_class, self._data)
         self._request_then_save()
@@ -166,18 +165,20 @@ class AbstractUI(ABC):
         self.terminal_page += 1
         self._show_page()
 
+    def handle_scroll(self):
+        if self.canvas:
+            self.canvas.__exit__()
+        myslice = utils.slice_images(self._max_images, self.terminal_page)
+        self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
+
     def _show_page(self) -> 'IO':
         if not files.dir_not_empty(self._data):
             print('This is the last page!')
             self._data.page_num -= 1
             return False
 
-        if self.canvas:
-            self.canvas.__exit__()
-
         if self.scrollable:
-            myslice = slice(self._max_images*self.terminal_page, self._max_images*(self.terminal_page+1))
-            self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
+            self.handle_scroll()
         else:
             lscat.show_instant(self._tracker_class, self._data)
         self._print_page_info()

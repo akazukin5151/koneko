@@ -83,10 +83,7 @@ class AbstractUI(ABC):
 
 
     def _show_then_fetch(self) -> 'IO':
-        if self.scrollable:
-            self.handle_scroll()
-        else:
-            lscat.show_instant(self._tracker_class, self._data)
+        self.scroll_or_show()
         self._request_then_save()
         self._verify_up_to_date()
         self._print_page_info()
@@ -171,16 +168,19 @@ class AbstractUI(ABC):
         myslice = utils.slice_images(self._max_images, self.terminal_page)
         self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
 
+    def scroll_or_show(self):
+        if self.scrollable:
+            self.handle_scroll()
+        else:
+            lscat.show_instant(self._tracker_class, self._data)
+
     def _show_page(self) -> 'IO':
         if not files.dir_not_empty(self._data):
             print('This is the last page!')
             self._data.page_num -= 1
             return False
 
-        if self.scrollable:
-            self.handle_scroll()
-        else:
-            lscat.show_instant(self._tracker_class, self._data)
+        self.scroll_or_show()
         self._print_page_info()
 
     def reload(self) -> 'IO':

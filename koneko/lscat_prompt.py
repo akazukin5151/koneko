@@ -11,10 +11,11 @@ def scroll_prompt(cls, data, end):
     show = True
     counter = 0
     canvas = None
-    number_of_images = len(os.listdir(data.download_path))
-    max_scrolls = number_of_images // end + 1
+
     if cls is lscat.TrackDownloadsUsers:
-        max_scrolls -= 1
+        max_scrolls = utils.max_terminal_scrolls(data, False)
+    else:
+        max_scrolls = utils.max_terminal_scrolls(data, True)
 
     with TERM.cbreak():
         while True:
@@ -146,17 +147,15 @@ class GalleryUserLoop(AbstractLoop):
     @classmethod
     def for_gallery(cls, data, tracker):
         result = cls(data, tracker)
-        number_of_images = len(os.listdir(data.download_path))
         result.max_images = utils.max_images()
-        result.max_scrolls = number_of_images // result.max_images + 1
+        result.max_scrolls = utils.max_terminal_scrolls(data, True)
         return result
 
     @classmethod
     def for_user(cls, data, tracker):
         result = cls(data, tracker)
-        number_of_images = len(os.listdir(data.download_path))
         result.max_images = utils.max_images_user()
-        result.max_scrolls = number_of_images // result.max_images
+        result.max_scrolls = utils.max_terminal_scrolls(data, False)
         return result
 
 

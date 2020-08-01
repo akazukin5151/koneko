@@ -106,6 +106,12 @@ def max_images_user():
     """
     return 4 * config.nrows_config()
 
+def max_terminal_scrolls(data, is_gallery_mode: bool) -> int:
+    number_of_images = len(os.listdir(data.download_path))
+    if is_gallery_mode:
+        return number_of_images // max_images() + 1
+    return number_of_images // max_images_user()
+
 
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
     """Takes prompt input key seqs, find the selected image number.

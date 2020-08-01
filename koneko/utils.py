@@ -25,7 +25,6 @@ import funcy
 from pixcat import Image
 
 from koneko import pure, config, printer, TERM, KONEKODIR
-from koneko.config import ncols_config, xcoords_config
 
 
 # History and logging
@@ -135,7 +134,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
     >>> a = [find_number_map(x,y) for y in range(1,7) for x in range(1,6)]
     >>> assert a == list(range(30))
     """
-    ncols = ncols_config()
+    ncols = config.ncols_config()
     nrows = ceil(30 / ncols)
     if 1 <= x <= ncols and 1 <= y <= nrows:
         return ((x - 1) % ncols) + (ncols * (y - 1))
@@ -205,7 +204,7 @@ def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
 
 def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
     # Default usage of config module
-    return show_single(xcoords_config()[1], y, thumbnail_size)
+    return show_single(config.xcoords_config()[1], y, thumbnail_size)
 
 
 def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':

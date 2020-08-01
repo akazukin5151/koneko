@@ -6,9 +6,9 @@ from abc import ABC, abstractmethod
 from koneko import utils, lscat, config, TERM, printer, FakeData
 
 
-def scroll_prompt(cls, data, end):
+def scroll_prompt(cls, data, max_images):
     show = True
-    counter = 0
+    terminal_page = 0
     canvas = None
 
     if cls is lscat.TrackDownloadsUsers:
@@ -21,19 +21,19 @@ def scroll_prompt(cls, data, end):
             if show:
                 if canvas:
                     canvas.__exit__()
-                myslice = slice(end*counter, end*(counter+1))
+                myslice = slice(max_images*terminal_page, max_images*(terminal_page+1))
                 canvas = lscat.handle_scroll(cls, data, myslice)
 
             ans = TERM.inkey()
             # TODO: extract out all check quit things in the entire codebase
             utils.quit_on_q(ans)
 
-            if ans.name == 'KEY_DOWN' and counter + 1 < max_scrolls:
-                counter += 1
+            if ans.name == 'KEY_DOWN' and terminal_page + 1 < max_scrolls:
+                terminal_page += 1
                 show = True
 
-            elif ans.name == 'KEY_UP' and counter > 0:
-                counter -= 1
+            elif ans.name == 'KEY_UP' and terminal_page > 0:
+                terminal_page -= 1
                 show = True
 
             else:
@@ -49,7 +49,7 @@ class AbstractLoop(ABC):
         self.current_page: int
         self.scrollable: bool
         # Defined in start
-        self.counter: int
+        self.terminal_page: int
 
     @abstractmethod
     def show_func(self) -> 'IO':
@@ -59,12 +59,12 @@ class AbstractLoop(ABC):
         return True
 
     @abstractmethod
-    def end_func(self) -> 'Any':
+    def max_images_func(self) -> 'Any':
         raise NotImplementedError
 
     def start(self) -> 'IO':
         show_images = True
-        self.counter = 0
+        self.terminal_page = 0
 
         with TERM.cbreak():
             while True:
@@ -102,14 +102,14 @@ class AbstractLoop(ABC):
 
                 elif (ans.name == 'KEY_DOWN'
                         and self.scrollable
-                        and self.counter + 1 < self.max_scrolls):
-                    self.counter += 1
+                        and self.terminal_page + 1 < self.max_scrolls):
+                    self.terminal_page += 1
                     show_images = True
 
                 elif (ans.name == 'KEY_UP'
                         and self.scrollable
-                        and self.counter > 0):
-                    self.counter -= 1
+                        and self.terminal_page > 0):
+                    self.terminal_page -= 1
                     show_images = True
 
                 else:
@@ -117,7 +117,7 @@ class AbstractLoop(ABC):
                     show_images = False
 
                 if show_images:
-                    self.end_func()
+                    self.max_images_func()
 
 
 class GalleryUserLoop(AbstractLoop):
@@ -157,12 +157,12 @@ class GalleryUserLoop(AbstractLoop):
 
     def show_func(self) -> 'IO':
         if self.scrollable:
-            self.myslice = slice(self.max_images*self.counter, self.max_images*(self.counter+1))
+            self.myslice = slice(self.max_images*self.terminal_page, self.max_images*(self.terminal_page+1))
             self.canvas = lscat.handle_scroll(self.cls, self.data, self.myslice)
         else:
             lscat.show_instant(self.cls, self.data)
 
-    def end_func(self):
+    def max_images_func(self):
         if self.canvas:
             self.canvas.__exit__()
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
@@ -194,7 +194,7 @@ class ImageLoop(AbstractLoop):
         else:
             lscat.icat(self.root / self.image)
 
-    def end_func(self):
+    def max_images_func(self):
         self.image = self.all_images[self.current_page]
         if self.canvas:
             self.canvas.__exit__()

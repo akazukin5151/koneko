@@ -57,7 +57,7 @@ def common(
         keyseqs.append(command)
         return keyseqs
 
-    # Escape, backspace
+    # needs to be here not in case, because keyseqs needs to be cleared to []
     elif command.name == 'KEY_ESCAPE' or command.name == 'KEY_BACKSPACE':
         # Remove entire line
         print('\r', '\b \b' * 4, end='', flush=True)

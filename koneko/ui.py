@@ -612,6 +612,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         super().__init__(raw, image_id, firstmode)
         self.event = threading.Event()
+        self.display_func = lscat.ueberzug if config.use_ueberzug() else lscat.icat
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
 
@@ -679,7 +680,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
         os.system('clear')
 
-        lscat.icat(self.filepath)
+        self.display_func(self.filepath)
 
         print(f'Page {self.page_num+1}/{self.number_of_pages}')
         self.start_preview()

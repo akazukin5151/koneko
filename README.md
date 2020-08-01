@@ -122,7 +122,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
             - [x] In lscat app
             - [ ] In koneko app
                 - [x] For already downloaded images
-                - [ ] For mode i/2
+                - [x] For mode i/2
                 - [ ] For showing images as they download
         * "Display scrolling" means lscat will print newlines to scroll down and display more images
         * The number of images in a terminal page is number_of_cols * number_of_rows

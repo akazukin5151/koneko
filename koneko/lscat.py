@@ -17,7 +17,6 @@ TLDR if you want to write your own renderer (with icat or not), the API is:
 """
 
 import os
-import itertools
 import threading
 from abc import ABC
 
@@ -33,7 +32,6 @@ def icat(path: str) -> 'IO':
     I abuse this fact in the main generators to make printing pages easier, and
     user mode is possible only because of this fact.
     """
-    #os.system(f'kitty +kitten icat --silent {args}')
     Image(path).show()
 
 
@@ -305,13 +303,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
     rowspaces = config.ycoords_config()
-    msg_rows = pure.take(
-        number_of_rows,
-        itertools.chain(
-            [rowspaces[0]],
-            itertools.cycle([rowspaces[1]])
-        )
-    )
+    msg_rows = [rowspaces[0]] + [rowspaces[1]] * (number_of_rows - 1)
 
     os.system('clear')
     canvas.__enter__()

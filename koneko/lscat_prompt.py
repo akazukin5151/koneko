@@ -26,7 +26,7 @@ def scroll_prompt(cls, data, end):
 
             ans = TERM.inkey()
             # TODO: extract out all check quit things in the entire codebase
-            utils.check_quit(ans)
+            utils.quit_on_q(ans)
 
             elif ans.name == 'KEY_DOWN' and counter + 1 < max_scrolls:
                 counter += 1
@@ -80,7 +80,7 @@ class AbstractLoop(ABC):
 
                 ans = TERM.inkey()
                 print(ans)
-                utils.check_quit(ans)
+                utils.quit_on_q(ans)
 
                 if ans == 'n' and self.current_page == self.max_pages:
                     print('This is the last cached page!')

@@ -183,7 +183,7 @@ def get_cache_size() -> str:
     ).decode('utf-8').rstrip()
 
 
-def check_quit(ans: str):
+def quit_on_q(ans: str):
     if ans == 'q':
         sys.exit(0)
 

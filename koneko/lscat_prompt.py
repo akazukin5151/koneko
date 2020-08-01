@@ -7,7 +7,6 @@ from koneko import utils, lscat, config, TERM, printer, FakeData
 
 
 def scroll_prompt(cls, data, end):
-    # TODO: integrate to koneko prompt (currently only works for lscat app)
     show = True
     counter = 0
     canvas = None

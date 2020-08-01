@@ -19,14 +19,14 @@ def ask_quit_capture(capsys):
 
 def test_ask_quit_do_nothing(monkeypatch, patch_cbreak, customexit_to_quit, capsys):
     # Does not call the 'class'
-    fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(True,))
+    fake_inkey = namedtuple('FakeInKey', ('name',), defaults=(True,))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     assert not prompt.ask_quit()
     ask_quit_capture(capsys)
 
 
 def test_ask_quit_enter(monkeypatch, patch_cbreak, customexit_to_quit, capsys):
-    fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
+    fake_inkey = namedtuple('FakeInKey', ('name',), defaults=('KEY_ENTER',))
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):
         assert prompt.ask_quit()
@@ -35,7 +35,7 @@ def test_ask_quit_enter(monkeypatch, patch_cbreak, customexit_to_quit, capsys):
 
 @pytest.mark.parametrize('letter', ['y', 'q', '', 'h'])
 def test_ask_quit_letter(monkeypatch, patch_cbreak, customexit_to_quit, letter, capsys):
-    fake_inkey = namedtuple('FakeInKey', ('code',), defaults=(343,))
+    fake_inkey = namedtuple('FakeInKey', ('name',), defaults=('KEY_ENTER',))
     fake_inkey.__call__ = lambda x: letter
     monkeypatch.setattr('koneko.prompt.TERM.inkey', fake_inkey)
     with pytest.raises(CustomExit):

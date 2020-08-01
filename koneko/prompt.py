@@ -19,7 +19,7 @@ def ask_quit() -> 'IO':
     with TERM.cbreak():
         while True:
             ans = TERM.inkey()
-            if ans == 'y' or ans == 'q' or ans.code == 343:  # Enter
+            if ans == 'y' or ans == 'q' or ans.name == 'KEY_ENTER':
                 sys.exit(0)
             elif ans:
                 break
@@ -58,7 +58,7 @@ def common(
         return keyseqs
 
     # Escape, backspace
-    elif command.code == 361 or command.code == 263:
+    elif command.name == 'KEY_ESCAPE' or command.name == 'KEY_BACKSPACE':
         # Remove entire line
         print('\r', '\b \b' * 4, end='', flush=True)
         return []

@@ -55,6 +55,8 @@ def test_previous_page_gallery(monkeypatch):
             ui.AbstractGallery._show_page(self)
         def _print_page_info(self, *a):
             return True
+        def scroll_or_show(self):
+            pass
 
     gallery = FakeGallery()
     gallery._data.page_num = 2
@@ -78,6 +80,8 @@ def test_previous_page_users(monkeypatch, capsys):
             ui.AbstractGallery._show_page(self)
         def _print_page_info(self, *a):
             return True
+        def scroll_or_show(self):
+            pass
 
 
     gallery = FakeGallery()

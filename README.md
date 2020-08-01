@@ -125,11 +125,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
                     - [x] Users mode
                     - [x] Image mode
                         - [x] FIXME: hide old images
-                - [ ] For showing images as they download
-                    - [x] Gallery mode (doesn't hide old images)
-                    - [ ] Users mode
-                        - [ ] doesn't hide the first terminal page
-                        - [ ] if scrolling while prefetching, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
+                - [x] For showing images as they download
+                    - [x] Gallery and User mode
+                        - [x] doesn't hide images in the first terminal page
+                        - [ ] BUG: if scrolling while prefetching, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
                     - [x] Image mode
                 - [ ] Everywhere else (main screen, info screen, etc)
                 - [ ] Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)

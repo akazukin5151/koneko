@@ -125,8 +125,9 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
             - [ ] In koneko app
                 - [x] For already downloaded images
                 - [x] For mode i/2
-                    - [ ] FIXME: hide old images
+                    - [x] FIXME: hide old images
                 - [ ] For showing images as they download
+                - [ ] Everywhere else (main screen, info screen, etc)
         * "Display scrolling" means lscat will print newlines to scroll down and display more images
         * The number of images in a terminal page is number_of_cols * number_of_rows
         * As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed

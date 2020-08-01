@@ -120,9 +120,12 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [x] Add option to config
         - [ ] Respond to the config option
             - [x] In lscat app
+                - [ ] In lscat config assistant
+                - [ ] Display path
             - [ ] In koneko app
                 - [x] For already downloaded images
                 - [x] For mode i/2
+                    - [ ] FIXME: hide old images
                 - [ ] For showing images as they download
         * "Display scrolling" means lscat will print newlines to scroll down and display more images
         * The number of images in a terminal page is number_of_cols * number_of_rows

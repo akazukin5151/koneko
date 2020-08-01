@@ -12,13 +12,13 @@ page_illusts = page_json['illusts']
 
 
 def test_find_number_map(monkeypatch):
-    monkeypatch.setattr('koneko.utils.ncols_config', lambda: 5)
+    monkeypatch.setattr('koneko.config.ncols_config', lambda: 5)
     assert ([utils.find_number_map(x, y)
              for y in range(1, 7)
              for x in range(1, 6)] == list(range(30)))
     assert not utils.find_number_map(0, 100)
 
-    monkeypatch.setattr('koneko.utils.ncols_config', lambda: 6)
+    monkeypatch.setattr('koneko.config.ncols_config', lambda: 6)
     assert [utils.find_number_map(x, y)
             for y in range(1, 7)
             for x in range(1, 7)][:30] == list(range(30))
@@ -62,3 +62,9 @@ def test_history(monkeypatch, tmp_path):
 
 def test_handle_missing_pics():
     utils.handle_missing_pics()
+
+
+def test_max_images(monkeypatch):
+    monkeypatch.setattr('koneko.config.nrows_config', lambda: 2)
+    monkeypatch.setattr('koneko.config.ncols_config', lambda: 5)
+    assert utils.max_images() == 10

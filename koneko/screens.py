@@ -3,7 +3,18 @@ import shutil
 
 import pixcat
 
-from koneko import ui, cli, utils, __version__, KONEKODIR
+from koneko import ui, cli, utils, config, lscat, __version__, KONEKODIR
+
+
+def display(path, icat_size, ueberzug_size):
+    if config.use_ueberzug():
+        ueberzug = utils.try_import_ueberzug()
+        canvas = ueberzug.Canvas()
+        canvas.__enter__()
+        lscat.ueberzug_display(canvas, path, 0, 0, ueberzug_size // 20)
+        return canvas
+
+    pixcat.Image(path).thumbnail(icat_size).show(align='left', y=0)
 
 
 def begin_prompt(printmessage=True) -> 'IO[str]':
@@ -27,13 +38,10 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         for message in messages:
             print(' ' * 30, message)
 
-    pixcat.Image(
-        KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    ).thumbnail(600).show(
-        align='left', y=0
-    )
+    canvas = display(KONEKODIR.parent / 'pics' / '71471144_p0.png', 600, 600)
 
     command = input('\n\nEnter a command: ')
+    utils.exit_if_exist(canvas)
     return command
 
 
@@ -98,14 +106,11 @@ def info_screen_loop() -> 'IO':
     for message in messages:
         print(' ' * 26, message)
 
-    pixcat.Image(
-        KONEKODIR.parent / 'pics' / '79494300_p0.png'
-    ).thumbnail(750).show(
-        align='left', y=0
-    )
+    canvas = display(KONEKODIR.parent / 'pics' / '79494300_p0.png', 750, 500)
 
     while True:
         help_command = input('\nEnter any key to return: ')
         if help_command or help_command == '':
             os.system('clear')
+            utils.exit_if_exist(canvas)
             break

@@ -33,6 +33,7 @@ from collections import namedtuple
 from docopt import docopt
 
 from koneko import (
+    utils,
     lscat,
     config,
     picker,
@@ -85,12 +86,20 @@ def _main() -> 'IO':
 
 def display_gallery() -> 'IO':
     data = FakeData(KONEKODIR / 'testgallery')
-    lscat.show_instant(lscat.TrackDownloads, data)
+    _display_core(lscat.TrackDownloads, data, utils.max_images())
 
 
 def display_user() -> 'IO':
     data = FakeData(KONEKODIR / 'testuser')
-    lscat.show_instant(lscat.TrackDownloadsUsers, data)
+    _display_core(lscat.TrackDownloadsUsers, data, utils.max_images_user())
+
+
+def _display_core(tracker, data, max_images):
+    if config.use_ueberzug() or not config.scroll_display():
+        lscat_prompt.scroll_prompt(tracker, data, max_images)
+        input()  # On program exit all images are cleared
+    else:
+        lscat.show_instant(tracker, data)
 
 
 def display_path(path=None) -> 'IO':
@@ -101,7 +110,7 @@ def display_path(path=None) -> 'IO':
         print('Invalid path!')
         sys.exit(1)
 
-    data = FakeData(path)
+    data = FakeData(Path(path))
     lscat.show_instant(lscat.TrackDownloads, data)
 
 
@@ -110,11 +119,11 @@ def browse_cache() -> 'IO':
     data = FakeData(path)
 
     if '.koneko' in os.listdir(path):
-        lscat_prompt.GalleryUserLoop(data, lscat.TrackDownloadsUsers).start()
+        lscat_prompt.GalleryUserLoop.for_user(data, lscat.TrackDownloadsUsers).start()
     elif 'individual' in str(path):
         lscat_prompt.ImageLoop(path, sorted(os.listdir(path))[0]).start()
     else:
-        lscat_prompt.GalleryUserLoop(data, lscat.TrackDownloads).start()
+        lscat_prompt.GalleryUserLoop.for_gallery(data, lscat.TrackDownloads).start()
 
 
 def config_assistance(actions: 'Optional[list[int]]' = None) -> 'IO':

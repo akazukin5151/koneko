@@ -24,8 +24,7 @@ from logging.handlers import RotatingFileHandler
 import funcy
 from pixcat import Image
 
-from koneko import pure, printer, TERM, KONEKODIR
-from koneko.config import ncols_config, xcoords_config
+from koneko import pure, config, printer, TERM, KONEKODIR
 
 
 # History and logging
@@ -96,6 +95,26 @@ def catch_ctrl_c(func: 'func[T]') -> 'T':
 
 
 # Calculations
+def max_images():
+    """Calculates the maximum number of images that can fit in single terminal page"""
+    return config.ncols_config() * config.nrows_config()
+
+def max_images_user():
+    """Calculates the maximum number of images that can fit in single terminal page
+    For User Modes, there are 3 previews + 1 artist image, hence always 4 columns
+    """
+    return 4 * config.nrows_config()
+
+def max_terminal_scrolls(data, is_gallery_mode: bool) -> int:
+    number_of_images = len(os.listdir(data.download_path))
+    if is_gallery_mode:
+        return number_of_images // max_images() + 1
+    return number_of_images // max_images_user()
+
+def slice_images(max_images: int, terminal_page: int) -> slice:
+    return slice(max_images * terminal_page, max_images * (terminal_page + 1))
+
+
 def seq_coords_to_int(keyseqs: 'list[str]') -> 'Optional[int]':
     """Takes prompt input key seqs, find the selected image number.
     If find_number_map() returns None, prompt.goto_image() will catch it.
@@ -115,7 +134,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
     >>> a = [find_number_map(x,y) for y in range(1,7) for x in range(1,6)]
     >>> assert a == list(range(30))
     """
-    ncols = ncols_config()
+    ncols = config.ncols_config()
     nrows = ceil(30 / ncols)
     if 1 <= x <= ncols and 1 <= y <= nrows:
         return ((x - 1) % ncols) + (ncols * (y - 1))
@@ -166,7 +185,7 @@ def get_cache_size() -> str:
     ).decode('utf-8').rstrip()
 
 
-def check_quit(ans: str):
+def quit_on_q(ans: str):
     if ans == 'q':
         sys.exit(0)
 
@@ -185,7 +204,7 @@ def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
 
 def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
     # Default usage of config module
-    return show_single(xcoords_config()[1], y, thumbnail_size)
+    return show_single(config.xcoords_config()[1], y, thumbnail_size)
 
 
 def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
@@ -205,3 +224,24 @@ def hide_if_exist(image: Image) -> 'IO':
         image.hide()
         printer.move_cursor_up(1)
 
+
+def try_import_ueberzug():
+    try:
+        import ueberzug.lib.v0 as ueberzug
+    except ImportError as e:
+        raise ImportError("Install with `pip install ueberzug`") from e
+    return ueberzug
+
+def try_import_ueberzug_module(module):
+    toexec = "try_import_ueberzug()." + module
+    return eval(toexec)
+
+def try_get_FIT_CONTAIN():
+    return try_import_ueberzug_module('ScalerOption').FIT_CONTAIN.value
+
+def try_get_VISIBLE():
+    return try_import_ueberzug_module('Visibility').VISIBLE
+
+def exit_if_exist(canvas):
+    if canvas:
+        canvas.__exit__()

@@ -32,6 +32,8 @@ class AbstractUI(ABC):
         declare the data attribute as appropriate.
         Main path includes any user input (eg, artist user id or search string)
         """
+        self._max_images: int
+        self._is_gallery_mode: bool
         # Reference to the appropriate class or function
         self._prompt: 'prompt.<function>'
         self._data_class: 'data.<class>'
@@ -39,9 +41,12 @@ class AbstractUI(ABC):
 
         # Attribute defined in self.start()
         self._data: 'data.<class>'  # Instantiated data class, not reference
+        self.canvas: 'Optional[ueberzug.Canvas]' = None
         # Attribute defined in self.prefetch_thread()
         self._prefetch_thread: threading.Thread
 
+        self.scrollable = config.use_ueberzug() or not config.scroll_display()
+        self.terminal_page = 0  # starts at zero so the first slice has start=0
         self.start(main_path)
 
     @abstractmethod
@@ -51,10 +56,9 @@ class AbstractUI(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
     def _maybe_join_thread(self) -> None:
         """Run any procedure before prefetching (either in background or not)"""
-        raise NotImplementedError
+        return True
 
     @abstractmethod
     def _print_page_info(self) -> None:
@@ -71,24 +75,28 @@ class AbstractUI(ABC):
             self._download_from_scratch()
         self._prefetch()
 
-    def _verify_up_to_date(self) -> 'IO':
-        if files.dir_not_empty(self._data):
-            return True
+    def _download_from_scratch(self) -> 'IO':
         files.remove_dir_if_exist(self._data)
-        download.init_download(self._data, self._tracker_class(self._data))
-
+        self._request_then_save()
+        self._download_save_canvas()
+        self._print_page_info()
 
     def _show_then_fetch(self) -> 'IO':
-        lscat.show_instant(self._tracker_class, self._data)
+        self.scroll_or_show()
         self._request_then_save()
         self._verify_up_to_date()
         self._print_page_info()
 
-    def _download_from_scratch(self) -> 'IO':
+    def _verify_up_to_date(self) -> 'IO':
+        if files.dir_not_empty(self._data):
+            return True
         files.remove_dir_if_exist(self._data)
-        self._request_then_save()
-        download.init_download(self._data, self._tracker_class(self._data))
-        self._print_page_info()
+        self._download_save_canvas()
+
+    def _download_save_canvas(self):
+        tracker = self._tracker_class(self._data)
+        download.init_download(self._data, tracker)
+        self.canvas = tracker.canvas
 
 
     def _prefetch(self) -> 'IO':
@@ -129,6 +137,7 @@ class AbstractUI(ABC):
     def next_page(self) -> 'IO':
         self._prefetch_thread.join()
         self._data.page_num += 1
+        self.terminal_page = 0
         self._show_page()
         self._prefetch_next_page()
 
@@ -137,15 +146,44 @@ class AbstractUI(ABC):
             print('This is the first page!')
             return False
         self._data.page_num -= 1
+        self.terminal_page = 0
         self._data.offset = int(self._data.offset) - 30
         self._show_page()
+
+    def scroll_up(self):
+        if self.terminal_page == 0:
+            print('This is the top of the terminal page!')
+            return False
+
+        self.terminal_page -= 1
+        self._show_page()
+
+    def scroll_down(self):
+        if self.terminal_page + 1 >= utils.max_terminal_scrolls(self._data, self._is_gallery_mode):
+            print('This is the bottom of the terminal page!')
+            return False
+
+        self.terminal_page += 1
+        self._show_page()
+
+    def handle_scroll(self):
+        utils.exit_if_exist(self.canvas)
+        myslice = utils.slice_images(self._max_images, self.terminal_page)
+        self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
+
+    def scroll_or_show(self):
+        if self.scrollable:
+            self.handle_scroll()
+        else:
+            lscat.show_instant(self._tracker_class, self._data)
 
     def _show_page(self) -> 'IO':
         if not files.dir_not_empty(self._data):
             print('This is the last page!')
             self._data.page_num -= 1
             return False
-        lscat.show_instant(self._tracker_class, self._data)
+
+        self.scroll_or_show()
         self._print_page_info()
 
     def reload(self) -> 'IO':
@@ -165,11 +203,9 @@ class AbstractGallery(AbstractUI, ABC):
         self._prompt = prompt.gallery_like_prompt
         self._data_class = data.GalleryData
         self._tracker_class = lscat.TrackDownloads
+        self._max_images = utils.max_images()
+        self._is_gallery_mode = True
         super().__init__(main_path)
-
-    def _maybe_join_thread(self):
-        """Implements abstractmethod: No action needed"""
-        return True
 
     def _print_page_info(self):
         """Implements abstractmethod: Indicate which posts are multi-image and
@@ -403,10 +439,12 @@ class AbstractUsers(AbstractUI, ABC):
         self._prompt = prompt.user_prompt
         self._data_class = data.UserData
         self._tracker_class = lscat.TrackDownloadsUsers
+        self._max_images = utils.max_images_user()
+        self._is_gallery_mode = False
         super().__init__(main_path)
 
     def _maybe_join_thread(self):
-        """Implements abstractmethod: Wait for parse_thread to join (if any)"""
+        """Overrides abstractmethod: Wait for parse_thread to join (if any)"""
         with funcy.suppress(AttributeError):
             self.parse_thread.join()
 
@@ -487,9 +525,8 @@ class ToImage(ABC):
     def get_image_id(self, post_json: 'Json') -> str:
         raise NotImplementedError
 
-    @abstractmethod
     def maybe_show_preview(self) -> 'Maybe[IO]':
-        raise NotImplementedError
+        return True
 
     @abstractmethod
     def download_image(self, idata) -> 'IO':
@@ -552,9 +589,6 @@ class ViewPostMode(ToImage):
     def get_image_id(self, _) -> str:
         return self._image_id
 
-    def maybe_show_preview(self) -> 'None':
-        return True
-
     def download_image(self, idata) -> 'IO':
         download.download_url(
             idata.download_path,
@@ -581,12 +615,15 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         super().__init__(raw, image_id, firstmode)
         self.event = threading.Event()
+        self.display_func = lscat.ueberzug if config.use_ueberzug() else lscat.icat
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
+        self.canvas: 'Optional[ueberzug.Canvas]' = None
+        self.preview_canvas: 'Optional[ueberzug.Canvas]' = None
 
     def display_initial(self) -> 'IO':
         os.system('clear')
-        lscat.icat(self.download_path / self.large_filename)
+        self.canvas = self.display_func(self.download_path / self.large_filename)
         print(f'Page 1/{self.number_of_pages}')
 
     def open_image(self) -> 'IO':
@@ -647,8 +684,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             )
 
         os.system('clear')
+        utils.exit_if_exist(self.canvas)
+        utils.exit_if_exist(self.preview_canvas)
 
-        lscat.icat(self.filepath)
+        self.canvas = self.display_func(self.filepath)
 
         print(f'Page {self.page_num+1}/{self.number_of_pages}')
         self.start_preview()
@@ -701,6 +740,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
             if i == 4:  # Last pic
                 printer.move_cursor_xy(self.loc[0], self.loc[1])
+
+            self.preview_canvas = tracker.canvas
 
             i += 1
 

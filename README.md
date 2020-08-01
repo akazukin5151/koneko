@@ -110,6 +110,40 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
+* Ueberzug support to work with other terminals
+    - [x] Get the ueberzug API working
+    - [x] Read config and decide whether to use icat or ueberzug at runtime
+    - [ ] Add option to prevent display scrolling and use up/down keys to view more images
+        - [x] Add option to config
+        - [ ] Respond to the config option
+            - [x] In lscat app
+                - [ ] In lscat config assistant
+                - [ ] Display path
+            - [ ] In koneko app
+                - [x] For already downloaded images
+                    - [x] Gallery mode
+                    - [x] Users mode
+                    - [x] Image mode
+                        - [x] FIXME: hide old images
+                - [x] For showing images as they download
+                    - [x] Gallery and User mode
+                        - [x] doesn't hide images in the first terminal page
+                        - [ ] BUG: if scrolling while prefetching, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
+                    - [x] Image mode
+                - [x] Everywhere else (main screen, info screen, etc)
+                - [ ] Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)
+        * "Display scrolling" means lscat will print newlines to scroll down and display more images
+        * The number of images in a terminal page is number_of_cols * number_of_rows
+        * As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed
+        * The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
+        * Images displayed with icat will respond to terminal scroll events, but not ueberzug, so if ueberzug is enabled, this option will always be enabled as well.
+    - [ ] Refine
+        - [x] Hide images when scrolling
+        - [ ] Center align image mode
+            - [x] Add config
+            - [ ] Update configuration assistant
+        - [x] Fix print_info
+        - [ ] Better loops, extract common code to functions or even ABCs
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date
 * Option to save username, but prompt for password (and not save it) every time

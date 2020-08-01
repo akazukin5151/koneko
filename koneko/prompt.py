@@ -19,7 +19,7 @@ def ask_quit() -> 'IO':
     with TERM.cbreak():
         while True:
             ans = TERM.inkey()
-            if ans == 'y' or ans == 'q' or ans.code == 343:  # Enter
+            if ans == 'y' or ans == 'q' or ans.name == 'KEY_ENTER':
                 sys.exit(0)
             elif ans:
                 break
@@ -47,13 +47,18 @@ def common(
         func()
         return keyseqs
 
+    func = case.get(command.name, None)
+    if func:
+        func()
+        return keyseqs
+
     # Wait for the rest of the sequence
     elif command.isdigit() or command in allowed_keys:
         keyseqs.append(command)
         return keyseqs
 
-    # Escape, backspace
-    elif command.code == 361 or command.code == 263:
+    # needs to be here not in case, because keyseqs needs to be cleared to []
+    elif command.name == 'KEY_ESCAPE' or command.name == 'KEY_BACKSPACE':
         # Remove entire line
         print('\r', '\b \b' * 4, end='', flush=True)
         return []
@@ -86,7 +91,9 @@ def gallery_like_prompt(gallery):
         'p': gallery.previous_page,
         'h': gallery.help,
         'q': ask_quit,
-        'm': lambda: print('', gallery.__doc__)
+        'm': lambda: print('', gallery.__doc__),
+        'KEY_DOWN': gallery.scroll_down,
+        'KEY_UP': gallery.scroll_up,
     }
 
     with TERM.cbreak():
@@ -179,7 +186,9 @@ def user_prompt(user):
         'p': user.previous_page,
         'h': printer.user_help,
         'q': ask_quit,
-        'm': lambda: print(user.__class__.__bases__[0].__doc__)
+        'm': lambda: print(user.__class__.__bases__[0].__doc__),
+        'KEY_DOWN': user.scroll_down,
+        'KEY_UP': user.scroll_up,
     }
 
     with TERM.cbreak():

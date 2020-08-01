@@ -12,10 +12,13 @@ def test_display_gallery(monkeypatch, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.scroll_display', lambda: True)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
 
     lscat_app.main()
+
     assert mock.mock_calls == mock.call_args_list == [
         call(
             lscat.TrackDownloads,
@@ -29,6 +32,8 @@ def test_display_user(monkeypatch, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.scroll_display', lambda: True)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 4)
 
@@ -52,11 +57,11 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
 
     lscat_app.main()
     assert mock.mock_calls == [
-        call(
+        call.for_gallery(
             FakeData(tmp_path),
             lscat.TrackDownloads,
         ),
-        call().start()
+        call.for_gallery().start()
     ]
 
 
@@ -72,11 +77,11 @@ def test_browse_cache_invis(monkeypatch, tmp_path, argv):
 
     lscat_app.main()
     assert mock.mock_calls == [
-        call(
+        call.for_user(
             FakeData(tmp_path),
             lscat.TrackDownloadsUsers,
         ),
-        call().start()
+        call.for_user().start()
     ]
 
 
@@ -120,7 +125,7 @@ def test_display_path_cli_complete(monkeypatch, tmp_path):
     assert mock.mock_calls == mock.call_args_list == [
         call(
             lscat.TrackDownloads,
-            FakeData(str(tmp_path)),
+            FakeData(tmp_path),
         )
     ]
 
@@ -138,7 +143,7 @@ def test_display_path_cli_incomplete(monkeypatch, tmp_path):
     assert mock.mock_calls == mock.call_args_list == [
         call(
             lscat.TrackDownloads,
-            FakeData(str(tmp_path)),
+            FakeData(tmp_path),
         )
     ]
 

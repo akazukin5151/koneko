@@ -33,6 +33,7 @@ class AbstractUI(ABC):
         Main path includes any user input (eg, artist user id or search string)
         """
         self._max_images: int
+        self._is_gallery_mode: bool
         # Reference to the appropriate class or function
         self._prompt: 'prompt.<function>'
         self._data_class: 'data.<class>'
@@ -150,10 +151,18 @@ class AbstractUI(ABC):
         self._show_page()
 
     def scroll_up(self):
+        if self.terminal_page == 0:
+            print('This is the top of the terminal page!')
+            return False
+
         self.terminal_page -= 1
         self._show_page()
 
     def scroll_down(self):
+        if self.terminal_page + 1 >= utils.max_terminal_scrolls(self._data, self._is_gallery_mode):
+            print('This is the bottom of the terminal page!')
+            return False
+
         self.terminal_page += 1
         self._show_page()
 
@@ -191,6 +200,7 @@ class AbstractGallery(AbstractUI, ABC):
         self._data_class = data.GalleryData
         self._tracker_class = lscat.TrackDownloads
         self._max_images = utils.max_images()
+        self._is_gallery_mode = True
         super().__init__(main_path)
 
     def _print_page_info(self):
@@ -426,6 +436,7 @@ class AbstractUsers(AbstractUI, ABC):
         self._data_class = data.UserData
         self._tracker_class = lscat.TrackDownloadsUsers
         self._max_images = utils.max_images_user()
+        self._is_gallery_mode = False
         super().__init__(main_path)
 
     def _maybe_join_thread(self):

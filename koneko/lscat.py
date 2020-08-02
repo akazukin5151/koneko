@@ -76,7 +76,7 @@ def icat(path: str) -> 'IO':
     Image(path).show()
 
 
-def ueberzug(path):
+def ueberzug_center_align(path):
     """Display center-aligned image in original size"""
     ueberzug = utils.try_import_ueberzug()
     canvas = ueberzug.Canvas()

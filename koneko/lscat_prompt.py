@@ -187,7 +187,7 @@ class ImageLoop(AbstractLoop):
 
     def show_func(self) -> 'IO':
         if self.use_ueberzug:
-            self.canvas = lscat.ueberzug(self.root / self.image)
+            self.canvas = lscat.ueberzug_center_align(self.root / self.image)
         else:
             lscat.icat(self.root / self.image)
 

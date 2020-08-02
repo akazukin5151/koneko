@@ -23,15 +23,23 @@ from abc import ABC
 from pixcat import Image
 from returns.result import safe
 
-from koneko import pure, TERM, utils, files, config, printer, KONEKODIR
+from koneko import (
+    pure,
+    TERM,
+    utils,
+    files,
+    config,
+    printer,
+    KONEKODIR,
+    WELCOME_IMAGE
+)
 
 
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
-    path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
     if config.use_ueberzug():
-        return ueberzug_display(path, x, y, thumbnail_size / 20)
+        return ueberzug_display(WELCOME_IMAGE, x, y, thumbnail_size / 20)
 
-    img = Image(path).thumbnail(thumbnail_size)
+    img = Image(WELCOME_IMAGE).thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=y)
     return img
 
@@ -52,8 +60,7 @@ def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
             show_single(x, 0, thumbnail_size)
         return None
 
-    path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    return display_multiple_x_ueberzug(path, xcoords, thumbnail_size)
+    return display_multiple_x_ueberzug(WELCOME_IMAGE, xcoords, thumbnail_size)
 
 
 def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
@@ -63,8 +70,7 @@ def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
             show_single_x(px, size)
         return None
 
-    path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
-    display_multiple_x_canvas(canvas, preview_xcoords, path, size)
+    display_multiple_x_canvas(canvas, preview_xcoords, WELCOME_IMAGE, size)
     return canvas
 
 

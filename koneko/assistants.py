@@ -18,6 +18,7 @@ from koneko import (
     printer,
     FakeData,
     KONEKODIR,
+    WELCOME_IMAGE,
 )
 
 
@@ -26,13 +27,17 @@ PLUS = frozenset({'+', '='})
 MINUS = frozenset({'-', '_'})
 
 
+def copy_image() -> Image:
+    return copy(Image(WELCOME_IMAGE))
+
+
 class ImageWrapper:
     def __init__(self):
         self.use_ueberzug = config.use_ueberzug()
         if self.use_ueberzug:
-            self.image = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+            self.image = WELCOME_IMAGE
         else:
-            self.image = copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
+            self.image = copy_image()
 
     def show(self, size, x, y):
         if self.use_ueberzug:
@@ -45,10 +50,6 @@ class ImageWrapper:
             self.canvas.__exit__()
         elif not try_skip:
             self.image.hide()
-
-
-def copy_image() -> Image:
-    return copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
 
 
 def thumbnail_size_assistant() -> 'IO[int]':

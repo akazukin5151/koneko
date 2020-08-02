@@ -327,3 +327,11 @@ See [example config](example_config.ini) for reference.
 
 ## Experimental
 * `image_mode_previews`: In view post mode (mode 2), preview the next four images for multi-image posts. Unstable because of pixcat implementation details -- it prints out escape codes that moves the terminal cursor, changing the location of other print statements.
+
+## Ueberzug
+
+* "Display scrolling" means lscat will print newlines to scroll down and display more images
+* The number of images in a terminal page is number_of_cols * number_of_rows
+* As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed
+* The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
+* Images displayed with icat will respond to terminal scroll events, but not ueberzug, so if ueberzug is enabled, this option will always be enabled as well.

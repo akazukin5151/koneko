@@ -151,11 +151,11 @@ def test_print_doc(capsys, monkeypatch):
     monkeypatch.setattr('koneko.Terminal.height', 50)
     printer.print_doc('hi')
     captured = capsys.readouterr()
-    assert captured.out == '\x1b[48Bhi\n'
+    assert captured.out == 'hi\n'
 
     printer.print_doc('hi\n\n')
     captured = capsys.readouterr()
-    assert captured.out == '\x1b[46Bhi\n\n\n'
+    assert captured.out == 'hi\n\n\n'
 
 
 def test_update_gallery_info(capsys):

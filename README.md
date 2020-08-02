@@ -150,6 +150,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [x] Add config
         - [ ] Update configuration assistant
     - [ ] Better loops, extract common code to functions or even ABCs
+        - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date
 * Option to save username, but prompt for password (and not save it) every time

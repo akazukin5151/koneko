@@ -380,7 +380,7 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
 
     os.system('clear')
     canvas.__enter__()
-    while True:
+    for _ in range(number_of_cols * number_of_rows):
         image = yield
 
         number = int(image.split('_')[0])
@@ -394,6 +394,9 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
             rowspaces[y % number_of_rows],
             size
         )
+
+    while True:
+        yield
 
 
 def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':

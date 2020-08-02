@@ -151,13 +151,15 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [ ] Image
     - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
     - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
-    - [ ] Center align image mode
+    - [x] Center align image mode
         - [x] Add config
-        - [ ] Update configuration assistant
+        - [x] Update configuration assistant
+        - [ ] DOCS
     - [ ] Better loops, extract common code to functions or even ABCs
-        - [ ] Do not instantiate a new canvas in every loop (eg in assistants.py:)
+        - [ ] Performance: Do not instantiate a new canvas in every loop (eg in assistants.py:)
             - [ ] ImageWrapper (thumbnail size assistant)
             - [ ] AbstractImageAdjuster
+        - [ ] Consider program wide singleton where only one ueberzug process will be used in the entire program's lifetime, only changing the visibility attribute to hide/unhide images
         - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
 
 * Illust-related mode can't go back to image mode

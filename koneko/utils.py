@@ -24,7 +24,7 @@ from logging.handlers import RotatingFileHandler
 import funcy
 from pixcat import Image
 
-from koneko import pure, config, printer, TERM, KONEKODIR
+from koneko import pure, config, printer, KONEKODIR
 
 
 # History and logging

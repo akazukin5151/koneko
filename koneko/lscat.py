@@ -23,7 +23,7 @@ from abc import ABC
 from pixcat import Image
 from returns.result import safe
 
-from koneko import pure, utils, files, config, printer
+from koneko import pure, TERM, utils, files, config, printer, KONEKODIR
 
 
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':

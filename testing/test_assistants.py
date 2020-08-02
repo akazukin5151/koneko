@@ -1,5 +1,5 @@
 """Doesn't do anything too advanced (can't figure out multi-key sequences yet), so just returns defaults"""
-
+from sys import platform
 from unittest.mock import Mock
 
 import pytest
@@ -85,6 +85,8 @@ def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch
     assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys, tmp_path):
+    if platform == 'darwin':
+        pytest.skip('Ueberzug does not work on macOS')
     monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: 'y')

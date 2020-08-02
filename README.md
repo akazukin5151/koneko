@@ -142,8 +142,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 * Refine ueberzug (must complete before release)
+    - [ ] BUG: Hide all images during mode transitions
+        - [x] mode i/2 -> related illusts mode
+        - [ ] config assistants
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
-    - [ ] BUG: Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)
     - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
     - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
     - [ ] Center align image mode
@@ -153,6 +155,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
 
 * Illust-related mode can't go back to image mode
+* Support illust related mode in lscat app mode 2/b
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date
 * Option to save username, but prompt for password (and not save it) every time

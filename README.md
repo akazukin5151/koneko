@@ -142,10 +142,13 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 * Refine ueberzug (must complete before release)
-    - [ ] BUG: Hide all images before reloading
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
         - Also happens with view user/image while prefetching
-    - [ ] BUG: print info in config assistant is hidden by ueberzug
+    - [ ] BUG: print info is hidden by ueberzug
+        - [ ] config assistant
+        - [ ] Gallery
+        - [ ] User
+        - [ ] Image
     - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
     - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
     - [ ] Center align image mode

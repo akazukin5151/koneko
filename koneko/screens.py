@@ -11,7 +11,7 @@ def display(path, icat_size, ueberzug_size):
         ueberzug = utils.try_import_ueberzug()
         canvas = ueberzug.Canvas()
         canvas.__enter__()
-        lscat.ueberzug_display(canvas, path, 0, 0, ueberzug_size // 20)
+        lscat.display_canvas(canvas, path, 0, 0, ueberzug_size // 20)
         return canvas
 
     pixcat.Image(path).thumbnail(icat_size).show(align='left', y=0)

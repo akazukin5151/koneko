@@ -39,7 +39,7 @@ class ImageWrapper:
             ueberzug = utils.try_import_ueberzug()
             self.canvas = ueberzug.Canvas()
             self.canvas.__enter__()
-            lscat.ueberzug_display(self.canvas, self.image, size=size/20, **kwargs)
+            lscat.display_canvas(self.canvas, self.image, size=size/20, **kwargs)
         else:
             self.image.thumbnail(size).show(align='left', **kwargs)
 

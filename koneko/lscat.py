@@ -27,7 +27,6 @@ from koneko import pure, utils, files, config, printer
 
 
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
-    # Must make a copy before using this reference
     img = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png').thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=y)
     return img
@@ -83,7 +82,23 @@ def ueberzug(path):
     return canvas
 
 
-def ueberzug_display(canvas, img_path, x, y, size):
+def ueberzug_display(path, x, y, size):
+    ueberzug = utils.try_import_ueberzug()
+    canvas = ueberzug.Canvas()
+    canvas.__enter__()
+    canvas.create_placement(
+        str(path),
+        path=str(path),
+        x=x,
+        y=y,
+        width=size,
+        height=size,
+        visibility=utils.try_get_VISIBLE()
+    )
+    return canvas
+
+
+def display_canvas(canvas, img_path, x, y, size):
     canvas.create_placement(
         str(img_path),
         path=str(img_path),
@@ -318,7 +333,7 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
         x = number % number_of_cols
         y = number // number_of_cols
 
-        ueberzug_display(
+        display_canvas(
             canvas,
             path / image,
             left_shifts[x],
@@ -356,7 +371,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
             )
 
         # Display artist profile pic
-        ueberzug_display(
+        display_canvas(
             canvas,
             path / a_img,
             padding,
@@ -366,7 +381,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
 
         # Display the three previews
         for j in range(3):
-            ueberzug_display(
+            display_canvas(
                 canvas,
                 path / (yield),
                 preview_xcoords[j],
@@ -396,7 +411,7 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
         else:
             x = 1
 
-        ueberzug_display(
+        display_canvas(
             canvas,
             path / image,
             _xcoords[x],

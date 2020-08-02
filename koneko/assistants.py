@@ -22,8 +22,8 @@ from koneko import (
 
 
 # Constants
-PLUS = {'+', '='}
-MINUS = {'-', '_'}
+PLUS = frozenset({'+', '='})
+MINUS = frozenset({'-', '_'})
 
 
 def copy_image() -> Image:

@@ -362,6 +362,7 @@ class IllustFollowGallery(AbstractGallery):
     def go_artist_gallery_num(self, selected_image_num: int) -> 'IO':
         """Like self.view_image(), but goes to artist mode instead of image"""
         artist_user_id = self._data.artist_user_id(selected_image_num)
+        utils.exit_if_exist(self.canvas)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # Gallery prompt ends, user presses back

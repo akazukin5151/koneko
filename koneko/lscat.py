@@ -67,15 +67,17 @@ def hide_if_exist(image: Image) -> 'IO':
 
 
 def icat(path: str) -> 'IO':
-    """icat and pixcat behaves differently. pixcat prints out the escape codes,
-    shifting the current cursor position, but calling a system command does not.
-    I abuse this fact in the main generators to make printing pages easier, and
-    user mode is possible only because of this fact.
+    """icat (system command) and pixcat behaves differently.
+    pixcat prints out the escape codes, shifting the current cursor position,
+    but calling a system command does not. I abuse this fact in the main
+    generators to make printing pages easier, and user mode is possible only
+    because of this fact.
     """
     Image(path).show()
 
 
 def ueberzug(path):
+    """Display center-aligned image in original size"""
     ueberzug = utils.try_import_ueberzug()
     canvas = ueberzug.Canvas()
     canvas.__enter__()
@@ -90,6 +92,7 @@ def ueberzug(path):
 
 
 def ueberzug_display(path, x, y, size):
+    """Without any setup, display given path with variable coordinates and size"""
     ueberzug = utils.try_import_ueberzug()
     canvas = ueberzug.Canvas()
     canvas.__enter__()
@@ -106,6 +109,7 @@ def ueberzug_display(path, x, y, size):
 
 
 def display_canvas(canvas, img_path, x, y, size):
+    """Given independently instantiated ueberzug canvas, display image"""
     canvas.create_placement(
         str(img_path),
         path=str(img_path),

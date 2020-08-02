@@ -117,34 +117,38 @@ def test_display_path_cli_invalid_quits(monkeypatch, capsys):
 def test_display_path_cli_complete(monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '3', str(tmp_path)])
-    monkeypatch.setattr('koneko.lscat.show_instant', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.GalleryUserLoop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 2)
 
     lscat_app.main()
-    assert mock.mock_calls == mock.call_args_list == [
-        call(
-            lscat.TrackDownloads,
+    assert mock.call_args_list == []
+    assert mock.mock_calls == [
+        call.for_gallery(
             FakeData(tmp_path),
-        )
+            lscat.TrackDownloads,
+        ),
+        call.for_gallery().start()
     ]
 
 
 def test_display_path_cli_incomplete(monkeypatch, tmp_path):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True, '3'])
-    monkeypatch.setattr('koneko.lscat.show_instant', mock)
+    monkeypatch.setattr('koneko.lscat_prompt.GalleryUserLoop', mock)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 2)
     responses = iter((str(tmp_path),))
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
 
     lscat_app.main()
-    assert mock.mock_calls == mock.call_args_list == [
-        call(
-            lscat.TrackDownloads,
+    assert mock.call_args_list == []
+    assert mock.mock_calls == [
+        call.for_gallery(
             FakeData(tmp_path),
-        )
+            lscat.TrackDownloads,
+        ),
+        call.for_gallery().start()
     ]
 
 
@@ -184,6 +188,7 @@ def test_maybe_ypadding_img_height(monkeypatch, send_enter, capsys):
 
 
 def test_maybe_page_spacing(monkeypatch, send_enter, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.assistants.page_spacing_assistant', lambda x: 99)
 
     lscat_app.config_assistance(['4'])

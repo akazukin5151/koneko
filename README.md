@@ -69,7 +69,7 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 * Python 3.8+
 * It has been tested on kitty v0.17.2 onwards, but should work on older versions
 * Operating system: all OSes that kitty supports, which means Linux and macOS.
-* Uses xdg-open (for opening links in your browser) and curl (for safety fallback, see below)
+* Uses `xdg-open` (linux) / `open` (mac) (for opening links in your browser) and `curl` (for safety fallback, see below)
 
 <details>
   <summary>If it crashes (it shouldn't), it might be because pip didn't 'install' the welcome pictures, *and* the script failed to download them for some reason. Try:</summary>
@@ -92,11 +92,33 @@ See the [manual](MANUAL.md) here
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.10.2
+### Version 0.11.0
 
 #### Features
+* Ueberzug support to work with other terminals (but seems to be linux only)
+    * New configuration options in the experimental section
+        * `use_ueberzug` (default: off)
+        * `scroll_display` (default: on)
+            * On means you have to manually scroll the terminal with mouse/keyboard shortcuts
+            * Off means you can use up/down keys to view more images
+            * This option is always on if `use_ueberzug` is on
+        * `ueberzug_center_spaces` (default: 20)
+    * If `scroll_display` is off, then use up/down keys to view more images
+    * Should work on everything:
+         * lscat app
+             * In lscat config assistant
+                 * Page spacing is disabled for ueberzug
+             * Browse cache, display path
+             * testgallery, testuser
+         * koneko app
+             * For already downloaded images in Gallery, Users, & Image modes
+             * For showing images as they download in Gallery, Users, & Image modes
+             * Everywhere else (main screen, info screen, etc)
 
 #### Bug fixes
+* Fixed bugs in lscat app's display path (mode p/3):
+    * Not working if path given via cli
+    * Always showing directory in gallery mode
 
 #### Code maintenance
 * Remove circular imports
@@ -105,45 +127,30 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] main importing cli
     - [x] picker importing assistants
 * Updated and improved diagrams in HACKING.md
+* Methods starting with `maybe` (formerly abstractmethods) now do nothing by default, override to do something
+    * Rename middle() to maybe_show_preview() in lscat prompt
+* Inline in yield expression in users preview (lscat)
+* Replace while loop with a for loop and a guard at the end in lscat
+* Use Keystroke name attribute rather than its key code (blessed.Terminal)
+* Rename utils.check_quit() to quit_on_q()
+* Move lscat related functions in utils to lscat
+* print_doc now restores previous cursor location
+
 
 # Roadmap
 
 ## Features
 
-* Ueberzug support to work with other terminals
-    - [x] Get the ueberzug API working
-    - [x] Read config and decide whether to use icat or ueberzug at runtime
-    - [ ] Add option to prevent display scrolling and use up/down keys to view more images
-        - [x] Add option to config
-        - [ ] Respond to the config option
-            - [x] In lscat app
-                - [ ] In lscat config assistant
-                - [ ] Display path
-            - [ ] In koneko app
-                - [x] For already downloaded images
-                    - [x] Gallery mode
-                    - [x] Users mode
-                    - [x] Image mode
-                        - [x] FIXME: hide old images
-                - [x] For showing images as they download
-                    - [x] Gallery and User mode
-                        - [x] doesn't hide images in the first terminal page
-                        - [ ] BUG: if scrolling while prefetching, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
-                    - [x] Image mode
-                - [x] Everywhere else (main screen, info screen, etc)
-                - [ ] Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)
-        * "Display scrolling" means lscat will print newlines to scroll down and display more images
-        * The number of images in a terminal page is number_of_cols * number_of_rows
-        * As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed
-        * The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
-        * Images displayed with icat will respond to terminal scroll events, but not ueberzug, so if ueberzug is enabled, this option will always be enabled as well.
-    - [ ] Refine
-        - [x] Hide images when scrolling
-        - [ ] Center align image mode
-            - [x] Add config
-            - [ ] Update configuration assistant
-        - [x] Fix print_info
-        - [ ] Better loops, extract common code to functions or even ABCs
+* Refine ueberzug (must complete before release)
+    - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
+    - [ ] BUG: Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)
+    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
+    - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
+    - [ ] Center align image mode
+        - [x] Add config
+        - [ ] Update configuration assistant
+    - [ ] Better loops, extract common code to functions or even ABCs
+        - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date
 * Option to save username, but prompt for password (and not save it) every time

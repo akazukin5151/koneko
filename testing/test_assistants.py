@@ -21,15 +21,17 @@ def disable_print_doc(monkeypatch):
 
 class FakeInKey:
     def __init__(self):
-        self.code = 343
+        self.name = 'KEY_ENTER'
 
 
 def test_thumbnail_size_assistant_default(monkeypatch, disable_pixcat, patch_cbreak, disable_print_doc):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     assert assistants.thumbnail_size_assistant() == 300  # Default
 
 
 def test_page_spacing_assistant(monkeypatch, disable_pixcat, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     responses = iter(['', 'not_a_number', '30'])
     monkeypatch.setattr('builtins.input', lambda *a: next(responses))
     monkeypatch.setattr('koneko.assistants.time.sleep', lambda *a, **k: Mock())
@@ -43,18 +45,33 @@ def test_page_spacing_assistant(monkeypatch, disable_pixcat, capsys):
 
 
 def test_gallery_print_spacing_assistant_n(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: '')
-    monkeypatch.setattr('koneko.utils.show_instant_sample', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.show_instant_sample', lambda *a: True)
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Default
-    assert assistants.gallery_print_spacing_assistant(310, 10, 1) == [9, 17, 17, 17, 17]
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
     captured = capsys.readouterr()
     assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2                 3                 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
+def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.Terminal.width', 40)
+    monkeypatch.setattr('builtins.input', lambda: '')
+    monkeypatch.setattr('koneko.lscat.show_instant_sample', lambda *a: True)
+
+    monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
+    # Default
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
+    captured = capsys.readouterr()
+    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K         1                 2                 3                 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+
+
 
 def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: 'y')
     monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: True)
@@ -63,25 +80,39 @@ def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Default
-    assert assistants.gallery_print_spacing_assistant(310, 10, 1) == [9, 17, 17, 17, 17]
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
     captured = capsys.readouterr()
     assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+
+def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.Terminal.width', 40)
+    monkeypatch.setattr('builtins.input', lambda: 'y')
+    monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat_app.FakeData', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
+
+    monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
+    # Default
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
+    captured = capsys.readouterr()
+    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 
 def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, patch_cbreak, capsys):
     monkeypatch.setattr('koneko.Terminal.width', 40)
-    monkeypatch.setattr('koneko.utils.display_user_row', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.display_user_row', lambda *a: True)
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Default
     assert assistants.user_info_assistant(310, 10, 1) == 18
     captured = capsys.readouterr()
-    assert captured.out == '\x1b[5A\x1b[K\x1b[1B\x1b[K\x1b[1A                  000\n                  Example artist\n\x1b[2A\n\n\n\n'
+    assert captured.out == '\x1b[K\x1b[1B\x1b[K\x1b[1A                  000\n                  Example artist\n\x1b[2A\n\n\n\n'
 
 
 def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
-    monkeypatch.setattr('koneko.utils.show_single_x', lambda *a, **k: Mock())
+    monkeypatch.setattr('koneko.lscat.show_single_x', lambda *a, **k: Mock())
     # Default
     assert assistants.xpadding_assistant(310) == (0, 0)
 
@@ -91,8 +122,8 @@ def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys
 
 def test_ypadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
-    monkeypatch.setattr('koneko.utils.show_single_x', lambda *a, **k: Mock())
-    monkeypatch.setattr('koneko.utils.show_single_y', lambda *a, **k: Mock())
+    monkeypatch.setattr('koneko.lscat.show_single_x', lambda *a, **k: Mock())
+    monkeypatch.setattr('koneko.lscat.show_single_y', lambda *a, **k: Mock())
     # Default
     assert assistants.ypadding_assistant(310) == (0, 0)
 

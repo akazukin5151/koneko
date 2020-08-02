@@ -22,9 +22,29 @@ from koneko import (
 
 
 # Constants
-ENTER = 343
-PLUS = {'+', '='}
-MINUS = {'-', '_'}
+PLUS = frozenset({'+', '='})
+MINUS = frozenset({'-', '_'})
+
+
+class ImageWrapper:
+    def __init__(self):
+        self.use_ueberzug = config.use_ueberzug()
+        if self.use_ueberzug:
+            self.image = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+        else:
+            self.image = copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
+
+    def show(self, size, x, y):
+        if self.use_ueberzug:
+            self.canvas = lscat.ueberzug_display(self.image, x=x, y=y, size=size/20)
+        else:
+            self.image.thumbnail(size).show(align='left', x=x, y=y)
+
+    def hide(self, try_skip):
+        if self.use_ueberzug:
+            self.canvas.__exit__()
+        elif not try_skip:
+            self.image.hide()
 
 
 def copy_image() -> Image:
@@ -41,24 +61,25 @@ def thumbnail_size_assistant() -> 'IO[int]':
     """
     printer.print_doc(thumbnail_size_assistant.__doc__)
 
-    image = copy_image()
+    image = ImageWrapper()
 
     size = 300  # starting size
     with TERM.cbreak():
         while True:
-            image.thumbnail(size).show(align='left', x=0, y=0)
+            image.show(size=size, x=0, y=0)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)
 
             if ans in PLUS:
+                image.hide(try_skip=True)
                 size += 20
 
             elif ans in MINUS:
-                image.hide()
+                image.hide(try_skip=False)
                 size -= 20
 
-            elif ans.code == ENTER:
+            elif ans.name == 'KEY_ENTER':
                 return size
 
 
@@ -137,7 +158,7 @@ class _AbstractImageAdjuster(ABC):
 
     def hide_show_print(self) -> 'IO':
         """Hide image if shown, show another image, and report"""
-        utils.hide_if_exist(self.image)
+        lscat.hide_if_exist(self.image)
 
         self.image = self.show_func_args()
 
@@ -160,7 +181,7 @@ class _AbstractImageAdjuster(ABC):
                 ans = TERM.inkey()
                 utils.quit_on_q(ans)
 
-                if ans.code == ENTER and self.image:
+                if ans.name == 'KEY_ENTER' and self.image:
                     self.maybe_erase()
                     return self.return_tup()
 
@@ -198,7 +219,7 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
         """Complements concrete method: Find image width/height first"""
         printer.print_doc(self.doc)
 
-        utils.show_single_x(self.default_x, self.thumbnail_size)
+        lscat.show_single_x(self.default_x, self.thumbnail_size)
 
         self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
@@ -212,7 +233,7 @@ class _XPadding(_AbstractPadding):
         super().__init__()
         # Base
         self.thumbnail_size = thumbnail_size
-        self.show_func = utils.show_single_x
+        self.show_func = lscat.show_single_x
         self.side_label = 'width'
 
         # Padding ABC
@@ -237,7 +258,7 @@ class _YPadding(_AbstractPadding):
         super().__init__()
         # Base
         self.thumbnail_size = thumbnail_size
-        self.show_func = utils.show_single_y
+        self.show_func = lscat.show_single_y
         self.side_label = 'height'
 
         # Padding ABC
@@ -245,17 +266,22 @@ class _YPadding(_AbstractPadding):
         self.default_x = config.xcoords_config()[1]
         self.find_dim_func = _FindImageHeight
 
+        # Unique
+        self.use_ueberzug = not config.use_ueberzug()
+
     def report(self) -> 'IO':
         """Implements abstractmethod"""
         printer.write(f'y spacing = {self.spaces}')
 
     def maybe_move_down(self) -> 'IO':
         """Overrides base method: move cursor down"""
-        printer.move_cursor_down(self.width_or_height)
+        if self.use_ueberzug:
+            printer.move_cursor_down(self.width_or_height)
 
     def maybe_move_up(self) -> 'IO':
         """Overrides base method: move cursor up"""
-        printer.move_cursor_up(self.spaces)
+        if self.use_ueberzug:
+            printer.move_cursor_up(self.spaces)
 
     def show_func_args(self) -> Image:
         """Implements abstractmethod: first argument is unique"""
@@ -299,7 +325,7 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
 class _FindImageWidth(_FindImageDimension):
     def __init__(self, thumbnail_size):
         self.thumbnail_size = thumbnail_size
-        self.show_func = utils.show_single_x
+        self.show_func = lscat.show_single_x
         self.side_label = 'width'
         self.start_spaces = config.xcoords_config()[0]
         super().__init__()
@@ -308,7 +334,7 @@ class _FindImageWidth(_FindImageDimension):
 class _FindImageHeight(_FindImageDimension):
     def __init__(self, thumbnail_size):
         self.thumbnail_size = thumbnail_size
-        self.show_func = utils.show_single_y
+        self.show_func = lscat.show_single_y
         self.side_label = 'height'
         self.start_spaces = 0
         super().__init__()
@@ -318,8 +344,21 @@ class _FindImageHeight(_FindImageDimension):
         printer.move_cursor_up(self.spaces)
 
 
+def check_ueberzug() -> bool:
+    if config.use_ueberzug():
+        os.system('clear')
+        print(
+            'The page spacing assistant is not needed if you use ueberzug, '
+            'because ueberzug does not respond to scroll events'
+        )
+        return False
+    return True
+
 def page_spacing_assistant(thumbnail_size: int) -> int:
     # This doesn't use print_doc() as a clean state is needed
+    if not check_ueberzug():
+        return -1
+
     os.system('clear')
     print(*(
         '=== Page spacing ===',
@@ -351,7 +390,24 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
         print('Must enter a number!')
 
 
-def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[int]':
+def _display_inital_row(ans, size, xpadding, image_width, image_height):
+    if ans == 'y':
+        _path = picker.pick_dir()
+        _data = FakeData(_path)
+        lscat.show_instant(lscat.TrackDownloads, _data)
+        ncols = config.ncols_config()  # Default fallback, on user choice
+        if config.use_ueberzug():
+            print('\n' * (image_height * config.nrows_config() + 1))
+        return ncols
+
+    lscat.show_instant_sample(size, xpadding, image_width)
+    ncols = pure.ncols(TERM.width, xpadding, image_width)
+    if config.use_ueberzug():
+        print('\n' * (image_height - 2))
+    return ncols
+
+
+def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: int) -> 'list[int]':
     """=== Gallery print spacing ===
     Use +/= to increase the spacing, and -/_ to decrease it
     Use q to exit the program, and press enter to go to the next assistant
@@ -364,14 +420,7 @@ def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[i
     ans = input()
 
     # Setup variables
-    if ans == 'y':
-        _path = picker.pick_dir()
-        _data = FakeData(_path)
-        lscat.show_instant(lscat.TrackDownloads, _data)
-        ncols = config.ncols_config()  # Default fallback, on user choice
-    else:
-        utils.show_instant_sample(size, image_width, xpadding)
-        ncols = pure.ncols(TERM.width, image_width, xpadding)
+    ncols = _display_inital_row(ans, size, xpadding, image_width, image_height)
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
@@ -393,16 +442,16 @@ def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[i
                 spacings[current_selection] -= 1
 
             # right arrow
-            elif (ans.code == 261 or ans in {'d', 'l'}
+            elif (ans.name == 'KEY_RIGHT' or ans in {'d', 'l'}
                     and current_selection < len(spacings) - 1):
                 current_selection += 1
 
             # left arrow
-            elif (ans.code == 260 or ans in {'a', 'h'}
+            elif (ans.name == 'KEY_LEFT' or ans in {'a', 'h'}
                     and current_selection > 0):
                 current_selection -= 1
 
-            elif ans.code == ENTER:
+            elif ans.name == 'KEY_ENTER':
                 return spacings
 
 
@@ -420,9 +469,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     # Start
     printer.print_doc(user_info_assistant.__doc__)
 
-    utils.display_user_row(thumbnail_size, xpadding, preview_xcoords)
-
-    printer.move_cursor_up(5)
+    lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
 
     with TERM.cbreak():
         while True:
@@ -437,7 +484,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
             elif ans in MINUS and spacing > 0:
                 spacing -= 1
 
-            elif ans.code == ENTER:
+            elif ans.name == 'KEY_ENTER':
                 print('\n' * 3)
                 return spacing
 

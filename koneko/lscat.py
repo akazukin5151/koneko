@@ -23,19 +23,61 @@ from abc import ABC
 from pixcat import Image
 from returns.result import safe
 
-from koneko import pure, utils, files, config, printer
+from koneko import pure, TERM, utils, files, config, printer, KONEKODIR
+
+
+def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
+    path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    if config.use_ueberzug():
+        return ueberzug_display(path, x, y, thumbnail_size / 20)
+
+    img = Image(path).thumbnail(thumbnail_size)
+    img.show(align='left', x=x, y=y)
+    return img
+
+
+def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
+    return show_single(x, 0, thumbnail_size)
+
+
+def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
+    # Default usage of config module
+    return show_single(config.xcoords_config()[1], y, thumbnail_size)
+
+
+def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
+    xcoords = pure.xcoords(TERM.width, image_width, xpadding)
+    for x in xcoords:
+        show_single(x, 0, thumbnail_size)
+
+
+def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
+    show_single(padding, 0, size)
+    for px in preview_xcoords:
+        show_single_x(px, size)
+
+
+def hide_if_exist(image: Image) -> 'IO':
+    if image:
+        try:
+            image.hide()
+        except AttributeError:
+            image.__exit__()
+        printer.move_cursor_up(1)
 
 
 def icat(path: str) -> 'IO':
-    """icat and pixcat behaves differently. pixcat prints out the escape codes,
-    shifting the current cursor position, but calling a system command does not.
-    I abuse this fact in the main generators to make printing pages easier, and
-    user mode is possible only because of this fact.
+    """icat (system command) and pixcat behaves differently.
+    pixcat prints out the escape codes, shifting the current cursor position,
+    but calling a system command does not. I abuse this fact in the main
+    generators to make printing pages easier, and user mode is possible only
+    because of this fact.
     """
     Image(path).show()
 
 
-def ueberzug(path):
+def ueberzug_center_align(path):
+    """Display center-aligned image in original size"""
     ueberzug = utils.try_import_ueberzug()
     canvas = ueberzug.Canvas()
     canvas.__enter__()
@@ -49,7 +91,25 @@ def ueberzug(path):
     return canvas
 
 
-def ueberzug_display(canvas, img_path, x, y, size):
+def ueberzug_display(path, x, y, size):
+    """Without any setup, display given path with variable coordinates and size"""
+    ueberzug = utils.try_import_ueberzug()
+    canvas = ueberzug.Canvas()
+    canvas.__enter__()
+    canvas.create_placement(
+        str(path),
+        path=str(path),
+        x=x,
+        y=y,
+        width=size,
+        height=size,
+        visibility=utils.try_get_VISIBLE()
+    )
+    return canvas
+
+
+def display_canvas(canvas, img_path, x, y, size):
+    """Given independently instantiated ueberzug canvas, display image"""
     canvas.create_placement(
         str(img_path),
         path=str(img_path),
@@ -284,7 +344,7 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
         x = number % number_of_cols
         y = number // number_of_cols
 
-        ueberzug_display(
+        display_canvas(
             canvas,
             path / image,
             left_shifts[x],
@@ -322,7 +382,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
             )
 
         # Display artist profile pic
-        ueberzug_display(
+        display_canvas(
             canvas,
             path / a_img,
             padding,
@@ -332,7 +392,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
 
         # Display the three previews
         for j in range(3):
-            ueberzug_display(
+            display_canvas(
                 canvas,
                 path / (yield),
                 preview_xcoords[j],
@@ -362,7 +422,7 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
         else:
             x = 1
 
-        ueberzug_display(
+        display_canvas(
             canvas,
             path / image,
             _xcoords[x],

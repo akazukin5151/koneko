@@ -111,13 +111,16 @@ def display_path(path=None) -> 'IO':
         sys.exit(1)
 
     data = FakeData(Path(path))
-    lscat.show_instant(lscat.TrackDownloads, data)
+    _lscat_prompt_switcher(path, data)
 
 
 def browse_cache() -> 'IO':
     path = picker.pick_dir()
     data = FakeData(path)
+    _lscat_prompt_switcher(path, data)
 
+
+def _lscat_prompt_switcher(path, data):
     if '.koneko' in os.listdir(path):
         lscat_prompt.GalleryUserLoop.for_user(data, lscat.TrackDownloadsUsers).start()
     elif 'individual' in str(path):
@@ -140,7 +143,7 @@ def config_assistance(actions: 'Optional[list[int]]' = None) -> 'IO':
 
     page_spacing = maybe_page_spacing(actions, size)
 
-    gallery_print_spacing = maybe_print_spacing(actions, size, xpadding, image_width)
+    gallery_print_spacing = maybe_print_spacing(actions, size, xpadding, image_width, image_height)
 
     user_info_xcoord = maybe_print_xcoord(actions, size, xpadding, image_width)
 
@@ -179,19 +182,21 @@ def maybe_xpadding_img_width(actions: 'list[int]', size: int) -> 'tuple[int]':
 def maybe_ypadding_img_height(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]':
     if 3 in actions or 7 in actions:
         return assistants.ypadding_assistant(size)
-    return None, None
+    return None, 8  # Default image height
 
 
 def maybe_page_spacing(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]':
     if 4 in actions or 7 in actions:
-        return assistants.page_spacing_assistant(size)
+        ans = assistants.page_spacing_assistant(size)
+        if ans != -1:
+            return ans
     return None, None
 
 
-def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width: int) -> 'list[int]':
+def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width, image_height: int) -> 'list[int]':
     if 5 in actions or 7 in actions:
         return assistants.gallery_print_spacing_assistant(
-            size, xpadding, image_width
+            size, xpadding, image_width, image_height
         )
 
 

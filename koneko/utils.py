@@ -24,7 +24,7 @@ from logging.handlers import RotatingFileHandler
 import funcy
 from pixcat import Image
 
-from koneko import pure, config, printer, TERM, KONEKODIR
+from koneko import pure, config, printer, KONEKODIR
 
 
 # History and logging
@@ -190,41 +190,7 @@ def quit_on_q(ans: str):
         sys.exit(0)
 
 
-# Lscat related
-def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
-    # Must make a copy before using this reference
-    img = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png').thumbnail(thumbnail_size)
-    img.show(align='left', x=x, y=y)
-    return img
-
-
-def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
-    return show_single(x, 0, thumbnail_size)
-
-
-def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
-    # Default usage of config module
-    return show_single(config.xcoords_config()[1], y, thumbnail_size)
-
-
-def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
-    xcoords = pure.xcoords(TERM.width, image_width, xpadding)
-    for x in xcoords:
-        show_single(x, 0, thumbnail_size)
-
-
-def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
-    show_single(padding, 0, size)
-    for px in preview_xcoords:
-        show_single_x(px, size)
-
-
-def hide_if_exist(image: Image) -> 'IO':
-    if image:
-        image.hide()
-        printer.move_cursor_up(1)
-
-
+# Ueberzug
 def try_import_ueberzug():
     try:
         import ueberzug.lib.v0 as ueberzug

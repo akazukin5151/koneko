@@ -26,10 +26,12 @@ class FakeInKey:
 
 def test_thumbnail_size_assistant_default(monkeypatch, disable_pixcat, patch_cbreak, disable_print_doc):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     assert assistants.thumbnail_size_assistant() == 300  # Default
 
 
 def test_page_spacing_assistant(monkeypatch, disable_pixcat, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     responses = iter(['', 'not_a_number', '30'])
     monkeypatch.setattr('builtins.input', lambda *a: next(responses))
     monkeypatch.setattr('koneko.assistants.time.sleep', lambda *a, **k: Mock())

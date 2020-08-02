@@ -55,7 +55,7 @@ def maybe_print_height_ypadding(actions, image_height: int, ypadding: int) -> 'I
 
 
 def maybe_print_page_spacing(actions, page_spacing: int) -> 'IO':
-    if 4 in actions or 7 in actions:
+    if (4 in actions or 7 in actions) and isinstance(page_spacing, int):
         print(f'page_spacing = {page_spacing}')
 
 

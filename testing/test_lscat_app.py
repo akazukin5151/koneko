@@ -188,6 +188,7 @@ def test_maybe_ypadding_img_height(monkeypatch, send_enter, capsys):
 
 
 def test_maybe_page_spacing(monkeypatch, send_enter, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.assistants.page_spacing_assistant', lambda x: 99)
 
     lscat_app.config_assistance(['4'])

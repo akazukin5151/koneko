@@ -26,6 +26,30 @@ PLUS = frozenset({'+', '='})
 MINUS = frozenset({'-', '_'})
 
 
+class ImageWrapper:
+    def __init__(self):
+        self.use_ueberzug = config.use_ueberzug()
+        if self.use_ueberzug:
+            self.image = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+        else:
+            self.image = copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
+
+    def show(self, size, **kwargs):
+        if self.use_ueberzug:
+            ueberzug = utils.try_import_ueberzug()
+            self.canvas = ueberzug.Canvas()
+            self.canvas.__enter__()
+            lscat.ueberzug_display(self.canvas, self.image, size=size/20, **kwargs)
+        else:
+            self.image.thumbnail(size).show(align='left', **kwargs)
+
+    def hide(self, try_skip):
+        if self.use_ueberzug:
+            self.canvas.__exit__()
+        elif not try_skip:
+            self.image.hide()
+
+
 def copy_image() -> Image:
     return copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
 
@@ -40,21 +64,22 @@ def thumbnail_size_assistant() -> 'IO[int]':
     """
     printer.print_doc(thumbnail_size_assistant.__doc__)
 
-    image = copy_image()
+    image = ImageWrapper()
 
     size = 300  # starting size
     with TERM.cbreak():
         while True:
-            image.thumbnail(size).show(align='left', x=0, y=0)
+            image.show(size=size, x=0, y=0)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)
 
             if ans in PLUS:
+                image.hide(try_skip=True)
                 size += 20
 
             elif ans in MINUS:
-                image.hide()
+                image.hide(try_skip=False)
                 size -= 20
 
             elif ans.name == 'KEY_ENTER':
@@ -317,8 +342,21 @@ class _FindImageHeight(_FindImageDimension):
         printer.move_cursor_up(self.spaces)
 
 
+def check_ueberzug() -> bool:
+    if config.use_ueberzug():
+        os.system('clear')
+        print(
+            'The page spacing assistant is not needed if you use ueberzug, '
+            'because ueberzug does not respond to scroll events'
+        )
+        return False
+    return True
+
 def page_spacing_assistant(thumbnail_size: int) -> int:
     # This doesn't use print_doc() as a clean state is needed
+    if not check_ueberzug():
+        return -1
+
     os.system('clear')
     print(*(
         '=== Page spacing ===',

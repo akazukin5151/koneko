@@ -75,8 +75,9 @@ def print_doc(doc: str) -> 'IO':
     os.system('clear')
     number_of_newlines = doc.count('\n')
     bottom = TERM.height - (number_of_newlines + 2)
-    move_cursor_down(bottom)
-    print(doc)
+    #move_cursor_down(bottom)
+    with TERM.location(0, bottom):
+        print(doc)
 
 
 def print_multiple_imgs(illusts_json: 'Json') -> 'IO':

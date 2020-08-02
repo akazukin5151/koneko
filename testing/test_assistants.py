@@ -96,7 +96,7 @@ def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_d
     # Default
     assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
     captured = capsys.readouterr()
-    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 
 def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, patch_cbreak, capsys):

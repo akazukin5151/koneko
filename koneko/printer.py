@@ -38,36 +38,41 @@ def _print_info(message_xcoord: int) -> 'IO':
 
 
 def maybe_print_size(actions: 'list[int]', size: int) -> 'IO':
-    if 1 in actions or 7 in actions:
+    if 1 in actions or 8 in actions:
         print(f'image_thumbnail_size = {size}')
 
 
 def maybe_print_width_xpadding(actions, image_width: int, xpadding: int) -> 'IO':
-    if 2 in actions or 7 in actions:
+    if 2 in actions or 8 in actions:
         print(f'image_width = {image_width}')
         print(f'images_x_spacing = {xpadding}')
 
 
 def maybe_print_height_ypadding(actions, image_height: int, ypadding: int) -> 'IO':
-    if 3 in actions or 7 in actions:
+    if 3 in actions or 8 in actions:
         print(f'image_height = {image_height}')
         print(f'images_y_spacing = {ypadding}')
 
 
 def maybe_print_page_spacing(actions, page_spacing: int) -> 'IO':
-    if (4 in actions or 7 in actions) and isinstance(page_spacing, int):
+    if (4 in actions or 8 in actions) and isinstance(page_spacing, int):
         print(f'page_spacing = {page_spacing}')
 
 
 def maybe_print_print_spacing(actions, gallery_print_spacing: 'list[int]') -> 'IO':
-    if 5 in actions or 7 in actions:
+    if 5 in actions or 8 in actions:
         print('gallery_print_spacing =',
               ','.join((str(x) for x in gallery_print_spacing)))
 
 
 def maybe_print_user_info(actions, user_info_xcoord: int) -> 'IO':
-    if 6 in actions or 7 in actions:
+    if 6 in actions or 8 in actions:
         print(f'users_print_name_xcoord = {user_info_xcoord}')
+
+
+def maybe_print_center_spaces(actions, ueberzug_center_spaces):
+    if 7 in actions or 8 in actions:
+        print(f'ueberzug_center_spaces = {ueberzug_center_spaces}')
 
 
 def print_doc(doc: str) -> 'IO':

@@ -495,3 +495,59 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
                 utils.exit_if_exist(canvas)
                 return spacing
 
+def center_spaces_assistant():
+    """=== Ueberzug center image ===
+    Use +/= to move the image right, and -/_ to move it left
+    Adjust the position to the center of your terminal
+
+    Use q to exit the program, and press enter to confirm the current position
+    """
+    if not config.use_ueberzug():
+        print('Center images assistant is only for ueberzug!')
+        return -1
+
+    # Setup
+    image = WELCOME_IMAGE.parent / '79494300_p0.png'
+    ueberzug = utils.try_import_ueberzug()
+    canvas = ueberzug.Canvas()
+    scaler = utils.try_get_FIT_CONTAIN()
+    vis = utils.try_get_VISIBLE()
+    invs = utils.try_import_ueberzug_module('Visibility').INVISIBLE
+    spacing = 0
+    i = 0
+
+    # Start
+    printer.print_doc(center_spaces_assistant.__doc__)
+    canvas.__enter__()
+    print('\n' * (TERM.height - 9), f'Current position: {spacing:01}')
+
+    with TERM.cbreak():
+        while True:
+            printer.move_cursor_up(1)
+            print(f'Current position: {spacing:02}')
+            placement = canvas.create_placement(
+                str(image) + str(i),
+                path=str(image),
+                x=spacing,
+                y=0,
+                width=25,
+                height=25,
+                scaler=scaler,
+                visibility=vis,
+            )
+
+            ans = TERM.inkey()
+            utils.quit_on_q(ans)
+
+            if ans in PLUS:
+                spacing += 1
+
+            elif ans in MINUS and spacing > 0:
+                spacing -= 1
+
+            elif ans.name == 'KEY_ENTER':
+                utils.exit_if_exist(canvas)
+                return spacing
+
+            placement.visibility = invs
+            i += 1

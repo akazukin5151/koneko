@@ -166,14 +166,17 @@ class GalleryUserLoop(AbstractLoop):
 
 
 class ImageLoop(AbstractLoop):
-    def __init__(self, root, image):
+    def __init__(self, root):
         # Unique
         self.use_ueberzug = config.use_ueberzug()
         self.root = root
-        self.image = image
-        self.all_images = sorted(os.listdir(root))
+
+        self.all_images = [f for f in sorted(os.listdir(root)) if (root / f).is_file()]
+        self.image = self.all_images[0]
         if len(self.all_images) > 1:
             self.FakeData = namedtuple('data', ('download_path', 'page_num'))
+
+
         # Defined in self.show_func()
         self.canvas: 'Optional[ueberzug.Canvas]' = None
         # Defined in self.maybe_show_preview()

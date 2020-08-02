@@ -68,6 +68,8 @@ def thumbnail_size_assistant() -> 'IO[int]':
     with TERM.cbreak():
         while True:
             image.show(size=size, x=0, y=0)
+            with TERM.location(0, (TERM.height - 10)):
+                print(f'size = {size}')
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)

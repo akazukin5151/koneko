@@ -150,11 +150,11 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [ ] User
         - [ ] Image
     - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
-    - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
     - [x] Center align image mode
         - [x] Add config
         - [x] Update configuration assistant
         - [ ] DOCS
+    - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
     - [ ] Better loops, extract common code to functions or even ABCs
         - [ ] Performance: Do not instantiate a new canvas in every loop (eg in assistants.py:)
             - [ ] ImageWrapper (thumbnail size assistant)

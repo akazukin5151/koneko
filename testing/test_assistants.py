@@ -47,7 +47,7 @@ def test_page_spacing_assistant(monkeypatch, disable_pixcat, capsys):
 def test_gallery_print_spacing_assistant_n(monkeypatch, disable_print_doc, patch_cbreak, capsys):
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: '')
-    monkeypatch.setattr('koneko.utils.show_instant_sample', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.show_instant_sample', lambda *a: True)
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Default
@@ -72,7 +72,7 @@ def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch
 
 def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, patch_cbreak, capsys):
     monkeypatch.setattr('koneko.Terminal.width', 40)
-    monkeypatch.setattr('koneko.utils.display_user_row', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.display_user_row', lambda *a: True)
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Default
@@ -83,7 +83,7 @@ def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, pat
 
 def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
-    monkeypatch.setattr('koneko.utils.show_single_x', lambda *a, **k: Mock())
+    monkeypatch.setattr('koneko.lscat.show_single_x', lambda *a, **k: Mock())
     # Default
     assert assistants.xpadding_assistant(310) == (0, 0)
 
@@ -93,8 +93,8 @@ def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys
 
 def test_ypadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
-    monkeypatch.setattr('koneko.utils.show_single_x', lambda *a, **k: Mock())
-    monkeypatch.setattr('koneko.utils.show_single_y', lambda *a, **k: Mock())
+    monkeypatch.setattr('koneko.lscat.show_single_x', lambda *a, **k: Mock())
+    monkeypatch.setattr('koneko.lscat.show_single_y', lambda *a, **k: Mock())
     # Default
     assert assistants.ypadding_assistant(310) == (0, 0)
 

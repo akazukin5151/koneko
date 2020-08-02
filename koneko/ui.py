@@ -239,7 +239,7 @@ class AbstractGallery(AbstractUI, ABC):
 
     def _back(self) -> 'IO':
         """After user 'back's from image prompt or artist gallery, start mode again"""
-        lscat.show_instant(self._tracker_class, self._data)
+        self.scroll_or_show()
         self._print_page_info()
         prompt.gallery_like_prompt(self)
 
@@ -700,6 +700,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             download.async_download_spinner(self.download_path, [next_img_url])
 
     def leave(self, force=False) -> 'IO':
+        utils.exit_if_exist(self.canvas)
         self.event.set()
         if self.firstmode or force:
             # Came from view post mode, don't know current page num

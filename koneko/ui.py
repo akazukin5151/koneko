@@ -190,8 +190,9 @@ class AbstractUI(ABC):
         print('This will delete cached images and redownload them. Proceed?')
         ans = input(f'Directory to be deleted: {self._data.main_path}\n')
         if ans == 'y' or not ans:
-            rmtree(self._data.main_path)
             # Will remove all data, but keep info on the main path
+            rmtree(self._data.main_path)
+            utils.exit_if_exist(self.canvas)
             self.start(self._data.main_path)
         self._prompt(self)
 

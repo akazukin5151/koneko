@@ -34,14 +34,11 @@ class ImageWrapper:
         else:
             self.image = copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
 
-    def show(self, size, **kwargs):
+    def show(self, size, x, y):
         if self.use_ueberzug:
-            ueberzug = utils.try_import_ueberzug()
-            self.canvas = ueberzug.Canvas()
-            self.canvas.__enter__()
-            lscat.display_canvas(self.canvas, self.image, size=size/20, **kwargs)
+            self.canvas = lscat.ueberzug_display(self.image, x=x, y=y, size=size/20)
         else:
-            self.image.thumbnail(size).show(align='left', **kwargs)
+            self.image.thumbnail(size).show(align='left', x=x, y=y)
 
     def hide(self, try_skip):
         if self.use_ueberzug:

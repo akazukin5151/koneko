@@ -45,6 +45,19 @@ def test_page_spacing_assistant(monkeypatch, disable_pixcat, capsys):
 
 
 def test_gallery_print_spacing_assistant_n(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.Terminal.width', 40)
+    monkeypatch.setattr('builtins.input', lambda: '')
+    monkeypatch.setattr('koneko.lscat.show_instant_sample', lambda *a: True)
+
+    monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
+    # Default
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
+    captured = capsys.readouterr()
+    assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2                 3                 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+
+def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: '')
     monkeypatch.setattr('koneko.lscat.show_instant_sample', lambda *a: True)
@@ -56,7 +69,23 @@ def test_gallery_print_spacing_assistant_n(monkeypatch, disable_print_doc, patch
     assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K         1                 2                 3                 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 
+
 def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.Terminal.width', 40)
+    monkeypatch.setattr('builtins.input', lambda: 'y')
+    monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat_app.FakeData', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
+
+    monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
+    # Default
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
+    captured = capsys.readouterr()
+    assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+
+def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: 'y')
     monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: True)

@@ -78,7 +78,7 @@ def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, pat
     # Default
     assert assistants.user_info_assistant(310, 10, 1) == 18
     captured = capsys.readouterr()
-    assert captured.out == '\x1b[5A\x1b[K\x1b[1B\x1b[K\x1b[1A                  000\n                  Example artist\n\x1b[2A\n\n\n\n'
+    assert captured.out == '\x1b[K\x1b[1B\x1b[K\x1b[1A                  000\n                  Example artist\n\x1b[2A\n\n\n\n'
 
 
 def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):

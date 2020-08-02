@@ -708,6 +708,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         # Else: image prompt and class ends, goes back to previous mode
 
     def view_related_images(self):
+        utils.exit_if_exist(self.canvas)
+        utils.exit_if_exist(self.preview_canvas)
         mode = IllustRelatedGallery(self.image_id, self.download_path)
         prompt.gallery_like_prompt(mode)
 

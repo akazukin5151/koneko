@@ -142,9 +142,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 * Refine ueberzug (must complete before release)
-    - [ ] BUG: Hide all images during mode transitions
-        - [x] mode i/2 -> related illusts mode
-        - [x] config assistants
+    - [ ] BUG: Hide all images before reloading
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
         - Also happens with view user/image while prefetching
     - [ ] BUG: print info in config assistant is hidden by ueberzug

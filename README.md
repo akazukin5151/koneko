@@ -97,6 +97,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 #### Features
 
 #### Bug fixes
+* Fixed bug where lscat app's display path (mode p/3) always show dir in gallery mode
 
 #### Code maintenance
 * Remove circular imports

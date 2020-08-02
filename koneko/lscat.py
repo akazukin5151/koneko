@@ -53,12 +53,33 @@ def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
         return None
 
     path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    return display_multiple_x_ueberzug(path, xcoords, thumbnail_size)
+
+
+def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
+    canvas = show_single(padding, 0, size)
+    if not config.use_ueberzug():
+        for px in preview_xcoords:
+            show_single_x(px, size)
+        return None
+
+    path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    display_multiple_x_canvas(canvas, preview_xcoords, path, size)
+    return canvas
+
+
+def display_multiple_x_ueberzug(path, xcoords, thumbnail_size):
     ueberzug = utils.try_import_ueberzug()
-    scaler = utils.try_get_FIT_CONTAIN()
-    vis = utils.try_get_VISIBLE()
     canvas = ueberzug.Canvas()
     canvas.__enter__()
 
+    display_multiple_x_canvas(canvas, xcoords, path, thumbnail_size)
+    return canvas
+
+
+def display_multiple_x_canvas(canvas, xcoords, path, thumbnail_size):
+    scaler = utils.try_get_FIT_CONTAIN()
+    vis = utils.try_get_VISIBLE()
     for x in xcoords:
         canvas.create_placement(
             str(path) + str(x),  # Identifier must be unique
@@ -70,15 +91,6 @@ def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
             scaler=scaler,
             visibility=vis,
         )
-
-
-    return canvas
-
-
-def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
-    show_single(padding, 0, size)
-    for px in preview_xcoords:
-        show_single_x(px, size)
 
 
 def hide_if_exist(image: Image) -> 'IO':

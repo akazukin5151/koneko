@@ -474,7 +474,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     # Start
     printer.print_doc(user_info_assistant.__doc__)
 
-    lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
+    canvas = lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
 
     with TERM.cbreak():
         while True:
@@ -491,5 +491,6 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
 
             elif ans.name == 'KEY_ENTER':
                 print('\n' * 3)
+                utils.exit_if_exist(canvas)
                 return spacing
 

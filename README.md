@@ -118,7 +118,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [ ] Respond to the config option
             - [x] In lscat app
                 - [ ] In lscat config assistant
-                - [ ] Display path
+                - [x] Display path
             - [ ] In koneko app
                 - [x] For already downloaded images
                     - [x] Gallery mode

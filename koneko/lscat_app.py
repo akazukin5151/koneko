@@ -111,13 +111,16 @@ def display_path(path=None) -> 'IO':
         sys.exit(1)
 
     data = FakeData(Path(path))
-    lscat.show_instant(lscat.TrackDownloads, data)
+    _lscat_prompt_switcher(path, data)
 
 
 def browse_cache() -> 'IO':
     path = picker.pick_dir()
     data = FakeData(path)
+    _lscat_prompt_switcher(path, data)
 
+
+def _lscat_prompt_switcher(path, data):
     if '.koneko' in os.listdir(path):
         lscat_prompt.GalleryUserLoop.for_user(data, lscat.TrackDownloadsUsers).start()
     elif 'individual' in str(path):

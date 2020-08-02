@@ -120,7 +120,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
             - [x] In lscat app
                 - [ ] In lscat config assistant
                     - [x] Thumbnail size
-                    - [ ] x-padding
+                    - [x] x-padding
                     - [ ] y-padding
                     - [x] Page spacing (disabled for ueberzug)
                     - [ ] Gallery print spacing

@@ -59,7 +59,10 @@ def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
 
 def hide_if_exist(image: Image) -> 'IO':
     if image:
-        image.hide()
+        try:
+            image.hide()
+        except AttributeError:
+            image.__exit__()
         printer.move_cursor_up(1)
 
 

@@ -513,6 +513,7 @@ def center_spaces_assistant():
     scaler = utils.try_get_FIT_CONTAIN()
     vis = utils.try_get_VISIBLE()
     invs = utils.try_import_ueberzug_module('Visibility').INVISIBLE
+    valid = True
     spacing = 0
     i = 0
 
@@ -523,31 +524,38 @@ def center_spaces_assistant():
 
     with TERM.cbreak():
         while True:
-            printer.move_cursor_up(1)
-            print(f'Current position: {spacing:02}')
-            placement = canvas.create_placement(
-                str(image) + str(i),
-                path=str(image),
-                x=spacing,
-                y=0,
-                width=25,
-                height=25,
-                scaler=scaler,
-                visibility=vis,
-            )
+            if valid:
+                printer.move_cursor_up(1)
+                print(f'Current position: {spacing:02}')
+                placement = canvas.create_placement(
+                    str(image) + str(i),
+                    path=str(image),
+                    x=spacing,
+                    y=0,
+                    width=25,
+                    height=25,
+                    scaler=scaler,
+                    visibility=vis,
+                )
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)
 
             if ans in PLUS:
                 spacing += 1
+                valid = True
 
             elif ans in MINUS and spacing > 0:
                 spacing -= 1
+                valid = True
 
             elif ans.name == 'KEY_ENTER':
                 utils.exit_if_exist(canvas)
                 return spacing
 
-            placement.visibility = invs
-            i += 1
+            else:
+                valid = False
+
+            if valid:
+                placement.visibility = invs
+                i += 1

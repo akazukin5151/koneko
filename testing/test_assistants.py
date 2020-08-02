@@ -21,7 +21,7 @@ def disable_print_doc(monkeypatch):
 
 class FakeInKey:
     def __init__(self):
-        self.code = 343
+        self.name = 'KEY_ENTER'
 
 
 def test_thumbnail_size_assistant_default(monkeypatch, disable_pixcat, patch_cbreak, disable_print_doc):

@@ -22,7 +22,6 @@ from koneko import (
 
 
 # Constants
-ENTER = 343
 PLUS = {'+', '='}
 MINUS = {'-', '_'}
 
@@ -58,7 +57,7 @@ def thumbnail_size_assistant() -> 'IO[int]':
                 image.hide()
                 size -= 20
 
-            elif ans.code == ENTER:
+            elif ans.name == 'KEY_ENTER':
                 return size
 
 
@@ -160,7 +159,7 @@ class _AbstractImageAdjuster(ABC):
                 ans = TERM.inkey()
                 utils.quit_on_q(ans)
 
-                if ans.code == ENTER and self.image:
+                if ans.name == 'KEY_ENTER' and self.image:
                     self.maybe_erase()
                     return self.return_tup()
 
@@ -393,16 +392,16 @@ def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[i
                 spacings[current_selection] -= 1
 
             # right arrow
-            elif (ans.code == 261 or ans in {'d', 'l'}
+            elif (ans.name == 'KEY_RIGHT' or ans in {'d', 'l'}
                     and current_selection < len(spacings) - 1):
                 current_selection += 1
 
             # left arrow
-            elif (ans.code == 260 or ans in {'a', 'h'}
+            elif (ans.name == 'KEY_LEFT' or ans in {'a', 'h'}
                     and current_selection > 0):
                 current_selection -= 1
 
-            elif ans.code == ENTER:
+            elif ans.name == 'KEY_ENTER':
                 return spacings
 
 
@@ -437,7 +436,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
             elif ans in MINUS and spacing > 0:
                 spacing -= 1
 
-            elif ans.code == ENTER:
+            elif ans.name == 'KEY_ENTER':
                 print('\n' * 3)
                 return spacing
 

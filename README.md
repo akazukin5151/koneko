@@ -107,7 +107,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * Should work on everything:
          * lscat app
              * In lscat config assistant
-                 * Page spacing (disabled for ueberzug)
+                 * Page spacing is disabled for ueberzug
              * Browse cache, display path
              * testgallery, testuser
          * koneko app
@@ -116,7 +116,9 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
              * Everywhere else (main screen, info screen, etc)
 
 #### Bug fixes
-* Fixed bug where lscat app's display path (mode p/3) always show dir in gallery mode
+* Fixed bugs in lscat app's display path (mode p/3):
+    * Not working if path given via cli
+    * Always showing directory in gallery mode
 
 #### Code maintenance
 * Remove circular imports
@@ -125,16 +127,25 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [x] main importing cli
     - [x] picker importing assistants
 * Updated and improved diagrams in HACKING.md
+* Methods starting with `maybe` (formerly abstractmethods) now do nothing by default, override to do something
+    * Rename middle() to maybe_show_preview() in lscat prompt
+* Inline in yield expression in users preview (lscat)
+* Replace while loop with a for loop and a guard at the end in lscat
+* Use Keystroke name attribute rather than its key code (blessed.Terminal)
+* Rename utils.check_quit() to quit_on_q()
+* Move lscat related functions in utils to lscat
+* print_doc now restores previous cursor location
 
 
 # Roadmap
 
 ## Features
 
-* Refine ueberzug
+* Refine ueberzug (must complete before release)
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
     - [ ] BUG: Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)
     - [ ] DOC: link to ueberzug section in MANUAL.md in readme, update README.md about ueberzug
+    - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
     - [ ] Center align image mode
         - [x] Add config
         - [ ] Update configuration assistant

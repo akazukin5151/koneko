@@ -145,7 +145,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
         - Also happens with view user/image while prefetching
     - [ ] BUG: print info is hidden by ueberzug
-        - [ ] config assistant
+        - [x] config assistant
         - [ ] Gallery
         - [ ] User
         - [ ] Image

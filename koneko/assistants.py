@@ -168,7 +168,8 @@ class _AbstractImageAdjuster(ABC):
 
         self.maybe_move_up()
         printer.write('\r' + ' ' * 20 + '\r')
-        self.report()
+        with TERM.location(0, TERM.height - 13):
+            self.report()
 
     def start(self) -> (int, int):
         """Main loop"""
@@ -249,7 +250,8 @@ class _XPadding(_AbstractPadding):
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""
-        printer.write(f'x spacing = {self.spaces}')
+        # The trailing spaces at the end ensures everything is covered after exit
+        printer.write(f'x spacing = {self.spaces}    ')
 
     def show_func_args(self) -> Image:
         """Implements abstractmethod: First argument is unique"""
@@ -277,7 +279,8 @@ class _YPadding(_AbstractPadding):
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""
-        printer.write(f'y spacing = {self.spaces}')
+        printer.write(f'y spacing = {self.spaces}      ')
+        # The trailing spaces at the end ensures everything is covered after exit
 
     def maybe_move_down(self) -> 'IO':
         """Overrides base method: move cursor down"""

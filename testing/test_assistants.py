@@ -119,7 +119,7 @@ def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys
     assert assistants.xpadding_assistant(310) == (0, 0)
 
     captured = capsys.readouterr()
-    assert captured.out == '\r                    \rimage width = 0\x1b[K\x1b[1A\r                    \rx spacing = 0'
+    assert captured.out == '\r                    \rimage width = 0\x1b[K\x1b[1A\r                    \rx spacing = 0    '
 
 
 def test_ypadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):
@@ -130,4 +130,4 @@ def test_ypadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys
     assert assistants.ypadding_assistant(310) == (0, 0)
 
     captured = capsys.readouterr()
-    assert captured.out == '\r                    \rimage height = 0\x1b[K\x1b[1A\r                    \ry spacing = 0'
+    assert captured.out == '\r                    \rimage height = 0\x1b[K\x1b[1A\r                    \ry spacing = 0      '

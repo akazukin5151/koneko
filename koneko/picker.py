@@ -101,7 +101,7 @@ def ask_assistant() -> 'IO[list[int]]':
         '5. Gallery print spacing',
         '6. User mode print info x-position',
         '7. Ueberzug center image spaces',
-        'a. (Run all of the above)\n',
+        '8. (Run all of the above)\n',
         'Quit'
     )
 

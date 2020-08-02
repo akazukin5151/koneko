@@ -23,7 +23,7 @@ Possible configuration assistants:
   5  Gallery print spacing
   6  User mode print info x-position
   7  Ueberzug center images
-  a  All of the above
+  8  All of the above
 """
 
 import os

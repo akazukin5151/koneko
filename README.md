@@ -154,6 +154,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [ ] Update configuration assistant
     - [ ] Better loops, extract common code to functions or even ABCs
         - [ ] Do not instantiate a new canvas in every loop
+            - [ ] assistants.py: AbstractImageAdjuster
         - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
 
 * Illust-related mode can't go back to image mode

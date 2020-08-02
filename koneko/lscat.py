@@ -105,7 +105,8 @@ def hide_if_exist(image: Image) -> 'IO':
             image.hide()
         except AttributeError:
             image.__exit__()
-        printer.move_cursor_up(1)
+        else:
+            printer.move_cursor_up(1)
 
 
 def icat(path: str) -> 'IO':

@@ -123,7 +123,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
                     - [x] x-padding
                     - [x] y-padding
                     - [x] Page spacing (disabled for ueberzug)
-                    - [ ] Gallery print spacing
+                    - [x] Gallery print spacing
                     - [x] User mode print info x-position
                 - [x] Display path
             - [ ] In koneko app

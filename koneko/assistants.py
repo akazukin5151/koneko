@@ -393,7 +393,7 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
         print('Must enter a number!')
 
 
-def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[int]':
+def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: int) -> 'list[int]':
     """=== Gallery print spacing ===
     Use +/= to increase the spacing, and -/_ to decrease it
     Use q to exit the program, and press enter to go to the next assistant
@@ -411,9 +411,13 @@ def gallery_print_spacing_assistant(size, image_width, xpadding: int) -> 'list[i
         _data = FakeData(_path)
         lscat.show_instant(lscat.TrackDownloads, _data)
         ncols = config.ncols_config()  # Default fallback, on user choice
+        if config.use_ueberzug():
+            print('\n' * (image_height * config.nrows_config() + 1))
     else:
-        lscat.show_instant_sample(size, image_width, xpadding)
-        ncols = pure.ncols(TERM.width, image_width, xpadding)
+        lscat.show_instant_sample(size, xpadding, image_width)
+        ncols = pure.ncols(TERM.width, xpadding, image_width)
+        if config.use_ueberzug():
+            print('\n' * (image_height - 2))
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)

@@ -144,7 +144,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Refine ueberzug (must complete before release)
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
     - [ ] BUG: Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)
-    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, update README.md about ueberzug
+    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
     - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
     - [ ] Center align image mode
         - [x] Add config

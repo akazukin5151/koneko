@@ -462,6 +462,7 @@ class AbstractUsers(AbstractUI, ABC):
             print('Invalid number!')
             return False
 
+        utils.exit_if_exist(self.canvas)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # After backing from gallery

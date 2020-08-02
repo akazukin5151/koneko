@@ -269,17 +269,22 @@ class _YPadding(_AbstractPadding):
         self.default_x = config.xcoords_config()[1]
         self.find_dim_func = _FindImageHeight
 
+        # Unique
+        self.use_ueberzug = not config.use_ueberzug()
+
     def report(self) -> 'IO':
         """Implements abstractmethod"""
         printer.write(f'y spacing = {self.spaces}')
 
     def maybe_move_down(self) -> 'IO':
         """Overrides base method: move cursor down"""
-        printer.move_cursor_down(self.width_or_height)
+        if self.use_ueberzug:
+            printer.move_cursor_down(self.width_or_height)
 
     def maybe_move_up(self) -> 'IO':
         """Overrides base method: move cursor up"""
-        printer.move_cursor_up(self.spaces)
+        if self.use_ueberzug:
+            printer.move_cursor_up(self.spaces)
 
     def show_func_args(self) -> Image:
         """Implements abstractmethod: first argument is unique"""

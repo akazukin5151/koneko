@@ -146,12 +146,14 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [x] mode i/2 -> related illusts mode
         - [ ] config assistants
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
+    - [ ] BUG: print info in config assistant is hidden by ueberzug
     - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
     - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
     - [ ] Center align image mode
         - [x] Add config
         - [ ] Update configuration assistant
     - [ ] Better loops, extract common code to functions or even ABCs
+        - [ ] Do not instantiate a new canvas in every loop
         - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
 
 * Illust-related mode can't go back to image mode

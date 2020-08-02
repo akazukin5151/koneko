@@ -27,7 +27,11 @@ from koneko import pure, TERM, utils, files, config, printer, KONEKODIR
 
 
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
-    img = Image(KONEKODIR.parent / 'pics' / '71471144_p0.png').thumbnail(thumbnail_size)
+    path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    if config.use_ueberzug:
+        return ueberzug_display(path, x, y, thumbnail_size / 20)
+
+    img = Image(path).thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=y)
     return img
 

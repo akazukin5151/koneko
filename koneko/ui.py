@@ -290,7 +290,8 @@ class ArtistGallery(AbstractGallery):
         """Implements abstractmethod"""
         # Display image (using either coords or image number), the show this prompt
         if keyseqs[0] == 'b':
-            pass  # Stop gallery instance, return to previous state
+            utils.exit_if_exist(self.canvas)
+            # Gallery instance stopped here, return to previous state
         elif keyseqs[0] == 'r':
             self.reload()
         elif keyseqs[0].lower() == 'a':

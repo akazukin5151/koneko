@@ -47,8 +47,32 @@ def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
 
 def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
     xcoords = pure.xcoords(TERM.width, image_width, xpadding)
+    if not config.use_ueberzug():
+        for x in xcoords:
+            show_single(x, 0, thumbnail_size)
+        return None
+
+    path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+    ueberzug = utils.try_import_ueberzug()
+    scaler = utils.try_get_FIT_CONTAIN()
+    vis = utils.try_get_VISIBLE()
+    canvas = ueberzug.Canvas()
+    canvas.__enter__()
+
     for x in xcoords:
-        show_single(x, 0, thumbnail_size)
+        canvas.create_placement(
+            str(path) + str(x),  # Identifier must be unique
+            path=str(path),
+            x=x,
+            y=0,
+            width=thumbnail_size / 20,
+            height=thumbnail_size / 20,
+            scaler=scaler,
+            visibility=vis,
+        )
+
+
+    return canvas
 
 
 def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':

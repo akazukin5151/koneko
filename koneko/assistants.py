@@ -80,6 +80,7 @@ def thumbnail_size_assistant() -> 'IO[int]':
                 size -= 20
 
             elif ans.name == 'KEY_ENTER':
+                image.hide(try_skip=False)
                 return size
 
 
@@ -183,6 +184,7 @@ class _AbstractImageAdjuster(ABC):
 
                 if ans.name == 'KEY_ENTER' and self.image:
                     self.maybe_erase()
+                    utils.exit_if_exist(self.static_canvas)
                     return self.return_tup()
 
                 if ans in PLUS:
@@ -209,6 +211,7 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
 
     def return_tup(self) -> (int, int):
         """Implements abstractmethod"""
+        utils.exit_if_exist(self.image)
         return self.spaces, self.width_or_height
 
     def is_input_valid(self) -> bool:
@@ -219,7 +222,7 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
         """Complements concrete method: Find image width/height first"""
         printer.print_doc(self.doc)
 
-        lscat.show_single_x(self.default_x, self.thumbnail_size)
+        self.static_canvas = lscat.show_single_x(self.default_x, self.thumbnail_size)
 
         self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
@@ -300,6 +303,7 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
         self.side_label: str
         self.start_spaces: int
         self.image = None
+        self.static_canvas = None
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""
@@ -394,17 +398,17 @@ def _display_inital_row(ans, size, xpadding, image_width, image_height):
     if ans == 'y':
         _path = picker.pick_dir()
         _data = FakeData(_path)
-        lscat.show_instant(lscat.TrackDownloads, _data)
+        canvas = lscat.handle_scroll(lscat.TrackDownloads, _data, slice(None))
         ncols = config.ncols_config()  # Default fallback, on user choice
         if config.use_ueberzug():
             print('\n' * (image_height * config.nrows_config() + 1))
-        return ncols
+        return ncols, canvas
 
-    lscat.show_instant_sample(size, xpadding, image_width)
+    canvas = lscat.show_instant_sample(size, xpadding, image_width)
     ncols = pure.ncols(TERM.width, xpadding, image_width)
     if config.use_ueberzug():
         print('\n' * (image_height - 2))
-    return ncols
+    return ncols, canvas
 
 
 def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: int) -> 'list[int]':
@@ -420,7 +424,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
     ans = input()
 
     # Setup variables
-    ncols = _display_inital_row(ans, size, xpadding, image_width, image_height)
+    ncols, canvas = _display_inital_row(ans, size, xpadding, image_width, image_height)
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
@@ -452,6 +456,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
                 current_selection -= 1
 
             elif ans.name == 'KEY_ENTER':
+                utils.exit_if_exist(canvas)
                 return spacings
 
 

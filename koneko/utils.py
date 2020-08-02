@@ -210,4 +210,7 @@ def try_get_VISIBLE():
 
 def exit_if_exist(canvas):
     if canvas:
-        canvas.__exit__()
+        try:
+            canvas.__exit__()
+        except AttributeError:
+            pass

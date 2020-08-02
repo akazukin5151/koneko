@@ -232,6 +232,7 @@ class AbstractGallery(AbstractUI, ABC):
 
     def view_image(self, selected_image_num: int) -> 'IO':
         """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
+        utils.exit_if_exist(self.canvas)
         ViewImage(self._data, selected_image_num).start()
         # Image prompt ends, user presses back
         self._back()

@@ -710,7 +710,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def view_related_images(self):
         utils.exit_if_exist(self.canvas)
         utils.exit_if_exist(self.preview_canvas)
-        mode = IllustRelatedGallery(self.image_id, self.download_path)
+        mode = IllustRelatedGallery(self.image_id, self.download_path.parent)
         prompt.gallery_like_prompt(mode)
 
     def start_preview(self) -> 'IO':

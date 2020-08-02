@@ -3,7 +3,16 @@ import shutil
 
 import pixcat
 
-from koneko import ui, cli, utils, config, lscat, __version__, KONEKODIR
+from koneko import (
+    ui,
+    cli,
+    utils,
+    config,
+    lscat,
+    KONEKODIR,
+    __version__,
+    WELCOME_IMAGE
+)
 
 
 def display(path, icat_size, ueberzug_size):

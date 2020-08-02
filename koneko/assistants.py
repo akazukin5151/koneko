@@ -393,6 +393,23 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
         print('Must enter a number!')
 
 
+def _display_inital_row(ans, size, xpadding, image_width, image_height):
+    if ans == 'y':
+        _path = picker.pick_dir()
+        _data = FakeData(_path)
+        lscat.show_instant(lscat.TrackDownloads, _data)
+        ncols = config.ncols_config()  # Default fallback, on user choice
+        if config.use_ueberzug():
+            print('\n' * (image_height * config.nrows_config() + 1))
+        return ncols
+
+    lscat.show_instant_sample(size, xpadding, image_width)
+    ncols = pure.ncols(TERM.width, xpadding, image_width)
+    if config.use_ueberzug():
+        print('\n' * (image_height - 2))
+    return ncols
+
+
 def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: int) -> 'list[int]':
     """=== Gallery print spacing ===
     Use +/= to increase the spacing, and -/_ to decrease it
@@ -406,18 +423,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
     ans = input()
 
     # Setup variables
-    if ans == 'y':
-        _path = picker.pick_dir()
-        _data = FakeData(_path)
-        lscat.show_instant(lscat.TrackDownloads, _data)
-        ncols = config.ncols_config()  # Default fallback, on user choice
-        if config.use_ueberzug():
-            print('\n' * (image_height * config.nrows_config() + 1))
-    else:
-        lscat.show_instant_sample(size, xpadding, image_width)
-        ncols = pure.ncols(TERM.width, xpadding, image_width)
-        if config.use_ueberzug():
-            print('\n' * (image_height - 2))
+    ncols = _display_inital_row(ans, size, xpadding, image_width, image_height)
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)

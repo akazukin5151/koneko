@@ -124,7 +124,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
                     - [ ] y-padding
                     - [x] Page spacing (disabled for ueberzug)
                     - [ ] Gallery print spacing
-                    - [ ] User mode print info x-position
+                    - [x] User mode print info x-position
                 - [x] Display path
             - [ ] In koneko app
                 - [x] For already downloaded images

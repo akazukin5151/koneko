@@ -459,8 +459,6 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
 
     lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
 
-    printer.move_cursor_up(5)
-
     with TERM.cbreak():
         while True:
             printer.update_user_info(spacing)

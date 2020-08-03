@@ -705,6 +705,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def leave(self, force=False) -> 'IO':
         utils.exit_if_exist(self.canvas)
+        utils.exit_if_exist(self.preview_canvas)
         self.event.set()
         if self.firstmode or force:
             # Came from view post mode, don't know current page num

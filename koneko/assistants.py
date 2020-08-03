@@ -27,31 +27,6 @@ PLUS = frozenset({'+', '='})
 MINUS = frozenset({'-', '_'})
 
 
-def copy_image() -> Image:
-    return copy(Image(WELCOME_IMAGE))
-
-
-class ImageWrapper:
-    def __init__(self):
-        self.use_ueberzug = config.use_ueberzug()
-        if self.use_ueberzug:
-            self.image = WELCOME_IMAGE
-        else:
-            self.image = copy_image()
-
-    def show(self, size, x, y):
-        if self.use_ueberzug:
-            self.canvas = lscat.ueberzug_display(self.image, x=x, y=y, size=size/20)
-        else:
-            self.image.thumbnail(size).show(align='left', x=x, y=y)
-
-    def hide(self, try_skip):
-        if self.use_ueberzug:
-            self.canvas.__exit__()
-        elif not try_skip:
-            self.image.hide()
-
-
 def thumbnail_size_assistant() -> 'IO[int]':
     """=== Thumbnail size ===
     This will display an image whose thumbnail size can be varied

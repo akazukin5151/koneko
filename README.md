@@ -144,16 +144,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Refine ueberzug (must complete before release)
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
         - Also happens with view user/image while prefetching
-    - [ ] BUG: print info is hidden by ueberzug
-        - [x] lscat app
-            - [x] config assistant
-            - [x] mode 2 and 3 (browse cache and display path)
-                - [x] Gallery
-                - [x] User
-                - [x] Image
-        - [ ] Gallery
-        - [ ] User
-        - [ ] Image
+        - In particular, prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
     - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentate ueberzug usage, & update README.md about ueberzug
         - [ ] Help and manual needs to be updated as well
         - [ ] Center align image config
@@ -164,6 +155,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
             - [ ] ImageWrapper (thumbnail size assistant)
             - [ ] AbstractImageAdjuster
         - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
+
+- Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
 
 * Illust-related mode can't go back to image mode
 * Support illust related mode in lscat app mode 2/b

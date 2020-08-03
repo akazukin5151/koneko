@@ -372,7 +372,6 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
     thumbnail_size = config.thumbnail_size_config()
-    size = thumbnail_size / 20
 
     api.start()
     os.system('clear')
@@ -387,7 +386,7 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
             path / image,
             left_shifts[x],
             rowspaces[y % number_of_rows],
-            size
+            thumbnail_size
         )
 
     while True:
@@ -399,7 +398,6 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     message_xcoord, padding = config.get_gen_users_settings()
     page_spacing = config.users_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
-    size = thumbnail_size / 20
 
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
@@ -427,7 +425,7 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
             path / a_img,
             padding,
             rowspaces[ycoord],
-            size
+            thumbnail_size
         )
 
         # Display the three previews
@@ -436,7 +434,7 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
                 path / (yield),
                 preview_xcoords[j],
                 rowspaces[ycoord],
-                size
+                thumbnail_size
             )
 
     while True:  # Prevent StopIteration errors
@@ -448,7 +446,6 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
     left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
     thumbnail_size = config.thumbnail_size_config()
-    size = thumbnail_size / 20
 
     api.start()
     for preview_num in range(4):  # Max 4 previews
@@ -465,7 +462,7 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
             path / image,
             _xcoords[x],
             rowspaces[y],
-            size
+            thumbnail_size
         )
 
     while True:  # Prevent StopIteration errors

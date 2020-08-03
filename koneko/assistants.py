@@ -149,7 +149,6 @@ class _AbstractImageAdjuster(ABC):
 
     def hide_show_print(self) -> 'IO':
         """Hide image if shown, show another image, and report"""
-        #lscat.hide_if_exist(self.image)
         if self.image:
             lscat.api.hide(self.image)
 

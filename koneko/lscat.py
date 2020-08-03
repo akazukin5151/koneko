@@ -126,41 +126,6 @@ def show_single_y(y: int, size: int) -> 'IO[Image]':
     return api.show(WELCOME_IMAGE, config.xcoords_config()[1], y, size)
 
 
-def display_multiple_x_ueberzug(path, xcoords, thumbnail_size):
-    ueberzug = utils.try_import_ueberzug()
-    canvas = ueberzug.Canvas()
-    canvas.__enter__()
-
-    display_multiple_x_canvas(canvas, xcoords, path, thumbnail_size)
-    return canvas
-
-
-def display_multiple_x_canvas(canvas, xcoords, path, thumbnail_size):
-    scaler = utils.try_get_FIT_CONTAIN()
-    vis = utils.try_get_VISIBLE()
-    for x in xcoords:
-        canvas.create_placement(
-            str(path) + str(x),  # Identifier must be unique
-            path=str(path),
-            x=x,
-            y=0,
-            width=thumbnail_size / 20,
-            height=thumbnail_size / 20,
-            scaler=scaler,
-            visibility=vis,
-        )
-
-
-def hide_if_exist(image: Image) -> 'IO':
-    if image:
-        try:
-            image.hide()
-        except AttributeError:
-            image.__exit__()
-        else:
-            printer.move_cursor_up(1)
-
-
 def icat(path: str) -> 'IO':
     """icat (system command) and pixcat behaves differently.
     pixcat prints out the escape codes, shifting the current cursor position,

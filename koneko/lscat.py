@@ -254,6 +254,23 @@ class TrackDownloadsUsers(AbstractTracker):
         super().__init__()
 
 
+class TrackDownloadsImage(AbstractTracker):
+    """Experimental"""
+    def __init__(self, data):
+        min_num = data.page_num + 1
+        self.orders = list(range(min_num, 30))
+        if config.use_ueberzug():
+            self.generator = generate_previews_ueberzug(data.download_path, min_num)
+        else:
+            self.generator = generate_previews(data.download_path, min_num)
+        super().__init__()
+
+    def update(self, new: str):
+        """Overrides base class because numlist is different"""
+        self.generator.send(new)
+
+
+
 def generate_page(path: 'Path') -> 'IO':
     """Given number, calculate its coordinates and display it, then yield"""
     left_shifts = config.xcoords_config()
@@ -282,6 +299,30 @@ def generate_page(path: 'Path') -> 'IO':
             rowspaces[y % number_of_rows],
             thumbnail_size
         )
+
+def generate_page_ueberzug(path: 'Path') -> 'IO':
+    left_shifts = config.xcoords_config()
+    rowspaces = config.ycoords_config()
+    number_of_cols = config.ncols_config()
+    number_of_rows = config.nrows_config()
+    thumbnail_size = config.thumbnail_size_config()
+
+    api.start()
+    os.system('clear')
+    for i in range(number_of_cols * number_of_rows):
+        x = i % number_of_cols
+        y = i // number_of_cols
+
+        image = yield
+        yield api.show(
+            path / image,
+            left_shifts[x],
+            rowspaces[y % number_of_rows],
+            thumbnail_size
+        )
+
+    while True:
+        yield
 
 
 def generate_users(path: 'Path', print_info=True) -> 'IO':
@@ -320,76 +361,6 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
                 0,
                 thumbnail_size
             )
-
-
-class TrackDownloadsImage(AbstractTracker):
-    """Experimental"""
-    def __init__(self, data):
-        min_num = data.page_num + 1
-        self.orders = list(range(min_num, 30))
-        if config.use_ueberzug():
-            self.generator = generate_previews_ueberzug(data.download_path, min_num)
-        else:
-            self.generator = generate_previews(data.download_path, min_num)
-        super().__init__()
-
-    def update(self, new: str):
-        """Overrides base class because numlist is different"""
-        self.generator.send(new)
-
-
-def generate_previews(path: 'Path', min_num: int) -> 'IO':
-    """Experimental"""
-    rowspaces = config.ycoords_config()
-    left_shifts = config.xcoords_config()
-    _xcoords = (left_shifts[0], left_shifts[-1])
-    thumbnail_size = config.thumbnail_size_config()
-
-    i = 0
-    while True:
-        image = yield
-        i += 1
-
-        number = int(image.split('_')[1].replace('p', '')) - min_num
-        y = number % 2
-        if i <= 2:
-            x = 0
-        else:
-            x = 1
-
-        yield api.show(
-            path / image,
-            _xcoords[x],
-            rowspaces[y],
-            thumbnail_size
-        )
-
-
-
-def generate_page_ueberzug(path: 'Path') -> 'IO':
-    left_shifts = config.xcoords_config()
-    rowspaces = config.ycoords_config()
-    number_of_cols = config.ncols_config()
-    number_of_rows = config.nrows_config()
-    thumbnail_size = config.thumbnail_size_config()
-
-    api.start()
-    os.system('clear')
-    for i in range(number_of_cols * number_of_rows):
-        x = i % number_of_cols
-        y = i // number_of_cols
-
-        image = yield
-        yield api.show(
-            path / image,
-            left_shifts[x],
-            rowspaces[y % number_of_rows],
-            thumbnail_size
-        )
-
-    while True:
-        yield
-
 
 def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
@@ -439,6 +410,32 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     while True:  # Prevent StopIteration errors
         yield
 
+
+def generate_previews(path: 'Path', min_num: int) -> 'IO':
+    """Experimental"""
+    rowspaces = config.ycoords_config()
+    left_shifts = config.xcoords_config()
+    _xcoords = (left_shifts[0], left_shifts[-1])
+    thumbnail_size = config.thumbnail_size_config()
+
+    i = 0
+    while True:
+        image = yield
+        i += 1
+
+        number = int(image.split('_')[1].replace('p', '')) - min_num
+        y = number % 2
+        if i <= 2:
+            x = 0
+        else:
+            x = 1
+
+        yield api.show(
+            path / image,
+            _xcoords[x],
+            rowspaces[y],
+            thumbnail_size
+        )
 
 def generate_previews_ueberzug(path: 'Path', min_num: int) -> 'IO':
     rowspaces = config.ycoords_config()

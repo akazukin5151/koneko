@@ -480,7 +480,8 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     # Start
     printer.print_doc(user_info_assistant.__doc__)
 
-    canvas = lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
+    #canvas = lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
+    canvas = lscat.api.show_user_row(WELCOME_IMAGE, preview_xcoords, xpadding, thumbnail_size)
 
     with TERM.cbreak():
         while True:
@@ -499,6 +500,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
                 print('\n' * 3)
                 utils.exit_if_exist(canvas)
                 return spacing
+
 
 def center_spaces_assistant():
     """=== Ueberzug center image ===
@@ -526,7 +528,7 @@ def center_spaces_assistant():
             if valid:
                 printer.move_cursor_up(1)
                 print(f'Current position: {spacing:02}')
-                placement = lscat.ueberzug_api.show(image, spacing, 0, 25)
+                placement = lscat.api.show(image, spacing, 0, 25)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)
@@ -541,12 +543,12 @@ def center_spaces_assistant():
 
             elif ans.name == 'KEY_ENTER':
                 os.system('clear')
-                lscat.ueberzug_api.hide(placement)
+                lscat.api.hide(placement)
                 return spacing
 
             else:
                 valid = False
 
             if valid:
-                lscat.ueberzug_api.hide(placement)
+                lscat.api.hide(placement)
                 i += 1

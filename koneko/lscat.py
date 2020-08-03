@@ -480,6 +480,22 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
         yield
 
 
+class Pixcat:
+    """Program-wide singleton, central handler for pixcat images"""
+    def show(self, image_path, x, y, size) -> 'pixcat.Image':
+        image = Image(image_path).thumbnail(size)
+        image.show(align='left', x=x, y=y)
+        return image
+
+    def show_user_row(self, image_path, xcoords, xpadding, size):
+        self.show(image_path, xpadding, 0, size)
+        for x in xcoords:
+            self.show(image_path, x, 0, size)
+
+    def hide(self, image: 'pixcat.Image'):
+        image.hide()
+
+
 class Ueberzug:
     """Program-wide singleton, central handler for ueberzug images"""
     def __init__(self):
@@ -505,8 +521,13 @@ class Ueberzug:
             visibility=self.visible,
         )
 
+    def show_user_row(self, image_path, xcoords, xpadding, size):
+        self.show(image_path, xpadding, 0, size / 20)
+        for x in xcoords:
+            self.show(image_path, x, 0, size / 20)
+
     def hide(self, placement: 'ueberzug.Placement'):
         placement.visibility = self.invisible
 
-if config.use_ueberzug():
-    ueberzug_api = Ueberzug()
+
+api = Ueberzug() if config.use_ueberzug() else Pixcat()

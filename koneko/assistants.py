@@ -523,7 +523,7 @@ def center_spaces_assistant():
             if valid:
                 printer.move_cursor_up(1)
                 print(f'Current position: {spacing:02}')
-                placement = lscat.api.show(image, spacing, 0, 25)
+                placement = lscat.api.show(image, spacing, 0, 500)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)

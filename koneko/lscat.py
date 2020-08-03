@@ -92,8 +92,8 @@ class Ueberzug:
             path=str(image_path),
             x=x,
             y=y,
-            width=size,
-            height=size,
+            width=size / 20,
+            height=size / 20,
             scaler=self.scaler,
             visibility=self.visible,
         )

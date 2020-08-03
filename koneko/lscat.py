@@ -44,17 +44,13 @@ class Pixcat:
         pass
 
     def show(self, image_path, x, y, size) -> 'pixcat.Image':
-        image = Image(image_path).thumbnail(size)
-        image.show(align='left', x=x, y=y)
-        return image
+        return Image(image_path).thumbnail(size).show(align='left', x=x, y=y)
 
     def show_center(self, image_path):
         return Image(image_path).show(y=0)
 
     def show_no_xy(self, image_path, size):
-        image = Image(image_path).thumbnail(size)
-        image.show(align='left')
-        return image
+        return Image(image_path).thumbnail(size).show(align='left')
 
     def show_user_row(self, image_path, xcoords, xpadding, size):
         image = self.show(image_path, xpadding, 0, size)
@@ -148,21 +144,6 @@ def icat(path: str) -> 'IO':
     because of this fact.
     """
     Image(path).show()
-
-
-def ueberzug_center_align(path):
-    """Display center-aligned image in original size"""
-    ueberzug = utils.try_import_ueberzug()
-    canvas = ueberzug.Canvas()
-    canvas.__enter__()
-    canvas.create_placement(
-        str(path),
-        path=str(path),
-        x=config.ueberzug_center_spaces(),
-        y=0,
-        visibility=utils.try_get_VISIBLE()
-    )
-    return canvas
 
 
 def handle_scroll(cls, data, myslice):

@@ -62,7 +62,7 @@ class AbstractLoop(ABC):
         raise NotImplementedError
 
     def report(self):
-        printer.new_print_bottom(
+        printer.print_bottom(
             f'Page {self.current_page} / {self.max_pages}\n',
             "n: go to next page, "
             "p: go to previous page, "

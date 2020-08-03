@@ -488,12 +488,17 @@ class Pixcat:
         return image
 
     def show_user_row(self, image_path, xcoords, xpadding, size):
-        self.show(image_path, xpadding, 0, size)
+        images = [self.show(image_path, xpadding, 0, size)]
         for x in xcoords:
-            self.show(image_path, x, 0, size)
+            images.append(self.show(image_path, x, 0, size))
+        return images
 
     def hide(self, image: 'pixcat.Image'):
         image.hide()
+
+    def hide_all(self, images):
+        for image in images:
+            self.hide(image)
 
 
 class Ueberzug:
@@ -522,12 +527,17 @@ class Ueberzug:
         )
 
     def show_user_row(self, image_path, xcoords, xpadding, size):
-        self.show(image_path, xpadding, 0, size / 20)
+        placements = [self.show(image_path, xpadding, 0, size / 20)]
         for x in xcoords:
-            self.show(image_path, x, 0, size / 20)
+            placements.append(self.show(image_path, x, 0, size / 20))
+        return placements
 
     def hide(self, placement: 'ueberzug.Placement'):
         placement.visibility = self.invisible
+
+    def hide_all(self, placements):
+        for placement in placements:
+            self.hide(placement)
 
 
 api = Ueberzug() if config.use_ueberzug() else Pixcat()

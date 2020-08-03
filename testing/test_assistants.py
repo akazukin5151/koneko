@@ -103,7 +103,7 @@ def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_d
 
 def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, patch_cbreak, capsys):
     monkeypatch.setattr('koneko.Terminal.width', 40)
-    monkeypatch.setattr('koneko.lscat.api.show_user_row', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.api.show_user_row', lambda *a: [Mock()])
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Default

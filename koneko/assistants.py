@@ -149,7 +149,9 @@ class _AbstractImageAdjuster(ABC):
 
     def hide_show_print(self) -> 'IO':
         """Hide image if shown, show another image, and report"""
-        lscat.hide_if_exist(self.image)
+        #lscat.hide_if_exist(self.image)
+        if self.image:
+            lscat.api.hide(self.image)
 
         self.image = self.show_func_args()
 
@@ -175,6 +177,7 @@ class _AbstractImageAdjuster(ABC):
 
                 if ans.name == 'KEY_ENTER' and self.image:
                     self.maybe_erase()
+                    lscat.api.hide(self.image)
                     if self.static:
                         lscat.api.hide(self.static)
                     return self.return_tup()

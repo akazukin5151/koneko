@@ -129,12 +129,11 @@ def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
 
 
 def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
-    return show_single(x, 0, thumbnail_size)
+    return api.show(WELCOME_IMAGE, x, 0, thumbnail_size)
 
 
-def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
-    # Default usage of config module
-    return show_single(config.xcoords_config()[1], y, thumbnail_size)
+def show_single_y(y: int, size: int) -> 'IO[Image]':
+    return api.show(WELCOME_IMAGE, config.xcoords_config()[1], y, size)
 
 
 def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':

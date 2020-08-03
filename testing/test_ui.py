@@ -53,7 +53,7 @@ def test_previous_page_gallery(monkeypatch):
             self.scrollable = False
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
-        def _print_page_info(self, *a):
+        def _report(self, *a):
             return True
         def scroll_or_show(self):
             pass
@@ -78,7 +78,7 @@ def test_previous_page_users(monkeypatch, capsys):
             self.scrollable = False
         def _show_page(self):
             ui.AbstractGallery._show_page(self)
-        def _print_page_info(self, *a):
+        def _report(self, *a):
             return True
         def scroll_or_show(self):
             pass

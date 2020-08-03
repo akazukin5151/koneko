@@ -45,7 +45,8 @@ class AbstractUI(ABC):
         # Attribute defined in self.prefetch_thread()
         self._prefetch_thread: threading.Thread
 
-        self.scrollable = config.use_ueberzug() or not config.scroll_display()
+        self.use_ueberzug = config.use_ueberzug()
+        self.scrollable = self.use_ueberzug or not config.scroll_display()
         self.terminal_page = 0  # starts at zero so the first slice has start=0
         self.start(main_path)
 
@@ -65,6 +66,10 @@ class AbstractUI(ABC):
         """Run any procedure to print the page info"""
         raise NotImplementedError
 
+    def _report(self):
+        with printer.print_bottom(self.use_ueberzug):
+            self._print_page_info()
+
     def start(self, main_path: 'Path') -> 'IO':
         # self._data defined here not in __init__, so that reload() will wipe cache
         # This has to be taken into account before any attempts to make this a subclass of Data
@@ -79,13 +84,13 @@ class AbstractUI(ABC):
         files.remove_dir_if_exist(self._data)
         self._request_then_save()
         self._download_save_canvas()
-        self._print_page_info()
+        self._report()
 
     def _show_then_fetch(self) -> 'IO':
         self.scroll_or_show()
         self._request_then_save()
         self._verify_up_to_date()
-        self._print_page_info()
+        self._report()
 
     def _verify_up_to_date(self) -> 'IO':
         if files.dir_not_empty(self._data):
@@ -184,7 +189,7 @@ class AbstractUI(ABC):
             return False
 
         self.scroll_or_show()
-        self._print_page_info()
+        self._report()
 
     def reload(self) -> 'IO':
         print('This will delete cached images and redownload them. Proceed?')
@@ -241,7 +246,7 @@ class AbstractGallery(AbstractUI, ABC):
     def _back(self) -> 'IO':
         """After user 'back's from image prompt or artist gallery, start mode again"""
         self.scroll_or_show()
-        self._print_page_info()
+        self._report()
         prompt.gallery_like_prompt(self)
 
 

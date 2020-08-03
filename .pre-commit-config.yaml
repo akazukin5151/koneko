@@ -4,11 +4,11 @@ repos:
     hooks:
     -   id: no-commit-to-branch
 
-- repo: local
-  hooks:
-  - id: pytest
-    name: pytest
-    entry: pytest -vvvv -l
-    language: system
-    pass_filenames: false
-    verbose: true
+#- repo: local
+#  hooks:
+#  - id: pytest
+#    name: pytest
+#    entry: pytest -vvvv -l
+#    language: system
+#    pass_filenames: false
+#    verbose: true

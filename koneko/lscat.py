@@ -35,6 +35,82 @@ from koneko import (
 )
 
 
+class Pixcat:
+    """Program-wide singleton, central handler for pixcat images"""
+    def start(self):
+        pass
+
+    def show(self, image_path, x, y, size) -> 'pixcat.Image':
+        image = Image(image_path).thumbnail(size)
+        image.show(align='left', x=x, y=y)
+        return image
+
+    def show_user_row(self, image_path, xcoords, xpadding, size):
+        image = self.show(image_path, xpadding, 0, size)
+        previews = [self.show(image_path, x, 0, size) for x in xcoords]
+        return [image] + previews
+
+    def show_row(self, image_path, xpadding, image_width, size):
+        xcoords = pure.xcoords(TERM.width, image_width, xpadding)
+        return [self.show(image_path, x, 0, size) for x in xcoords]
+
+    def hide(self, image: 'pixcat.Image'):
+        image.hide()
+
+    def hide_all(self, images):
+        for image in images:
+            self.hide(image)
+
+
+class Ueberzug:
+    """Program-wide singleton, central handler for ueberzug images"""
+    def __init__(self):
+        ueberzug = utils.try_import_ueberzug()
+        self.canvas = ueberzug.Canvas()
+        self.scaler = ueberzug.ScalerOption.FIT_CONTAIN.value
+        self.visible = ueberzug.Visibility.VISIBLE
+        self.invisible = ueberzug.Visibility.INVISIBLE
+        self._counter = -1
+
+        self.start()
+
+    def start(self):
+        self.canvas.__enter__()
+
+    def show(self, image_path, x, y, size) -> 'ueberzug.Placement':
+        self._counter += 1
+        return self.canvas.create_placement(
+            str(image_path) + str(self._counter),
+            path=str(image_path),
+            x=x,
+            y=y,
+            width=size,
+            height=size,
+            scaler=self.scaler,
+            visibility=self.visible,
+        )
+
+    def show_user_row(self, image_path, xcoords, xpadding, size):
+        placement = self.show(image_path, xpadding, 0, size / 20)
+        previews = [self.show(image_path, x, 0, size / 20) for x in xcoords]
+        return [placement] + previews
+
+    def show_row(self, image_path, xpadding, image_width, size):
+        xcoords = pure.xcoords(TERM.width, image_width, xpadding)
+        return [self.show(image_path, x, 0, size / 20) for x in xcoords]
+
+    def hide(self, placement: 'ueberzug.Placement'):
+        placement.visibility = self.invisible
+
+    def hide_all(self, placements):
+        for placement in placements:
+            self.hide(placement)
+
+
+api = Ueberzug() if config.use_ueberzug() else Pixcat()
+
+
+
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
     if config.use_ueberzug():
         return ueberzug_display(WELCOME_IMAGE, x, y, thumbnail_size / 20)
@@ -151,19 +227,6 @@ def ueberzug_display(path, x, y, size):
     return canvas
 
 
-def display_canvas(canvas, img_path, x, y, size):
-    """Given independently instantiated ueberzug canvas, display image"""
-    canvas.create_placement(
-        str(img_path),
-        path=str(img_path),
-        x=x,
-        y=y,
-        width=size,
-        height=size,
-        scaler=utils.try_get_FIT_CONTAIN(),
-        visibility=utils.try_get_VISIBLE(),
-    )
-
 
 def handle_scroll(cls, data, myslice):
     tracker = cls(data)
@@ -171,7 +234,7 @@ def handle_scroll(cls, data, myslice):
     for x in sorted(os.listdir(data.download_path)):
         if not x.startswith('.'):
             tracker.update(x)
-    return tracker.canvas
+    return api.canvas
 
 
 def show_instant(cls: 'lscat.<class>', data: 'data.<class>') -> 'IO':
@@ -235,9 +298,7 @@ class TrackDownloads(AbstractTracker):
     def __init__(self, data: 'data.<class>'):
         self.orders = list(range(30))
         if config.use_ueberzug():
-            ueberzug = utils.try_import_ueberzug()
-            self.canvas = ueberzug.Canvas()
-            self.generator = generate_page_ueberzug(data.download_path, self.canvas)
+            self.generator = generate_page_ueberzug(data.download_path)
         else:
             self.canvas = None
             self.generator = generate_page(data.download_path)
@@ -261,9 +322,7 @@ class TrackDownloadsUsers(AbstractTracker):
         self.orders = pure.generate_orders(splitpoint * 4, splitpoint)
 
         if config.use_ueberzug():
-            ueberzug = utils.try_import_ueberzug()
-            self.canvas = ueberzug.Canvas()
-            self.generator = generate_users_ueberzug(data.download_path, self.canvas, print_info)
+            self.generator = generate_users_ueberzug(data.download_path, print_info)
         else:
             self.canvas = None
             self.generator = generate_users(data.download_path, print_info)
@@ -370,7 +429,7 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
 
 
 
-def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
+def generate_page_ueberzug(path: 'Path') -> 'IO':
     left_shifts = config.xcoords_config()
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
@@ -378,8 +437,8 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
     thumbnail_size = config.thumbnail_size_config()
     size = thumbnail_size / 20
 
+    api.start()
     os.system('clear')
-    canvas.__enter__()
     for _ in range(number_of_cols * number_of_rows):
         image = yield
 
@@ -387,8 +446,7 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
         x = number % number_of_cols
         y = number // number_of_cols
 
-        display_canvas(
-            canvas,
+        api.show(
             path / image,
             left_shifts[x],
             rowspaces[y % number_of_rows],
@@ -399,7 +457,7 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
         yield
 
 
-def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
+def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
     page_spacing = config.users_page_spacing_config()
@@ -411,8 +469,8 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
     rowspaces = config.ycoords_config()
     msg_rows = [rowspaces[0]] + [rowspaces[1]] * (number_of_rows - 1)
 
+    api.start()
     os.system('clear')
-    canvas.__enter__()
     for row in range(number_of_rows):
         ycoord = row % number_of_rows
         a_img = yield
@@ -428,8 +486,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
             )
 
         # Display artist profile pic
-        display_canvas(
-            canvas,
+        api.show(
             path / a_img,
             padding,
             rowspaces[ycoord],
@@ -438,8 +495,7 @@ def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':
 
         # Display the three previews
         for j in range(3):
-            display_canvas(
-                canvas,
+            api.show(
                 path / (yield),
                 preview_xcoords[j],
                 rowspaces[ycoord],
@@ -457,7 +513,7 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
     thumbnail_size = config.thumbnail_size_config()
     size = thumbnail_size / 20
 
-    canvas.__enter__()
+    api.start()
     for preview_num in range(4):  # Max 4 previews
         image = yield
 
@@ -468,8 +524,7 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
         else:
             x = 1
 
-        display_canvas(
-            canvas,
+        api.show(
             path / image,
             _xcoords[x],
             rowspaces[y],
@@ -480,62 +535,3 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
         yield
 
 
-class Pixcat:
-    """Program-wide singleton, central handler for pixcat images"""
-    def show(self, image_path, x, y, size) -> 'pixcat.Image':
-        image = Image(image_path).thumbnail(size)
-        image.show(align='left', x=x, y=y)
-        return image
-
-    def show_user_row(self, image_path, xcoords, xpadding, size):
-        image = self.show(image_path, xpadding, 0, size)
-        previews = [self.show(image_path, x, 0, size) for x in xcoords]
-        return [image] + previews
-
-    def hide(self, image: 'pixcat.Image'):
-        image.hide()
-
-    def hide_all(self, images):
-        for image in images:
-            self.hide(image)
-
-
-class Ueberzug:
-    """Program-wide singleton, central handler for ueberzug images"""
-    def __init__(self):
-        ueberzug = utils.try_import_ueberzug()
-        self.canvas = ueberzug.Canvas()
-        self.scaler = ueberzug.ScalerOption.FIT_CONTAIN.value
-        self.visible = ueberzug.Visibility.VISIBLE
-        self.invisible = ueberzug.Visibility.INVISIBLE
-        self._counter = -1
-
-        self.canvas.__enter__()
-
-    def show(self, image_path, x, y, size) -> 'ueberzug.Placement':
-        self._counter += 1
-        return self.canvas.create_placement(
-            str(image_path) + str(self._counter),
-            path=str(image_path),
-            x=x,
-            y=y,
-            width=size,
-            height=size,
-            scaler=self.scaler,
-            visibility=self.visible,
-        )
-
-    def show_user_row(self, image_path, xcoords, xpadding, size):
-        placement = self.show(image_path, xpadding, 0, size / 20)
-        previews = [self.show(image_path, x, 0, size / 20) for x in xcoords]
-        return [placement] + previews
-
-    def hide(self, placement: 'ueberzug.Placement'):
-        placement.visibility = self.invisible
-
-    def hide_all(self, placements):
-        for placement in placements:
-            self.hide(placement)
-
-
-api = Ueberzug() if config.use_ueberzug() else Pixcat()

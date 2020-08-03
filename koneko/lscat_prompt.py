@@ -213,7 +213,7 @@ class ImageLoop(AbstractLoop):
             for image in self.all_images[self.current_page + 1:][:4]:
                 tracker.update(image)
             printer.move_cursor_xy(loc[0], loc[1])
-            self.preview_canvas = tracker.canvas
+            self.preview_canvas = lscat.api.canvas
 
     def _update_tracker(self) -> 'IO':
         """Unique"""

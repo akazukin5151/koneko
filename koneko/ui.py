@@ -101,7 +101,7 @@ class AbstractUI(ABC):
     def _download_save_canvas(self):
         tracker = self._tracker_class(self._data)
         download.init_download(self._data, tracker)
-        self.canvas = tracker.canvas
+        self.canvas = lscat.api.canvas
 
 
     def _prefetch(self) -> 'IO':
@@ -756,7 +756,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             if i == 4:  # Last pic
                 printer.move_cursor_xy(self.loc[0], self.loc[1])
 
-            self.preview_canvas = tracker.canvas
+            self.preview_canvas = lscat.api.canvas
 
             i += 1
 

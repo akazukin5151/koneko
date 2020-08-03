@@ -404,17 +404,19 @@ def _display_inital_row(ans, size, xpadding, image_width, image_height):
     if ans == 'y':
         _path = picker.pick_dir()
         _data = FakeData(_path)
+        # FIXME: should return images from tracker in some way
         canvas = lscat.handle_scroll(lscat.TrackDownloads, _data, slice(None))
         ncols = config.ncols_config()  # Default fallback, on user choice
         if config.use_ueberzug():
             print('\n' * (image_height * config.nrows_config() + 1))
         return ncols, canvas
 
-    canvas = lscat.show_instant_sample(size, xpadding, image_width)
+    #canvas = lscat.show_instant_sample(size, xpadding, image_width)
+    images = lscat.api.show_row(WELCOME_IMAGE, xpadding, image_width, size)
     ncols = pure.ncols(TERM.width, xpadding, image_width)
     if config.use_ueberzug():
         print('\n' * (image_height - 2))
-    return ncols, canvas
+    return ncols, images
 
 
 def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: int) -> 'list[int]':
@@ -430,7 +432,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
     ans = input()
 
     # Setup variables
-    ncols, canvas = _display_inital_row(ans, size, xpadding, image_width, image_height)
+    ncols, images = _display_inital_row(ans, size, xpadding, image_width, image_height)
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
@@ -462,7 +464,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
                 current_selection -= 1
 
             elif ans.name == 'KEY_ENTER':
-                utils.exit_if_exist(canvas)
+                lscat.api.hide_all(images)
                 return spacings
 
 

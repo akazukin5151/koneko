@@ -118,8 +118,8 @@ def update_user_info(spacing: int) -> 'IO':
 
 
 def image_help() -> 'IO':
-    print('')
-    print(''.join([
+    print_bottom('')
+    print_bottom(''.join([
         c.b, 'ack; ',
         c.n, 'ext image; ',
         c.p, 'revious image; ',
@@ -132,8 +132,8 @@ def image_help() -> 'IO':
 
 
 def user_help() -> 'IO':
-    print('')
-    print(''.join([
+    print_bottom('')
+    print_bottom(''.join([
         'view ', c.BLUE_N, "th artist's illusts ",
         c.n, 'ext page; ',
         c.p, 'revious page; ',

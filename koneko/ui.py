@@ -148,7 +148,7 @@ class AbstractUI(ABC):
 
     def previous_page(self) -> 'IO':
         if self._data.page_num <= 1:
-            print('This is the first page!')
+            printer.print_bottom('This is the first page!')
             return False
         self._data.page_num -= 1
         self.terminal_page = 0
@@ -157,7 +157,7 @@ class AbstractUI(ABC):
 
     def scroll_up(self):
         if self.terminal_page == 0:
-            print('This is the top of the terminal page!')
+            printer.print_bottom('This is the top of the terminal page!')
             return False
 
         self.terminal_page -= 1
@@ -165,7 +165,7 @@ class AbstractUI(ABC):
 
     def scroll_down(self):
         if self.terminal_page + 1 >= utils.max_terminal_scrolls(self._data, self._is_gallery_mode):
-            print('This is the bottom of the terminal page!')
+            printer.print_bottom('This is the bottom of the terminal page!')
             return False
 
         self.terminal_page += 1
@@ -184,7 +184,7 @@ class AbstractUI(ABC):
 
     def _show_page(self) -> 'IO':
         if not files.dir_not_empty(self._data):
-            print('This is the last page!')
+            printer.print_bottom('This is the last page!')
             self._data.page_num -= 1
             return False
 
@@ -192,7 +192,7 @@ class AbstractUI(ABC):
         self._report()
 
     def reload(self) -> 'IO':
-        print('This will delete cached images and redownload them. Proceed?')
+        printer.print_bottom('This will delete cached images and redownload them. Proceed?')
         ans = input(f'Directory to be deleted: {self._data.main_path}\n')
         if ans == 'y' or not ans:
             # Will remove all data, but keep info on the main path
@@ -301,14 +301,14 @@ class ArtistGallery(AbstractGallery):
         elif keyseqs[0] == 'r':
             self.reload()
         elif keyseqs[0].lower() == 'a':
-            print('Invalid command! Press h to show help')
+            printer.print_bottom('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self)  # Go back to while loop
 
     @staticmethod
     def help() -> 'IO':
         """Implements abstractmethod"""
-        print('')
-        print(''.join(
+        printer.print_bottom('')
+        printer.print_bottom(''.join(
             colors.base1 + ['view '] + colors.base2
             + ['view ', colors.m, 'anual; ',
                colors.b, 'ack\n']))
@@ -361,7 +361,7 @@ class IllustFollowGallery(AbstractGallery):
         """New method for mode 5 only"""
         selected_image_num = utils.find_number_map(int(first_num), int(second_num))
         if selected_image_num is False:  # 0 is valid!
-            print('Invalid number!')
+            printer.print_bottom('Invalid number!')
         else:
             self.go_artist_gallery_num(selected_image_num)
 
@@ -378,7 +378,7 @@ class IllustFollowGallery(AbstractGallery):
         """Implements abstractmethod"""
         # "b" must be handled first, because keyseqs might be empty
         if keyseqs[0] == 'b':
-            print('Invalid command! Press h to show help')
+            printer.print_bottom('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self)  # Go back to while loop
         elif keyseqs[0] == 'r':
             self.reload()
@@ -390,8 +390,8 @@ class IllustFollowGallery(AbstractGallery):
     @staticmethod
     def help() -> 'IO':
         """Implements abstractmethod"""
-        print('')
-        print(''.join(colors.base1 + [
+        printer.print_bottom('')
+        printer.print_bottom(''.join(colors.base1 + [
             colors.a, "view artist's illusts; ",
             colors.n, 'ext page;\n',
             colors.p, 'revious page; ',
@@ -467,7 +467,7 @@ class AbstractUsers(AbstractUI, ABC):
         try:
             artist_user_id = self._data.artist_user_id(selected_user_num)
         except IndexError:
-            print('Invalid number!')
+            printer.print_bottom('Invalid number!')
             return False
 
         utils.exit_if_exist(self.canvas)
@@ -589,11 +589,11 @@ class ViewPostMode(ToImage):
         self.firstmode = True
 
     def get_post_json(self) -> 'IO':
-        print('Fetching illust details...')
+        printer.print_bottom('Fetching illust details...')
         try:
             return api.myapi.protected_illust_detail(self._image_id)['illust']
         except KeyError:
-            print('Work has been deleted or the ID does not exist!')
+            printer.print_bottom('Work has been deleted or the ID does not exist!')
             sys.exit(1)
 
     def get_image_id(self, _) -> str:

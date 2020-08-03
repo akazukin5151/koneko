@@ -375,15 +375,12 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
 
     api.start()
     os.system('clear')
-    for _ in range(number_of_cols * number_of_rows):
-        image = yield
-
-        number = int(image.split('_')[0])
-        x = number % number_of_cols
-        y = number // number_of_cols
+    for i in range(number_of_cols * number_of_rows):
+        x = i % number_of_cols
+        y = i // number_of_cols
 
         api.show(
-            path / image,
+            path / (yield),
             left_shifts[x],
             rowspaces[y % number_of_rows],
             thumbnail_size

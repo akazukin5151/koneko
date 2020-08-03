@@ -27,8 +27,7 @@ def ask_quit() -> 'IO':
 
 def ask_wait_user_input(keyseqs: 'list[str]', view_name: str) -> str:
     if not keyseqs:
-        with printer.print_bottom(offset=-1):
-            print(f'Enter {view_name} view command:')
+        printer.new_print_bottom(f'Enter {view_name} view command:', offset=-1)
     command = TERM.inkey()
     print(command, end='', flush=True)
     return command

@@ -159,3 +159,7 @@ def print_bottom(use_ueberzug: 'Optional[bool]' = None, offset=0):
         if use_ueberzug:
             cursor.__exit__(None, None, None)
 
+def new_print_bottom(*values, use_ueberzug=None, offset=0, **kwargs):
+    with print_bottom(use_ueberzug, offset):
+        print(*values, **kwargs)
+

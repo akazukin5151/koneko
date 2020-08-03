@@ -380,7 +380,7 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
     input('\nEnter any key to continue\n')
     os.system('clear')
 
-    copy_image().thumbnail(thumbnail_size).show(align='left')
+    image = lscat.api.show_no_xy(WELCOME_IMAGE, thumbnail_size)
 
     time.sleep(0.1)
 
@@ -396,6 +396,7 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
     while True:
         ans = input()
         if ans.isdigit():
+            lscat.api.hide(image)
             return ans
         print('Must enter a number!')
 

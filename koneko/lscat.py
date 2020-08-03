@@ -48,6 +48,11 @@ class Pixcat:
         image.show(align='left', x=x, y=y)
         return image
 
+    def show_no_xy(self, image_path, size):
+        image = Image(image_path).thumbnail(size)
+        image.show(align='left')
+        return image
+
     def show_user_row(self, image_path, xcoords, xpadding, size):
         image = self.show(image_path, xpadding, 0, size)
         previews = [self.show(image_path, x, 0, size) for x in xcoords]

@@ -483,6 +483,11 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     #canvas = lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
     images = lscat.api.show_user_row(WELCOME_IMAGE, preview_xcoords, xpadding, thumbnail_size)
 
+    if not config.use_ueberzug():
+        printer.move_cursor_up(5)
+    else:
+        printer.move_cursor_down(3)
+
     with TERM.cbreak():
         while True:
             printer.update_user_info(spacing)

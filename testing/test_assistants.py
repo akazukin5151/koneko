@@ -102,6 +102,7 @@ def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_d
 
 
 def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, patch_cbreak, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('koneko.lscat.api.show_user_row', lambda *a: [Mock()])
 
@@ -109,7 +110,7 @@ def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, pat
     # Default
     assert assistants.user_info_assistant(310, 10, 1) == 18
     captured = capsys.readouterr()
-    assert captured.out == '\x1b[K\x1b[1B\x1b[K\x1b[1A                  000\n                  Example artist\n\x1b[2A\n\n\n\n'
+    assert captured.out == '\x1b[5A\x1b[K\x1b[1B\x1b[K\x1b[1A                  000\n                  Example artist\n\x1b[2A\n\n\n\n'
 
 
 def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):

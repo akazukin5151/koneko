@@ -133,7 +133,7 @@ class GalleryUserLoop(AbstractLoop):
         self.max_images: int
         self.max_scrolls: int
         self.myslice: slice
-        self.canvas: 'Optional[ueberzug.Canvas]' = None
+        self.images: 'list[Placement | Image]' = []
 
         # Base ABC
         self.condition = 1
@@ -162,12 +162,12 @@ class GalleryUserLoop(AbstractLoop):
     def show_func(self) -> 'IO':
         if self.scrollable:
             self.myslice = utils.slice_images(self.max_images, self.terminal_page)
-            self.canvas = lscat.handle_scroll(self.cls, self.data, self.myslice)
+            self.images = lscat.handle_scroll(self.cls, self.data, self.myslice)
         else:
             lscat.show_instant(self.cls, self.data)
 
     def max_images_func(self):
-        utils.exit_if_exist(self.canvas)
+        lscat.api.hide_all(self.images)
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
 

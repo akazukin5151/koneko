@@ -37,6 +37,9 @@ from koneko import (
 
 class Pixcat:
     """Program-wide singleton, central handler for pixcat images"""
+    def __init__(self):
+        self.canvas = None  # Temporary, remove later
+
     def start(self):
         pass
 
@@ -351,8 +354,11 @@ def generate_page(path: 'Path') -> 'IO':
         if number % (number_of_cols * number_of_rows) == 0 and number != 0:
             print('\n' * page_spacing)
 
-        Image(path / image).thumbnail(thumbnail_size).show(
-            align='left', x=left_shifts[x], y=rowspaces[(y % number_of_rows)]
+        api.show(
+            path / image,
+            left_shifts[x],
+            rowspaces[y % number_of_rows],
+            thumbnail_size
         )
 
 
@@ -376,12 +382,20 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
         print('\n' * page_spacing)  # Scroll to new 'page'
 
         # Display artist profile pic
-        Image(path / a_img).thumbnail(thumbnail_size).show(align='left', x=padding, y=0)
+        api.show(
+            path / a_img,
+            padding,
+            0,
+            thumbnail_size
+        )
 
         # Display the three previews
         for i in range(3):
-            Image(path / (yield)).thumbnail(thumbnail_size).show(
-                align='left', y=0, x=preview_xcoords[i]
+            api.show(
+                path / (yield),
+                preview_xcoords[i],
+                0,
+                thumbnail_size
             )
 
 
@@ -423,8 +437,11 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
         else:
             x = 1
 
-        Image(path / image).thumbnail(thumbnail_size).show(
-            align='left', x=_xcoords[x], y=rowspaces[y]
+        api.show(
+            path / image,
+            _xcoords[x],
+            rowspaces[y],
+            thumbnail_size
         )
 
 

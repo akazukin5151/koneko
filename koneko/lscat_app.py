@@ -194,7 +194,7 @@ def maybe_page_spacing(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]
         ans = assistants.page_spacing_assistant(size)
         if ans != -1:
             return ans
-    return None, None
+    return None
 
 
 def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width, image_height: int) -> 'list[int]':

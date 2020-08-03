@@ -46,6 +46,7 @@ class AbstractLoop(ABC):
         self.condition: int
         self.current_page: int
         self.scrollable: bool
+        self.use_ueberzug = config.use_ueberzug()
         # Defined in start
         self.terminal_page: int
 
@@ -62,7 +63,7 @@ class AbstractLoop(ABC):
 
     def report(self):
         cursor = TERM.location(0, TERM.height - 5)
-        if self.scrollable:
+        if self.use_ueberzug:
             cursor.__enter__()
 
         print(f'Page {self.current_page} / {self.max_pages}')
@@ -72,7 +73,7 @@ class AbstractLoop(ABC):
             "q: quit"
         )
 
-        if self.scrollable:
+        if self.use_ueberzug:
             cursor.__exit__(None, None, None)
 
     def start(self) -> 'IO':
@@ -130,6 +131,7 @@ class AbstractLoop(ABC):
 
 class GalleryUserLoop(AbstractLoop):
     def __init__(self, data, cls):
+        super().__init__()
         # Unique
         self.cls = cls
         self.data = data
@@ -142,7 +144,7 @@ class GalleryUserLoop(AbstractLoop):
         # Base ABC
         self.condition = 1
         self.current_page = int(data.download_path.name)
-        self.scrollable = config.use_ueberzug() or not config.scroll_display()
+        self.scrollable = self.use_ueberzug or not config.scroll_display()
         self.max_pages = len(
             [x for x in os.listdir(data.download_path.parent)
              if x.isdigit()]
@@ -177,6 +179,7 @@ class GalleryUserLoop(AbstractLoop):
 
 class ImageLoop(AbstractLoop):
     def __init__(self, root):
+        super().__init__()
         # Unique
         self.use_ueberzug = config.use_ueberzug()
         self.root = root

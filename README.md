@@ -147,10 +147,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] BUG: print info is hidden by ueberzug
         - [ ] lscat app
             - [x] config assistant
-            - [ ] mode 2 and 3 (browse cache and display path)
+            - [x] mode 2 and 3 (browse cache and display path)
                 - [x] Gallery
-                - [ ] User
-                - [ ] Image
+                - [x] User
+                - [x] Image
         - [ ] Gallery
         - [ ] User
         - [ ] Image

@@ -266,8 +266,9 @@ class TrackDownloadsImage(AbstractTracker):
         super().__init__()
 
     def update(self, new: str):
-        """Overrides base class because numlist is different"""
-        self.generator.send(new)
+        """Overrides base class because all previews will be in order"""
+        self.images.append(self.generator.send(new))
+        self.generator.send(None)
 
 
 

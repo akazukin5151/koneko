@@ -624,6 +624,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     """
     def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         super().__init__(raw, image_id, firstmode)
+        self.use_ueberzug = config.use_ueberzug()
         self.event = threading.Event()
         self.display_func = lscat.ueberzug_center_align if config.use_ueberzug() else lscat.icat
         # Defined in self.start_preview()
@@ -634,7 +635,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def display_initial(self) -> 'IO':
         os.system('clear')
         self.canvas = self.display_func(self.download_path / self.large_filename)
-        print(f'Page 1/{self.number_of_pages}')
+        with printer.print_bottom(self.use_ueberzug):
+            print(f'Page 1/{self.number_of_pages}')
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self.image_id)
@@ -652,10 +654,12 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def next_image(self) -> 'IO':
         if not self.page_urls:
-            print('This is the only image in the post!')
+            with printer.print_bottom(self.use_ueberzug):
+                print('This is the only image in the post!')
             return False
         elif self.page_num + 1 == self.number_of_pages:
-            print('This is the last image in the post!')
+            with printer.print_bottom(self.use_ueberzug):
+                print('This is the last image in the post!')
             return False
 
         # jump_to_image corrects for 1-based
@@ -664,10 +668,12 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def previous_image(self) -> 'IO':
         if not self.page_urls:
-            print('This is the only image in the post!')
+            with printer.print_bottom(self.use_ueberzug):
+                print('This is the only image in the post!')
             return False
         elif self.page_num == 0:
-            print('This is the first image in the post!')
+            with printer.print_bottom(self.use_ueberzug):
+                print('This is the first image in the post!')
             return False
 
         self.page_num -= 1
@@ -676,7 +682,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def jump_to_image(self, selected_image_num: int) -> 'IO':
         self.event.set()
         if selected_image_num <= 0 or selected_image_num > len(self.page_urls):
-            print('Invalid number!')
+            with printer.print_bottom(self.use_ueberzug):
+                print('Invalid number!')
             return False
 
         # Internally 0-based, but externally 1-based
@@ -699,7 +706,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
         self.canvas = self.display_func(self.filepath)
 
-        print(f'Page {self.page_num+1}/{self.number_of_pages}')
+        with printer.print_bottom(self.use_ueberzug):
+            print(f'Page {self.page_num+1}/{self.number_of_pages}')
         self.start_preview()
 
     def _prefetch_next_image(self) -> 'IO':

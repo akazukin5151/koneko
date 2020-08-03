@@ -111,6 +111,7 @@ def test_next_image(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
     monkeypatch.setattr('koneko.ui.Image.start_preview', lambda *a: True)
     data.page_urls = False
+    data.use_ueberzug = False
     data.event = Mock()
     data.jump_to_image = Mock()
 
@@ -140,6 +141,7 @@ def test_previous_image(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
     monkeypatch.setattr('koneko.ui.Image.start_preview', lambda *a: True)
     data.page_urls = False
+    data.use_ueberzug = False
     data.event = Mock()
     data.jump_to_image = Mock()
 

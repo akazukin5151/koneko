@@ -513,18 +513,12 @@ def center_spaces_assistant():
 
     # Setup
     image = WELCOME_IMAGE.parent / '79494300_p0.png'
-    ueberzug = utils.try_import_ueberzug()
-    canvas = ueberzug.Canvas()
-    scaler = utils.try_get_FIT_CONTAIN()
-    vis = utils.try_get_VISIBLE()
-    invs = utils.try_import_ueberzug_module('Visibility').INVISIBLE
     valid = True
     spacing = 0
     i = 0
 
     # Start
     printer.print_doc(center_spaces_assistant.__doc__)
-    canvas.__enter__()
     print('\n' * (TERM.height - 9), f'Current position: {spacing:01}')
 
     with TERM.cbreak():
@@ -532,16 +526,7 @@ def center_spaces_assistant():
             if valid:
                 printer.move_cursor_up(1)
                 print(f'Current position: {spacing:02}')
-                placement = canvas.create_placement(
-                    str(image) + str(i),
-                    path=str(image),
-                    x=spacing,
-                    y=0,
-                    width=25,
-                    height=25,
-                    scaler=scaler,
-                    visibility=vis,
-                )
+                placement = lscat.ueberzug_api.show(image, spacing, 0, 25)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)
@@ -555,12 +540,13 @@ def center_spaces_assistant():
                 valid = True
 
             elif ans.name == 'KEY_ENTER':
-                utils.exit_if_exist(canvas)
+                os.system('clear')
+                lscat.ueberzug_api.hide(placement)
                 return spacing
 
             else:
                 valid = False
 
             if valid:
-                placement.visibility = invs
+                lscat.ueberzug_api.hide(placement)
                 i += 1

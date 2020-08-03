@@ -478,3 +478,35 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
 
     while True:  # Prevent StopIteration errors
         yield
+
+
+class Ueberzug:
+    """Program-wide singleton, central handler for ueberzug images"""
+    def __init__(self):
+        ueberzug = utils.try_import_ueberzug()
+        self.canvas = ueberzug.Canvas()
+        self.scaler = ueberzug.ScalerOption.FIT_CONTAIN.value
+        self.visible = ueberzug.Visibility.VISIBLE
+        self.invisible = ueberzug.Visibility.INVISIBLE
+        self._counter = -1
+
+        self.canvas.__enter__()
+
+    def show(self, image_path, x, y, size) -> 'ueberzug.Placement':
+        self._counter += 1
+        return self.canvas.create_placement(
+            str(image_path) + str(self._counter),
+            path=str(image_path),
+            x=x,
+            y=y,
+            width=size,
+            height=size,
+            scaler=self.scaler,
+            visibility=self.visible,
+        )
+
+    def hide(self, placement: 'ueberzug.Placement'):
+        placement.visibility = self.invisible
+
+if config.use_ueberzug():
+    ueberzug_api = Ueberzug()

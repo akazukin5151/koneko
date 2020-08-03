@@ -62,19 +62,13 @@ class AbstractLoop(ABC):
         raise NotImplementedError
 
     def report(self):
-        cursor = TERM.location(0, TERM.height - 5)
-        if self.use_ueberzug:
-            cursor.__enter__()
-
-        print(f'Page {self.current_page} / {self.max_pages}')
-        print(
-            "n: go to next page, "
-            "p: go to previous page, "
-            "q: quit"
-        )
-
-        if self.use_ueberzug:
-            cursor.__exit__(None, None, None)
+        with printer.print_bottom(self.use_ueberzug):
+            print(f'Page {self.current_page} / {self.max_pages}')
+            print(
+                "n: go to next page, "
+                "p: go to previous page, "
+                "q: quit"
+            )
 
     def start(self) -> 'IO':
         show_images = True

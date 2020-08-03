@@ -1,4 +1,5 @@
 import os
+from contextlib import contextmanager
 
 from koneko import TERM
 from koneko import colors as c
@@ -140,3 +141,21 @@ def user_help() -> 'IO':
         c.q, 'uit (with confirmation);',
         'view ', c.m, 'anual\n'
     ]))
+
+
+@contextmanager
+def print_bottom(use_ueberzug: 'Optional[bool]' = None):
+    if use_ueberzug is None:
+        from koneko import config
+        use_ueberzug = config.use_ueberzug
+
+    if use_ueberzug:
+        cursor = TERM.location(0, TERM.height - 5)
+        cursor.__enter__()
+
+    try:
+        yield
+    finally:
+        if use_ueberzug:
+            cursor.__exit__(None, None, None)
+

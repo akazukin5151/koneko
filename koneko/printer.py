@@ -144,7 +144,7 @@ def user_help() -> 'IO':
 
 
 @contextmanager
-def print_bottom(use_ueberzug: 'Optional[bool]' = None, offset=0):
+def maybe_print_bottom(use_ueberzug: 'Optional[bool]' = None, offset=0):
     if use_ueberzug is None:
         from koneko import config
         use_ueberzug = config.use_ueberzug()
@@ -159,7 +159,7 @@ def print_bottom(use_ueberzug: 'Optional[bool]' = None, offset=0):
         if use_ueberzug:
             cursor.__exit__(None, None, None)
 
-def new_print_bottom(*values, use_ueberzug=None, offset=0, **kwargs):
-    with print_bottom(use_ueberzug, offset):
+def print_bottom(*values, use_ueberzug=None, offset=0, **kwargs):
+    with maybe_print_bottom(use_ueberzug, offset):
         print(*values, **kwargs)
 

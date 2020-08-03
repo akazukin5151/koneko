@@ -67,7 +67,7 @@ class AbstractUI(ABC):
         raise NotImplementedError
 
     def _report(self):
-        with printer.print_bottom(self.use_ueberzug):
+        with printer.maybe_print_bottom(self.use_ueberzug):
             self._print_page_info()
 
     def start(self, main_path: 'Path') -> 'IO':
@@ -635,7 +635,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def display_initial(self) -> 'IO':
         os.system('clear')
         self.canvas = self.display_func(self.download_path / self.large_filename)
-        printer.new_print_bottom(f'Page 1/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
+        printer.print_bottom(f'Page 1/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self.image_id)
@@ -653,10 +653,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def next_image(self) -> 'IO':
         if not self.page_urls:
-            printer.new_print_bottom('This is the only image in the post!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom('This is the only image in the post!', use_ueberzug=self.use_ueberzug)
             return False
         elif self.page_num + 1 == self.number_of_pages:
-            printer.new_print_bottom('This is the last image in the post!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom('This is the last image in the post!', use_ueberzug=self.use_ueberzug)
             return False
 
         # jump_to_image corrects for 1-based
@@ -665,10 +665,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def previous_image(self) -> 'IO':
         if not self.page_urls:
-            printer.new_print_bottom('This is the only image in the post!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom('This is the only image in the post!', use_ueberzug=self.use_ueberzug)
             return False
         elif self.page_num == 0:
-            printer.new_print_bottom('This is the first image in the post!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom('This is the first image in the post!', use_ueberzug=self.use_ueberzug)
             return False
 
         self.page_num -= 1
@@ -677,7 +677,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def jump_to_image(self, selected_image_num: int) -> 'IO':
         self.event.set()
         if selected_image_num <= 0 or selected_image_num > len(self.page_urls):
-            printer.new_print_bottom('Invalid number!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom('Invalid number!', use_ueberzug=self.use_ueberzug)
             return False
 
         # Internally 0-based, but externally 1-based
@@ -700,7 +700,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
         self.canvas = self.display_func(self.filepath)
 
-        printer.new_print_bottom(f'Page {self.page_num+1}/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
+        printer.print_bottom(f'Page {self.page_num+1}/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
         self.start_preview()
 
     def _prefetch_next_image(self) -> 'IO':

@@ -151,24 +151,6 @@ def ueberzug_center_align(path):
     return canvas
 
 
-def ueberzug_display(path, x, y, size):
-    """Without any setup, display given path with variable coordinates and size"""
-    ueberzug = utils.try_import_ueberzug()
-    canvas = ueberzug.Canvas()
-    canvas.__enter__()
-    canvas.create_placement(
-        str(path),
-        path=str(path),
-        x=x,
-        y=y,
-        width=size,
-        height=size,
-        visibility=utils.try_get_VISIBLE()
-    )
-    return canvas
-
-
-
 def handle_scroll(cls, data, myslice):
     tracker = cls(data)
     tracker.orders = tracker.orders[myslice]

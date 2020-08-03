@@ -18,7 +18,7 @@ TLDR if you want to write your own renderer (with icat or not), the API is:
 
 import os
 import threading
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from pixcat import Image
 from returns.result import safe
@@ -35,7 +35,40 @@ from koneko import (
 )
 
 
-class Pixcat:
+class Display(ABC):
+    # Required methods
+    @abstractmethod
+    def start(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def show(self, image_path, x, y, size) -> 'pixcat.Image':
+        raise NotImplementedError
+
+    @abstractmethod
+    def show_center(self, image_path):
+        raise NotImplementedError
+
+    @abstractmethod
+    def hide(self, image: 'pixcat.Image'):
+        raise NotImplementedError
+
+    # Common methods
+    def show_user_row(self, image_path, xcoords, xpadding, size):
+        image = self.show(image_path, xpadding, 0, size)
+        previews = [self.show(image_path, x, 0, size) for x in xcoords]
+        return [image] + previews
+
+    def show_row(self, image_path, xpadding, image_width, size):
+        xcoords = pure.xcoords(TERM.width, image_width, xpadding)
+        return [self.show(image_path, x, 0, size) for x in xcoords]
+
+    def hide_all(self, images):
+        for image in images:
+            if image:
+                self.hide(image)
+
+class Pixcat(Display):
     """Program-wide singleton, central handler for pixcat images"""
     def __init__(self):
         self.canvas = None  # Temporary, remove later
@@ -49,27 +82,15 @@ class Pixcat:
     def show_center(self, image_path):
         return Image(image_path).show(y=0)
 
-    def show_no_xy(self, image_path, size):
-        return Image(image_path).thumbnail(size).show(align='left')
-
-    def show_user_row(self, image_path, xcoords, xpadding, size):
-        image = self.show(image_path, xpadding, 0, size)
-        previews = [self.show(image_path, x, 0, size) for x in xcoords]
-        return [image] + previews
-
-    def show_row(self, image_path, xpadding, image_width, size):
-        xcoords = pure.xcoords(TERM.width, image_width, xpadding)
-        return [self.show(image_path, x, 0, size) for x in xcoords]
-
     def hide(self, image: 'pixcat.Image'):
         image.hide()
 
-    def hide_all(self, images):
-        for image in images:
-            self.hide(image)
+    # Unique
+    def show_no_xy(self, image_path, size):
+        return Image(image_path).thumbnail(size).show(align='left')
 
 
-class Ueberzug:
+class Ueberzug(Display):
     """Program-wide singleton, central handler for ueberzug images"""
     def __init__(self):
         ueberzug = utils.try_import_ueberzug()
@@ -108,22 +129,8 @@ class Ueberzug:
             visibility=self.visible,
         )
 
-    def show_user_row(self, image_path, xcoords, xpadding, size):
-        placement = self.show(image_path, xpadding, 0, size)
-        previews = [self.show(image_path, x, 0, size) for x in xcoords]
-        return [placement] + previews
-
-    def show_row(self, image_path, xpadding, image_width, size):
-        xcoords = pure.xcoords(TERM.width, image_width, xpadding)
-        return [self.show(image_path, x, 0, size) for x in xcoords]
-
     def hide(self, placement: 'ueberzug.Placement'):
         placement.visibility = self.invisible
-
-    def hide_all(self, placements):
-        for placement in placements:
-            if placement:
-                self.hide(placement)
 
 
 api = Ueberzug() if config.use_ueberzug() else Pixcat()

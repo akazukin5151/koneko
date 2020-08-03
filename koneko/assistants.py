@@ -403,7 +403,6 @@ def _display_inital_row(ans, size, xpadding, image_width, image_height):
             print('\n' * (image_height * config.nrows_config() + 1))
         return ncols, canvas
 
-    #canvas = lscat.show_instant_sample(size, xpadding, image_width)
     images = lscat.api.show_row(WELCOME_IMAGE, xpadding, image_width, size)
     ncols = pure.ncols(TERM.width, xpadding, image_width)
     if config.use_ueberzug():
@@ -474,7 +473,6 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     # Start
     printer.print_doc(user_info_assistant.__doc__)
 
-    #canvas = lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
     images = lscat.api.show_user_row(WELCOME_IMAGE, preview_xcoords, xpadding, thumbnail_size)
 
     if not config.use_ueberzug():

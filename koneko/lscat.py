@@ -119,42 +119,11 @@ api = Ueberzug() if config.use_ueberzug() else Pixcat()
 
 
 
-def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
-    if config.use_ueberzug():
-        return ueberzug_display(WELCOME_IMAGE, x, y, thumbnail_size / 20)
-
-    img = Image(WELCOME_IMAGE).thumbnail(thumbnail_size)
-    img.show(align='left', x=x, y=y)
-    return img
-
-
 def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
     return api.show(WELCOME_IMAGE, x, 0, thumbnail_size)
 
-
 def show_single_y(y: int, size: int) -> 'IO[Image]':
     return api.show(WELCOME_IMAGE, config.xcoords_config()[1], y, size)
-
-
-def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
-    xcoords = pure.xcoords(TERM.width, image_width, xpadding)
-    if not config.use_ueberzug():
-        for x in xcoords:
-            show_single(x, 0, thumbnail_size)
-        return None
-
-    return display_multiple_x_ueberzug(WELCOME_IMAGE, xcoords, thumbnail_size)
-
-
-def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
-    canvas = show_single(padding, 0, size)
-    if not config.use_ueberzug():
-        for px in preview_xcoords:
-            show_single_x(px, size)
-        return None
-
-    display_multiple_x_canvas(canvas, preview_xcoords, WELCOME_IMAGE, size)
-    return canvas
 
 
 def display_multiple_x_ueberzug(path, xcoords, thumbnail_size):

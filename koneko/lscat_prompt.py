@@ -60,6 +60,21 @@ class AbstractLoop(ABC):
     def max_images_func(self) -> 'Any':
         raise NotImplementedError
 
+    def report(self):
+        cursor = TERM.location(0, TERM.height - 5)
+        if self.scrollable:
+            cursor.__enter__()
+
+        print(f'Page {self.current_page} / {self.max_pages}')
+        print(
+            "n: go to next page, "
+            "p: go to previous page, "
+            "q: quit"
+        )
+
+        if self.scrollable:
+            cursor.__exit__(None, None, None)
+
     def start(self) -> 'IO':
         show_images = True
         self.terminal_page = 0
@@ -69,12 +84,7 @@ class AbstractLoop(ABC):
                 if show_images:
                     self.show_func()
                     self.maybe_show_preview()
-                    print(f'Page {self.current_page} / {self.max_pages}')
-                    print(
-                        "n: go to next page, "
-                        "p: go to previous page, "
-                        "q: quit"
-                    )
+                    self.report()
 
                 ans = TERM.inkey()
                 print(ans)

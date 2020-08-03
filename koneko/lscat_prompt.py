@@ -9,7 +9,7 @@ from koneko import utils, lscat, config, TERM, printer, FakeData
 def scroll_prompt(cls, data, max_images):
     show = True
     terminal_page = 0
-    canvas = None
+    images = []
 
     if cls is lscat.TrackDownloadsUsers:
         max_scrolls = utils.max_terminal_scrolls(data, False)
@@ -19,9 +19,9 @@ def scroll_prompt(cls, data, max_images):
     with TERM.cbreak():
         while True:
             if show:
-                utils.exit_if_exist(canvas)
+                lscat.api.hide_all(images)
                 myslice = utils.slice_images(max_images, terminal_page)
-                canvas = lscat.handle_scroll(cls, data, myslice)
+                images = lscat.handle_scroll(cls, data, myslice)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)

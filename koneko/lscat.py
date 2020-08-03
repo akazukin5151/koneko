@@ -157,7 +157,7 @@ def handle_scroll(cls, data, myslice):
     for x in sorted(os.listdir(data.download_path)):
         if not x.startswith('.'):
             tracker.update(x)
-    return api.canvas
+    return tracker.images
 
 
 def show_instant(cls: 'lscat.<class>', data: 'data.<class>') -> 'IO':
@@ -184,6 +184,7 @@ class AbstractTracker(ABC):
         self._lock = threading.Lock()
         self._downloaded: 'list[str]' = []
         self._numlist: 'list[int]' = []
+        self.images = []
 
         self.generator.send(None)
 
@@ -207,7 +208,8 @@ class AbstractTracker(ABC):
 
         if next_num in self._numlist:
             pic = self._downloaded[self._numlist.index(next_num)]
-            self.generator.send(pic)
+            self.images.append(self.generator.send(pic))
+            self.generator.send(None)
 
             self.orders = self.orders[1:]
             self._downloaded.remove(pic)
@@ -274,7 +276,7 @@ def generate_page(path: 'Path') -> 'IO':
         if number % (number_of_cols * number_of_rows) == 0 and number != 0:
             print('\n' * page_spacing)
 
-        api.show(
+        yield api.show(
             path / image,
             left_shifts[x],
             rowspaces[y % number_of_rows],
@@ -302,7 +304,7 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
         print('\n' * page_spacing)  # Scroll to new 'page'
 
         # Display artist profile pic
-        api.show(
+        yield api.show(
             path / a_img,
             padding,
             0,
@@ -311,8 +313,9 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
 
         # Display the three previews
         for i in range(3):
-            api.show(
-                path / (yield),
+            p_img = yield
+            yield api.show(
+                path / p_img,
                 preview_xcoords[i],
                 0,
                 thumbnail_size
@@ -357,7 +360,7 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
         else:
             x = 1
 
-        api.show(
+        yield api.show(
             path / image,
             _xcoords[x],
             rowspaces[y],
@@ -379,8 +382,9 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
         x = i % number_of_cols
         y = i // number_of_cols
 
-        api.show(
-            path / (yield),
+        image = yield
+        yield api.show(
+            path / image,
             left_shifts[x],
             rowspaces[y % number_of_rows],
             thumbnail_size
@@ -418,7 +422,7 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
             )
 
         # Display artist profile pic
-        api.show(
+        yield api.show(
             path / a_img,
             padding,
             rowspaces[ycoord],
@@ -427,8 +431,9 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
 
         # Display the three previews
         for j in range(3):
-            api.show(
-                path / (yield),
+            p_img = yield
+            yield api.show(
+                path / p_img,
                 preview_xcoords[j],
                 rowspaces[ycoord],
                 thumbnail_size
@@ -455,7 +460,7 @@ def generate_previews_ueberzug(path: 'Path', min_num: int, canvas) -> 'IO':
         else:
             x = 1
 
-        api.show(
+        yield api.show(
             path / image,
             _xcoords[x],
             rowspaces[y],

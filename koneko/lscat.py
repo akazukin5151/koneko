@@ -109,13 +109,13 @@ class Ueberzug:
         )
 
     def show_user_row(self, image_path, xcoords, xpadding, size):
-        placement = self.show(image_path, xpadding, 0, size / 20)
-        previews = [self.show(image_path, x, 0, size / 20) for x in xcoords]
+        placement = self.show(image_path, xpadding, 0, size)
+        previews = [self.show(image_path, x, 0, size) for x in xcoords]
         return [placement] + previews
 
     def show_row(self, image_path, xpadding, image_width, size):
         xcoords = pure.xcoords(TERM.width, image_width, xpadding)
-        return [self.show(image_path, x, 0, size / 20) for x in xcoords]
+        return [self.show(image_path, x, 0, size) for x in xcoords]
 
     def hide(self, placement: 'ueberzug.Placement'):
         placement.visibility = self.invisible

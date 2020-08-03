@@ -179,15 +179,15 @@ class ImageLoop(AbstractLoop):
         self.root = root
 
         self.all_images = [f for f in sorted(os.listdir(root)) if (root / f).is_file()]
-        self.image = self.all_images[0]
+        self.image_path = self.all_images[0]
         if len(self.all_images) > 1:
             self.FakeData = namedtuple('data', ('download_path', 'page_num'))
 
 
         # Defined in self.show_func()
-        self.canvas: 'Optional[ueberzug.Canvas]' = None
+        self.image: 'Optional[ueberzug.Canvas]' = None
         # Defined in self.maybe_show_preview()
-        self.preview_canvas: 'Optional[ueberzug.Canvas]' = None
+        self.preview_images: 'list[ueberzug.Canvas]' = []
 
         # Base ABC
         self.condition = 0
@@ -196,15 +196,12 @@ class ImageLoop(AbstractLoop):
         self.scrollable = False
 
     def show_func(self) -> 'IO':
-        if self.use_ueberzug:
-            self.canvas = lscat.ueberzug_center_align(self.root / self.image)
-        else:
-            lscat.icat(self.root / self.image)
+        self.image = lscat.api.show_center(self.root / self.image_path)
 
     def max_images_func(self):
-        self.image = self.all_images[self.current_page]
-        utils.exit_if_exist(self.canvas)
-        utils.exit_if_exist(self.preview_canvas)
+        self.image_path = self.all_images[self.current_page]
+        lscat.api.hide(self.image)  # FIXME: doesn't work for some reason
+        lscat.api.hide_all(self.preview_images)
 
     def maybe_show_preview(self) -> 'IO':
         if len(self.all_images) > 1:
@@ -213,7 +210,7 @@ class ImageLoop(AbstractLoop):
             for image in self.all_images[self.current_page + 1:][:4]:
                 tracker.update(image)
             printer.move_cursor_xy(loc[0], loc[1])
-            self.preview_canvas = lscat.api.canvas
+            self.preview_images = tracker.images
 
     def _update_tracker(self) -> 'IO':
         """Unique"""

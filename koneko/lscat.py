@@ -48,6 +48,9 @@ class Pixcat:
         image.show(align='left', x=x, y=y)
         return image
 
+    def show_center(self, image_path):
+        return Image(image_path).show(y=0)
+
     def show_no_xy(self, image_path, size):
         image = Image(image_path).thumbnail(size)
         image.show(align='left')
@@ -94,6 +97,17 @@ class Ueberzug:
             y=y,
             width=size / 20,
             height=size / 20,
+            scaler=self.scaler,
+            visibility=self.visible,
+        )
+
+    def show_center(self, image_path):
+        self._counter += 1
+        return self.canvas.create_placement(
+            str(image_path) + str(self._counter),
+            path=str(image_path),
+            x=config.ueberzug_center_spaces(),
+            y=0,
             scaler=self.scaler,
             visibility=self.visible,
         )

@@ -122,7 +122,8 @@ class Ueberzug:
 
     def hide_all(self, placements):
         for placement in placements:
-            self.hide(placement)
+            if placement:
+                self.hide(placement)
 
 
 api = Ueberzug() if config.use_ueberzug() else Pixcat()

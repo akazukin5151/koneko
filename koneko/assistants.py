@@ -395,12 +395,11 @@ def _display_inital_row(ans, size, xpadding, image_width, image_height):
     if ans == 'y':
         _path = picker.pick_dir()
         _data = FakeData(_path)
-        # FIXME: should return images from tracker in some way
-        canvas = lscat.handle_scroll(lscat.TrackDownloads, _data, slice(None))
+        images = lscat.handle_scroll(lscat.TrackDownloads, _data, slice(None))
         ncols = config.ncols_config()  # Default fallback, on user choice
         if config.use_ueberzug():
             print('\n' * (image_height * config.nrows_config() + 1))
-        return ncols, canvas
+        return ncols, images
 
     images = lscat.api.show_row(WELCOME_IMAGE, xpadding, image_width, size)
     ncols = pure.ncols(TERM.width, xpadding, image_width)

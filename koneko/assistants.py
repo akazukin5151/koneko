@@ -60,14 +60,17 @@ def thumbnail_size_assistant() -> 'IO[int]':
 
     Keep in mind this size will be used for a grid of images
     """
+    # Setup
+    images = []
+    size = 300
+    previous_size = 300
+
+    # Start
     printer.print_doc(thumbnail_size_assistant.__doc__)
 
-    image = ImageWrapper()
-
-    size = 300  # starting size
     with TERM.cbreak():
         while True:
-            image.show(size=size, x=0, y=0)
+            images.append(lscat.api.show(WELCOME_IMAGE, 0, 0, size))
             with TERM.location(0, (TERM.height - 10)):
                 print(f'size = {size}')
 
@@ -75,15 +78,24 @@ def thumbnail_size_assistant() -> 'IO[int]':
             utils.quit_on_q(ans)
 
             if ans in PLUS:
-                image.hide(try_skip=True)
+                previous_size = size
                 size += 20
 
+            # +, +, +, -, +
+            # |     |  ^  |> Do nothing here as well
+            # |     |  |
+            # |     |  |
+            # |     |  This is where all images should be hidden
+            # |     |
+            # No images hidden in this range
             elif ans in MINUS:
-                image.hide(try_skip=False)
+                previous_size = size
                 size -= 20
+                if previous_size > size:
+                    lscat.api.hide_all(images)
 
             elif ans.name == 'KEY_ENTER':
-                image.hide(try_skip=False)
+                lscat.api.hide_all(images)
                 return size
 
 

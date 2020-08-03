@@ -147,7 +147,7 @@ def user_help() -> 'IO':
 def print_bottom(use_ueberzug: 'Optional[bool]' = None):
     if use_ueberzug is None:
         from koneko import config
-        use_ueberzug = config.use_ueberzug
+        use_ueberzug = config.use_ueberzug()
 
     if use_ueberzug:
         cursor = TERM.location(0, TERM.height - 5)

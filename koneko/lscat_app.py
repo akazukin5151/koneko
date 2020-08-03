@@ -22,7 +22,8 @@ Possible configuration assistants:
   4  Page spacing
   5  Gallery print spacing
   6  User mode print info x-position
-  a  All of the above
+  7  Ueberzug center images
+  8  All of the above
 """
 
 import os
@@ -124,7 +125,7 @@ def _lscat_prompt_switcher(path, data):
     if '.koneko' in os.listdir(path):
         lscat_prompt.GalleryUserLoop.for_user(data, lscat.TrackDownloadsUsers).start()
     elif 'individual' in str(path):
-        lscat_prompt.ImageLoop(path, sorted(os.listdir(path))[0]).start()
+        lscat_prompt.ImageLoop(path).start()
     else:
         lscat_prompt.GalleryUserLoop.for_gallery(data, lscat.TrackDownloads).start()
 
@@ -147,6 +148,8 @@ def config_assistance(actions: 'Optional[list[int]]' = None) -> 'IO':
 
     user_info_xcoord = maybe_print_xcoord(actions, size, xpadding, image_width)
 
+    ueberzug_center_spaces = maybe_center_spaces(actions)
+
     print('\n\nYour recommended settings are:')
     printer.maybe_print_size(actions, size)
     printer.maybe_print_width_xpadding(actions, image_width, xpadding)
@@ -154,6 +157,7 @@ def config_assistance(actions: 'Optional[list[int]]' = None) -> 'IO':
     printer.maybe_print_page_spacing(actions, page_spacing)
     printer.maybe_print_print_spacing(actions, gallery_print_spacing)
     printer.maybe_print_user_info(actions, user_info_xcoord)
+    printer.maybe_print_center_spaces(actions, ueberzug_center_spaces)
     input('\nEnter any key to quit\n')
 
 
@@ -165,13 +169,13 @@ def maybe_ask_assistant(actions: 'Optional[list[int]]') -> 'list[int]':
 
 
 def maybe_thumbnail_size(actions: 'list[int]') -> int:
-    if 1 in actions or 7 in actions:
+    if 1 in actions or 8 in actions:
         return assistants.thumbnail_size_assistant()
     return config.thumbnail_size_config()
 
 
 def maybe_xpadding_img_width(actions: 'list[int]', size: int) -> 'tuple[int]':
-    if 2 in actions or 7 in actions:
+    if 2 in actions or 8 in actions:
         return assistants.xpadding_assistant(size)
     return (
         config.get_gen_users_settings()[1],
@@ -180,13 +184,13 @@ def maybe_xpadding_img_width(actions: 'list[int]', size: int) -> 'tuple[int]':
 
 
 def maybe_ypadding_img_height(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]':
-    if 3 in actions or 7 in actions:
+    if 3 in actions or 8 in actions:
         return assistants.ypadding_assistant(size)
     return None, 8  # Default image height
 
 
 def maybe_page_spacing(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]':
-    if 4 in actions or 7 in actions:
+    if 4 in actions or 8 in actions:
         ans = assistants.page_spacing_assistant(size)
         if ans != -1:
             return ans
@@ -194,17 +198,21 @@ def maybe_page_spacing(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]
 
 
 def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width, image_height: int) -> 'list[int]':
-    if 5 in actions or 7 in actions:
+    if 5 in actions or 8 in actions:
         return assistants.gallery_print_spacing_assistant(
             size, xpadding, image_width, image_height
         )
 
 
 def maybe_print_xcoord(actions: 'list[int]', size, xpadding, image_width: int) -> int:
-    if 6 in actions or 7 in actions:
+    if 6 in actions or 8 in actions:
         return assistants.user_info_assistant(
             size,
             xpadding,
             image_width
         )
 
+
+def maybe_center_spaces(actions: 'list[int]'):
+    if 7 in actions or 8 in actions:
+        return assistants.center_spaces_assistant()

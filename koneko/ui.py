@@ -45,7 +45,8 @@ class AbstractUI(ABC):
         # Attribute defined in self.prefetch_thread()
         self._prefetch_thread: threading.Thread
 
-        self.scrollable = config.use_ueberzug() or not config.scroll_display()
+        self.use_ueberzug = config.use_ueberzug()
+        self.scrollable = self.use_ueberzug or not config.scroll_display()
         self.terminal_page = 0  # starts at zero so the first slice has start=0
         self.start(main_path)
 
@@ -65,6 +66,10 @@ class AbstractUI(ABC):
         """Run any procedure to print the page info"""
         raise NotImplementedError
 
+    def _report(self):
+        with printer.maybe_print_bottom(self.use_ueberzug):
+            self._print_page_info()
+
     def start(self, main_path: 'Path') -> 'IO':
         # self._data defined here not in __init__, so that reload() will wipe cache
         # This has to be taken into account before any attempts to make this a subclass of Data
@@ -79,13 +84,13 @@ class AbstractUI(ABC):
         files.remove_dir_if_exist(self._data)
         self._request_then_save()
         self._download_save_canvas()
-        self._print_page_info()
+        self._report()
 
     def _show_then_fetch(self) -> 'IO':
         self.scroll_or_show()
         self._request_then_save()
         self._verify_up_to_date()
-        self._print_page_info()
+        self._report()
 
     def _verify_up_to_date(self) -> 'IO':
         if files.dir_not_empty(self._data):
@@ -143,7 +148,7 @@ class AbstractUI(ABC):
 
     def previous_page(self) -> 'IO':
         if self._data.page_num <= 1:
-            print('This is the first page!')
+            printer.print_bottom('This is the first page!')
             return False
         self._data.page_num -= 1
         self.terminal_page = 0
@@ -152,7 +157,7 @@ class AbstractUI(ABC):
 
     def scroll_up(self):
         if self.terminal_page == 0:
-            print('This is the top of the terminal page!')
+            printer.print_bottom('This is the top of the terminal page!')
             return False
 
         self.terminal_page -= 1
@@ -160,7 +165,7 @@ class AbstractUI(ABC):
 
     def scroll_down(self):
         if self.terminal_page + 1 >= utils.max_terminal_scrolls(self._data, self._is_gallery_mode):
-            print('This is the bottom of the terminal page!')
+            printer.print_bottom('This is the bottom of the terminal page!')
             return False
 
         self.terminal_page += 1
@@ -179,19 +184,20 @@ class AbstractUI(ABC):
 
     def _show_page(self) -> 'IO':
         if not files.dir_not_empty(self._data):
-            print('This is the last page!')
+            printer.print_bottom('This is the last page!')
             self._data.page_num -= 1
             return False
 
         self.scroll_or_show()
-        self._print_page_info()
+        self._report()
 
     def reload(self) -> 'IO':
-        print('This will delete cached images and redownload them. Proceed?')
+        printer.print_bottom('This will delete cached images and redownload them. Proceed?')
         ans = input(f'Directory to be deleted: {self._data.main_path}\n')
         if ans == 'y' or not ans:
-            rmtree(self._data.main_path)
             # Will remove all data, but keep info on the main path
+            rmtree(self._data.main_path)
+            utils.exit_if_exist(self.canvas)
             self.start(self._data.main_path)
         self._prompt(self)
 
@@ -232,14 +238,15 @@ class AbstractGallery(AbstractUI, ABC):
 
     def view_image(self, selected_image_num: int) -> 'IO':
         """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
+        utils.exit_if_exist(self.canvas)
         ViewImage(self._data, selected_image_num).start()
         # Image prompt ends, user presses back
         self._back()
 
     def _back(self) -> 'IO':
         """After user 'back's from image prompt or artist gallery, start mode again"""
-        lscat.show_instant(self._tracker_class, self._data)
-        self._print_page_info()
+        self.scroll_or_show()
+        self._report()
         prompt.gallery_like_prompt(self)
 
 
@@ -289,18 +296,19 @@ class ArtistGallery(AbstractGallery):
         """Implements abstractmethod"""
         # Display image (using either coords or image number), the show this prompt
         if keyseqs[0] == 'b':
-            pass  # Stop gallery instance, return to previous state
+            utils.exit_if_exist(self.canvas)
+            # Gallery instance stopped here, return to previous state
         elif keyseqs[0] == 'r':
             self.reload()
         elif keyseqs[0].lower() == 'a':
-            print('Invalid command! Press h to show help')
+            printer.print_bottom('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self)  # Go back to while loop
 
     @staticmethod
     def help() -> 'IO':
         """Implements abstractmethod"""
-        print('')
-        print(''.join(
+        printer.print_bottom('')
+        printer.print_bottom(''.join(
             colors.base1 + ['view '] + colors.base2
             + ['view ', colors.m, 'anual; ',
                colors.b, 'ack\n']))
@@ -353,13 +361,14 @@ class IllustFollowGallery(AbstractGallery):
         """New method for mode 5 only"""
         selected_image_num = utils.find_number_map(int(first_num), int(second_num))
         if selected_image_num is False:  # 0 is valid!
-            print('Invalid number!')
+            printer.print_bottom('Invalid number!')
         else:
             self.go_artist_gallery_num(selected_image_num)
 
     def go_artist_gallery_num(self, selected_image_num: int) -> 'IO':
         """Like self.view_image(), but goes to artist mode instead of image"""
         artist_user_id = self._data.artist_user_id(selected_image_num)
+        utils.exit_if_exist(self.canvas)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # Gallery prompt ends, user presses back
@@ -369,7 +378,7 @@ class IllustFollowGallery(AbstractGallery):
         """Implements abstractmethod"""
         # "b" must be handled first, because keyseqs might be empty
         if keyseqs[0] == 'b':
-            print('Invalid command! Press h to show help')
+            printer.print_bottom('Invalid command! Press h to show help')
             prompt.gallery_like_prompt(self)  # Go back to while loop
         elif keyseqs[0] == 'r':
             self.reload()
@@ -381,8 +390,8 @@ class IllustFollowGallery(AbstractGallery):
     @staticmethod
     def help() -> 'IO':
         """Implements abstractmethod"""
-        print('')
-        print(''.join(colors.base1 + [
+        printer.print_bottom('')
+        printer.print_bottom(''.join(colors.base1 + [
             colors.a, "view artist's illusts; ",
             colors.n, 'ext page;\n',
             colors.p, 'revious page; ',
@@ -458,9 +467,10 @@ class AbstractUsers(AbstractUI, ABC):
         try:
             artist_user_id = self._data.artist_user_id(selected_user_num)
         except IndexError:
-            print('Invalid number!')
+            printer.print_bottom('Invalid number!')
             return False
 
+        utils.exit_if_exist(self.canvas)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # After backing from gallery
@@ -579,11 +589,11 @@ class ViewPostMode(ToImage):
         self.firstmode = True
 
     def get_post_json(self) -> 'IO':
-        print('Fetching illust details...')
+        printer.print_bottom('Fetching illust details...')
         try:
             return api.myapi.protected_illust_detail(self._image_id)['illust']
         except KeyError:
-            print('Work has been deleted or the ID does not exist!')
+            printer.print_bottom('Work has been deleted or the ID does not exist!')
             sys.exit(1)
 
     def get_image_id(self, _) -> str:
@@ -614,6 +624,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     """
     def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         super().__init__(raw, image_id, firstmode)
+        self.use_ueberzug = config.use_ueberzug()
         self.event = threading.Event()
         self.display_func = lscat.ueberzug_center_align if config.use_ueberzug() else lscat.icat
         # Defined in self.start_preview()
@@ -624,7 +635,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def display_initial(self) -> 'IO':
         os.system('clear')
         self.canvas = self.display_func(self.download_path / self.large_filename)
-        print(f'Page 1/{self.number_of_pages}')
+        printer.print_bottom(f'Page 1/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self.image_id)
@@ -642,10 +653,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def next_image(self) -> 'IO':
         if not self.page_urls:
-            print('This is the only image in the post!')
+            printer.print_bottom('This is the only image in the post!', use_ueberzug=self.use_ueberzug)
             return False
         elif self.page_num + 1 == self.number_of_pages:
-            print('This is the last image in the post!')
+            printer.print_bottom('This is the last image in the post!', use_ueberzug=self.use_ueberzug)
             return False
 
         # jump_to_image corrects for 1-based
@@ -654,10 +665,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def previous_image(self) -> 'IO':
         if not self.page_urls:
-            print('This is the only image in the post!')
+            printer.print_bottom('This is the only image in the post!', use_ueberzug=self.use_ueberzug)
             return False
         elif self.page_num == 0:
-            print('This is the first image in the post!')
+            printer.print_bottom('This is the first image in the post!', use_ueberzug=self.use_ueberzug)
             return False
 
         self.page_num -= 1
@@ -666,7 +677,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def jump_to_image(self, selected_image_num: int) -> 'IO':
         self.event.set()
         if selected_image_num <= 0 or selected_image_num > len(self.page_urls):
-            print('Invalid number!')
+            printer.print_bottom('Invalid number!', use_ueberzug=self.use_ueberzug)
             return False
 
         # Internally 0-based, but externally 1-based
@@ -689,7 +700,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
         self.canvas = self.display_func(self.filepath)
 
-        print(f'Page {self.page_num+1}/{self.number_of_pages}')
+        printer.print_bottom(f'Page {self.page_num+1}/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
         self.start_preview()
 
     def _prefetch_next_image(self) -> 'IO':
@@ -699,6 +710,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             download.async_download_spinner(self.download_path, [next_img_url])
 
     def leave(self, force=False) -> 'IO':
+        utils.exit_if_exist(self.canvas)
+        utils.exit_if_exist(self.preview_canvas)
         self.event.set()
         if self.firstmode or force:
             # Came from view post mode, don't know current page num
@@ -708,7 +721,9 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         # Else: image prompt and class ends, goes back to previous mode
 
     def view_related_images(self):
-        mode = IllustRelatedGallery(self.image_id, self.download_path)
+        utils.exit_if_exist(self.canvas)
+        utils.exit_if_exist(self.preview_canvas)
+        mode = IllustRelatedGallery(self.image_id, self.download_path.parent)
         prompt.gallery_like_prompt(mode)
 
     def start_preview(self) -> 'IO':

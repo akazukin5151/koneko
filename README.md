@@ -143,14 +143,23 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 * Refine ueberzug (must complete before release)
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
-    - [ ] BUG: Hide all images during mode transitions (eg, mode i/2 -> related illusts mode)
-    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
+        - Also happens with view user/image while prefetching
+        - In particular, prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
+    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentate ueberzug usage, & update README.md about ueberzug
+        - [ ] Help and manual needs to be updated as well
+        - [ ] Center align image config
     - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
-    - [ ] Center align image mode
-        - [x] Add config
-        - [ ] Update configuration assistant
     - [ ] Better loops, extract common code to functions or even ABCs
+        - [ ] Consider program wide singleton where only one ueberzug process will be used in the entire program's lifetime, only changing the visibility attribute to hide/unhide images
+        - [ ] Performance: Do not instantiate a new canvas in every loop (eg in assistants.py:)
+            - [ ] ImageWrapper (thumbnail size assistant)
+            - [ ] AbstractImageAdjuster
         - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
+
+- Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
+
+* Illust-related mode can't go back to image mode
+* Support illust related mode in lscat app mode 2/b
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date
 * Option to save username, but prompt for password (and not save it) every time

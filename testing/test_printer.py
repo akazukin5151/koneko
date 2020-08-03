@@ -74,7 +74,7 @@ def test_print_info(capsys):
     assert captured.out == '     000\n     Example artist\n'
 
 
-@pytest.mark.parametrize('correct', ([1], [7], [1, 7]))
+@pytest.mark.parametrize('correct', ([1], [8], [1, 8]))
 @pytest.mark.parametrize('incorrect', ([2], [2, 3]))
 def test_maybe_print_size(capsys, correct, incorrect):
     printer.maybe_print_size(correct, 10)
@@ -86,7 +86,7 @@ def test_maybe_print_size(capsys, correct, incorrect):
     assert captured.out == ''
 
 
-@pytest.mark.parametrize('correct', ([2], [7], [2, 7]))
+@pytest.mark.parametrize('correct', ([2], [8], [2, 8]))
 @pytest.mark.parametrize('incorrect', ([1], [1, 3]))
 def test_maybe_print_width_xpadding(capsys, correct, incorrect):
     printer.maybe_print_width_xpadding(correct, 10, 20)
@@ -98,7 +98,7 @@ def test_maybe_print_width_xpadding(capsys, correct, incorrect):
     assert captured.out == ''
 
 
-@pytest.mark.parametrize('correct', ([3], [7], [3, 7]))
+@pytest.mark.parametrize('correct', ([3], [8], [3, 8]))
 @pytest.mark.parametrize('incorrect', ([1], [1, 2]))
 def test_maybe_print_height_ypadding(capsys, correct, incorrect):
     printer.maybe_print_height_ypadding(correct, 10, 20)
@@ -110,7 +110,7 @@ def test_maybe_print_height_ypadding(capsys, correct, incorrect):
     assert captured.out == ''
 
 
-@pytest.mark.parametrize('correct', ([4], [7], [4, 7]))
+@pytest.mark.parametrize('correct', ([4], [8], [4, 8]))
 @pytest.mark.parametrize('incorrect', ([1], [1, 2]))
 def test_maybe_print_page_spacing(capsys, correct, incorrect):
     printer.maybe_print_page_spacing(correct, 10)
@@ -123,7 +123,7 @@ def test_maybe_print_page_spacing(capsys, correct, incorrect):
 
 
 
-@pytest.mark.parametrize('correct', ([5], [7], [5, 7]))
+@pytest.mark.parametrize('correct', ([5], [8], [5, 8]))
 @pytest.mark.parametrize('incorrect', ([1], [1, 2]))
 def test_maybe_print_print_spacing(capsys, correct, incorrect):
     printer.maybe_print_print_spacing(correct, range(5))
@@ -135,7 +135,7 @@ def test_maybe_print_print_spacing(capsys, correct, incorrect):
     assert captured.out == ''
 
 
-@pytest.mark.parametrize('correct', ([6], [7], [6, 7]))
+@pytest.mark.parametrize('correct', ([6], [8], [6, 8]))
 @pytest.mark.parametrize('incorrect', ([1], [1, 2]))
 def test_maybe_print_user_info(capsys, correct, incorrect):
     printer.maybe_print_user_info(correct, 10)

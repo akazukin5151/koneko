@@ -18,6 +18,7 @@ from koneko import (
     printer,
     FakeData,
     KONEKODIR,
+    WELCOME_IMAGE,
 )
 
 
@@ -26,13 +27,17 @@ PLUS = frozenset({'+', '='})
 MINUS = frozenset({'-', '_'})
 
 
+def copy_image() -> Image:
+    return copy(Image(WELCOME_IMAGE))
+
+
 class ImageWrapper:
     def __init__(self):
         self.use_ueberzug = config.use_ueberzug()
         if self.use_ueberzug:
-            self.image = KONEKODIR.parent / 'pics' / '71471144_p0.png'
+            self.image = WELCOME_IMAGE
         else:
-            self.image = copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
+            self.image = copy_image()
 
     def show(self, size, x, y):
         if self.use_ueberzug:
@@ -45,10 +50,6 @@ class ImageWrapper:
             self.canvas.__exit__()
         elif not try_skip:
             self.image.hide()
-
-
-def copy_image() -> Image:
-    return copy(Image(KONEKODIR.parent / 'pics' / '71471144_p0.png'))
 
 
 def thumbnail_size_assistant() -> 'IO[int]':
@@ -67,6 +68,8 @@ def thumbnail_size_assistant() -> 'IO[int]':
     with TERM.cbreak():
         while True:
             image.show(size=size, x=0, y=0)
+            with TERM.location(0, (TERM.height - 10)):
+                print(f'size = {size}')
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)
@@ -80,6 +83,7 @@ def thumbnail_size_assistant() -> 'IO[int]':
                 size -= 20
 
             elif ans.name == 'KEY_ENTER':
+                image.hide(try_skip=False)
                 return size
 
 
@@ -164,7 +168,8 @@ class _AbstractImageAdjuster(ABC):
 
         self.maybe_move_up()
         printer.write('\r' + ' ' * 20 + '\r')
-        self.report()
+        with TERM.location(0, TERM.height - 13):
+            self.report()
 
     def start(self) -> (int, int):
         """Main loop"""
@@ -183,6 +188,7 @@ class _AbstractImageAdjuster(ABC):
 
                 if ans.name == 'KEY_ENTER' and self.image:
                     self.maybe_erase()
+                    utils.exit_if_exist(self.static_canvas)
                     return self.return_tup()
 
                 if ans in PLUS:
@@ -209,6 +215,7 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
 
     def return_tup(self) -> (int, int):
         """Implements abstractmethod"""
+        utils.exit_if_exist(self.image)
         return self.spaces, self.width_or_height
 
     def is_input_valid(self) -> bool:
@@ -219,7 +226,7 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
         """Complements concrete method: Find image width/height first"""
         printer.print_doc(self.doc)
 
-        lscat.show_single_x(self.default_x, self.thumbnail_size)
+        self.static_canvas = lscat.show_single_x(self.default_x, self.thumbnail_size)
 
         self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
@@ -243,7 +250,8 @@ class _XPadding(_AbstractPadding):
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""
-        printer.write(f'x spacing = {self.spaces}')
+        # The trailing spaces at the end ensures everything is covered after exit
+        printer.write(f'x spacing = {self.spaces}    ')
 
     def show_func_args(self) -> Image:
         """Implements abstractmethod: First argument is unique"""
@@ -271,7 +279,8 @@ class _YPadding(_AbstractPadding):
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""
-        printer.write(f'y spacing = {self.spaces}')
+        printer.write(f'y spacing = {self.spaces}      ')
+        # The trailing spaces at the end ensures everything is covered after exit
 
     def maybe_move_down(self) -> 'IO':
         """Overrides base method: move cursor down"""
@@ -300,6 +309,7 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
         self.side_label: str
         self.start_spaces: int
         self.image = None
+        self.static_canvas = None
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""
@@ -394,17 +404,17 @@ def _display_inital_row(ans, size, xpadding, image_width, image_height):
     if ans == 'y':
         _path = picker.pick_dir()
         _data = FakeData(_path)
-        lscat.show_instant(lscat.TrackDownloads, _data)
+        canvas = lscat.handle_scroll(lscat.TrackDownloads, _data, slice(None))
         ncols = config.ncols_config()  # Default fallback, on user choice
         if config.use_ueberzug():
             print('\n' * (image_height * config.nrows_config() + 1))
-        return ncols
+        return ncols, canvas
 
-    lscat.show_instant_sample(size, xpadding, image_width)
+    canvas = lscat.show_instant_sample(size, xpadding, image_width)
     ncols = pure.ncols(TERM.width, xpadding, image_width)
     if config.use_ueberzug():
         print('\n' * (image_height - 2))
-    return ncols
+    return ncols, canvas
 
 
 def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: int) -> 'list[int]':
@@ -420,7 +430,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
     ans = input()
 
     # Setup variables
-    ncols = _display_inital_row(ans, size, xpadding, image_width, image_height)
+    ncols, canvas = _display_inital_row(ans, size, xpadding, image_width, image_height)
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
@@ -452,6 +462,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
                 current_selection -= 1
 
             elif ans.name == 'KEY_ENTER':
+                utils.exit_if_exist(canvas)
                 return spacings
 
 
@@ -469,7 +480,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     # Start
     printer.print_doc(user_info_assistant.__doc__)
 
-    lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
+    canvas = lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
 
     with TERM.cbreak():
         while True:
@@ -486,5 +497,70 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
 
             elif ans.name == 'KEY_ENTER':
                 print('\n' * 3)
+                utils.exit_if_exist(canvas)
                 return spacing
 
+def center_spaces_assistant():
+    """=== Ueberzug center image ===
+    Use +/= to move the image right, and -/_ to move it left
+    Adjust the position to the center of your terminal
+
+    Use q to exit the program, and press enter to confirm the current position
+    """
+    if not config.use_ueberzug():
+        print('Center images assistant is only for ueberzug!')
+        return -1
+
+    # Setup
+    image = WELCOME_IMAGE.parent / '79494300_p0.png'
+    ueberzug = utils.try_import_ueberzug()
+    canvas = ueberzug.Canvas()
+    scaler = utils.try_get_FIT_CONTAIN()
+    vis = utils.try_get_VISIBLE()
+    invs = utils.try_import_ueberzug_module('Visibility').INVISIBLE
+    valid = True
+    spacing = 0
+    i = 0
+
+    # Start
+    printer.print_doc(center_spaces_assistant.__doc__)
+    canvas.__enter__()
+    print('\n' * (TERM.height - 9), f'Current position: {spacing:01}')
+
+    with TERM.cbreak():
+        while True:
+            if valid:
+                printer.move_cursor_up(1)
+                print(f'Current position: {spacing:02}')
+                placement = canvas.create_placement(
+                    str(image) + str(i),
+                    path=str(image),
+                    x=spacing,
+                    y=0,
+                    width=25,
+                    height=25,
+                    scaler=scaler,
+                    visibility=vis,
+                )
+
+            ans = TERM.inkey()
+            utils.quit_on_q(ans)
+
+            if ans in PLUS:
+                spacing += 1
+                valid = True
+
+            elif ans in MINUS and spacing > 0:
+                spacing -= 1
+                valid = True
+
+            elif ans.name == 'KEY_ENTER':
+                utils.exit_if_exist(canvas)
+                return spacing
+
+            else:
+                valid = False
+
+            if valid:
+                placement.visibility = invs
+                i += 1

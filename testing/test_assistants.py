@@ -1,5 +1,5 @@
 """Doesn't do anything too advanced (can't figure out multi-key sequences yet), so just returns defaults"""
-
+from sys import platform
 from unittest.mock import Mock
 
 import pytest
@@ -70,11 +70,11 @@ def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_print_d
 
 
 
-def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch_cbreak, capsys, tmp_path):
     monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: 'y')
-    monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: True)
+    monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: tmp_path)
     monkeypatch.setattr('koneko.lscat_app.FakeData', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
 
@@ -84,11 +84,13 @@ def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch
     captured = capsys.readouterr()
     assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
-def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys):
+
+@pytest.mark.skipif(platform == 'darwin', reason='Ueberzug does not work on macOS')
+def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys, tmp_path):
     monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: 'y')
-    monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: True)
+    monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: tmp_path)
     monkeypatch.setattr('koneko.lscat_app.FakeData', lambda *a: True)
     monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
 
@@ -117,7 +119,7 @@ def test_xpadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys
     assert assistants.xpadding_assistant(310) == (0, 0)
 
     captured = capsys.readouterr()
-    assert captured.out == '\r                    \rimage width = 0\x1b[K\x1b[1A\r                    \rx spacing = 0'
+    assert captured.out == '\r                    \rimage width = 0\x1b[K\x1b[1A\r                    \rx spacing = 0    '
 
 
 def test_ypadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys):
@@ -128,4 +130,4 @@ def test_ypadding_assistant(monkeypatch, patch_cbreak, disable_print_doc, capsys
     assert assistants.ypadding_assistant(310) == (0, 0)
 
     captured = capsys.readouterr()
-    assert captured.out == '\r                    \rimage height = 0\x1b[K\x1b[1A\r                    \ry spacing = 0'
+    assert captured.out == '\r                    \rimage height = 0\x1b[K\x1b[1A\r                    \ry spacing = 0      '

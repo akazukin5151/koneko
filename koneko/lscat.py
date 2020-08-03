@@ -23,15 +23,23 @@ from abc import ABC
 from pixcat import Image
 from returns.result import safe
 
-from koneko import pure, TERM, utils, files, config, printer, KONEKODIR
+from koneko import (
+    pure,
+    TERM,
+    utils,
+    files,
+    config,
+    printer,
+    KONEKODIR,
+    WELCOME_IMAGE
+)
 
 
 def show_single(x: int, y: int, thumbnail_size: int) -> 'IO[Image]':
-    path = KONEKODIR.parent / 'pics' / '71471144_p0.png'
     if config.use_ueberzug():
-        return ueberzug_display(path, x, y, thumbnail_size / 20)
+        return ueberzug_display(WELCOME_IMAGE, x, y, thumbnail_size / 20)
 
-    img = Image(path).thumbnail(thumbnail_size)
+    img = Image(WELCOME_IMAGE).thumbnail(thumbnail_size)
     img.show(align='left', x=x, y=y)
     return img
 
@@ -47,14 +55,48 @@ def show_single_y(y: int, thumbnail_size: int) -> 'IO[Image]':
 
 def show_instant_sample(thumbnail_size, xpadding, image_width: int) -> 'IO':
     xcoords = pure.xcoords(TERM.width, image_width, xpadding)
-    for x in xcoords:
-        show_single(x, 0, thumbnail_size)
+    if not config.use_ueberzug():
+        for x in xcoords:
+            show_single(x, 0, thumbnail_size)
+        return None
+
+    return display_multiple_x_ueberzug(WELCOME_IMAGE, xcoords, thumbnail_size)
 
 
 def display_user_row(size, padding: int, preview_xcoords: 'list[int]') -> 'IO':
-    show_single(padding, 0, size)
-    for px in preview_xcoords:
-        show_single_x(px, size)
+    canvas = show_single(padding, 0, size)
+    if not config.use_ueberzug():
+        for px in preview_xcoords:
+            show_single_x(px, size)
+        return None
+
+    display_multiple_x_canvas(canvas, preview_xcoords, WELCOME_IMAGE, size)
+    return canvas
+
+
+def display_multiple_x_ueberzug(path, xcoords, thumbnail_size):
+    ueberzug = utils.try_import_ueberzug()
+    canvas = ueberzug.Canvas()
+    canvas.__enter__()
+
+    display_multiple_x_canvas(canvas, xcoords, path, thumbnail_size)
+    return canvas
+
+
+def display_multiple_x_canvas(canvas, xcoords, path, thumbnail_size):
+    scaler = utils.try_get_FIT_CONTAIN()
+    vis = utils.try_get_VISIBLE()
+    for x in xcoords:
+        canvas.create_placement(
+            str(path) + str(x),  # Identifier must be unique
+            path=str(path),
+            x=x,
+            y=0,
+            width=thumbnail_size / 20,
+            height=thumbnail_size / 20,
+            scaler=scaler,
+            visibility=vis,
+        )
 
 
 def hide_if_exist(image: Image) -> 'IO':
@@ -63,7 +105,8 @@ def hide_if_exist(image: Image) -> 'IO':
             image.hide()
         except AttributeError:
             image.__exit__()
-        printer.move_cursor_up(1)
+        else:
+            printer.move_cursor_up(1)
 
 
 def icat(path: str) -> 'IO':
@@ -337,7 +380,7 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
 
     os.system('clear')
     canvas.__enter__()
-    while True:
+    for _ in range(number_of_cols * number_of_rows):
         image = yield
 
         number = int(image.split('_')[0])
@@ -351,6 +394,9 @@ def generate_page_ueberzug(path: 'Path', canvas) -> 'IO':
             rowspaces[y % number_of_rows],
             size
         )
+
+    while True:
+        yield
 
 
 def generate_users_ueberzug(path: 'Path', canvas, print_info=True) -> 'IO':

@@ -46,6 +46,7 @@ class AbstractLoop(ABC):
         self.condition: int
         self.current_page: int
         self.scrollable: bool
+        self.use_ueberzug = config.use_ueberzug()
         # Defined in start
         self.terminal_page: int
 
@@ -60,6 +61,15 @@ class AbstractLoop(ABC):
     def max_images_func(self) -> 'Any':
         raise NotImplementedError
 
+    def report(self):
+        printer.new_print_bottom(
+            f'Page {self.current_page} / {self.max_pages}\n',
+            "n: go to next page, "
+            "p: go to previous page, "
+            "q: quit",
+            use_ueberzug=self.use_ueberzug
+        )
+
     def start(self) -> 'IO':
         show_images = True
         self.terminal_page = 0
@@ -69,12 +79,7 @@ class AbstractLoop(ABC):
                 if show_images:
                     self.show_func()
                     self.maybe_show_preview()
-                    print(f'Page {self.current_page} / {self.max_pages}')
-                    print(
-                        "n: go to next page, "
-                        "p: go to previous page, "
-                        "q: quit"
-                    )
+                    self.report()
 
                 ans = TERM.inkey()
                 print(ans)
@@ -120,6 +125,7 @@ class AbstractLoop(ABC):
 
 class GalleryUserLoop(AbstractLoop):
     def __init__(self, data, cls):
+        super().__init__()
         # Unique
         self.cls = cls
         self.data = data
@@ -132,7 +138,7 @@ class GalleryUserLoop(AbstractLoop):
         # Base ABC
         self.condition = 1
         self.current_page = int(data.download_path.name)
-        self.scrollable = config.use_ueberzug() or not config.scroll_display()
+        self.scrollable = self.use_ueberzug or not config.scroll_display()
         self.max_pages = len(
             [x for x in os.listdir(data.download_path.parent)
              if x.isdigit()]
@@ -166,14 +172,18 @@ class GalleryUserLoop(AbstractLoop):
 
 
 class ImageLoop(AbstractLoop):
-    def __init__(self, root, image):
+    def __init__(self, root):
+        super().__init__()
         # Unique
         self.use_ueberzug = config.use_ueberzug()
         self.root = root
-        self.image = image
-        self.all_images = sorted(os.listdir(root))
+
+        self.all_images = [f for f in sorted(os.listdir(root)) if (root / f).is_file()]
+        self.image = self.all_images[0]
         if len(self.all_images) > 1:
             self.FakeData = namedtuple('data', ('download_path', 'page_num'))
+
+
         # Defined in self.show_func()
         self.canvas: 'Optional[ueberzug.Canvas]' = None
         # Defined in self.maybe_show_preview()

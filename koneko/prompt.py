@@ -15,7 +15,7 @@ from koneko import pure, utils, printer, download, TERM
 # Common prompt code
 def ask_quit() -> 'IO':
     """Ask for quit confirmation, no need to press enter"""
-    print('\nAre you sure you want to exit?')
+    printer.print_bottom('\nAre you sure you want to exit?', offset=1)
     with TERM.cbreak():
         while True:
             ans = TERM.inkey()
@@ -27,9 +27,9 @@ def ask_quit() -> 'IO':
 
 def ask_wait_user_input(keyseqs: 'list[str]', view_name: str) -> str:
     if not keyseqs:
-        print(f'Enter {view_name} view command:')
+        printer.print_bottom(f'Enter {view_name} view command:', offset=-1)
     command = TERM.inkey()
-    print(command, end='', flush=True)
+    printer.print_bottom(command, offset=2, end='', flush=True)
     return command
 
 
@@ -60,11 +60,11 @@ def common(
     # needs to be here not in case, because keyseqs needs to be cleared to []
     elif command.name == 'KEY_ESCAPE' or command.name == 'KEY_BACKSPACE':
         # Remove entire line
-        print('\r', '\b \b' * 4, end='', flush=True)
+        printer.print_bottom('\r', '\b \b' * 4, end='', flush=True)
         return []
 
     elif not command.isdigit() or len(keyseqs) > 3:
-        print('\nInvalid command! Press h to show help')
+        printer.print_bottom('\nInvalid command! Press h to show help')
         return []
 
 
@@ -91,7 +91,7 @@ def gallery_like_prompt(gallery):
         'p': gallery.previous_page,
         'h': gallery.help,
         'q': ask_quit,
-        'm': lambda: print('', gallery.__doc__),
+        'm': lambda: printer.print_bottom('', gallery.__doc__),
         'KEY_DOWN': gallery.scroll_down,
         'KEY_UP': gallery.scroll_up,
     }
@@ -110,7 +110,7 @@ def gallery_like_prompt(gallery):
                 image_num = utils.seq_coords_to_int(keyseqs)
                 if image_num is not False:
                     return goto_image(gallery, image_num)
-                print('\nInvalid command! Press h to show help')
+                printer.print_bottom('\nInvalid command! Press h to show help')
                 keyseqs = []
 
             # 1. One letter two digit sequence
@@ -149,7 +149,7 @@ def image_prompt(image):
         'r': image.view_related_images,
         'h': printer.image_help,
         'q': ask_quit,
-        'm': lambda: print(image.__doc__)
+        'm': lambda: printer.print_bottom(image.__doc__)
     }
 
     with TERM.cbreak():
@@ -186,7 +186,7 @@ def user_prompt(user):
         'p': user.previous_page,
         'h': printer.user_help,
         'q': ask_quit,
-        'm': lambda: print(user.__class__.__bases__[0].__doc__),
+        'm': lambda: printer.print_bottom(user.__class__.__bases__[0].__doc__),
         'KEY_DOWN': user.scroll_down,
         'KEY_UP': user.scroll_up,
     }
@@ -231,7 +231,7 @@ def open_or_download(gallery, keyseqs: 'list[str]') -> 'IO':
 
 def goto_image(gallery, image_num: int) -> 'IO':
     if image_num is False:
-        print('Invalid number!')
+        printer.print_bottom('Invalid number!')
         gallery_like_prompt(gallery)  # Go back to while loop
     else:
         gallery.view_image(image_num)

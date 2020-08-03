@@ -3,7 +3,16 @@ import shutil
 
 import pixcat
 
-from koneko import ui, cli, utils, config, lscat, __version__, KONEKODIR
+from koneko import (
+    ui,
+    cli,
+    utils,
+    config,
+    lscat,
+    KONEKODIR,
+    __version__,
+    WELCOME_IMAGE
+)
 
 
 def display(path, icat_size, ueberzug_size):
@@ -34,7 +43,7 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         for message in messages:
             print(' ' * 30, message)
 
-    canvas = display(KONEKODIR.parent / 'pics' / '71471144_p0.png', 600, 600)
+    canvas = display(WELCOME_IMAGE, 600, 600)
 
     command = input('\n\nEnter a command: ')
     utils.exit_if_exist(canvas)

@@ -98,7 +98,7 @@ def test_browse_cache_image(monkeypatch, tmp_path, argv):
     monkeypatch.setattr('koneko.picker.pick_dir', lambda: path)
 
     lscat_app.main()
-    assert mock.mock_calls == [call(path, 'somefile'), call().start()]
+    assert mock.mock_calls == [call(path), call().start()]
 
 
 def test_display_path_cli_invalid_quits(monkeypatch, capsys):

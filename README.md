@@ -145,7 +145,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
         - Also happens with view user/image while prefetching
     - [ ] BUG: print info is hidden by ueberzug
-        - [ ] lscat app
+        - [x] lscat app
             - [x] config assistant
             - [x] mode 2 and 3 (browse cache and display path)
                 - [x] Gallery
@@ -154,17 +154,15 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [ ] Gallery
         - [ ] User
         - [ ] Image
-    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentat ueberzug usage, & update README.md about ueberzug
-    - [x] Center align image mode
-        - [x] Add config
-        - [x] Update configuration assistant
-        - [ ] DOCS
+    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentate ueberzug usage, & update README.md about ueberzug
+        - [ ] Help and manual needs to be updated as well
+        - [ ] Center align image config
     - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
     - [ ] Better loops, extract common code to functions or even ABCs
+        - [ ] Consider program wide singleton where only one ueberzug process will be used in the entire program's lifetime, only changing the visibility attribute to hide/unhide images
         - [ ] Performance: Do not instantiate a new canvas in every loop (eg in assistants.py:)
             - [ ] ImageWrapper (thumbnail size assistant)
             - [ ] AbstractImageAdjuster
-        - [ ] Consider program wide singleton where only one ueberzug process will be used in the entire program's lifetime, only changing the visibility attribute to hide/unhide images
         - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
 
 * Illust-related mode can't go back to image mode

@@ -175,7 +175,8 @@ class _AbstractImageAdjuster(ABC):
 
                 if ans.name == 'KEY_ENTER' and self.image:
                     self.maybe_erase()
-                    utils.exit_if_exist(self.static_canvas)
+                    if self.static:
+                        lscat.api.hide(self.static)
                     return self.return_tup()
 
                 if ans in PLUS:
@@ -213,7 +214,7 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
         """Complements concrete method: Find image width/height first"""
         printer.print_doc(self.doc)
 
-        self.static_canvas = lscat.show_single_x(self.default_x, self.thumbnail_size)
+        self.static = lscat.api.show(WELCOME_IMAGE, self.default_x, 0, self.thumbnail_size)
 
         self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
@@ -296,7 +297,7 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
         self.side_label: str
         self.start_spaces: int
         self.image = None
-        self.static_canvas = None
+        self.static = None
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""

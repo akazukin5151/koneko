@@ -1,5 +1,4 @@
 import os
-import sys
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
@@ -9,7 +8,7 @@ from koneko import utils, lscat, config, TERM, printer, FakeData
 def scroll_prompt(cls, data, max_images):
     show = True
     terminal_page = 0
-    canvas = None
+    images = []
 
     if cls is lscat.TrackDownloadsUsers:
         max_scrolls = utils.max_terminal_scrolls(data, False)
@@ -19,9 +18,9 @@ def scroll_prompt(cls, data, max_images):
     with TERM.cbreak():
         while True:
             if show:
-                utils.exit_if_exist(canvas)
+                lscat.api.hide_all(images)
                 myslice = utils.slice_images(max_images, terminal_page)
-                canvas = lscat.handle_scroll(cls, data, myslice)
+                images = lscat.handle_scroll(cls, data, myslice)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)
@@ -58,11 +57,11 @@ class AbstractLoop(ABC):
         return True
 
     @abstractmethod
-    def max_images_func(self) -> 'Any':
+    def end_func(self) -> 'Any':
         raise NotImplementedError
 
     def report(self):
-        printer.new_print_bottom(
+        printer.print_bottom(
             f'Page {self.current_page} / {self.max_pages}\n',
             "n: go to next page, "
             "p: go to previous page, "
@@ -120,7 +119,7 @@ class AbstractLoop(ABC):
                     show_images = False
 
                 if show_images:
-                    self.max_images_func()
+                    self.end_func()
 
 
 class GalleryUserLoop(AbstractLoop):
@@ -133,7 +132,7 @@ class GalleryUserLoop(AbstractLoop):
         self.max_images: int
         self.max_scrolls: int
         self.myslice: slice
-        self.canvas: 'Optional[ueberzug.Canvas]' = None
+        self.images: 'list[Placement | Image]' = []
 
         # Base ABC
         self.condition = 1
@@ -162,12 +161,12 @@ class GalleryUserLoop(AbstractLoop):
     def show_func(self) -> 'IO':
         if self.scrollable:
             self.myslice = utils.slice_images(self.max_images, self.terminal_page)
-            self.canvas = lscat.handle_scroll(self.cls, self.data, self.myslice)
+            self.images = lscat.handle_scroll(self.cls, self.data, self.myslice)
         else:
             lscat.show_instant(self.cls, self.data)
 
-    def max_images_func(self):
-        utils.exit_if_exist(self.canvas)
+    def end_func(self):
+        lscat.api.hide_all(self.images)
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
 
@@ -179,15 +178,15 @@ class ImageLoop(AbstractLoop):
         self.root = root
 
         self.all_images = [f for f in sorted(os.listdir(root)) if (root / f).is_file()]
-        self.image = self.all_images[0]
+        self.image_path = self.all_images[0]
         if len(self.all_images) > 1:
             self.FakeData = namedtuple('data', ('download_path', 'page_num'))
 
 
         # Defined in self.show_func()
-        self.canvas: 'Optional[ueberzug.Canvas]' = None
+        self.image: 'Optional[ueberzug.Canvas]' = None
         # Defined in self.maybe_show_preview()
-        self.preview_canvas: 'Optional[ueberzug.Canvas]' = None
+        self.preview_images: 'list[ueberzug.Canvas]' = []
 
         # Base ABC
         self.condition = 0
@@ -196,15 +195,12 @@ class ImageLoop(AbstractLoop):
         self.scrollable = False
 
     def show_func(self) -> 'IO':
-        if self.use_ueberzug:
-            self.canvas = lscat.ueberzug_center_align(self.root / self.image)
-        else:
-            lscat.icat(self.root / self.image)
+        self.image = lscat.api.show_center(self.root / self.image_path)
 
-    def max_images_func(self):
-        self.image = self.all_images[self.current_page]
-        utils.exit_if_exist(self.canvas)
-        utils.exit_if_exist(self.preview_canvas)
+    def end_func(self):
+        self.image_path = self.all_images[self.current_page]
+        lscat.api.hide(self.image)
+        lscat.api.hide_all(self.preview_images)
 
     def maybe_show_preview(self) -> 'IO':
         if len(self.all_images) > 1:
@@ -213,7 +209,7 @@ class ImageLoop(AbstractLoop):
             for image in self.all_images[self.current_page + 1:][:4]:
                 tracker.update(image)
             printer.move_cursor_xy(loc[0], loc[1])
-            self.preview_canvas = tracker.canvas
+            self.preview_images = tracker.images
 
     def _update_tracker(self) -> 'IO':
         """Unique"""

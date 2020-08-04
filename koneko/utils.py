@@ -22,9 +22,8 @@ from subprocess import check_output
 from logging.handlers import RotatingFileHandler
 
 import funcy
-from pixcat import Image
 
-from koneko import pure, config, printer, KONEKODIR, WELCOME_IMAGE
+from koneko import config, KONEKODIR
 
 
 # History and logging
@@ -208,9 +207,3 @@ def try_get_FIT_CONTAIN():
 def try_get_VISIBLE():
     return try_import_ueberzug_module('Visibility').VISIBLE
 
-def exit_if_exist(canvas):
-    if canvas:
-        try:
-            canvas.__exit__()
-        except AttributeError:
-            pass

@@ -191,9 +191,7 @@ def maybe_ypadding_img_height(actions: 'list[int]', size: int) -> 'tuple[Optiona
 
 def maybe_page_spacing(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]':
     if 4 in actions or 8 in actions:
-        ans = assistants.page_spacing_assistant(size)
-        if ans != -1:
-            return ans
+        return assistants.page_spacing_assistant(size)
     return None
 
 

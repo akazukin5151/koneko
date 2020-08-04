@@ -56,12 +56,7 @@ def maybe_print_height_ypadding(actions, image_height: int, ypadding: int) -> 'I
 
 
 def maybe_print_page_spacing(actions, page_spacing: 'Union[tuple, str]') -> 'IO':
-    if not (isinstance(page_spacing, tuple) and isinstance(page_spacing[0], int)):
-        return
-    if not page_spacing.isdigit():
-        return
-
-    if (4 in actions or 8 in actions):
+    if (4 in actions or 8 in actions) and page_spacing is not None:
         print(f'page_spacing = {page_spacing}')
 
 

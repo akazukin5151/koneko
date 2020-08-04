@@ -357,7 +357,7 @@ def check_ueberzug() -> bool:
 def page_spacing_assistant(thumbnail_size: int) -> int:
     # This doesn't use print_doc() as a clean state is needed
     if not check_ueberzug():
-        return -1
+        return None
 
     os.system('clear')
     print(*(

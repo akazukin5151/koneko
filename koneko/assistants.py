@@ -1,9 +1,7 @@
 """prompt.py but for lscat_app"""
 
 import os
-import sys
 import time
-from copy import copy
 from abc import ABC, abstractmethod
 
 from pixcat import Image
@@ -17,7 +15,6 @@ from koneko import (
     picker,
     printer,
     FakeData,
-    KONEKODIR,
     WELCOME_IMAGE,
 )
 

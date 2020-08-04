@@ -1,11 +1,8 @@
 import os
-import sys
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
 from koneko import utils, lscat, config, TERM, printer, FakeData
-
-
 
 
 def scroll_prompt(cls, data, max_images):

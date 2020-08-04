@@ -202,7 +202,7 @@ class ImageLoop(AbstractLoop):
 
     def end_func(self):
         self.image_path = self.all_images[self.current_page]
-        lscat.api.hide(self.image)  # FIXME: doesn't work for some reason
+        lscat.api.hide(self.image)
         lscat.api.hide_all(self.preview_images)
 
     def maybe_show_preview(self) -> 'IO':

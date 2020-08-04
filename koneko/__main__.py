@@ -24,9 +24,7 @@ def _main() -> 'IO':
         try:
             func(args, your_id)
         except KeyboardInterrupt:
-            args_to_pass = args
-        else:
-            args_to_pass = None
+            pass
 
         os.system('clear')
         main.main_loop(None, your_id)

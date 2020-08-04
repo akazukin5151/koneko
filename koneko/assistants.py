@@ -205,7 +205,7 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
 
     def return_tup(self) -> (int, int):
         """Implements abstractmethod"""
-        utils.exit_if_exist(self.image)
+        lscat.api.hide(self.image)
         return self.spaces, self.width_or_height
 
     def is_input_valid(self) -> bool:

@@ -60,8 +60,8 @@ class Display(ABC):
         return [self.show(image_path, x, 0, size) for x in xcoords]
 
     def hide_all(self, images):
-        for image in images:
-            if image:
+        if images:
+            for image in images:
                 self.hide(image)
 
 class Pixcat(Display):
@@ -73,7 +73,8 @@ class Pixcat(Display):
         return Image(image_path).show(y=0)
 
     def hide(self, image: 'pixcat.Image'):
-        image.hide()
+        if image:
+            image.hide()
 
     # Unique
     def show_no_xy(self, image_path, size):
@@ -117,7 +118,8 @@ class Ueberzug(Display):
         )
 
     def hide(self, placement: 'ueberzug.Placement'):
-        placement.visibility = self.invisible
+        if placement:
+            placement.visibility = self.invisible
 
 
 api = Ueberzug() if config.use_ueberzug() else Pixcat()

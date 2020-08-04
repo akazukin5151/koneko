@@ -30,7 +30,6 @@ from koneko import (
     files,
     config,
     printer,
-    KONEKODIR,
     WELCOME_IMAGE
 )
 

@@ -41,7 +41,7 @@ class AbstractUI(ABC):
 
         # Attribute defined in self.start()
         self._data: 'data.<class>'  # Instantiated data class, not reference
-        self.images: 'Optional[ueberzug.Canvas]' = None
+        self.images: 'list[Image]' = []
         # Attribute defined in self.prefetch_thread()
         self._prefetch_thread: threading.Thread
 
@@ -628,8 +628,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.event = threading.Event()
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
-        self.image: 'Optional[ueberzug.Canvas]' = None
-        self.preview_images: 'Optional[ueberzug.Canvas]' = None
+        self.image: 'list[Image]' = []
+        self.preview_images: 'list[Image]' = []
 
     def display_initial(self) -> 'IO':
         os.system('clear')

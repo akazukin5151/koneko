@@ -117,31 +117,6 @@ class Ueberzug(Display):
         )
 
     def hide(self, placement: 'ueberzug.Placement'):
-<<<<<<< HEAD
-        placement.visibility = self.invisible
-
-
-api = Ueberzug() if config.use_ueberzug() else Pixcat()
-
-
-
-def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
-    return api.show(WELCOME_IMAGE, x, 0, thumbnail_size)
-
-def show_single_y(y: int, size: int) -> 'IO[Image]':
-    return api.show(WELCOME_IMAGE, config.xcoords_config()[1], y, size)
-
-
-def icat(path: str) -> 'IO':
-    """icat (system command) and pixcat behaves differently.
-    pixcat prints out the escape codes, shifting the current cursor position,
-    but calling a system command does not. I abuse this fact in the main
-    generators to make printing pages easier, and user mode is possible only
-    because of this fact.
-    """
-    Image(path).show()
-
-=======
         if placement:
             placement.visibility = self.invisible
 
@@ -156,8 +131,6 @@ def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
 def show_single_y(y: int, size: int) -> 'IO[Image]':
     return api.show(WELCOME_IMAGE, config.xcoords_config()[1], y, size)
 
-
->>>>>>> lscat-api
 
 def handle_scroll(cls, data, myslice):
     tracker = cls(data)

@@ -49,7 +49,7 @@ class APIHandler:
         """
         try:
             self._api.auth(refresh_token=self._token)
-        except PixivError as e:
+        except PixivError:
             return False
         return True
 

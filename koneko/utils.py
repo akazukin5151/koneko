@@ -22,7 +22,6 @@ from subprocess import check_output
 from logging.handlers import RotatingFileHandler
 
 import funcy
-from pixcat import Image
 
 from koneko import config, KONEKODIR
 

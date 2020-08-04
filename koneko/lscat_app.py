@@ -29,7 +29,6 @@ Possible configuration assistants:
 import os
 import sys
 from pathlib import Path
-from collections import namedtuple
 
 from docopt import docopt
 

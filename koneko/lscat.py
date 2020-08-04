@@ -315,10 +315,8 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
 def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
-    page_spacing = config.users_page_spacing_config()
     thumbnail_size = config.thumbnail_size_config()
 
-    number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
     rowspaces = config.ycoords_config()
     msg_rows = [rowspaces[0]] + [rowspaces[1]] * (number_of_rows - 1)

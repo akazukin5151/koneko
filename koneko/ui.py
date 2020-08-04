@@ -41,7 +41,7 @@ class AbstractUI(ABC):
 
         # Attribute defined in self.start()
         self._data: 'data.<class>'  # Instantiated data class, not reference
-        self.canvas: 'Optional[ueberzug.Canvas]' = None
+        self.images: 'Optional[ueberzug.Canvas]' = None
         # Attribute defined in self.prefetch_thread()
         self._prefetch_thread: threading.Thread
 
@@ -101,7 +101,7 @@ class AbstractUI(ABC):
     def _download_save_canvas(self):
         tracker = self._tracker_class(self._data)
         download.init_download(self._data, tracker)
-        self.canvas = tracker.images
+        self.images = tracker.images
 
 
     def _prefetch(self) -> 'IO':
@@ -172,9 +172,9 @@ class AbstractUI(ABC):
         self._show_page()
 
     def handle_scroll(self):
-        lscat.api.hide_all(self.canvas)
+        lscat.api.hide_all(self.images)
         myslice = utils.slice_images(self._max_images, self.terminal_page)
-        self.canvas = lscat.handle_scroll(self._tracker_class, self._data, myslice)
+        self.images = lscat.handle_scroll(self._tracker_class, self._data, myslice)
 
     def scroll_or_show(self):
         if self.scrollable:
@@ -197,7 +197,7 @@ class AbstractUI(ABC):
         if ans == 'y' or not ans:
             # Will remove all data, but keep info on the main path
             rmtree(self._data.main_path)
-            lscat.api.hide_all(self.canvas)
+            lscat.api.hide_all(self.images)
             self.start(self._data.main_path)
         self._prompt(self)
 
@@ -238,7 +238,7 @@ class AbstractGallery(AbstractUI, ABC):
 
     def view_image(self, selected_image_num: int) -> 'IO':
         """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
-        lscat.api.hide_all(self.canvas)
+        lscat.api.hide_all(self.images)
         ViewImage(self._data, selected_image_num).start()
         # Image prompt ends, user presses back
         self._back()
@@ -296,7 +296,7 @@ class ArtistGallery(AbstractGallery):
         """Implements abstractmethod"""
         # Display image (using either coords or image number), the show this prompt
         if keyseqs[0] == 'b':
-            lscat.api.hide_all(self.canvas)
+            lscat.api.hide_all(self.images)
             # Gallery instance stopped here, return to previous state
         elif keyseqs[0] == 'r':
             self.reload()
@@ -368,7 +368,7 @@ class IllustFollowGallery(AbstractGallery):
     def go_artist_gallery_num(self, selected_image_num: int) -> 'IO':
         """Like self.view_image(), but goes to artist mode instead of image"""
         artist_user_id = self._data.artist_user_id(selected_image_num)
-        lscat.api.hide_all(self.canvas)
+        lscat.api.hide_all(self.images)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # Gallery prompt ends, user presses back
@@ -470,7 +470,7 @@ class AbstractUsers(AbstractUI, ABC):
             printer.print_bottom('Invalid number!')
             return False
 
-        lscat.api.hide_all(self.canvas)
+        lscat.api.hide_all(self.images)
         mode = ArtistGallery(artist_user_id)
         prompt.gallery_like_prompt(mode)
         # After backing from gallery
@@ -628,12 +628,12 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.event = threading.Event()
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
-        self.canvas: 'Optional[ueberzug.Canvas]' = None
-        self.preview_canvas: 'Optional[ueberzug.Canvas]' = None
+        self.image: 'Optional[ueberzug.Canvas]' = None
+        self.preview_images: 'Optional[ueberzug.Canvas]' = None
 
     def display_initial(self) -> 'IO':
         os.system('clear')
-        self.canvas = lscat.api.show_center(self.download_path / self.large_filename)
+        self.image = lscat.api.show_center(self.download_path / self.large_filename)
         printer.print_bottom(f'Page 1/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
 
     def open_image(self) -> 'IO':
@@ -694,10 +694,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             )
 
         os.system('clear')
-        lscat.api.hide(self.canvas)
-        lscat.api.hide_all(self.preview_canvas)
+        lscat.api.hide(self.image)
+        lscat.api.hide_all(self.preview_images)
 
-        self.canvas = lscat.api.show_center(self.filepath)
+        self.image = lscat.api.show_center(self.filepath)
 
         printer.print_bottom(f'Page {self.page_num+1}/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
         self.start_preview()
@@ -709,8 +709,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             download.async_download_spinner(self.download_path, [next_img_url])
 
     def leave(self, force=False) -> 'IO':
-        lscat.api.hide(self.canvas)
-        lscat.api.hide_all(self.preview_canvas)
+        lscat.api.hide(self.image)
+        lscat.api.hide_all(self.preview_images)
         self.event.set()
         if self.firstmode or force:
             # Came from view post mode, don't know current page num
@@ -720,8 +720,8 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         # Else: image prompt and class ends, goes back to previous mode
 
     def view_related_images(self):
-        lscat.api.hide(self.canvas)
-        lscat.api.hide_all(self.preview_canvas)
+        lscat.api.hide(self.image)
+        lscat.api.hide_all(self.preview_images)
         mode = IllustRelatedGallery(self.image_id, self.download_path.parent)
         prompt.gallery_like_prompt(mode)
 
@@ -755,7 +755,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             if i == 4:  # Last pic
                 printer.move_cursor_xy(self.loc[0], self.loc[1])
 
-            self.preview_canvas = tracker.images
+            self.preview_images = tracker.images
 
             i += 1
 

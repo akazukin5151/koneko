@@ -212,10 +212,7 @@ class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
     def __init__(self, data: 'data.<class>'):
         self.orders = list(range(30))
-        if config.use_ueberzug():
-            self.generator = generate_page_ueberzug(data.download_path)
-        else:
-            self.generator = generate_page(data.download_path)
+        self.generator = generate_page(data.download_path)
         super().__init__()
 
 
@@ -235,6 +232,7 @@ class TrackDownloadsUsers(AbstractTracker):
         # splitpoint * 3 + splitpoint == splitpoint * 4
         self.orders = pure.generate_orders(splitpoint * 4, splitpoint)
 
+        # TODO: Cannot merge yet because generate_users() goes to a new terminal page for every row
         if config.use_ueberzug():
             self.generator = generate_users_ueberzug(data.download_path, print_info)
         else:
@@ -247,10 +245,7 @@ class TrackDownloadsImage(AbstractTracker):
     def __init__(self, data):
         min_num = data.page_num + 1
         self.orders = list(range(min_num, 30))
-        if config.use_ueberzug():
-            self.generator = generate_previews_ueberzug(data.download_path, min_num)
-        else:
-            self.generator = generate_previews(data.download_path, min_num)
+        self.generator = generate_previews_ueberzug(data.download_path, min_num)
         super().__init__()
 
     def update(self, new: str):

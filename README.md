@@ -135,12 +135,15 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Rename utils.check_quit() to quit_on_q()
 * Move lscat related functions in utils to lscat
 * print_doc now restores previous cursor location
+* Rewrite of core lscat functions: **new unified API (lscat.api)** with the same interface for both pixcat and ueberzug
+    * For ueberzug, only one ueberzug process and canvas is instantiated in the program
 
 
 # Roadmap
 
 ## Features
 
+* Test new lscat api
 * Refine ueberzug (must complete before release)
     - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
         - Also happens with view user/image while prefetching
@@ -149,12 +152,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         - [ ] Help and manual needs to be updated as well
         - [ ] Center align image config
     - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
-    - [ ] Better loops, extract common code to functions or even ABCs
-        - [ ] Consider program wide singleton where only one ueberzug process will be used in the entire program's lifetime, only changing the visibility attribute to hide/unhide images
-        - [ ] Performance: Do not instantiate a new canvas in every loop (eg in assistants.py:)
-            - [ ] ImageWrapper (thumbnail size assistant)
-            - [ ] AbstractImageAdjuster
-        - Possibly use unified API (path, x, y, size), but determine which function to call at runtime. eg `func = lscat.ueberzug if config.use_ueberzug() else lscat.icat`
 
 - Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
 

@@ -279,7 +279,7 @@ def test_generate_users_ueberzug(monkeypatch, capsys):
     assert captured.out == '                  00\n                  test\n\n\n\n\n\n\n\n\n\n                  04\n                  test\n'
 
 
-def test_generate_previews_ueberzug(monkeypatch):
+def test_generate_previews(monkeypatch):
     monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
     mocked_api = Mock()
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
@@ -289,7 +289,7 @@ def test_generate_previews_ueberzug(monkeypatch):
     test_pics = [f"12345_p{idx}_master1200.jpg"
                  for idx in list(range(10))]
 
-    gen = lscat.generate_previews_ueberzug(Path('.'), 10)  # Path doesn't matter
+    gen = lscat.generate_previews(Path('.'), 10)  # Path doesn't matter
     gen.send(None)
 
     # No need to shuffle, tracker already shuffles

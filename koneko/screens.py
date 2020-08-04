@@ -15,13 +15,6 @@ from koneko import (
 )
 
 
-def display(path, icat_size, ueberzug_size):
-    if config.use_ueberzug():
-        return lscat.ueberzug_display(path, 0, 0, ueberzug_size // 20)
-    pixcat.Image(path).thumbnail(icat_size).show(align='left', y=0)
-    return None
-
-
 def begin_prompt(printmessage=True) -> 'IO[str]':
     messages = (
         '',
@@ -43,10 +36,10 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         for message in messages:
             print(' ' * 30, message)
 
-    canvas = display(WELCOME_IMAGE, 600, 600)
+    image = lscat.api.show(WELCOME_IMAGE, 0, 0, 600)
 
     command = input('\n\nEnter a command: ')
-    utils.exit_if_exist(canvas)
+    lscat.api.hide(image)
     return command
 
 
@@ -111,11 +104,12 @@ def info_screen_loop() -> 'IO':
     for message in messages:
         print(' ' * 26, message)
 
-    canvas = display(KONEKODIR.parent / 'pics' / '79494300_p0.png', 750, 500)
+    size = 500 if config.use_ueberzug() else 750
+    image = lscat.api.show(WELCOME_IMAGE.parent / '79494300_p0.png', 0, 0, size)
 
     while True:
         help_command = input('\nEnter any key to return: ')
         if help_command or help_command == '':
             os.system('clear')
-            utils.exit_if_exist(canvas)
+            lscat.api.hide(image)
             break

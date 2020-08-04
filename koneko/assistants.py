@@ -27,31 +27,6 @@ PLUS = frozenset({'+', '='})
 MINUS = frozenset({'-', '_'})
 
 
-def copy_image() -> Image:
-    return copy(Image(WELCOME_IMAGE))
-
-
-class ImageWrapper:
-    def __init__(self):
-        self.use_ueberzug = config.use_ueberzug()
-        if self.use_ueberzug:
-            self.image = WELCOME_IMAGE
-        else:
-            self.image = copy_image()
-
-    def show(self, size, x, y):
-        if self.use_ueberzug:
-            self.canvas = lscat.ueberzug_display(self.image, x=x, y=y, size=size/20)
-        else:
-            self.image.thumbnail(size).show(align='left', x=x, y=y)
-
-    def hide(self, try_skip):
-        if self.use_ueberzug:
-            self.canvas.__exit__()
-        elif not try_skip:
-            self.image.hide()
-
-
 def thumbnail_size_assistant() -> 'IO[int]':
     """=== Thumbnail size ===
     This will display an image whose thumbnail size can be varied
@@ -60,14 +35,17 @@ def thumbnail_size_assistant() -> 'IO[int]':
 
     Keep in mind this size will be used for a grid of images
     """
+    # Setup
+    images = []
+    size = 300
+    previous_size = 300
+
+    # Start
     printer.print_doc(thumbnail_size_assistant.__doc__)
 
-    image = ImageWrapper()
-
-    size = 300  # starting size
     with TERM.cbreak():
         while True:
-            image.show(size=size, x=0, y=0)
+            images.append(lscat.api.show(WELCOME_IMAGE, 0, 0, size))
             with TERM.location(0, (TERM.height - 10)):
                 print(f'size = {size}')
 
@@ -75,15 +53,24 @@ def thumbnail_size_assistant() -> 'IO[int]':
             utils.quit_on_q(ans)
 
             if ans in PLUS:
-                image.hide(try_skip=True)
+                previous_size = size
                 size += 20
 
+            # +, +, +, -, +
+            # |     |  ^  |> Do nothing here as well
+            # |     |  |
+            # |     |  |
+            # |     |  This is where all images should be hidden
+            # |     |
+            # No images hidden in this range
             elif ans in MINUS:
-                image.hide(try_skip=False)
+                previous_size = size
                 size -= 20
+                if previous_size > size:
+                    lscat.api.hide_all(images)
 
             elif ans.name == 'KEY_ENTER':
-                image.hide(try_skip=False)
+                lscat.api.hide_all(images)
                 return size
 
 
@@ -162,7 +149,8 @@ class _AbstractImageAdjuster(ABC):
 
     def hide_show_print(self) -> 'IO':
         """Hide image if shown, show another image, and report"""
-        lscat.hide_if_exist(self.image)
+        if self.image:
+            lscat.api.hide(self.image)
 
         self.image = self.show_func_args()
 
@@ -188,7 +176,9 @@ class _AbstractImageAdjuster(ABC):
 
                 if ans.name == 'KEY_ENTER' and self.image:
                     self.maybe_erase()
-                    utils.exit_if_exist(self.static_canvas)
+                    lscat.api.hide(self.image)
+                    if self.static:
+                        lscat.api.hide(self.static)
                     return self.return_tup()
 
                 if ans in PLUS:
@@ -226,7 +216,7 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
         """Complements concrete method: Find image width/height first"""
         printer.print_doc(self.doc)
 
-        self.static_canvas = lscat.show_single_x(self.default_x, self.thumbnail_size)
+        self.static = lscat.api.show(WELCOME_IMAGE, self.default_x, 0, self.thumbnail_size)
 
         self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
@@ -309,7 +299,7 @@ class _FindImageDimension(_AbstractImageAdjuster, ABC):
         self.side_label: str
         self.start_spaces: int
         self.image = None
-        self.static_canvas = None
+        self.static = None
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""
@@ -367,7 +357,7 @@ def check_ueberzug() -> bool:
 def page_spacing_assistant(thumbnail_size: int) -> int:
     # This doesn't use print_doc() as a clean state is needed
     if not check_ueberzug():
-        return -1
+        return None
 
     os.system('clear')
     print(*(
@@ -380,7 +370,7 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
     input('\nEnter any key to continue\n')
     os.system('clear')
 
-    copy_image().thumbnail(thumbnail_size).show(align='left')
+    image = lscat.api.show_no_xy(WELCOME_IMAGE, thumbnail_size)
 
     time.sleep(0.1)
 
@@ -396,6 +386,7 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
     while True:
         ans = input()
         if ans.isdigit():
+            lscat.api.hide(image)
             return ans
         print('Must enter a number!')
 
@@ -404,17 +395,17 @@ def _display_inital_row(ans, size, xpadding, image_width, image_height):
     if ans == 'y':
         _path = picker.pick_dir()
         _data = FakeData(_path)
-        canvas = lscat.handle_scroll(lscat.TrackDownloads, _data, slice(None))
+        images = lscat.handle_scroll(lscat.TrackDownloads, _data, slice(None))
         ncols = config.ncols_config()  # Default fallback, on user choice
         if config.use_ueberzug():
             print('\n' * (image_height * config.nrows_config() + 1))
-        return ncols, canvas
+        return ncols, images
 
-    canvas = lscat.show_instant_sample(size, xpadding, image_width)
+    images = lscat.api.show_row(WELCOME_IMAGE, xpadding, image_width, size)
     ncols = pure.ncols(TERM.width, xpadding, image_width)
     if config.use_ueberzug():
         print('\n' * (image_height - 2))
-    return ncols, canvas
+    return ncols, images
 
 
 def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: int) -> 'list[int]':
@@ -430,7 +421,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
     ans = input()
 
     # Setup variables
-    ncols, canvas = _display_inital_row(ans, size, xpadding, image_width, image_height)
+    ncols, images = _display_inital_row(ans, size, xpadding, image_width, image_height)
 
     # Just the default settings; len(first_list) == 5
     spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
@@ -462,7 +453,7 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
                 current_selection -= 1
 
             elif ans.name == 'KEY_ENTER':
-                utils.exit_if_exist(canvas)
+                lscat.api.hide_all(images)
                 return spacings
 
 
@@ -480,7 +471,6 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     # Start
     printer.print_doc(user_info_assistant.__doc__)
 
-    #canvas = lscat.display_user_row(thumbnail_size, xpadding, preview_xcoords)
     images = lscat.api.show_user_row(WELCOME_IMAGE, preview_xcoords, xpadding, thumbnail_size)
 
     if not config.use_ueberzug():
@@ -533,7 +523,7 @@ def center_spaces_assistant():
             if valid:
                 printer.move_cursor_up(1)
                 print(f'Current position: {spacing:02}')
-                placement = lscat.api.show(image, spacing, 0, 25)
+                placement = lscat.api.show(image, spacing, 0, 500)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)

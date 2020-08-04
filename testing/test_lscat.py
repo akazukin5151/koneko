@@ -49,7 +49,7 @@ def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
     }
 
 
-def test_TrackDownloads(monkeypatch):
+def test_TrackDownloads():
     mocked_data = Mock()
     mocked_generator = Mock()
     tracker = lscat.TrackDownloads(mocked_data)
@@ -63,20 +63,23 @@ def test_TrackDownloads(monkeypatch):
     for pic in random.sample(test_pics, 30):
         tracker.update(pic)
 
-    assert len(mocked_generator.mock_calls) == 30
-    methods_called = [mocked_generator.mock_calls[i][0] for i in range(30)]
-    # Only thing the tracker does is to call send() on the generator
-    assert methods_called == ['send'] * 30
+    assert len(mocked_generator.mock_calls) == 60 # 30 images * 2 because of None sends
+    assert mocked_generator.mock_calls[:4] == [
+        call.send('000_test'),
+        call.send(None),
+        call.send('001_test'),
+        call.send(None),
+    ]
 
-    #         first value in tuple (eg '020_test') <--|
-    #                                                 |  |--> convert digits to int
-    #  arg passed into generator.send, is tuple <--|  |  |
-    #                                              |  |  |
-    sent_img = [int(mocked_generator.mock_calls[i][1][0][:3]) for i in range(30)]
-    assert correct_order == sent_img
+    assert mocked_generator.mock_calls[-4:] == [
+        call.send('028_test'),
+        call.send(None),
+        call.send('029_test'),
+        call.send(None),
+    ]
 
 
-def test_TrackDownloadsUser(monkeypatch):
+def test_TrackDownloadsUser():
     mocked_data = Mock()
     mocked_data.splitpoint = 30
     mocked_generator = Mock()
@@ -91,20 +94,30 @@ def test_TrackDownloadsUser(monkeypatch):
     for pic in random.sample(test_pics, 120):
         tracker.update(pic)
 
-    assert len(mocked_generator.mock_calls) == 120
-    methods_called = [mocked_generator.mock_calls[i][0] for i in range(120)]
-    # Only thing the tracker does is to call send() on the generator
-    assert methods_called == ['send'] * 120
+    assert len(mocked_generator.mock_calls) == 240  # 120 images * 2 because of None sends
+    assert mocked_generator.mock_calls[:8] == [
+        call.send('000_test'),
+        call.send(None),
+        call.send('030_test'),
+        call.send(None),
+        call.send('031_test'),
+        call.send(None),
+        call.send('032_test'),
+        call.send(None),
+    ]
+    assert mocked_generator.mock_calls[-8:] == [
+        call.send('029_test'),
+        call.send(None),
+        call.send('117_test'),
+        call.send(None),
+        call.send('118_test'),
+        call.send(None),
+        call.send('119_test'),
+        call.send(None),
+    ]
 
-    #         first value in tuple (eg '020_test') <--|
-    #                                                 |  |--> convert digits to int
-    #  arg passed into generator.send, is tuple <--|  |  |
-    #                                              |  |  |
-    sent_img = [int(mocked_generator.mock_calls[i][1][0][:3]) for i in range(120)]
-    assert correct_order == sent_img
 
-
-def test_TrackDownloadsUser2(monkeypatch, tmp_path, use_test_cfg_path):
+def test_TrackDownloadsUser_with_koneko_file(tmp_path, use_test_cfg_path):
     """Test with .koneko file"""
     setup_test_config(tmp_path)
 
@@ -142,17 +155,28 @@ def test_TrackDownloadsImage(monkeypatch):
     for pic in test_pics:
         tracker.update(pic)
 
-    assert len(mocked_generator.mock_calls) == 10
-    mock_calls = [call.send(f'12345_p{i}_master1200.jpg') for i in range(0, 10)]
-    assert mocked_generator.mock_calls == mock_calls
+    assert len(mocked_generator.mock_calls) == 20  # 10 images * 2 because of None sends
+    assert mocked_generator.mock_calls[:4] == [
+        call.send('12345_p0_master1200.jpg'),
+        call.send(None),
+        call.send('12345_p1_master1200.jpg'),
+        call.send(None),
+    ]
+    assert mocked_generator.mock_calls[-4:] == [
+        call.send('12345_p8_master1200.jpg'),
+        call.send(None),
+        call.send('12345_p9_master1200.jpg'),
+        call.send(None),
+    ]
 
 
 def test_generate_page(monkeypatch, capsys):
-    mocked_pixcat = Mock()
-    monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
+    mocked_api = Mock()
+    monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
     monkeypatch.setattr('koneko.config.gallery_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(30))]
@@ -163,35 +187,41 @@ def test_generate_page(monkeypatch, capsys):
     # No need to shuffle, tracker already shuffles
     for pic in test_pics:
         gen.send(pic)
+        gen.send(None)
 
-    # One for .thumbnail() and one for .show(), so total is 30+30
-    thumb_calls = [x for x in mocked_pixcat.mock_calls if x[1]]
-    thumb_calls_args = [x[1] for x in thumb_calls]
-    assert len(mocked_pixcat.mock_calls) == 60  # 30 images * 2 because thumbnail + show == twice
-    assert len(thumb_calls) == 30  # 30 images
-    # Default thumbnail size
-    assert thumb_calls_args == [(310,)] * 30
-
-    show_calls = [x for x in mocked_pixcat.mock_calls if not x[1]]
-    kwargs = [x[2] for x in show_calls]
-    align = [x['align'] for x in kwargs]
-    xcoords = [x['x'] for x in kwargs]
-    ycoords = [x['y'] for x in kwargs]
-    assert align == ['left'] * 30  # 30 images
-    # Len of lists == 30 images
-    assert xcoords == [2, 20, 38, 56, 74] * 6
-    assert ycoords == [0, 0, 0, 0, 0, 9, 9, 9, 9, 9] * 3
-
-    captured = capsys.readouterr()
-    assert captured.out == '\n\n\n\n'
+    assert mocked_api.mock_calls[:10] == [
+        call.show(Path('000_test'), 2, 0, 310),
+        call.show(Path('001_test'), 20, 0, 310),
+        call.show(Path('002_test'), 38, 0, 310),
+        call.show(Path('003_test'), 56, 0, 310),
+        call.show(Path('004_test'), 74, 0, 310),
+        call.show(Path('005_test'), 2, 9, 310),
+        call.show(Path('006_test'), 20, 9, 310),
+        call.show(Path('007_test'), 38, 9, 310),
+        call.show(Path('008_test'), 56, 9, 310),
+        call.show(Path('009_test'), 74, 9, 310)
+    ]
+    assert mocked_api.mock_calls[-10:] == [
+        call.show(Path('020_test'), 2, 0, 310),
+        call.show(Path('021_test'), 20, 0, 310),
+        call.show(Path('022_test'), 38, 0, 310),
+        call.show(Path('023_test'), 56, 0, 310),
+        call.show(Path('024_test'), 74, 0, 310),
+        call.show(Path('025_test'), 2, 9, 310),
+        call.show(Path('026_test'), 20, 9, 310),
+        call.show(Path('027_test'), 38, 9, 310),
+        call.show(Path('028_test'), 56, 9, 310),
+        call.show(Path('029_test'), 74, 9, 310)
+    ]
 
 
 def test_generate_users(monkeypatch, capsys):
-    mocked_pixcat = Mock()
-    monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
+    mocked_api = Mock()
+    monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
     monkeypatch.setattr('koneko.config.users_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]
@@ -202,35 +232,57 @@ def test_generate_users(monkeypatch, capsys):
     # No need to shuffle, tracker already shuffles
     for pic in test_pics:
         gen.send(pic)
+        gen.send(None)
 
-    # One for .thumbnail() and one for .show(), so total is 30+30
-    thumb_calls = [x for x in mocked_pixcat.mock_calls if x[1]]
-    thumb_calls_args = [x[1] for x in thumb_calls]
-    assert len(mocked_pixcat.mock_calls) == 240  # 120 images * 2 because thumbnail + show == twice
-    assert len(thumb_calls) == 120  # Number of images
-    # Default thumbnail size
-    assert thumb_calls_args == [(310,)] * 120
-
-    show_calls = [x for x in mocked_pixcat.mock_calls if not x[1]]
-    kwargs = [x[2] for x in show_calls]
-    align = [x['align'] for x in kwargs]
-    xcoords = [x['x'] for x in kwargs]
-    ycoords = [x['y'] for x in kwargs]
-    assert align == ['left'] * 120  # 120 images
-    assert xcoords == [2, 39, 57, 75] * 30  # total len == 120
-    assert ycoords == [0] * 120  # 120 images
+    assert mocked_api.mock_calls[:4] == [
+        call.show(Path('000_test'), 2, 0, 310),
+        call.show(Path('001_test'), 39, 0, 310),
+        call.show(Path('002_test'), 57, 0, 310),
+        call.show(Path('003_test'), 75, 0, 310),
+    ]
 
     captured = capsys.readouterr()
-    assert captured.out[0:100] == '                  00\n                  test\n\n\n                  04\n                  test\n\n\n        '
+    assert captured.out == '                  00\n                  test\n\n\n                  04\n                  test\n\n\n                  08\n                  test\n\n\n                  12\n                  test\n\n\n                  16\n                  test\n\n\n                  20\n                  test\n\n\n                  24\n                  test\n\n\n                  28\n                  test\n\n\n                  32\n                  test\n\n\n                  36\n                  test\n\n\n                  40\n                  test\n\n\n                  44\n                  test\n\n\n                  48\n                  test\n\n\n                  52\n                  test\n\n\n                  56\n                  test\n\n\n                  60\n                  test\n\n\n                  64\n                  test\n\n\n                  68\n                  test\n\n\n                  72\n                  test\n\n\n                  76\n                  test\n\n\n                  80\n                  test\n\n\n                  84\n                  test\n\n\n                  88\n                  test\n\n\n                  92\n                  test\n\n\n                  96\n                  test\n\n\n                  00\n                  test\n\n\n                  04\n                  test\n\n\n                  08\n                  test\n\n\n                  12\n                  test\n\n\n                  16\n                  test\n\n\n'
 
-    assert captured.out[500:600] == 'est\n\n\n                  44\n                  test\n\n\n                  48\n                  test\n\n\n  '
 
-    assert captured.out[:100] == '                  00\n                  test\n\n\n                  04\n                  test\n\n\n        '
+def test_generate_users_ueberzug(monkeypatch, capsys):
+    mocked_api = Mock()
+    monkeypatch.setattr('koneko.lscat.api', mocked_api)
+    monkeypatch.setattr('koneko.Terminal.width', 100)
+    monkeypatch.setattr('koneko.Terminal.height', 20)
+    monkeypatch.setattr('koneko.config.users_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+
+    test_pics = [f"{str(idx).rjust(3, '0')}_test"
+                 for idx in list(range(120))]
+
+    gen = lscat.generate_users_ueberzug(Path('.'))  # Path doesn't matter
+    gen.send(None)
+
+    # No need to shuffle, tracker already shuffles
+    for pic in test_pics:
+        gen.send(pic)
+        gen.send(None)
+
+    assert mocked_api.mock_calls == [
+        call.show(Path('000_test'), 2, 0, 310),
+        call.show(Path('001_test'), 39, 0, 310),
+        call.show(Path('002_test'), 57, 0, 310),
+        call.show(Path('003_test'), 75, 0, 310),
+        call.show(Path('004_test'), 2, 9, 310),
+        call.show(Path('005_test'), 39, 9, 310),
+        call.show(Path('006_test'), 57, 9, 310),
+        call.show(Path('007_test'), 75, 9, 310)
+    ]
+
+    captured = capsys.readouterr()
+    assert captured.out == '                  00\n                  test\n\n\n\n\n\n\n\n\n\n                  04\n                  test\n'
 
 
 def test_generate_previews(monkeypatch):
-    mocked_pixcat = Mock()
-    monkeypatch.setattr('koneko.lscat.Image', lambda *a, **k: mocked_pixcat)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    mocked_api = Mock()
+    monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
 
@@ -243,21 +295,11 @@ def test_generate_previews(monkeypatch):
     # No need to shuffle, tracker already shuffles
     for pic in test_pics:
         gen.send(pic)
+        gen.send(None)
 
-    # One for .thumbnail() and one for .show(), so total is 30+30
-    thumb_calls = [x for x in mocked_pixcat.mock_calls if x[1]]
-    thumb_calls_args = [x[1] for x in thumb_calls]
-    assert len(mocked_pixcat.mock_calls) == 20  # Ten images * 2 because thumbnail + show == twice
-    assert len(thumb_calls) == 10  # Ten images
-    # Default thumbnail size
-    assert thumb_calls_args == [(310,)] * 10
-
-    show_calls = [x for x in mocked_pixcat.mock_calls if not x[1]]
-    kwargs = [x[2] for x in show_calls]
-    align = [x['align'] for x in kwargs]
-    xcoords = [x['x'] for x in kwargs]
-    ycoords = [x['y'] for x in kwargs]
-    assert align == ['left'] * 10  # Ten images
-    assert xcoords == [2, 2] + [74] * 8  # Total len == 10
-    assert ycoords == [0, 9] *  5  # Ten images
-
+    assert mocked_api.mock_calls == [
+        call.show(Path('12345_p0_master1200.jpg'), 2, 0, 310),
+        call.show(Path('12345_p1_master1200.jpg'), 2, 9, 310),
+        call.show(Path('12345_p2_master1200.jpg'), 74, 0, 310),
+        call.show(Path('12345_p3_master1200.jpg'), 74, 9, 310),
+    ]

@@ -572,7 +572,7 @@ class ViewImage(ToImage):
     def maybe_show_preview(self) -> 'IO':
         os.system('clear')
         image = sorted(os.listdir(self._gdata.download_path))[self._selected_image_num]
-        lscat.icat(self._gdata.main_path / str(self._gdata.page_num) / image)
+        lscat.api.show_center(self._gdata.main_path / str(self._gdata.page_num) / image)
 
     def download_image(self, idata) -> 'IO':
         download.download_url(
@@ -648,7 +648,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         large_url = pure.change_url_to_full(self.current_url)
         filename = pure.split_backslash_last(large_url)
         download.download_url(self.download_path, large_url, filename)
-        lscat.icat(self.download_path / filename)
+        lscat.api.show_center(self.download_path / filename)
 
     def next_image(self) -> 'IO':
         if not self.page_urls:

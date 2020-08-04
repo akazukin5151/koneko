@@ -133,15 +133,6 @@ def show_single_y(y: int, size: int) -> 'IO[Image]':
     return api.show(WELCOME_IMAGE, config.xcoords_config()[1], y, size)
 
 
-def icat(path: str) -> 'IO':
-    """icat (system command) and pixcat behaves differently.
-    pixcat prints out the escape codes, shifting the current cursor position,
-    but calling a system command does not. I abuse this fact in the main
-    generators to make printing pages easier, and user mode is possible only
-    because of this fact.
-    """
-    Image(path).show()
-
 
 def handle_scroll(cls, data, myslice):
     tracker = cls(data)

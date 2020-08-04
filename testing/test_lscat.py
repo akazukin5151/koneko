@@ -234,7 +234,6 @@ def test_generate_page_ueberzug(monkeypatch, capsys):
         gen.send(None)
 
     assert mocked_api.mock_calls == [
-        call.start(),
         call.show(Path('000_test'), 2, 0, 310),
         call.show(Path('001_test'), 20, 0, 310),
         call.show(Path('002_test'), 38, 0, 310),
@@ -298,7 +297,6 @@ def test_generate_users_ueberzug(monkeypatch, capsys):
         gen.send(None)
 
     assert mocked_api.mock_calls == [
-        call.start(),
         call.show(Path('000_test'), 2, 0, 310),
         call.show(Path('001_test'), 39, 0, 310),
         call.show(Path('002_test'), 57, 0, 310),

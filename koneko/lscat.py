@@ -38,10 +38,6 @@ from koneko import (
 class Display(ABC):
     # Required methods
     @abstractmethod
-    def start(self):
-        raise NotImplementedError
-
-    @abstractmethod
     def show(self, image_path, x, y, size) -> 'pixcat.Image':
         raise NotImplementedError
 
@@ -70,9 +66,6 @@ class Display(ABC):
 
 class Pixcat(Display):
     """Program-wide singleton, central handler for pixcat images"""
-    def start(self):
-        pass
-
     def show(self, image_path, x, y, size) -> 'pixcat.Image':
         return Image(image_path).thumbnail(size).show(align='left', x=x, y=y)
 
@@ -97,9 +90,6 @@ class Ueberzug(Display):
         self.invisible = ueberzug.Visibility.INVISIBLE
         self._counter = -1
 
-        self.start()
-
-    def start(self):
         self.canvas.__enter__()
 
     def show(self, image_path, x, y, size) -> 'ueberzug.Placement':
@@ -306,7 +296,6 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
     number_of_rows = config.nrows_config()
     thumbnail_size = config.thumbnail_size_config()
 
-    api.start()
     os.system('clear')
     for i in range(number_of_cols * number_of_rows):
         x = i % number_of_cols
@@ -372,7 +361,6 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     rowspaces = config.ycoords_config()
     msg_rows = [rowspaces[0]] + [rowspaces[1]] * (number_of_rows - 1)
 
-    api.start()
     os.system('clear')
     for row in range(number_of_rows):
         ycoord = row % number_of_rows
@@ -442,7 +430,6 @@ def generate_previews_ueberzug(path: 'Path', min_num: int) -> 'IO':
     _xcoords = (left_shifts[0], left_shifts[-1])
     thumbnail_size = config.thumbnail_size_config()
 
-    api.start()
     for preview_num in range(4):  # Max 4 previews
         image = yield
 

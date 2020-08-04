@@ -284,30 +284,6 @@ def generate_page(path: 'Path') -> 'IO':
             thumbnail_size
         )
 
-def generate_page_ueberzug(path: 'Path') -> 'IO':
-    left_shifts = config.xcoords_config()
-    rowspaces = config.ycoords_config()
-    number_of_cols = config.ncols_config()
-    number_of_rows = config.nrows_config()
-    thumbnail_size = config.thumbnail_size_config()
-
-    os.system('clear')
-    for i in range(number_of_cols * number_of_rows):
-        x = i % number_of_cols
-        y = i // number_of_cols
-
-        image = yield
-        yield api.show(
-            path / image,
-            left_shifts[x],
-            rowspaces[y % number_of_rows],
-            thumbnail_size
-        )
-
-    while True:
-        yield
-
-
 def generate_users(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.get_gen_users_settings()
@@ -392,32 +368,6 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     while True:  # Prevent StopIteration errors
         yield
 
-
-def generate_previews(path: 'Path', min_num: int) -> 'IO':
-    """Experimental"""
-    rowspaces = config.ycoords_config()
-    left_shifts = config.xcoords_config()
-    _xcoords = (left_shifts[0], left_shifts[-1])
-    thumbnail_size = config.thumbnail_size_config()
-
-    i = 0
-    while True:
-        image = yield
-        i += 1
-
-        number = int(image.split('_')[1].replace('p', '')) - min_num
-        y = number % 2
-        if i <= 2:
-            x = 0
-        else:
-            x = 1
-
-        yield api.show(
-            path / image,
-            _xcoords[x],
-            rowspaces[y],
-            thumbnail_size
-        )
 
 def generate_previews_ueberzug(path: 'Path', min_num: int) -> 'IO':
     rowspaces = config.ycoords_config()

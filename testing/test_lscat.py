@@ -214,38 +214,6 @@ def test_generate_page(monkeypatch, capsys):
         call.show(Path('029_test'), 74, 9, 310)
     ]
 
-def test_generate_page_ueberzug(monkeypatch, capsys):
-    mocked_api = Mock()
-    monkeypatch.setattr('koneko.lscat.api', mocked_api)
-    monkeypatch.setattr('koneko.Terminal.width', 100)
-    monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.gallery_page_spacing_config', lambda: 1)
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
-
-    test_pics = [f"{str(idx).rjust(3, '0')}_test"
-                 for idx in list(range(30))]
-
-    gen = lscat.generate_page_ueberzug(Path('.'))  # Path doesn't matter
-    gen.send(None)
-
-    # No need to shuffle, tracker already shuffles
-    for pic in test_pics:
-        gen.send(pic)
-        gen.send(None)
-
-    assert mocked_api.mock_calls == [
-        call.show(Path('000_test'), 2, 0, 310),
-        call.show(Path('001_test'), 20, 0, 310),
-        call.show(Path('002_test'), 38, 0, 310),
-        call.show(Path('003_test'), 56, 0, 310),
-        call.show(Path('004_test'), 74, 0, 310),
-        call.show(Path('005_test'), 2, 9, 310),
-        call.show(Path('006_test'), 20, 9, 310),
-        call.show(Path('007_test'), 38, 9, 310),
-        call.show(Path('008_test'), 56, 9, 310),
-        call.show(Path('009_test'), 74, 9, 310)
-    ]
-
 
 def test_generate_users(monkeypatch, capsys):
     mocked_api = Mock()
@@ -311,38 +279,6 @@ def test_generate_users_ueberzug(monkeypatch, capsys):
     assert captured.out == '                  00\n                  test\n\n\n\n\n\n\n\n\n\n                  04\n                  test\n'
 
 
-def test_generate_previews(monkeypatch):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
-    mocked_api = Mock()
-    monkeypatch.setattr('koneko.lscat.api', mocked_api)
-    monkeypatch.setattr('koneko.Terminal.width', 100)
-    monkeypatch.setattr('koneko.Terminal.height', 20)
-
-    test_pics = [f"12345_p{idx}_master1200.jpg"
-                 for idx in list(range(10))]
-
-    gen = lscat.generate_previews(Path('.'), 10)  # Path doesn't matter
-    gen.send(None)
-
-    # No need to shuffle, tracker already shuffles
-    for pic in test_pics:
-        gen.send(pic)
-        gen.send(None)
-
-    assert mocked_api.mock_calls == [
-        call.show(Path('12345_p0_master1200.jpg'), 2, 0, 310),
-        call.show(Path('12345_p1_master1200.jpg'), 2, 9, 310),
-        call.show(Path('12345_p2_master1200.jpg'), 74, 0, 310),
-        call.show(Path('12345_p3_master1200.jpg'), 74, 9, 310),
-        call.show(Path('12345_p4_master1200.jpg'), 74, 0, 310),
-        call.show(Path('12345_p5_master1200.jpg'), 74, 9, 310),
-        call.show(Path('12345_p6_master1200.jpg'), 74, 0, 310),
-        call.show(Path('12345_p7_master1200.jpg'), 74, 9, 310),
-        call.show(Path('12345_p8_master1200.jpg'), 74, 0, 310),
-        call.show(Path('12345_p9_master1200.jpg'), 74, 9, 310)
-    ]
-
-
 def test_generate_previews_ueberzug(monkeypatch):
     monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
     mocked_api = Mock()
@@ -353,7 +289,7 @@ def test_generate_previews_ueberzug(monkeypatch):
     test_pics = [f"12345_p{idx}_master1200.jpg"
                  for idx in list(range(10))]
 
-    gen = lscat.generate_previews(Path('.'), 10)  # Path doesn't matter
+    gen = lscat.generate_previews_ueberzug(Path('.'), 10)  # Path doesn't matter
     gen.send(None)
 
     # No need to shuffle, tracker already shuffles
@@ -366,10 +302,4 @@ def test_generate_previews_ueberzug(monkeypatch):
         call.show(Path('12345_p1_master1200.jpg'), 2, 9, 310),
         call.show(Path('12345_p2_master1200.jpg'), 74, 0, 310),
         call.show(Path('12345_p3_master1200.jpg'), 74, 9, 310),
-        call.show(Path('12345_p4_master1200.jpg'), 74, 0, 310),
-        call.show(Path('12345_p5_master1200.jpg'), 74, 9, 310),
-        call.show(Path('12345_p6_master1200.jpg'), 74, 0, 310),
-        call.show(Path('12345_p7_master1200.jpg'), 74, 9, 310),
-        call.show(Path('12345_p8_master1200.jpg'), 74, 0, 310),
-        call.show(Path('12345_p9_master1200.jpg'), 74, 9, 310)
     ]

@@ -6,6 +6,8 @@ from abc import ABC, abstractmethod
 from koneko import utils, lscat, config, TERM, printer, FakeData
 
 
+
+
 def scroll_prompt(cls, data, max_images):
     show = True
     terminal_page = 0
@@ -58,7 +60,7 @@ class AbstractLoop(ABC):
         return True
 
     @abstractmethod
-    def max_images_func(self) -> 'Any':
+    def end_func(self) -> 'Any':
         raise NotImplementedError
 
     def report(self):
@@ -120,7 +122,7 @@ class AbstractLoop(ABC):
                     show_images = False
 
                 if show_images:
-                    self.max_images_func()
+                    self.end_func()
 
 
 class GalleryUserLoop(AbstractLoop):
@@ -166,7 +168,7 @@ class GalleryUserLoop(AbstractLoop):
         else:
             lscat.show_instant(self.cls, self.data)
 
-    def max_images_func(self):
+    def end_func(self):
         lscat.api.hide_all(self.images)
         self.data = FakeData(self.data.download_path.parent / str(self.current_page))
 
@@ -198,7 +200,7 @@ class ImageLoop(AbstractLoop):
     def show_func(self) -> 'IO':
         self.image = lscat.api.show_center(self.root / self.image_path)
 
-    def max_images_func(self):
+    def end_func(self):
         self.image_path = self.all_images[self.current_page]
         lscat.api.hide(self.image)  # FIXME: doesn't work for some reason
         lscat.api.hide_all(self.preview_images)

@@ -70,9 +70,6 @@ class Display(ABC):
 
 class Pixcat(Display):
     """Program-wide singleton, central handler for pixcat images"""
-    def __init__(self):
-        self.canvas = None  # Temporary, remove later
-
     def start(self):
         pass
 
@@ -228,7 +225,6 @@ class TrackDownloads(AbstractTracker):
         if config.use_ueberzug():
             self.generator = generate_page_ueberzug(data.download_path)
         else:
-            self.canvas = None
             self.generator = generate_page(data.download_path)
         super().__init__()
 
@@ -252,7 +248,6 @@ class TrackDownloadsUsers(AbstractTracker):
         if config.use_ueberzug():
             self.generator = generate_users_ueberzug(data.download_path, print_info)
         else:
-            self.canvas = None
             self.generator = generate_users(data.download_path, print_info)
         super().__init__()
 

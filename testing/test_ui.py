@@ -101,14 +101,14 @@ def test_previous_page_users(monkeypatch, capsys):
 
 def test_show_full_res(monkeypatch):
     monkeypatch.setattr('koneko.download.download_url', lambda *a: True)
-    monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.api.show_center', lambda *a: True)
     data.current_url = 'fake'
     data.download_path = Path('fake')
     ui.Image.show_full_res(data)
 
 def test_next_image(monkeypatch, capsys):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
-    monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.api.show_center', lambda *a: True)
     monkeypatch.setattr('koneko.ui.Image.start_preview', lambda *a: True)
     data.page_urls = False
     data.use_ueberzug = False
@@ -138,7 +138,7 @@ def test_next_image(monkeypatch, capsys):
 
 def test_previous_image(monkeypatch, capsys):
     monkeypatch.setattr('koneko.download.async_download_spinner', lambda *a: True)
-    monkeypatch.setattr('koneko.lscat.icat', lambda *a: True)
+    monkeypatch.setattr('koneko.lscat.api.show_center', lambda *a: True)
     monkeypatch.setattr('koneko.ui.Image.start_preview', lambda *a: True)
     data.page_urls = False
     data.use_ueberzug = False

@@ -149,6 +149,61 @@ def test_ueberzug_hide(monkeypatch, tmp_path):
     assert vis_str == 'mock().Visibility.INVISIBLE'
 
 
+def test_show_user_rows_pixcat(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.api.show_user_row(tmp_path, list(range(5)), 2, 100)
+
+    assert mocked_pixcat.mock_calls == [
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=2, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=0, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=1, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=2, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=3, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=4, y=0)
+    ]
+
+def test_show_row_pixcat(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.api.show_row(tmp_path, 2, 18, 100)
+
+    assert mocked_pixcat.mock_calls == [
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=2, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=20, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=38, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=56, y=0)
+    ]
+
+def test_hide_all_pixcat(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    mocked_image = Mock()
+    lscat.api.hide_all([mocked_image] * 3)
+
+    assert mocked_image.mock_calls == [call.hide()] * 3
+
+
 
 def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
     showed = []

@@ -1,5 +1,5 @@
-import sys
 import json
+
 import pytest
 
 from koneko import printer

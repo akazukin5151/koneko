@@ -1,5 +1,4 @@
 import os
-import sys
 import random
 from pathlib import Path
 from unittest.mock import Mock, call

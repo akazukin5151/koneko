@@ -142,3 +142,10 @@ def test_center_spaces_assistant(monkeypatch, disable_pixcat, patch_cbreak, disa
     assert assistants.center_spaces_assistant() == 0
     captured = capsys.readouterr()
     assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Current position: 0\n\x1b[1ACurrent position: 00\n'
+
+
+def test_center_spaces_assistant_must_use_ueberzug(monkeypatch, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    assert assistants.center_spaces_assistant() == -1
+    captured = capsys.readouterr()
+    assert captured.out == 'Center images assistant is only for ueberzug!\n'

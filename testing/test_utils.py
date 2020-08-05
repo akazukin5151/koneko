@@ -21,6 +21,19 @@ def test_catch_ctrl_c(monkeypatch):
     assert mocked_system.call_args_list == [call('clear')]
 
 
+def test_max_terminal_scrolls_gallery(monkeypatch):
+    monkeypatch.setattr('koneko.config.ncols_config', lambda: 6)
+    monkeypatch.setattr('koneko.config.nrows_config', lambda: 5)
+    monkeypatch.setattr('koneko.utils.os.listdir', lambda *a: [0] * 10)
+    assert utils.max_terminal_scrolls(Mock(), True) == 10 // (6 * 5) + 1
+
+
+def test_max_terminal_scrolls_user(monkeypatch):
+    monkeypatch.setattr('koneko.config.nrows_config', lambda: 5)
+    monkeypatch.setattr('koneko.utils.os.listdir', lambda *a: [0] * 10)
+    assert utils.max_terminal_scrolls(Mock(), False) == 10 // (4 * 5)
+
+
 def test_find_number_map(monkeypatch):
     monkeypatch.setattr('koneko.config.ncols_config', lambda: 5)
     assert ([utils.find_number_map(x, y)

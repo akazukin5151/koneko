@@ -130,3 +130,15 @@ def test_ypadding_assistant(monkeypatch, disable_pixcat, patch_cbreak, disable_p
 
     captured = capsys.readouterr()
     assert captured.out == '\r                    \rimage height = 0\x1b[K\r                    \ry spacing = 0      '
+
+
+def test_center_spaces_assistant(monkeypatch, disable_pixcat, patch_cbreak, disable_print_doc, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.Terminal.width', 40)
+    monkeypatch.setattr('koneko.lscat.api', Mock())
+
+    monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
+    # Default
+    assert assistants.center_spaces_assistant() == 0
+    captured = capsys.readouterr()
+    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Current position: 0\n\x1b[1ACurrent position: 00\n'

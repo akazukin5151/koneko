@@ -4,9 +4,8 @@ import os
 import sys
 import threading
 from shutil import rmtree
+from contextlib import suppress
 from abc import ABC, abstractmethod
-
-import funcy
 
 from koneko import (
     api,
@@ -454,7 +453,7 @@ class AbstractUsers(AbstractUI, ABC):
 
     def _maybe_join_thread(self):
         """Overrides abstractmethod: Wait for parse_thread to join (if any)"""
-        with funcy.suppress(AttributeError):
+        with suppress(AttributeError):
             self.parse_thread.join()
 
     def _print_page_info(self) -> 'IO':
@@ -703,7 +702,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.start_preview()
 
     def _prefetch_next_image(self) -> 'IO':
-        with funcy.suppress(IndexError):
+        with suppress(IndexError):
             next_img_url = self.next_img_url
         if next_img_url:
             download.async_download_spinner(self.download_path, [next_img_url])

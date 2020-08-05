@@ -1,3 +1,4 @@
+from unittest.mock import Mock, call
 from logging.handlers import RotatingFileHandler
 
 import pytest
@@ -7,6 +8,17 @@ from koneko import utils
 from testing.page_json import page_json  # isort:skip
 
 page_illusts = page_json['illusts']
+
+
+def test_catch_ctrl_c(monkeypatch):
+    mocked_system = Mock()
+    monkeypatch.setattr('koneko.utils.os.system', mocked_system)
+
+    def function_that_sends_ctrl_c():
+        raise KeyboardInterrupt
+
+    utils.catch_ctrl_c(function_that_sends_ctrl_c)()
+    assert mocked_system.call_args_list == [call('clear')]
 
 
 def test_find_number_map(monkeypatch):

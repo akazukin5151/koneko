@@ -7,7 +7,7 @@ from collections import namedtuple
 
 import pytest
 
-from koneko import lscat, pure
+from koneko import lscat, pure, WELCOME_IMAGE
 from conftest import setup_test_config
 
 
@@ -204,6 +204,28 @@ def test_hide_all_pixcat(monkeypatch, tmp_path, use_pixcat_api):
 
     assert mocked_image.mock_calls == [call.hide()] * 3
 
+
+
+def test_show_single_x(monkeypatch, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.show_single_x(4, 310)
+    assert mocked_pixcat.mock_calls == [
+        call(WELCOME_IMAGE),
+        call().thumbnail(310),
+        call().thumbnail().show(align='left', x=4, y=0)
+    ]
+
+def test_show_single_y(monkeypatch, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    monkeypatch.setattr('koneko.config.xcoords_config', lambda: (None, 2))
+    lscat.show_single_y(4, 310)
+    assert mocked_pixcat.mock_calls == [
+        call(WELCOME_IMAGE),
+        call().thumbnail(310),
+        call().thumbnail().show(align='left', x=2, y=4)
+    ]
 
 
 def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):

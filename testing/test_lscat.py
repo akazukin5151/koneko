@@ -257,7 +257,6 @@ def test_TrackDownloads():
     tracker = lscat.TrackDownloads(mocked_data)
     tracker.generator = mocked_generator
 
-    correct_order = list(range(30))
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(30))]
 
@@ -288,7 +287,6 @@ def test_TrackDownloadsUser():
     tracker = lscat.TrackDownloadsUsers(mocked_data)
     tracker.generator = mocked_generator
 
-    correct_order = pure.generate_orders(120, 30)
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]
 
@@ -349,7 +347,6 @@ def test_TrackDownloadsImage(monkeypatch):
     tracker = lscat.TrackDownloadsImage(mocked_data)
     tracker.generator = mocked_generator
 
-    correct_order = list(range(10))
     test_pics = [f"12345_p{idx}_master1200.jpg"
                  for idx in list(range(10))]
 

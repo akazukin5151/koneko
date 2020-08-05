@@ -44,6 +44,13 @@ def test_page_spacing_assistant(monkeypatch, disable_pixcat, capsys):
     assert captured.out == '=== Page spacing ===\nThis will display an image, then print newlines.\nYour desired setting is the number when the image completely scrolls out of view\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\nWhen the image just completely scrolls out of view, what is the largest number?\n(By default on kitty, ctrl+shift+up/down scrolls up/down a line)\nMust enter a number!\n'
 
 
+def test_page_spacing_assistant_must_not_use_ueberzug(monkeypatch, capsys):
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    assert assistants.page_spacing_assistant(310) == None
+    captured = capsys.readouterr()
+    assert captured.out == 'The page spacing assistant is not needed if you use ueberzug, because ueberzug does not respond to scroll events\n'
+
+
 def test_gallery_print_spacing_assistant_n(monkeypatch, disable_pixcat, disable_print_doc, patch_cbreak, capsys):
     monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)

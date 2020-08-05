@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 @pytest.fixture()
 def send_enter(monkeypatch):
-    monkeypatch.setattr('builtins.input', lambda x: '')
+    monkeypatch.setattr('builtins.input', lambda *x: '')
 
 @contextmanager
 def fakecbreak():

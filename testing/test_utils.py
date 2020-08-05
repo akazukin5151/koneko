@@ -10,6 +10,26 @@ from testing.page_json import page_json  # isort:skip
 page_illusts = page_json['illusts']
 
 
+@pytest.mark.parametrize('msg', ('', 'message'))
+def test_spinner_normal(capsys, msg):
+    @utils.spinner(msg)
+    def function_to_be_wrapped():
+        return 'sentinel'
+
+    assert function_to_be_wrapped() == 'sentinel'
+    assert capsys.readouterr().out == f'{msg} |\r \r'
+
+
+def test_spinner_with_exception(capsys):
+    @utils.spinner('')
+    def function_to_be_wrapped():
+        raise Exception
+
+    with pytest.raises(Exception):
+        function_to_be_wrapped()
+    assert capsys.readouterr().out == ' |\r \r'
+
+
 def test_catch_ctrl_c(monkeypatch):
     mocked_system = Mock()
     monkeypatch.setattr('koneko.utils.os.system', mocked_system)

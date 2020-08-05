@@ -34,6 +34,11 @@ def test_max_terminal_scrolls_user(monkeypatch):
     assert utils.max_terminal_scrolls(Mock(), False) == 10 // (4 * 5)
 
 
+def test_slice_image():
+    assert utils.slice_images(10, 0) == slice(0, 10)
+    assert utils.slice_images(10, 1) == slice(10, 20)
+
+
 def test_find_number_map(monkeypatch):
     monkeypatch.setattr('koneko.config.ncols_config', lambda: 5)
     assert ([utils.find_number_map(x, y)

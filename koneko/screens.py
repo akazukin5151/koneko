@@ -53,11 +53,8 @@ def show_man_loop() -> 'IO':
     print(ui.AbstractUsers.__doc__)
     print(' ' * 3, '=' * 30)
     print(ui.IllustFollowGallery.__doc__)
-    while True:
-        help_command = input('\n\nEnter any key to return: ')
-        if help_command or help_command == '':
-            os.system('clear')
-            break
+    help_command = input('\n\nEnter any key to return: ')
+    os.system('clear')
 
 
 @utils.catch_ctrl_c
@@ -105,9 +102,6 @@ def info_screen_loop() -> 'IO':
     size = 500 if config.use_ueberzug() else 750
     image = lscat.api.show(WELCOME_IMAGE.parent / '79494300_p0.png', 0, 0, size)
 
-    while True:
-        help_command = input('\nEnter any key to return: ')
-        if help_command or help_command == '':
-            os.system('clear')
-            lscat.api.hide(image)
-            break
+    help_command = input('\nEnter any key to return: ')
+    os.system('clear')
+    lscat.api.hide(image)

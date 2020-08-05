@@ -137,6 +137,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
     nrows = ceil(30 / ncols)
     if 1 <= x <= ncols and 1 <= y <= nrows:
         return ((x - 1) % ncols) + (ncols * (y - 1))
+    return False
 
 
 # IO related

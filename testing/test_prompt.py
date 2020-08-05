@@ -43,6 +43,55 @@ def test_ask_quit_letter(monkeypatch, patch_cbreak, customexit_to_quit, letter, 
     ask_quit_capture(capsys)
 
 
+def test_common_case_normal():
+    mocked_func = Mock()
+    case = {
+        'a': mocked_func
+    }
+    assert prompt.common(case, 'a', ['unchanged'], ('a',)) == ['unchanged']
+    assert mocked_func.call_args_list == [call()]
+
+
+class FakeKeystroke(str):
+    def __init__(self, name):
+        self.name = name
+
+def test_common_case_from_name():
+    mocked_func = Mock()
+    case = {
+        'a': mocked_func
+    }
+    # Make str and its name attribute different
+    command = FakeKeystroke('foo')  # This will fail to match
+    command.name = 'a'  # This will be matched
+    assert prompt.common(case, command, ['unchanged'], ()) == ['unchanged']
+    assert mocked_func.call_args_list == [call()]
+
+
+@pytest.mark.parametrize('key', ('KEY_ESCAPE', 'KEY_BACKSPACE'))
+def test_common_escape_and_backspace(key):
+    assert prompt.common({}, FakeKeystroke(key), ['this will be cleared'], ()) == []
+
+
+def test_common_letter_num_keyseqs():
+    allowed_keys = ('a',)
+    case = {}
+
+    initial_keyseqs = prompt.common(case, Keystroke('a'), [], allowed_keys)
+    assert initial_keyseqs == ['a']
+
+    newkeyseqs = prompt.common(case, Keystroke('2'), initial_keyseqs, allowed_keys)
+    assert newkeyseqs == ['a', '2']
+
+    final_key_seqs = prompt.common(case, Keystroke('1'), newkeyseqs, allowed_keys)
+    assert final_key_seqs == ['a', '2', '1']
+
+
+def test_common_invalid(capsys):
+    assert prompt.common({}, FakeKeystroke('notdigit'), ['less than three items'], ()) == []
+
+
+
 class FakeInKey(ABC):
     """Fakes the Keystroke constructor in blessed. See:
     https://github.com/jquast/blessed/blob/83748bd9e97f9f2fd849588e677d541e162e3fc6/tests/test_keyboard.py#L98

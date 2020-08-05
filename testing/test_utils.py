@@ -108,14 +108,60 @@ def test_history(monkeypatch, tmp_path):
     assert utils.format_frequent(counter) == ['1: 1234 (1)', '2: 5678 (1)']
 
 
-def test_handle_missing_pics():
+def test_handle_missing_pics_exists(monkeypatch):
+    class FakePath(Mock):
+        def expanduser(self):
+            return self
+
+        def exists(self):
+            return True
+
+    mocked_path = FakePath()
+    monkeypatch.setattr('koneko.utils.Path', mocked_path)
+    assert utils.handle_missing_pics() is True
+    assert mocked_path.call_args_list == [call('~/.local/share/koneko/pics')]
+
+
+def test_handle_missing_pics_missing(monkeypatch, capsys):
+    class FakePath(Mock):
+        def expanduser(self):
+            return self
+
+        def exists(self):
+            return False
+
+    mocked_system = Mock()
+    mocked_path = FakePath()
+    monkeypatch.setattr('koneko.utils.Path', mocked_path)
+    monkeypatch.setattr('koneko.utils.os.system', mocked_system)
+
     utils.handle_missing_pics()
+    assert mocked_path.mock_calls == [call('~/.local/share/koneko/pics'), call().mkdir(parents=True)]
+
+    assert capsys.readouterr().out == 'Please wait, downloading welcome image (this will only occur once)...\n'
+
+    # mocked_path doesn't play well with assert
+    #assert mocked_system.call_args_list == [
+    #    call(f'curl -s {baseurl}{pics[0]} -o {mocked_path}/{pics[0]}'),
+    #    call(f'curl -s {baseurl}{pics[1]} -o {mocked_path}/{pics[1]}'),
+    #    call('clear')
+    #]
+    assert mocked_system.call_args_list[2] == call('clear')
+
+    assert str(mocked_system.call_args_list[0]).split(' <FakePath')[0] == 'call("curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/71471144_p0.png -o'  # No ending quote and bracket
+
+    assert str(mocked_system.call_args_list[0]).split('/')[-1] == '71471144_p0.png")'
+
+    assert str(mocked_system.call_args_list[1]).split(' <FakePath')[0] == 'call("curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300_p0.png -o'
+
+    assert str(mocked_system.call_args_list[1]).split('/')[-1] == '79494300_p0.png")'
 
 
 def test_max_images(monkeypatch):
     monkeypatch.setattr('koneko.config.nrows_config', lambda: 2)
     monkeypatch.setattr('koneko.config.ncols_config', lambda: 5)
     assert utils.max_images() == 10
+
 
 def test_open_link_coords_false(capsys):
     assert utils.open_link_coords(None, 0, 100) is None

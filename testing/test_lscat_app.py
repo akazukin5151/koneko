@@ -215,6 +215,16 @@ def test_maybe_print_xcoord(monkeypatch, send_enter, capsys):
     assert captured.out == '\n\nYour recommended settings are:\nusers_print_name_xcoord = 99\n'
 
 
+def test_maybe_center_spaces(monkeypatch, send_enter, capsys):
+    monkeypatch.setattr('koneko.assistants.center_spaces_assistant', lambda *a: 99)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+
+    lscat_app.config_assistance(['7'])
+
+    captured = capsys.readouterr()
+    assert captured.out == '\n\nYour recommended settings are:\nueberzug_center_spaces = 99\n'
+
+
 
 @pytest.mark.parametrize('argv', ([], ['1']))
 def test_config_assistant_1(monkeypatch, capsys, send_enter, argv):

@@ -178,6 +178,7 @@ def test_show_user_rows_pixcat(monkeypatch, tmp_path, use_pixcat_api):
 def test_show_row_pixcat(monkeypatch, tmp_path, use_pixcat_api):
     mocked_pixcat = Mock()
     monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    monkeypatch.setattr('koneko.Terminal.width', 70)
     lscat.api.show_row(tmp_path, 2, 18, 100)
 
     assert mocked_pixcat.mock_calls == [

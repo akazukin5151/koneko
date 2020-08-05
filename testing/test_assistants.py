@@ -94,6 +94,7 @@ def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch
 def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys, tmp_path):
     monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
+    monkeypatch.setattr('koneko.Terminal.height', 25)  # Fixes pytest if launched with -s
     monkeypatch.setattr('builtins.input', lambda: 'y')
     monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: tmp_path)
     monkeypatch.setattr('koneko.lscat_app.FakeData', lambda *a: True)
@@ -142,6 +143,7 @@ def test_ypadding_assistant(monkeypatch, disable_pixcat, patch_cbreak, disable_p
 def test_center_spaces_assistant(monkeypatch, disable_pixcat, patch_cbreak, disable_print_doc, capsys):
     monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
+    monkeypatch.setattr('koneko.Terminal.height', 25)  # Fixes pytest if launched with -s
     monkeypatch.setattr('koneko.lscat.api', Mock())
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)

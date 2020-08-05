@@ -14,6 +14,43 @@ from conftest import setup_test_config
 FakeData = namedtuple('data', ('download_path',))
 
 
+@pytest.fixture
+def use_pixcat_api(monkeypatch):
+    monkeypatch.setattr('koneko.lscat.api', lscat.Pixcat())
+
+
+def test_pixcat_show(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.api.show(tmp_path, 2, 3, 100)
+
+    assert mocked_pixcat.mock_calls == [
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=2, y=3)
+    ]
+
+def test_pixcat_show_center(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.api.show_center(tmp_path)
+
+    assert mocked_pixcat.mock_calls == [
+        call(tmp_path),
+        call().show(y=0)
+    ]
+
+def test_pixcat_hide(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    mocked_image = Mock()
+    lscat.api.hide(mocked_image)
+
+    assert mocked_image.mock_calls == [
+        call.hide()
+    ]
+
+
 def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
     showed = []
 

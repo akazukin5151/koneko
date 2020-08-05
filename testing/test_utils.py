@@ -34,7 +34,7 @@ def test_max_terminal_scrolls_user(monkeypatch):
     assert utils.max_terminal_scrolls(Mock(), False) == 10 // (4 * 5)
 
 
-def test_slice_image():
+def test_slice_images():
     assert utils.slice_images(10, 0) == slice(0, 10)
     assert utils.slice_images(10, 1) == slice(10, 20)
 

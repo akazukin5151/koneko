@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 import pytest
 
 from koneko import utils
-
+from conftest import CustomExit, raises_customexit
 from testing.page_json import page_json  # isort:skip
 
 page_illusts = page_json['illusts']
@@ -166,3 +166,13 @@ def test_max_images(monkeypatch):
 def test_open_link_coords_false(capsys):
     assert utils.open_link_coords(None, 0, 100) is None
     assert capsys.readouterr().out == 'Invalid number!\n'
+
+
+def test_quit_on_q_quit(monkeypatch):
+    monkeypatch.setattr('koneko.utils.sys.exit', raises_customexit)
+    with pytest.raises(CustomExit):
+        utils.quit_on_q('q')
+
+
+def test_quit_on_q_no_quit(monkeypatch):
+    assert utils.quit_on_q('not_q') is None

@@ -75,10 +75,6 @@ class Pixcat(Display):
         if image:
             image.hide()
 
-    # Unique
-    def show_no_xy(self, image_path, size):
-        return Image(image_path).thumbnail(size).show(align='left')
-
 
 class Ueberzug(Display):
     """Program-wide singleton, central handler for ueberzug images"""

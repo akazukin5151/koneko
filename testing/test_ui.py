@@ -7,7 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from koneko import ui, utils, download
+from koneko import ui, download
 
 
 class FakeData:
@@ -18,13 +18,6 @@ class FakeData:
         return 'fake'
 
 data = FakeData
-
-def test_open_link_coords(monkeypatch, capsys):
-    monkeypatch.setattr('koneko.ui.os.system', lambda x: True)
-    utils.open_link_coords(data, 1, 2)
-
-    captured = capsys.readouterr()
-    assert captured.out == 'Opened https://www.pixiv.net/artworks/1 in browser!\n'
 
 def test_download_image_coords(monkeypatch, capsys):
     # Should belong to test_download.py now

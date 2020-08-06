@@ -163,6 +163,20 @@ def test_max_images(monkeypatch):
     assert utils.max_images() == 10
 
 
+
+
+def test_open_link_coords(monkeypatch, capsys):
+    class FakeData:
+        def image_id(self):
+            return 1
+
+    monkeypatch.setattr('koneko.ui.os.system', lambda x: True)
+    utils.open_link_coords(FakeData, 1, 2)
+
+    captured = capsys.readouterr()
+    assert captured.out == 'Opened https://www.pixiv.net/artworks/1 in browser!\n'
+
+
 def test_open_link_coords_false(capsys):
     assert utils.open_link_coords(None, 0, 100) is None
     assert capsys.readouterr().out == 'Invalid number!\n'

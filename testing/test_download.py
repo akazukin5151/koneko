@@ -1,5 +1,6 @@
 from pathlib import Path
 from collections import namedtuple
+from unittest.mock import Mock, call
 
 import pytest
 
@@ -12,6 +13,39 @@ def test_save_number_of_artists(tmp_path):
     download.save_number_of_artists(data)
     with open(tmp_path / '.koneko', 'r') as f:
         assert f.read() == '30'
+
+
+def test_init_download_dir_has_files(monkeypatch):
+    monkeypatch.setattr('koneko.files.dir_not_empty', lambda x: True)
+    assert download.init_download(None, None) is True
+
+def test_init_download(monkeypatch):
+    mocked_api = Mock()
+    mocked_rmtree = Mock()
+    mocked_url = Mock()
+    monkeypatch.setattr('koneko.api.myapi', mocked_api)
+    monkeypatch.setattr('koneko.files.dir_not_empty', lambda x: False)
+    monkeypatch.setattr('koneko.download.rmtree', mocked_rmtree)
+    monkeypatch.setattr('koneko.download.itertools.filterfalse', lambda *a: [mocked_url]*2)
+    monkeypatch.setattr('koneko.download.os.makedirs', lambda *a, **k: True)  # Disable
+
+    mocked_data = Mock()
+    mocked_data.all_urls = [Mock()] * 2
+    mocked_tracker = Mock()
+    download.init_download(mocked_data, mocked_tracker)
+
+    assert mocked_rmtree.call_args_list == [call(mocked_data.download_path)]
+    assert mocked_data.method_calls == [call.download_path.is_dir()]
+    assert 'page_num' in dir(mocked_data)
+    assert 'newnames_with_ext' in dir(mocked_data)
+
+    assert mocked_tracker.method_calls == [call.update(mocked_url)] * 2
+
+    assert mocked_api.method_calls == [
+        call.protected_download(mocked_data.all_urls[0], mocked_data.download_path, mocked_url),
+        call.protected_download(mocked_data.all_urls[1], mocked_data.download_path, mocked_url)
+    ]
+
 
 
 class FakeData:

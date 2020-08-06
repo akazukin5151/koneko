@@ -32,7 +32,7 @@ class APIHandler:
         """Wait for login to finish, then assign PixivAPI session to API"""
         if not self._login_done:
             self._api_thread.join()
-            self._login_done= True
+            self._login_done = True
 
 
     def _login(self):

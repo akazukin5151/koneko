@@ -1,8 +1,17 @@
 from pathlib import Path
+from collections import namedtuple
 
 import pytest
 
 from koneko import download
+
+
+def test_save_number_of_artists(tmp_path):
+    FakeData = namedtuple('data', ('download_path', 'splitpoint'))
+    data = FakeData(tmp_path, 30)
+    download.save_number_of_artists(data)
+    with open(tmp_path / '.koneko', 'r') as f:
+        assert f.read() == '30'
 
 
 class FakeData:

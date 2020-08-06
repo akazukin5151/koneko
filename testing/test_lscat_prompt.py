@@ -37,6 +37,12 @@ def gallery_setup(monkeypatch):
     )
 
 
+def image_setup(monkeypatch, tmp_path):
+    for image in range(4):
+        (tmp_path / str(image)).touch()
+    return lscat_prompt.ImageLoop(tmp_path)
+
+
 
 def test_scroll_prompt(monkeypatch, patch_cbreak):
     class FakeInKeyNew(FakeInKey):
@@ -157,3 +163,54 @@ def test_gallery_user_loop_end_func(monkeypatch):
 
     assert lscat_mock.call_args_list == [call(['1', '2'])]
     assert p.data.download_path == Path('parent/1')
+
+
+def test_image_loop_init(monkeypatch, tmp_path):
+    p = image_setup(monkeypatch, tmp_path)
+    assert p.all_images == [str(n) for n in range(4)]
+    assert p.image_path == '0'
+    assert 'download_path' in dir(p.FakeData)
+    assert 'page_num' in dir(p.FakeData)
+    assert p.max_pages == 3
+
+
+def test_image_loop_show_func(monkeypatch, tmp_path):
+    p = image_setup(monkeypatch, tmp_path)
+    mocked_api = Mock()
+    monkeypatch.setattr('koneko.lscat.api', mocked_api)
+
+    p.show_func()
+    assert mocked_api.method_calls == [call.show_center(tmp_path / '0')]
+    assert p.image == mocked_api.show_center()
+
+
+def test_image_loop_end_func(monkeypatch, tmp_path):
+    p = image_setup(monkeypatch, tmp_path)
+    p.image = 'sample'
+    p.preview_images = range(4)
+    mocked_api = Mock()
+    monkeypatch.setattr('koneko.lscat.api', mocked_api)
+
+    p.end_func()
+    assert mocked_api.method_calls == [
+        call.hide('sample'),
+        call.hide_all(range(4)),
+    ]
+    assert p.image_path == '0'
+
+
+def test_image_loop_maybe_show_preview(monkeypatch, tmp_path):
+    p = image_setup(monkeypatch, tmp_path)
+    mocked_tracker = Mock()
+    monkeypatch.setattr('koneko.lscat.TrackDownloadsImage', mocked_tracker)
+    monkeypatch.setattr('koneko.lscat_prompt.TERM.get_location', lambda: (0, 0))
+    monkeypatch.setattr('koneko.printer.move_cursor_xy', lambda *a: True)
+
+    p.maybe_show_preview()
+    assert mocked_tracker.mock_calls == [
+        call(p.FakeData(tmp_path, 0)),
+        call().update('1'),
+        call().update('2'),
+        call().update('3'),
+    ]
+    assert p.preview_images == mocked_tracker().images

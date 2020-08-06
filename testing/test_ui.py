@@ -7,7 +7,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from koneko import ui, utils, download
+from koneko import ui
 
 
 class FakeData:
@@ -18,27 +18,6 @@ class FakeData:
         return 'fake'
 
 data = FakeData
-
-def test_open_link_coords(monkeypatch, capsys):
-    monkeypatch.setattr('koneko.ui.os.system', lambda x: True)
-    utils.open_link_coords(data, 1, 2)
-
-    captured = capsys.readouterr()
-    assert captured.out == 'Opened https://www.pixiv.net/artworks/1 in browser!\n'
-
-def test_download_image_coords(monkeypatch, capsys):
-    # Should belong to test_download.py now
-    monkeypatch.setattr('koneko.api.myapi.protected_download', lambda x: True)
-    monkeypatch.setattr('koneko.files.verify_full_download', lambda x: True)
-    monkeypatch.setattr('koneko.download.download_url', lambda *a, **k: True)
-    download.download_image_coords(data, 1, 2)
-    # Try if not verified first, then true
-    responses = iter([False, True])
-    monkeypatch.setattr('koneko.files.verify_full_download', lambda x: next(responses))
-    download.download_image_coords(data, 1, 2)
-
-    captured = capsys.readouterr()
-    assert captured.out == f'Image downloaded at {Path("~/Downloads/fake").expanduser()}\n' * 2
 
 
 def test_previous_page_gallery(monkeypatch):

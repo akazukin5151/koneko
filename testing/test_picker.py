@@ -1,4 +1,5 @@
 import curses
+from unittest.mock import Mock
 
 import pytest
 
@@ -55,6 +56,35 @@ def test_pick_dirs_picker(monkeypatch, letter):
         assert mypicker.start() == (None, letter)
     except curses.error:
         pass  # Github actions doesn't have a terminal
+
+
+def test_pick_dir_loop_y(monkeypatch, tmp_path):
+    mocked = Mock()
+    mocked.start = lambda: (None, 'y')
+    monkeypatch.setattr('koneko.picker._pick_dirs_picker', lambda *a: mocked)
+    monkeypatch.setattr('koneko.utils.quit_on_q', lambda x: False)
+    monkeypatch.setattr('koneko.files.path_valid', lambda x: True)
+    assert picker._pick_dir_loop(tmp_path, 'title', [2], ['2']) == tmp_path
+
+
+def test_pick_dir_loop_c(monkeypatch, tmp_path):
+    mocked = Mock()
+    mocked.start = lambda: (None, 'c')
+    monkeypatch.setattr('koneko.picker._pick_dirs_picker', lambda *a: mocked)
+    monkeypatch.setattr('koneko.utils.quit_on_q', lambda x: False)
+    monkeypatch.setattr('koneko.picker.handle_clear', raises_customexit)
+    with pytest.raises(CustomExit):
+        picker._pick_dir_loop(tmp_path, 'title', [2], ['2'])
+
+
+def test_pick_dir_loop_int(monkeypatch, tmp_path):
+    mocked = Mock()
+    mocked.start = lambda: (None, 1)
+    monkeypatch.setattr('koneko.picker._pick_dirs_picker', lambda *a: mocked)
+    monkeypatch.setattr('koneko.utils.quit_on_q', lambda x: False)
+    monkeypatch.setattr('koneko.picker.handle_cd', raises_customexit)
+    with pytest.raises(CustomExit):
+        picker._pick_dir_loop(tmp_path, 'title', [2, 2], ['2', '2'])
 
 
 def test_lscat_app_main(monkeypatch):
@@ -159,6 +189,17 @@ def test_handle_cd_path_is_dir(tmp_path):
     realpath = tmp_path / '1234'
     realpath.mkdir()
     assert picker.handle_cd(tmp_path, '1234', ['modes']) == (realpath, ['modes'])
+
+
+def test_handle_clear_quit(monkeypatch):
+    monkeypatch.setattr('koneko.picker.sys.exit', raises_customexit)
+    monkeypatch.setattr('koneko.screens.clear_cache_loop', lambda: True)
+    with pytest.raises(CustomExit):
+        picker.handle_clear()
+
+def test_handle_no_quit(monkeypatch):
+    monkeypatch.setattr('koneko.screens.clear_cache_loop', lambda: False)
+    picker.handle_clear()
 
 
 def test_actions_from_dir_filter_inactive(monkeypatch):

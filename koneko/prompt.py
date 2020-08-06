@@ -17,12 +17,9 @@ def ask_quit() -> 'IO':
     """Ask for quit confirmation, no need to press enter"""
     printer.print_bottom('\nAre you sure you want to exit?', offset=1)
     with TERM.cbreak():
-        while True:
-            ans = TERM.inkey()
-            if ans == 'y' or ans == 'q' or ans.name == 'KEY_ENTER':
-                sys.exit(0)
-            elif ans:
-                break
+        ans = TERM.inkey()
+        if ans == 'y' or ans == 'q' or ans.name == 'KEY_ENTER':
+            sys.exit(0)
 
 
 def ask_wait_user_input(keyseqs: 'list[str]', view_name: str) -> str:

@@ -1,5 +1,4 @@
 import os
-import sys
 import random
 from pathlib import Path
 from unittest.mock import Mock, call
@@ -7,11 +6,225 @@ from collections import namedtuple
 
 import pytest
 
-from koneko import lscat, pure
+from koneko import lscat, pure, WELCOME_IMAGE
 from conftest import setup_test_config
 
 
 FakeData = namedtuple('data', ('download_path',))
+
+
+@pytest.fixture
+def use_pixcat_api(monkeypatch):
+    monkeypatch.setattr('koneko.lscat.api', lscat.Pixcat())
+
+def assert_scaler(mocked_ueberzug):
+    scaler_str = (
+        str(mocked_ueberzug.mock_calls[2][2]['scaler'])
+        .split('id')[0]
+        .split('=')[-1]
+        .rstrip()
+        .replace("'", '')
+    )
+    assert scaler_str  == 'mock().ScalerOption.FIT_CONTAIN.value'
+
+def assert_vis(mocked_ueberzug):
+    vis_str = (
+        str(mocked_ueberzug.mock_calls[2][2]['visibility'])
+        .split('id')[0]
+        .split('=')[-1]
+        .rstrip()
+        .replace("'", '')
+    )
+    assert vis_str == 'mock().Visibility.VISIBLE'
+
+
+def test_pixcat_show(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.api.show(tmp_path, 2, 3, 100)
+
+    assert mocked_pixcat.mock_calls == [
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=2, y=3)
+    ]
+
+def test_pixcat_show_center(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.api.show_center(tmp_path)
+
+    assert mocked_pixcat.mock_calls == [
+        call(tmp_path),
+        call().show(y=0)
+    ]
+
+def test_pixcat_hide(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    mocked_image = Mock()
+    lscat.api.hide(mocked_image)
+
+    assert mocked_image.mock_calls == [
+        call.hide()
+    ]
+
+class FakeContextManager(Mock):
+    def __enter__(self):
+        return Mock()
+
+    def __exit__(self):
+        return Mock()
+
+def test_ueberzug_init(monkeypatch, tmp_path):
+    mocked_ueberzug = FakeContextManager()
+    monkeypatch.setattr('koneko.utils.try_import_ueberzug', mocked_ueberzug)
+    monkeypatch.setattr('koneko.lscat.api', lscat.Ueberzug())
+
+    assert mocked_ueberzug.mock_calls == [
+        call(),
+        call().Canvas()
+    ]
+
+def test_ueberzug_show(monkeypatch, tmp_path):
+    mocked_ueberzug = FakeContextManager()
+    monkeypatch.setattr('koneko.utils.try_import_ueberzug', mocked_ueberzug)
+    monkeypatch.setattr('koneko.lscat.api', lscat.Ueberzug())
+    lscat.api.show(tmp_path, 2, 3, 100)
+
+    #assert mocked_ueberzug.mock_calls == [
+    #    call(),
+    #    call().Canvas(),
+    #    call().Canvas().create_placement(
+    #        str(tmp_path) + '0',
+    #        x=2,
+    #        y=3,
+    #        width=5,
+    #        height=5,
+    #        scaler=mocked_ueberzug.ScalerOption.FIT_CONTAIN.value,   # FAILS
+    #        visibility=mocked_ueberzug.Visibility.VISIBLE,           # FAILS
+    #    )
+    #]
+    assert mocked_ueberzug.mock_calls[2][0] == '().Canvas().create_placement'
+    assert mocked_ueberzug.mock_calls[2][1] == (str(tmp_path) + '0',)
+    assert mocked_ueberzug.mock_calls[2][2]['path'] == str(tmp_path)
+    assert mocked_ueberzug.mock_calls[2][2]['x'] == 2
+    assert mocked_ueberzug.mock_calls[2][2]['y'] == 3
+    assert mocked_ueberzug.mock_calls[2][2]['width'] == 5
+    assert mocked_ueberzug.mock_calls[2][2]['height'] == 5
+
+    assert_scaler(mocked_ueberzug)
+    assert_vis(mocked_ueberzug)
+
+def test_ueberzug_show_center(monkeypatch, tmp_path):
+    mocked_ueberzug = FakeContextManager()
+    monkeypatch.setattr('koneko.utils.try_import_ueberzug', mocked_ueberzug)
+    monkeypatch.setattr('koneko.config.ueberzug_center_spaces', lambda: 20)
+    monkeypatch.setattr('koneko.lscat.api', lscat.Ueberzug())
+    lscat.api.show_center(tmp_path)
+
+    assert mocked_ueberzug.mock_calls[2][0] == '().Canvas().create_placement'
+    assert mocked_ueberzug.mock_calls[2][1] == (str(tmp_path) + '0',)
+    assert mocked_ueberzug.mock_calls[2][2]['path'] == str(tmp_path)
+    assert mocked_ueberzug.mock_calls[2][2]['x'] == 20
+    assert mocked_ueberzug.mock_calls[2][2]['y'] == 0
+
+    assert_scaler(mocked_ueberzug)
+    assert_vis(mocked_ueberzug)
+
+def test_ueberzug_hide(monkeypatch, tmp_path):
+    monkeypatch.setattr('koneko.utils.try_import_ueberzug', FakeContextManager())
+    monkeypatch.setattr('koneko.lscat.api', lscat.Ueberzug())
+    mocked_placement = Mock()
+    lscat.api.hide(mocked_placement)
+
+    vis_str = (
+        str(mocked_placement.visibility)
+        .split('id')[0]
+        .split('=')[-1]
+        .rstrip()
+        .replace("'", '')
+    )
+    assert vis_str == 'mock().Visibility.INVISIBLE'
+
+
+def test_show_user_rows_pixcat(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.api.show_user_row(tmp_path, list(range(5)), 2, 100)
+
+    assert mocked_pixcat.mock_calls == [
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=2, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=0, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=1, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=2, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=3, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=4, y=0)
+    ]
+
+def test_show_row_pixcat(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    monkeypatch.setattr('koneko.Terminal.width', 70)
+    lscat.api.show_row(tmp_path, 2, 18, 100)
+
+    assert mocked_pixcat.mock_calls == [
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=2, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=20, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=38, y=0),
+        call(tmp_path),
+        call().thumbnail(100),
+        call().thumbnail().show(align='left', x=56, y=0)
+    ]
+
+def test_hide_all_pixcat(monkeypatch, tmp_path, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    mocked_image = Mock()
+    lscat.api.hide_all([mocked_image] * 3)
+
+    assert mocked_image.mock_calls == [call.hide()] * 3
+
+
+
+def test_show_single_x(monkeypatch, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    lscat.show_single_x(4, 310)
+    assert mocked_pixcat.mock_calls == [
+        call(WELCOME_IMAGE),
+        call().thumbnail(310),
+        call().thumbnail().show(align='left', x=4, y=0)
+    ]
+
+def test_show_single_y(monkeypatch, use_pixcat_api):
+    mocked_pixcat = Mock()
+    monkeypatch.setattr('koneko.lscat.Image', mocked_pixcat)
+    monkeypatch.setattr('koneko.config.xcoords_config', lambda: (None, 2))
+    lscat.show_single_y(4, 310)
+    assert mocked_pixcat.mock_calls == [
+        call(WELCOME_IMAGE),
+        call().thumbnail(310),
+        call().thumbnail().show(align='left', x=2, y=4)
+    ]
 
 
 def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
@@ -44,7 +257,6 @@ def test_TrackDownloads():
     tracker = lscat.TrackDownloads(mocked_data)
     tracker.generator = mocked_generator
 
-    correct_order = list(range(30))
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(30))]
 
@@ -75,7 +287,6 @@ def test_TrackDownloadsUser():
     tracker = lscat.TrackDownloadsUsers(mocked_data)
     tracker.generator = mocked_generator
 
-    correct_order = pure.generate_orders(120, 30)
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]
 
@@ -136,7 +347,6 @@ def test_TrackDownloadsImage(monkeypatch):
     tracker = lscat.TrackDownloadsImage(mocked_data)
     tracker.generator = mocked_generator
 
-    correct_order = list(range(10))
     test_pics = [f"12345_p{idx}_master1200.jpg"
                  for idx in list(range(10))]
 

@@ -13,6 +13,16 @@ def write_print_setting(cfg, setting, tmp_path):
         cfg.write(f)
 
 
+def test_scroll_display(tmp_path, use_test_cfg_path):
+    setup_test_config(tmp_path)
+    assert config.scroll_display() is True
+
+
+def test_ueberzug_center_spaces(tmp_path, use_test_cfg_path):
+    setup_test_config(tmp_path)
+    assert config.ueberzug_center_spaces() == 20
+
+
 def test_check_print_info_default(tmp_path):
     setup_test_config(tmp_path)
     assert config.check_print_info() is True

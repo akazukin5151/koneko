@@ -45,6 +45,19 @@ def test_display_user(monkeypatch, argv):
         )
     ]
 
+def test_display_core(monkeypatch, send_enter):
+    """The previous two tests only test for use_ueberzug = False;
+    this one tests for True
+    """
+    mock = Mock()
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.lscat_prompt.scroll_prompt', mock)
+    lscat_app._display_core('tracker', 'data', 'max_images')
+
+    assert mock.mock_calls == mock.call_args_list == [
+         call('tracker', 'data', 'max_images')
+    ]
+
 
 @pytest.mark.parametrize('argv', (['2'], []))
 def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
@@ -213,6 +226,16 @@ def test_maybe_print_xcoord(monkeypatch, send_enter, capsys):
 
     captured = capsys.readouterr()
     assert captured.out == '\n\nYour recommended settings are:\nusers_print_name_xcoord = 99\n'
+
+
+def test_maybe_center_spaces(monkeypatch, send_enter, capsys):
+    monkeypatch.setattr('koneko.assistants.center_spaces_assistant', lambda *a: 99)
+    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+
+    lscat_app.config_assistance(['7'])
+
+    captured = capsys.readouterr()
+    assert captured.out == '\n\nYour recommended settings are:\nueberzug_center_spaces = 99\n'
 
 
 

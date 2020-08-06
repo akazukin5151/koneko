@@ -137,6 +137,7 @@ def find_number_map(x: int, y: int) -> 'Optional[int]':
     nrows = ceil(30 / ncols)
     if 1 <= x <= ncols and 1 <= y <= nrows:
         return ((x - 1) % ncols) + (ncols * (y - 1))
+    return False
 
 
 # IO related
@@ -196,14 +197,4 @@ def try_import_ueberzug():
     except ImportError as e:
         raise ImportError("Install with `pip install ueberzug`") from e
     return ueberzug
-
-def try_import_ueberzug_module(module):
-    toexec = "try_import_ueberzug()." + module
-    return eval(toexec)
-
-def try_get_FIT_CONTAIN():
-    return try_import_ueberzug_module('ScalerOption').FIT_CONTAIN.value
-
-def try_get_VISIBLE():
-    return try_import_ueberzug_module('Visibility').VISIBLE
 

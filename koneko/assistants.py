@@ -367,7 +367,7 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
     input('\nEnter any key to continue\n')
     os.system('clear')
 
-    image = lscat.api.show_no_xy(WELCOME_IMAGE, thumbnail_size)
+    image = lscat.api.show(WELCOME_IMAGE, 0, 0, thumbnail_size)
 
     time.sleep(0.1)
 

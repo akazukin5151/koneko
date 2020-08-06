@@ -60,6 +60,19 @@ def test_async_download_no_rename(monkeypatch, tmp_path):
     assert tmp_path.exists()
 
 
+def test_download_url(monkeypatch, tmp_path, capsys):
+    mocked_api = Mock()
+    monkeypatch.setattr('koneko.api.myapi', mocked_api)
+
+    download.download_url(tmp_path, 'url', tmp_path / 'filename')
+
+    assert tmp_path.exists()
+    assert capsys.readouterr().out == ' |\r   Downloading illustration...\r \r'
+    assert mocked_api.method_calls == [
+        call.protected_download('url', tmp_path, tmp_path / 'filename')
+    ]
+
+
 
 class FakeData:
     def url(self):

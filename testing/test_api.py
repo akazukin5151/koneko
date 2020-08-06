@@ -18,7 +18,7 @@ def test_api_login_without_token_no_error(monkeypatch):
             return self
 
     testapi = api.APIHandler()
-    testapi._logged_in = False
+    testapi._login_started = False
     mocked_api = SubscriptableMock()
     writer_mock = Mock()
     testapi._api = mocked_api
@@ -34,7 +34,7 @@ def test_api_login_without_token_no_error(monkeypatch):
 
 def test_api_login_with_token_no_error(monkeypatch):
     testapi = api.APIHandler()
-    testapi._logged_in = False
+    testapi._login_started = False
     mocked_api = Mock()
     writer_mock = Mock()
     testapi._api = mocked_api
@@ -54,7 +54,7 @@ def test_api_login_with_token_token_error_uses_normal_method(monkeypatch):
             return self
 
     testapi = api.APIHandler()
-    testapi._logged_in = False
+    testapi._login_started = False
     mocked_api = SubscriptableMock()
     writer_mock = Mock()
     testapi._api = mocked_api
@@ -71,7 +71,7 @@ def test_api_login_with_token_token_error_uses_normal_method(monkeypatch):
 
 def test_api_login_without_token_failed(monkeypatch, capsys):
     testapi = api.APIHandler()
-    testapi._logged_in = False
+    testapi._login_started = False
     testapi._api = Mock()
     testapi._api.login = lambda *a: raises()
     testapi._token = None

@@ -14,21 +14,25 @@ class APIHandler:
         self._api_thread = threading.Thread(target=self._login)
         self._token_file = KONEKODIR.parent / 'token'
         self._token = files.read_token_file(self._token_file)
+        self._login_started = False
+        self._login_done = False
 
         self._api = AppPixivAPI()  # Object to login and request on
         # Set in self.start() (because singleton is instantiated before config)
         self._credentials: 'dict[str, str]'
 
-    @funcy.once
     def start(self, credentials):
         """Start logging in. The only setup entry point that is public"""
-        self._credentials = credentials
-        self._api_thread.start()
+        if not self._login_started:
+            self._credentials = credentials
+            self._api_thread.start()
+            self._login_started = True
 
-    @funcy.once
     def _await_login(self):
         """Wait for login to finish, then assign PixivAPI session to API"""
-        self._api_thread.join()
+        if not self._login_done:
+            self._api_thread.join()
+            self._login_done = True
 
 
     def _login(self):

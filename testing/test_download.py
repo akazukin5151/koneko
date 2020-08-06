@@ -47,6 +47,19 @@ def test_init_download(monkeypatch):
     ]
 
 
+def test_async_download_no_rename(monkeypatch, tmp_path):
+    mocked_url = Mock()
+    mocked_tracker = Mock()
+    mocked_api = Mock()
+    monkeypatch.setattr('koneko.api.myapi', mocked_api)
+
+    download.async_download_no_rename(tmp_path, [mocked_url] * 2, mocked_tracker)
+
+    assert mocked_tracker.method_calls == [call.update(None)] * 2
+    assert mocked_api.method_calls == [call.protected_download(mocked_url, tmp_path, None)] * 2
+    assert tmp_path.exists()
+
+
 
 class FakeData:
     def url(self):

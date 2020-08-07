@@ -2,9 +2,43 @@
 
 title lscat and data
 
+
+abstract class lscat.Display <<(A, red)>>{
+    ..Required behaviour..
+    +show()
+    +show_center()
+    +hide()
+    ..Common behaviour..
+    +show_user_row()
+    +show_row()
+    +hide_all()
+}
+
+class lscat.Pixcat {
+    ..Implements..
+    +show()
+    +show_center()
+    +hide()
+}
+
+class lscat.Ueberzug {
+    ..Unique..
+    +__init__()
+    ..Implements..
+    +show()
+    +show_center()
+    +hide()
+}
+
+lscat.Display <-- lscat.Pixcat
+lscat.Display <-- lscat.Ueberzug
+
+
 abstract class lscat.AbstractTracker <<(A, red)>>{
+    ..Required attributes..
     - {abstract} orders
     - {abstract} generator
+    ..Common behaviors..
     +update()
     -_inspect()
 }
@@ -18,12 +52,36 @@ class lscat.TrackDownloadsUser {
     - orders
     - generator
 }
+class lscat.TrackDownloadsImage {
+    ..Implements..
+    - orders
+    - generator
+    ..Overrides..
+    -_inspect()
+}
 
 lscat.AbstractTracker <-- lscat.TrackDownloadsUser
 lscat.AbstractTracker <-- lscat.TrackDownloads
+lscat.AbstractTracker <-- lscat.TrackDownloadsImage
+lscat.AbstractTracker *.. lscat.Display
 
-ui.AbstractUsers *.up. lscat.TrackDownloadsUser
-ui.AbstractGallery *.up. lscat.TrackDownloads
+ui.AbstractUsers *.up.. lscat.TrackDownloadsUser
+ui.AbstractGallery *.up.. lscat.TrackDownloads
+ui.Image *.up.. lscat.TrackDownloadsImage
+
+
+package lscat {
+    object generate_page
+    object generate_users
+    object generate_users_ueberzug
+    object generate_previews
+}
+
+generate_users ...* lscat.TrackDownloadsUser
+generate_users_ueberzug ...* lscat.TrackDownloadsUser
+generate_page ...* lscat.TrackDownloads
+generate_previews ...* lscat.TrackDownloadsImage
+
 
 
 abstract class data.AbstractData <<(A, red)>>{

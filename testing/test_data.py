@@ -34,13 +34,10 @@ def user_updated():
     return data
 
 
-def test_next_offset_gdata():
-    gdata = gallery_updated()
-    assert gdata.next_offset == '30'
-
-def test_next_offset_udata():
-    udata = user_updated()
-    assert udata.next_offset == '30'
+@pytest.mark.parametrize('mode', (gallery_updated, user_updated))
+def test_next_offset_data(mode):
+    data = mode()
+    assert data.next_offset == '30'
 
 
 @pytest.mark.parametrize('mode', (gallery_updated, user_updated))

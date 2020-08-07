@@ -33,11 +33,11 @@ class AbstractData(ABC):
         self.all_names: 'list[str]'
 
     @abstractmethod
-    def update(self):
+    def update(self, raw, page_num=None):
         raise NotImplementedError
 
     @abstractmethod
-    def artist_user_id(self) -> str:
+    def artist_user_id(self, post_number) -> str:
         raise NotImplementedError
 
     def clone_with_page(self, page_num):
@@ -81,9 +81,10 @@ class GalleryData(AbstractData):
         next_url                (next JSON url)         self.next_url
     """
     # Required
-    def update(self, raw: 'Json'):
+    def update(self, raw: 'Json', page_num=None):
         """Adds newly requested raw json into the cache"""
-        self.all_pages_cache[self.page_num] = raw
+        key = page_num or self.page_num
+        self.all_pages_cache[key] = raw
 
     def artist_user_id(self, post_number: int) -> str:
         """Get the artist user id for a specified post number"""
@@ -121,9 +122,10 @@ class GalleryData(AbstractData):
 
 class UserData(AbstractData):
     # Required
-    def update(self, raw: 'Json'):
+    def update(self, raw: 'Json', page_num=None):
         """Adds newly requested raw json into the cache"""
-        self.all_pages_cache[self.page_num] = raw['user_previews']
+        key = page_num or self.page_num
+        self.all_pages_cache[key] = raw['user_previews']
         self.next_url = raw['next_url']
 
     @lru_cache

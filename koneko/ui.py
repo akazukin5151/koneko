@@ -108,10 +108,13 @@ class AbstractUI(ABC):
         self._prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self._prefetch_thread.start()
 
-    def _request_then_save(self) -> 'IO':
+    def _request_then_save(self, page_num=None) -> 'IO':
         """Do request and save it"""
         result = self._pixivrequest()
-        self._data.update(result)
+        if page_num:
+            self._data.update(result, page_num)
+        else:
+            self._data.update(result)
 
     def _prefetch_next_page(self) -> 'IO':
         # Wait for initial request to finish, so the data object is instantiated
@@ -129,14 +132,11 @@ class AbstractUI(ABC):
         if not immediate_next:
             return
 
-        oldnum = self._data.page_num
         self._data.offset = self._data.next_offset
-        self._data.page_num = int(self._data.offset) // 30 + 1
+        self._request_then_save(self._data.page_num + 1)
+        new = self._data.clone_with_page(int(self._data.offset) // 30 + 1)
+        download.init_download(new, None)
 
-        self._request_then_save()
-        download.init_download(self._data, None)
-
-        self._data.page_num = oldnum
 
     def next_page(self) -> 'IO':
         print('Downloading images in the next page...')

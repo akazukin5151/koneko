@@ -144,15 +144,16 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-* Refine ueberzug (must complete before release)
-    - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
-        - Also happens with view user/image while prefetching
-        - In particular, prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
-    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentate ueberzug usage, & update README.md about ueberzug
-        - [ ] Update diagrams in HACKING
-        - [ ] Help and manual needs to be updated as well
-        - [ ] Center align image config
-    - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
+* Race conditions while prefetching -- mitigate by waiting for a while before scrolling or navigating pages
+    * If scrolling while prefetching in gallery & user modes, `utils.max_terminal_scrolls()` uses the next dir (which doesn't exist yet) and crashes
+    * Also happens with view user/image while prefetching
+    * In particular, prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
+
+- [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentate ueberzug usage, & update README.md about ueberzug
+    - [ ] Update diagrams in HACKING
+    - [ ] Help and manual needs to be updated as well
+    - [ ] Center align image config
+- [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
 
 - Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
 

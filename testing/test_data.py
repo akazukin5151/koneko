@@ -51,6 +51,19 @@ def test_clone_with_page(mode):
     assert new != data
 
 
+@pytest.mark.parametrize('mode', (gallery_updated, user_updated))
+def test_is_immediate_next(mode):
+    data = mode()
+    assert data.offset == 0
+    assert data.next_offset == '30'
+    assert data.is_immediate_next is True
+
+    # This isn't realistic (offset will always be positive)
+    # but next_offset and next_url is tied to the JSON
+    data.offset = -30
+    assert data.is_immediate_next is False
+
+
 def test_urls_as_names_gdata():
     gdata = gallery()
     gdata.update(mode1)

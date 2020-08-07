@@ -139,11 +139,12 @@ class AbstractUI(ABC):
         self._data.page_num = oldnum
 
     def next_page(self) -> 'IO':
+        print('Downloading images in the next page...')
         self._prefetch_thread.join()
         self._data.page_num += 1
         self.terminal_page = 0
         self._show_page()
-        self._prefetch_next_page()
+        self._prefetch()
 
     def previous_page(self) -> 'IO':
         if self._data.page_num <= 1:

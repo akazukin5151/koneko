@@ -39,7 +39,9 @@ abstract class data.AbstractData <<(A, red)>>{
     +offset
     +page_num
     +all_pages_cache
+    +is_immediate_next
     ..Common methods..
+    +clone_with_page()
     +download_path()
     +next_offset()
     +urls_as_names()

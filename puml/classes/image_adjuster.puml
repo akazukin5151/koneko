@@ -8,14 +8,15 @@ abstract class AbstractImageAdjuster <<(A, red)>>{
     + {abstract} start_spaces
     ..Required behaviours..
     +{abstract}report()
-    +{abstract}maybe_move_up()
-    +{abstract}maybe_move_down()
-    +{abstract}maybe_erase()
     +{abstract}show_func_args()
     +{abstract}return_tup()
     +{abstract}is_input_valid()
     ..Common behaviour..
     +start()
+    ..Empty by default..
+    +maybe_move_up()
+    +maybe_move_down()
+    +maybe_erase()
 }
 
 abstract class AbstractPadding <<(A, red)>>{

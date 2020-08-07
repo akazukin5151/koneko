@@ -4,19 +4,28 @@ title ui
 set namespaceSeparator none
 
 abstract class ui.AbstractUI <<(A, red)>>{
-    ..Required attribute..
+    ..Required attributes..
     - {abstract} prompt
     - {abstract} data_class
     - {abstract} tracker_class
+    - {abstract} max_images
+    - {abstract} is_gallery_mode
     ..Required behaviour..
     -{abstract}pixivrequest()
-    -{abstract}maybe_join_thread()
     -{abstract}print_page_info()
+    ..Common attributes..
+    - use_ueberzug
     ..Common behaviour..
     +start()
     +next_page()
     +previous_page()
     +reload()
+    +scroll_up()
+    +scroll_down()
+    +handle_scroll()
+    +scroll_or_show()
+    ..Empty by default..
+    -maybe_join_thread()
 }
 
 abstract class ui.AbstractGallery <<(A, red)>>{
@@ -24,7 +33,6 @@ abstract class ui.AbstractGallery <<(A, red)>>{
     - prompt
     - data_class
     - tracker_class
-    -maybe_join_thread()
     -print_page_info()
     ..Unique..
     +view_image()
@@ -119,11 +127,12 @@ abstract class ui.ToImage <<(A, red)>>{
     ..Required behaviours..
     +{abstract}get_post_json()
     +{abstract}get_image_id()
-    +{abstract}maybe_show_preview()
     +{abstract}download_image()
     ..Common behaviours..
     +setup()
     +start()
+    ..Empty by default..
+    +maybe_show_preview()
 }
 
 class ui.ViewImage <<(U, DeepSkyBlue)>>{
@@ -144,7 +153,6 @@ class ui.ViewPostMode <<(U, DeepSkyBlue)>>{
     + firstmode
     +get_post_json()
     +get_image_id()
-    +maybe_show_preview()
     +download_image()
     ..Unique..
     - image_id
@@ -156,6 +164,7 @@ ui.ViewPostMode -up-> ui.ToImage
 class ui.Image <<(C, cyan)>>{
     + event
     + loc
+    + use_ueberzug
     +display_initial()
     +open_image()
     +download_image()

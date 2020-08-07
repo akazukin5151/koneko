@@ -55,6 +55,14 @@ class AbstractData(ABC):
         return self.next_url.split('&')[-1].split('=')[-1]
 
     @property
+    def is_immediate_next(self) -> bool:
+        """
+        Prevent download if not immediately next page, eg
+        p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
+        """
+        return (int(self.next_offset) - int(self.offset)) <= 30
+
+    @property
     def urls_as_names(self) -> 'list[str]':
         return [pure.split_backslash_last(url) for url in self.all_urls]
 

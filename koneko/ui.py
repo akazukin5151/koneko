@@ -120,17 +120,11 @@ class AbstractUI(ABC):
         # Wait for initial request to finish, so the data object is instantiated
         # Else next_url won't be set yet
         self._maybe_join_thread()
-        if not self._data.next_url:  # Last page
-            return True
 
-        if not self._data.next_offset.isdigit():
+        if not (self._data.next_url
+                or self._data.next_offset.isdigit()
+                or self._data.is_immediate_next):
             return True
-        # Won't download if not immediately next page, eg
-        # p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
-        offset_diffs = int(self._data.next_offset) - int(self._data.offset)
-        immediate_next: bool = offset_diffs <= 30
-        if not immediate_next:
-            return
 
         self._data.offset = self._data.next_offset
         self._request_then_save(self._data.page_num + 1)

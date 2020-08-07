@@ -119,6 +119,9 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Fixed bugs in lscat app's display path (mode p/3):
     * Not working if path given via cli
     * Always showing directory in gallery mode
+* Fixed race conditions while prefetching
+    * eg, viewing an image while prefetching would crash or cause undefined behaviour
+    * Prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
 
 #### Code maintenance
 * Remove circular imports
@@ -143,11 +146,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 # Roadmap
 
 ## Features
-
-* Race conditions while prefetching -- mitigate by waiting for a while before scrolling or navigating pages
-    * If scrolling while prefetching in gallery & user modes, `utils.max_terminal_scrolls()` uses the next dir (which doesn't exist yet) and crashes
-    * Also happens with view user/image while prefetching
-    * In particular, prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
 
 - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentate ueberzug usage, & update README.md about ueberzug
     - [ ] Update diagrams in HACKING

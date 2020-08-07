@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from koneko import KONEKODIR, data
 
 
@@ -39,6 +41,18 @@ def test_next_offset_gdata():
 def test_next_offset_udata():
     udata = user_updated()
     assert udata.next_offset == '30'
+
+
+@pytest.mark.parametrize('mode', (gallery_updated, user_updated))
+def test_clone_with_page(mode):
+    data = mode()
+    assert data.page_num == 1
+    new = data.clone_with_page(2)
+    assert new.page_num == 2
+    assert data.page_num == 1
+    assert type(new) is type(data)
+    assert new != data
+
 
 def test_urls_as_names_gdata():
     gdata = gallery()

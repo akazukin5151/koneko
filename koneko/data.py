@@ -1,8 +1,9 @@
 """Stores json data from the api. Acts as frontend to access data in a single line.
 Functionally pure, no side effects (but stores state)
 """
-from abc import ABC, abstractmethod
+from copy import copy
 from functools import lru_cache
+from abc import ABC, abstractmethod
 
 from koneko import pure, KONEKODIR
 
@@ -38,6 +39,11 @@ class AbstractData(ABC):
     @abstractmethod
     def artist_user_id(self) -> str:
         raise NotImplementedError
+
+    def clone_with_page(self, page_num):
+       new = copy(self)
+       new.page_num = page_num
+       return new
 
     @property
     def download_path(self) -> str:

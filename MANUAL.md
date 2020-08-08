@@ -10,12 +10,14 @@
     * [Mode r/6](#mode-r6)
     * [lscat app](#lscat-app)
 * [Configuration](#Configuration)
-    * [In general](#in-general)
-    * [Image](#image-configuration)
-    * [Print spacing](#print-spacing)
-    * [Page spacing](#page-spacing)
+    * [Credentials](#credentials)
+    * [lscat](#lscat)
+        * [Image configuration](#image-configuration)
+        * [Print spacing](#print-spacing)
+        * [Page spacing](#page-spacing)
     * [Misc](#misc)
     * [Experimental](#experimental)
+        * [Ueberzug](#ueberzug)
 
 
 # Usage

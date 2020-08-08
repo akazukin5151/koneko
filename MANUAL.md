@@ -289,54 +289,251 @@ See [example config](example_config.ini) for reference.
 
 ### In general
 * Your config must be saved as `~/.config/koneko/config.ini` (exact path and name)
-* The credentials section will be automatically generated on first launch
-* 'Gallery' means grid: artist illust mode (1) and illust follow mode (5)
+* 'Gallery' means grid: artist illust mode (a/1), illust follow mode (n/5), illust recommended mode (r/6), and illust related mode
 * 'Users' (mode) means: following users mode (3) and search users mode (4)
+* For booleans, anything not exactly ('1', 'yes', 'true', or 'on') will be considered off
 
-## Image configuration
-* `image_width`: width of the image, in terms of terminal blank spaces (default: `18`)
-* `image_height`: height of the image, in terms of terminal blank spaces (default: `8`)
-* `image_thumbnail_size`: size of the image for pixcat (I think it's in pixels) (default: `310`)
-* `images_x_spacing`: horizontal spacing between images (default: `2`)
-* `images_y_spacing`: vertical spacing between images in a page (default: `1`)
+## [Credentials]
 
-## Print spacing
-### Number of blank spaces in between numbers / in front of words
+* The credentials section will be automatically generated on first launch
 
-* `gallery_print_spacing`: the spacing between column numbers (number of blank spaces between each number)
-    * Integers must be comma delimited, no spaces
-    * Number of values must be equal to the number of columns
-    * Default: `9,17,17,17,17`
-* `users_print_name_xcoord`: x-position of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
-    * Default: `18`
-* The number(s) are the number of blank spaces (' ') to print
+<table>
+<thead>
+  <tr>
+    <th>Setting</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code>username</code></td>
+    <td>string</td>
+    <td></td>
+    <td>Your pixiv username</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>password</code></td>
+    <td>string</td>
+    <td></td>
+    <td>Your pixiv password</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>id</code></td>
+    <td>int</td>
+    <td></td>
+    <td>Your pixiv ID number</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+
+## [lscat]
+### Image configuration
+<table>
+<thead>
+  <tr>
+    <th>Setting</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code>image_width</code></td>
+    <td>int</td>
+    <td>18</td>
+    <td>Width of the image, in terms of terminal blank spaces</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>image_height</code></td>
+    <td>int</td>
+    <td>8</td>
+    <td>Height of the image, in terms of terminal blank spaces</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>image_thumbnail_size</code></td>
+    <td>int</td>
+    <td>310</td>
+    <td>Size of the image for pixcat (I think it's in pixels)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>images_x_spacing</code></td>
+    <td>int</td>
+    <td>2</td>
+    <td>Horizontal spacing between images in a page</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>images_y_spacing</code></td>
+    <td>int</td>
+    <td>1</td>
+    <td>Vertical spacing between images in a page</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+
+### Print spacing
+
+<table>
+<thead>
+  <tr>
+    <th>Setting</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code>gallery_print_spacing</code></td>
+    <td>list[int]</td>
+    <td>9,17,17,17,17</td>
+    <td>The number of blank spaces between column numbers (number of blank spaces between each number)</td>
+    <td><ul>
+        <li>Integers must be comma delimited, no spaces in between</li>
+        <li>Number of values must be equal to the number of columns</li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td><code>users_print_name_xcoord</code></td>
+    <td>int</td>
+    <td>18</td>
+    <td>The number of blank spaces between the left edge and the artist number and name</td>
+    <td><ul>
+        <li>x-position of number and artist name, relative from the left side (which should be on the right of the artist profile pic)</li>
+        <li>Number of values must be equal to the number of columns</li>
+    </ul></td>
+  </tr>
+</tbody>
+</table>
+
 * Both of them act on the x-axis
 * These settings are ignored if the `print_info` option is off
 
-## Page spacing
-### number of `\n` to print after every page, until all rows are out of view
-* `page_spacing`: (see header) 
-* Default: `23`
-* The next row cannot be displayed without covering another row, so printing newlines will shift the terminal screen down, until the last row is out of view.
-* Find a value such that the completed four-picture row is completely out of view.
-* Acts on the y-axis
+### Page spacing
 
-## Misc
-* `print_info`: Turns off printing the column numbers for the gallery, and number+artist name for user modes.
-* Anything not exactly ('1', 'yes', 'true', or 'on') will be considered off
+<table>
+<thead>
+  <tr>
+    <th>Setting</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code>page_spacing</code></td>
+    <td>int</td>
+    <td>23</td>
+    <td>The number of <code>\n</code> to print after every page, until all rows are out of view</td>
+    <td><ul>
+        <li>Find a value such that the completed four-picture row is completely out of view.</li>
+        <li>Acts on the y-axis</li>
+    </ul></td>
+  </tr>
+</tbody>
+</table>
 
-## Experimental
-* `image_mode_previews`: In view post mode (mode 2), preview the next four images for multi-image posts. Unstable because of pixcat implementation details -- it prints out escape codes that moves the terminal cursor, changing the location of other print statements.
+## [misc]
+
+<table>
+<thead>
+  <tr>
+    <th>Setting</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code>print_info</code></td>
+    <td>bool</td>
+    <td>on</td>
+    <td>Whether to print the column numbers for gallery modes, and number+artist name for user modes.</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+
+## [experimental]
+
+<table>
+<thead>
+  <tr>
+    <th>Setting</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code>image_mode_previews</code></td>
+    <td>bool</td>
+    <td>off</td>
+    <td>Whether to preview the next four images for multi-image posts, in view post mode (mode i/2)</td>
+    <td>Unstable because of pixcat implementation details -- it prints out escape codes that moves the terminal cursor, changing the location of other print statements.</td>
+  </tr>
+</tbody>
+</table>
 
 ### Ueberzug
 
-* `use_ueberzug`: Whether to use [Ueberzug](https://github.com/seebye/ueberzug) instead of [pixcat](https://github.com/mirukana/pixcat) / kitty's icat. For non-kitty users, you should use ueberzug.
-    * Default: off
-* `scroll_display` (bool): Whether lscat should print newlines to scroll down the terminal and display more images.
-    * The number of images in a terminal page is number_of_cols * number_of_rows
-    * As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed. This is what "display scrolling" means
-    * The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
-    * If ueberzug is on, this option will always be off, because only pixcat/icat respond to terminal scroll events
-    * Default: on
-* `ueberzug_center_spaces`: The x-coordinate of an image that is in the center of your terminal.
-    * Default: 20
+(Note: these settings still belong inside the `[experimental]` section)
+
+<table>
+<thead>
+  <tr>
+    <th>Setting</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code>use_ueberzug</code></td>
+    <td>bool</td>
+    <td>off</td>
+    <td>Whether to use 
+<a href="https://github.com/seebye/ueberzug">Ueberzug</a> instead of <a href="https://github.com/mirukana/pixcat">pixcat</a> / kitty's icat.</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>scroll_display</code></td>
+    <td>bool</td>
+    <td>on</td>
+    <td>Whether lscat should print newlines to scroll down the terminal and display more images</td>
+    <td><ul>
+        <li>The number of images in a terminal page is number_of_cols * number_of_rows</li>
+        <li>As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed. This is what "display scrolling" means</li>
+        <li>The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down</li>
+        <li>If ueberzug is on, this option will always be off, because only pixcat/icat respond to terminal scroll events</li>
+  </tr>
+  <tr>
+    <td><code>ueberzug_center_spaces</code></td>
+    <td>int</td>
+    <td>20</td>
+    <td>The x-coordinate of an image that is in the center of your terminal</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>

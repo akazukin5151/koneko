@@ -118,6 +118,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
              * For already downloaded images in Gallery, Users, & Image modes
              * For showing images as they download in Gallery, Users, & Image modes
              * Everywhere else (main screen, info screen, etc)
+* Improved documentation using tables in the manual (MANUAL.md) and developer guide (HACKING.md)
 
 #### Bug fixes
 * Fixed bugs in lscat app's display path (mode p/3):
@@ -151,7 +152,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-- [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
+- Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
 
 * Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
     * Help message that responds to terminal width

@@ -153,8 +153,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     - [ ] Center align image config
 - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
 
-- Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
-
+* Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
+    * Help message that responds to terminal width
 * Illust-related mode can't go back to image mode
 * Support illust related mode in lscat app mode 2/b
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers

@@ -109,9 +109,11 @@ def filter_modes_predicate(modes: 'list[str]', allowed_names: 'set[str]') -> 'fn
 
 
 def find_mode2_dirs() -> 'list[str]':
-    return [f for f in os.listdir(KONEKODIR)
-            if f.isdigit()
-            and 'individual' in os.listdir(KONEKODIR / f)]
+    return [
+        f for f in os.listdir(KONEKODIR)
+        if f.isdigit()
+        and 'individual' in os.listdir(KONEKODIR / f)
+    ]
 
 
 def valid_mode1(path: 'Path') -> bool:

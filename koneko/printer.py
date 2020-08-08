@@ -62,8 +62,10 @@ def maybe_print_page_spacing(actions, page_spacing: 'Union[tuple, str]') -> 'IO'
 
 def maybe_print_print_spacing(actions, gallery_print_spacing: 'list[int]') -> 'IO':
     if 5 in actions or 8 in actions:
-        print('gallery_print_spacing =',
-              ','.join((str(x) for x in gallery_print_spacing)))
+        print(
+            'gallery_print_spacing =',
+            ','.join((str(x) for x in gallery_print_spacing))
+        )
 
 
 def maybe_print_user_info(actions, user_info_xcoord: int) -> 'IO':
@@ -81,7 +83,6 @@ def print_doc(doc: str) -> 'IO':
     os.system('clear')
     number_of_newlines = doc.count('\n')
     bottom = TERM.height - (number_of_newlines + 2)
-    #move_cursor_down(bottom)
     with TERM.location(0, bottom):
         print(doc)
 
@@ -98,13 +99,15 @@ def print_multiple_imgs(illusts_json: 'Json') -> 'IO':
     print('')
 
 
-def update_gallery_info(spacings: 'list[int]', ncols: int, current_selection: int) -> 'IO':
+def update_gallery_info(spacings: 'list[int]', ncols, current_selection: int) -> 'IO':
     move_cursor_up(2)
     erase_line()
     print_cols(spacings, ncols)
-    print('\n\nAdjusting the number of spaces between '
-          f'{current_selection} and {current_selection+1}',
-          flush=True)
+    print(
+        '\n\nAdjusting the number of spaces between '
+        f'{current_selection} and {current_selection+1}',
+        flush=True
+    )
     move_cursor_up(1)
 
 
@@ -147,6 +150,7 @@ def user_help() -> 'IO':
 def maybe_print_bottom(use_ueberzug: 'Optional[bool]' = None, offset=0):
     if use_ueberzug is None:
         from koneko import config
+
         use_ueberzug = config.use_ueberzug()
 
     if use_ueberzug:
@@ -158,6 +162,7 @@ def maybe_print_bottom(use_ueberzug: 'Optional[bool]' = None, offset=0):
     finally:
         if use_ueberzug:
             cursor.__exit__(None, None, None)
+
 
 def print_bottom(*values, use_ueberzug=None, offset=0, **kwargs):
     with maybe_print_bottom(use_ueberzug, offset):

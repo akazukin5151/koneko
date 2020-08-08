@@ -33,15 +33,14 @@ def _pick_dirs_picker(actions: 'list[str]', title: str) -> Picker:
 
 def lscat_app_main() -> 'IO[int]':
     os.system('clear')
-    title = ('Welcome to the lscat interactive script\n'
-             'Please select an action')
+    title = 'Welcome to the lscat interactive script\nPlease select an action'
     actions = (
         '1. Launch koneko configuration assistance',
         '2. Browse a cached dir to display',
         '3. Display a specified path',
         '4. Display KONEKODIR / testgallery',
         '5. Display KONEKODIR / testuser',
-        'Quit'
+        'Quit',
     )
     mypicker = ws_picker(actions, title)
     _, ans = mypicker.start()
@@ -62,7 +61,9 @@ def frequent_modes_picker(actions: 'list[str]') -> int:
     return idx
 
 
-def _multiselect_picker(actions: 'list[str]', title: str, to_str=True) -> 'IO[list[int | str]]':
+def _multiselect_picker(
+    actions: 'list[str]', title: str, to_str=True
+) -> 'IO[list[int | str]]':
     """Returns a list of all the indices of actions"""
     picker = ws_picker(actions, title, multiselect=True, min_selection_count=1)
     selected = picker.start()
@@ -82,16 +83,19 @@ def select_modes_filter(more=False) -> 'IO[list[str]]':
     ]
 
     if more:
-        actions.extend(('5. View illustrations of all following artists',
-                        'c. Clear all filters'))
+        actions.extend(
+            ('5. View illustrations of all following artists', 'c. Clear all filters')
+        )
 
     return _multiselect_picker(actions, title, to_str=True)
 
 
 def ask_assistant() -> 'IO[list[int]]':
     """Ask for which koneko config assistant (lscat app)"""
-    title = ('=== Configuration assistance ===\n'
-             'Press SPACE to select an action & ENTER to confirm')
+    title = (
+        '=== Configuration assistance ===\n'
+        'Press SPACE to select an action & ENTER to confirm'
+    )
 
     actions = (
         '1. Thumbnail size',
@@ -102,7 +106,7 @@ def ask_assistant() -> 'IO[list[int]]':
         '6. User mode print info x-position',
         '7. Ueberzug center image spaces',
         '8. (Run all of the above)\n',
-        'Quit'
+        'Quit',
     )
 
     return _multiselect_picker(actions, title, to_str=False)
@@ -194,10 +198,12 @@ def handle_cd(path, selected_dir: 'Path', modes: 'list[str]') -> ('Path', 'list[
 def actions_from_dir(path: 'Path', modes: 'list[str]') -> 'list[str]':
     if path == KONEKODIR and modes:  # Filter active
         return try_filter_dir(modes)
-    if ('2' in modes
-            and '1' not in modes
-            and 'individual' not in str(path)
-            and str(path.name).isdigit()):
+    if (
+        '2' in modes
+        and '1' not in modes
+        and 'individual' not in str(path)
+        and str(path.name).isdigit()
+    ):
         return ['individual']
 
     return files.filter_history(path) or [EMPTY_WARNING]
@@ -205,6 +211,7 @@ def actions_from_dir(path: 'Path', modes: 'list[str]') -> 'list[str]':
 
 def try_filter_dir(modes: 'list[str]') -> 'list[str]':
     return sorted(files.filter_dir(modes)) or [EMPTY_FILTER_WARNING]
+
 
 def handle_clear() -> 'IO':
     if screens.clear_cache_loop():

@@ -52,14 +52,18 @@ def get_bool_config(section: str, setting: str, fallback: bool) -> bool:
     """
     return unsafe_get_bool_config(section, setting, fallback).value_or(fallback)
 
+
 def check_image_preview() -> bool:
     return get_bool_config('experimental', 'image_mode_previews', False)
+
 
 def check_print_info() -> bool:
     return get_bool_config('misc', 'print_info', True)
 
+
 def use_ueberzug() -> bool:
     return get_bool_config('experimental', 'use_ueberzug', False)
+
 
 def scroll_display() -> bool:
     return get_bool_config('experimental', 'scroll_display', True)
@@ -68,8 +72,12 @@ def scroll_display() -> bool:
 def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, int):
     settings = get_config_section('lscat')
     return (
-        settings.map(m.getint(f'image_{side}', fallback=fallbacks[0])).value_or(fallbacks[0]),
-        settings.map(m.getint(f'images_{dimension}_spacing', fallback=fallbacks[1])).value_or(fallbacks[1])
+        settings.map(m.getint(f'image_{side}', fallback=fallbacks[0])).value_or(
+            fallbacks[0]
+        ),
+        settings.map(
+            m.getint(f'images_{dimension}_spacing', fallback=fallbacks[1])
+        ).value_or(fallbacks[1]),
     )
 
 
@@ -108,14 +116,16 @@ def get_gen_users_settings() -> (int, int):
     settings = get_config_section('lscat')
     return (
         settings.map(m.getint('users_print_name_xcoord', fallback=18)).value_or(18),
-        settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2)
+        settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2),
     )
 
 
 def gallery_print_spacing_config() -> 'list[str]':
-    return get_settings('lscat', 'gallery_print_spacing').map(
-        m.split(',')
-    ).value_or(['9', '17', '17', '17', '17'])
+    return (
+        get_settings('lscat', 'gallery_print_spacing')
+        .map(m.split(','))
+        .value_or(['9', '17', '17', '17', '17'])
+    )
 
 
 def ueberzug_center_spaces() -> int:
@@ -127,6 +137,7 @@ def credentials_from_config(config_object, config_path) -> 'IO[(config, str)]':
     credentials = get_config_section('Credentials').unwrap()
     your_id = credentials.get('ID', '')
     return credentials, your_id
+
 
 # Technically frontend
 def begin_config() -> 'IO[(config, str)]':

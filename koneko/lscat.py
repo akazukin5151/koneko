@@ -23,15 +23,7 @@ from abc import ABC, abstractmethod
 from pixcat import Image
 from returns.result import safe
 
-from koneko import (
-    pure,
-    TERM,
-    utils,
-    files,
-    config,
-    printer,
-    WELCOME_IMAGE
-)
+from koneko import pure, TERM, utils, files, config, printer, WELCOME_IMAGE
 
 
 class Display(ABC):
@@ -63,8 +55,10 @@ class Display(ABC):
             for image in images:
                 self.hide(image)
 
+
 class Pixcat(Display):
     """Program-wide singleton, central handler for pixcat images"""
+
     def show(self, image_path, x, y, size) -> 'pixcat.Image':
         return Image(image_path).thumbnail(size).show(align='left', x=x, y=y)
 
@@ -78,6 +72,7 @@ class Pixcat(Display):
 
 class Ueberzug(Display):
     """Program-wide singleton, central handler for ueberzug images"""
+
     def __init__(self):
         ueberzug = utils.try_import_ueberzug()
         self.canvas = ueberzug.Canvas()
@@ -120,9 +115,9 @@ class Ueberzug(Display):
 api = Ueberzug() if config.use_ueberzug() else Pixcat()
 
 
-
 def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
     return api.show(WELCOME_IMAGE, x, 0, thumbnail_size)
+
 
 def show_single_y(y: int, size: int) -> 'IO[Image]':
     return api.show(WELCOME_IMAGE, config.xcoords_config()[1], y, size)
@@ -197,6 +192,7 @@ class AbstractTracker(ABC):
 
 class TrackDownloads(AbstractTracker):
     """For gallery modes (1 & 5)"""
+
     def __init__(self, data: 'data.<class>'):
         self.orders = list(range(30))
         self.generator = generate_page(data.download_path)
@@ -205,6 +201,7 @@ class TrackDownloads(AbstractTracker):
 
 class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
+
     def __init__(self, data: 'data.<class>'):
         print_info = config.check_print_info()
 
@@ -229,6 +226,7 @@ class TrackDownloadsUsers(AbstractTracker):
 
 class TrackDownloadsImage(AbstractTracker):
     """Experimental"""
+
     def __init__(self, data):
         min_num = data.page_num + 1
         self.orders = list(range(min_num, 30))
@@ -239,7 +237,6 @@ class TrackDownloadsImage(AbstractTracker):
         """Overrides base class because all previews will be in order"""
         self.images.append(self.generator.send(new))
         self.generator.send(None)
-
 
 
 def generate_page(path: 'Path') -> 'IO':
@@ -265,11 +262,9 @@ def generate_page(path: 'Path') -> 'IO':
             print('\n' * page_spacing)
 
         yield api.show(
-            path / image,
-            left_shifts[x],
-            rowspaces[y % number_of_rows],
-            thumbnail_size
+            path / image, left_shifts[x], rowspaces[y % number_of_rows], thumbnail_size
         )
+
 
 def generate_users(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
@@ -285,28 +280,24 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
         number = a_img.split('_')[0][1:]
 
         if print_info:
-            print(' ' * message_xcoord, number, '\n',
-                  ' ' * message_xcoord, artist_name,
-                  sep='')
+            print(
+                ' ' * message_xcoord,
+                number,
+                '\n',
+                ' ' * message_xcoord,
+                artist_name,
+                sep='',
+            )
         print('\n' * page_spacing)  # Scroll to new 'page'
 
         # Display artist profile pic
-        yield api.show(
-            path / a_img,
-            padding,
-            0,
-            thumbnail_size
-        )
+        yield api.show(path / a_img, padding, 0, thumbnail_size)
 
         # Display the three previews
         for i in range(3):
             p_img = yield
-            yield api.show(
-                path / p_img,
-                preview_xcoords[i],
-                0,
-                thumbnail_size
-            )
+            yield api.show(path / p_img, preview_xcoords[i], 0, thumbnail_size)
+
 
 def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
@@ -333,21 +324,13 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
             )
 
         # Display artist profile pic
-        yield api.show(
-            path / a_img,
-            padding,
-            rowspaces[ycoord],
-            thumbnail_size
-        )
+        yield api.show(path / a_img, padding, rowspaces[ycoord], thumbnail_size)
 
         # Display the three previews
         for j in range(3):
             p_img = yield
             yield api.show(
-                path / p_img,
-                preview_xcoords[j],
-                rowspaces[ycoord],
-                thumbnail_size
+                path / p_img, preview_xcoords[j], rowspaces[ycoord], thumbnail_size
             )
 
     while True:  # Prevent StopIteration errors
@@ -370,14 +353,7 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
         else:
             x = 1
 
-        yield api.show(
-            path / image,
-            _xcoords[x],
-            rowspaces[y],
-            thumbnail_size
-        )
+        yield api.show(path / image, _xcoords[x], rowspaces[y], thumbnail_size)
 
     while True:  # Prevent StopIteration errors
         yield
-
-

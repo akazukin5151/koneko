@@ -86,6 +86,7 @@ def async_download_spinner(download_path: Path, urls) -> 'IO':
 # The lscat generator cannot be pickled, as well as api.myapi
 # essentially everything has to be rewritten with multiprocessing in mind
 
+
 def _async_filter_and_download(data, newnames, tracker):
     helper = _download_with_tracker(path=data.download_path, tracker=tracker)
     os.makedirs(data.download_path, exist_ok=True)
@@ -138,4 +139,3 @@ def download_image_coords(data, first_num, second_num) -> 'IO':
         print('Invalid number!')
     else:
         download_image_num(data, selected_image_num)
-

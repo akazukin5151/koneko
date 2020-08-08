@@ -10,6 +10,7 @@ from koneko import files, utils, KONEKODIR
 
 class APIHandler:
     """Singleton that handles all the API interactions in the program"""
+
     def __init__(self):
         self._api_thread = threading.Thread(target=self._login)
         self._token_file = KONEKODIR.parent / 'token'
@@ -34,7 +35,6 @@ class APIHandler:
             self._api_thread.join()
             self._login_done = True
 
-
     def _login(self):
         """Logins to pixiv in the background, using credentials from config file"""
         if self._token:  # Token is set if file found in self.start()
@@ -46,7 +46,6 @@ class APIHandler:
                 self._token = response['response']['refresh_token']
                 files.write_token_file(self._token_file, self._token)
 
-
     def _login_with_token(self) -> bool:
         """Tries to login with saved token to avoid pixiv emails
         Returns True on successful login with token, False otherwise
@@ -57,20 +56,19 @@ class APIHandler:
             return False
         return True
 
-
     def _login_with_creds(self) -> 'Optional[dict[str, dict[str]]]':
         try:
             return self._api.login(
-                self._credentials['Username'],
-                self._credentials['Password']
+                self._credentials['Username'], self._credentials['Password']
             )
 
         except PixivError as e:
-            print('Login failed! Please correct your credentials in '
-                  '~/.config/koneko/config.ini')
+            print(
+                'Login failed! Please correct your credentials in '
+                '~/.config/koneko/config.ini'
+            )
             print(e)
             print("Press 'q' and enter to exit")
-
 
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))

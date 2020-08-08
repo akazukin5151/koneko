@@ -22,8 +22,7 @@ def _letter_with_coords(letter: str) -> str:
     >>> _letter_with_coords("i")
     ... [i][n]
     """
-    return ''.join([RED, '[', MAGENTA, letter, RED, ']',
-                    BLUE_N, RESET])
+    return ''.join([RED, '[', MAGENTA, letter, RED, ']', BLUE_N, RESET])
 
 
 def _two_letter_with_coords(letter: str) -> str:
@@ -31,15 +30,27 @@ def _two_letter_with_coords(letter: str) -> str:
     >>> _two_letter_with_coords("o")
     ... [o{y}{x}|O[n]]
     """
-    return ''.join([RED, '[', MAGENTA, letter.lower(), RESET, _COORDS, '|',
-                    MAGENTA, letter.upper(), BLUE_N, RED, ']', RESET])
+    return ''.join([
+        RED,
+        '[',
+        MAGENTA,
+        letter.lower(),
+        RESET,
+        _COORDS,
+        '|',
+        MAGENTA,
+        letter.upper(),
+        BLUE_N,
+        RED,
+        ']',
+        RESET,
+    ])
 
 
 _letters = ['n', 'p', 'r', 'q', 'm', 'b', 'o', 'd', 'f']
 _tlc = ['a', 'o', 'd']
 # {y}{x}
-_COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
-                  'y', RED, '}', RESET])
+_COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE, 'y', RED, '}', RESET])
 
 
 # Public constants

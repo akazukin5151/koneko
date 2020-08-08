@@ -143,7 +143,9 @@ def config_assistance(actions: 'Optional[list[int]]' = None) -> 'IO':
 
     page_spacing = maybe_page_spacing(actions, size)
 
-    gallery_print_spacing = maybe_print_spacing(actions, size, xpadding, image_width, image_height)
+    gallery_print_spacing = maybe_print_spacing(
+        actions, size, xpadding, image_width, image_height
+    )
 
     user_info_xcoord = maybe_print_xcoord(actions, size, xpadding, image_width)
 
@@ -178,7 +180,7 @@ def maybe_xpadding_img_width(actions: 'list[int]', size: int) -> 'tuple[int]':
         return assistants.xpadding_assistant(size)
     return (
         config.get_gen_users_settings()[1],
-        config._width_padding('width', 'x', (0, 2))[0]
+        config._width_padding('width', 'x', (0, 2))[0],
     )
 
 
@@ -194,7 +196,9 @@ def maybe_page_spacing(actions: 'list[int]', size: int) -> 'tuple[Optional[int]]
     return None
 
 
-def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width, image_height: int) -> 'list[int]':
+def maybe_print_spacing(
+    actions: 'list[int]', size, xpadding, image_width, image_height: int
+) -> 'list[int]':
     if 5 in actions or 8 in actions:
         return assistants.gallery_print_spacing_assistant(
             size, xpadding, image_width, image_height
@@ -203,11 +207,7 @@ def maybe_print_spacing(actions: 'list[int]', size, xpadding, image_width, image
 
 def maybe_print_xcoord(actions: 'list[int]', size, xpadding, image_width: int) -> int:
     if 6 in actions or 8 in actions:
-        return assistants.user_info_assistant(
-            size,
-            xpadding,
-            image_width
-        )
+        return assistants.user_info_assistant(size, xpadding, image_width)
 
 
 def maybe_center_spaces(actions: 'list[int]'):

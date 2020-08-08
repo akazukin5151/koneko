@@ -41,9 +41,9 @@ class AbstractData(ABC):
         raise NotImplementedError
 
     def clone_with_page(self, page_num):
-       new = copy(self)
-       new.page_num = page_num
-       return new
+        new = copy(self)
+        new.page_num = page_num
+        return new
 
     @property
     def download_path(self) -> str:
@@ -88,6 +88,7 @@ class GalleryData(AbstractData):
             ...
         next_url                (next JSON url)         self.next_url
     """
+
     # Required
     def update(self, raw: 'Json', page_num=None):
         """Adds newly requested raw json into the cache"""
@@ -165,10 +166,11 @@ class UserData(AbstractData):
 
     @property
     def image_urls(self) -> 'list[str]':
-        return [illust['image_urls']['square_medium']
-                for post in self.all_pages_cache[self.page_num]
-                for illust in post['illusts']]
-
+        return [
+            illust['image_urls']['square_medium']
+            for post in self.all_pages_cache[self.page_num]
+            for illust in post['illusts']
+        ]
 
     @property
     def splitpoint(self) -> int:
@@ -176,9 +178,9 @@ class UserData(AbstractData):
         return len(self.profile_pic_urls)
 
 
-
 class ImageData:
     """Stores data for image view (mode 2)"""
+
     def __init__(self, raw: 'Json', image_id: int, firstmode=False):
         self.image_id = image_id
         self.artist_user_id = raw['user']['id']
@@ -212,4 +214,3 @@ class ImageData:
     @property
     def large_filename(self) -> str:
         return pure.split_backslash_last(self.page_urls[0])
-

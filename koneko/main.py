@@ -15,15 +15,7 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
-from koneko import (
-    ui,
-    pure,
-    utils,
-    prompt,
-    screens,
-    picker,
-    lscat_app
- )
+from koneko import ui, pure, utils, prompt, screens, picker, lscat_app
 
 
 def main_loop(_, your_id: str) -> 'IO':
@@ -65,7 +57,7 @@ def main_loop(_, your_id: str) -> 'IO':
             print('\nInvalid command!')
 
 
-#- Loop classes
+# - Loop classes
 class AbstractLoop(ABC):
     """Ask for details relevant to mode then go to mode
     prompt user for details, if no command line arguments supplied
@@ -74,6 +66,7 @@ class AbstractLoop(ABC):
     wait for api thread to finish logging in
     activates the selected mode (needs to be overridden)
     """
+
     def __init__(self, user_input: 'Optional[str]'):
         self._user_input = user_input
         # Defined by classes that inherit this in _prompt_url_id()
@@ -179,6 +172,7 @@ class FollowingUserModeLoop(AbstractLoop):
     If yes, prompt_url_id() will be skipped
     If not, ask for pixiv ID or url and process it.
     """
+
     def _prompt_url_id(self) -> str:
         """Implements abstractmethod: prompt for artist ID or url"""
         self._raw_answer = input('Enter your pixiv ID or url: ')
@@ -279,4 +273,3 @@ def ask_your_id(your_id: str):
 
     # If your_id not stored, or if ans is no, or if id provided, via cli
     return ''
-

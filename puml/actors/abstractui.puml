@@ -10,8 +10,7 @@ User --> ui: Pixiv id
 database data
 create data
 ui -> data: main_path
-ui -> api ++: await_login()
-ui -> api: JSON request
+ui -> api ++: JSON request
 return JSON response
 ui -> data: Stores response
 create lscat
@@ -28,8 +27,6 @@ lscat -> User: Display image 3
 deactivate lscat
 ui --> User: Print info
 group prefetching
-    ui -> data ++: next_url
-    return next_url
     ui -> api ++: JSON request
     return JSON response
     ui -> data: Stores response

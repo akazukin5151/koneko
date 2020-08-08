@@ -148,7 +148,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentate ueberzug usage, & update README.md about ueberzug
-    - [ ] Update diagrams in HACKING
+    - [x] Update diagrams in HACKING
     - [ ] Help and manual needs to be updated as well
     - [ ] Center align image config
 - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux

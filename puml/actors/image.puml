@@ -13,7 +13,8 @@ ui -> idata: Stores response
 ui -> download: Download images
 activate download
 deactivate download
-return Displays image, prints info
+ui -> User: Displays image, prints info
+return Show previews
 |||
 
 == Open image ==

@@ -190,7 +190,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 ## Actor-ish models of ui classes
 ### ui.AbstractUI
   
-![AbstractUI UML](puml/actor/render/abstractui.png)
+![AbstractUI UML](puml/actors/render/abstractui.png)
   
 ### ui.Gallery classes (extending AbstractUI)
 

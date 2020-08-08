@@ -328,10 +328,15 @@ See [example config](example_config.ini) for reference.
 ## Experimental
 * `image_mode_previews`: In view post mode (mode 2), preview the next four images for multi-image posts. Unstable because of pixcat implementation details -- it prints out escape codes that moves the terminal cursor, changing the location of other print statements.
 
-## Ueberzug
+### Ueberzug
 
-* "Display scrolling" means lscat will print newlines to scroll down and display more images
-* The number of images in a terminal page is number_of_cols * number_of_rows
-* As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed
-* The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
-* Images displayed with icat will respond to terminal scroll events, but not ueberzug, so if ueberzug is enabled, this option will always be enabled as well.
+* `use_ueberzug`: Whether to use [Ueberzug](https://github.com/seebye/ueberzug) instead of [pixcat](https://github.com/mirukana/pixcat) / kitty's icat. For non-kitty users, you should use ueberzug.
+    * Default: off
+* `scroll_display` (bool): Whether lscat should print newlines to scroll down the terminal and display more images.
+    * The number of images in a terminal page is number_of_cols * number_of_rows
+    * As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed. This is what "display scrolling" means
+    * The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
+    * If ueberzug is on, this option will always be off, because only pixcat/icat respond to terminal scroll events
+    * Default: on
+* `ueberzug_center_spaces`: The x-coordinate of an image that is in the center of your terminal.
+    * Default: 20

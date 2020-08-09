@@ -15,7 +15,7 @@ os.system('cp example_config.ini ~/.local/share/koneko/')
 
 setup(
     name='koneko',
-    version='0.10.1',
+    version='0.11.0',
     description='Browse pixiv in the terminal',
     long_description=README,
     long_description_content_type='text/markdown',

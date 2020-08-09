@@ -152,10 +152,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-- Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
-
-* Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
+* Refactor config functions and confusing extraction of Results. See rust implementation of the config in koneko-rs
+* Some info (eg manual) are still being hidden by ueberzug; general unreliability of prints (need a rethink of implementation)
     * Help message that responds to terminal width
+* Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
 * Illust-related mode can't go back to image mode
 * Support illust related mode in lscat app mode 2/b
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers

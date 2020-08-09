@@ -37,27 +37,31 @@ def use_test_cfg_path(monkeypatch, tmp_path):
                         lambda x: Path(tmp_path / 'test_config.ini'))
 
 def setup_test_config(path):
-    default = """[Credentials]
-    username = koneko
-    password = mypassword
-    id = 1234
+    default = """
+[Credentials]
+username = koneko
+password = mypassword
+id = 1234
 
-    [lscat]
-    image_width = 18
-    image_height = 8
-    image_thumbnail_size = 310
-    images_x_spacing = 2
-    images_y_spacing = 1
-    gallery_print_spacing = 9,17,17,17,17
-    users_print_name_xcoord = 18
-    gallery_page_spacing = 23
-    users_page_spacing = 20
+[lscat]
+image_width = 18
+image_height = 8
+image_thumbnail_size = 310
+images_x_spacing = 2
+images_y_spacing = 1
+gallery_print_spacing = 9,17,17,17,17
+users_print_name_xcoord = 18
+gallery_page_spacing = 23
+users_page_spacing = 20
 
-    [misc]
-    print_info = on
+[misc]
+print_info = on
 
-    [experimental]
-    image_mode_previews = off
+[experimental]
+image_mode_previews = off
+use_ueberzug = off
+scroll_display = on
+ueberzug_center_spaces = 20
     """
     config_object = configparser.ConfigParser()
     config_object.read_string(default)

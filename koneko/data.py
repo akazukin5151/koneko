@@ -193,7 +193,7 @@ class ImageData:
         self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
         # Store multi image posts within their own dir
         if self.number_of_pages != 1:
-            self.download_path = self.download_path / str(image_id)
+            self.download_path /= str(image_id)
 
     @property
     def current_url(self) -> str:

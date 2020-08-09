@@ -153,6 +153,8 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 * Refactor config functions and confusing extraction of Results. See rust implementation of the config in koneko-rs
+    * Keep in mind that 'on'/'off' is allowed, which complicates parsing into types
+* Consider using reStructuredText and automate building and hosting of docs
 * Some info (eg manual) are still being hidden by ueberzug; general unreliability of prints (need a rethink of implementation)
     * Help message that responds to terminal width
 * Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux

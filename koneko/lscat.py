@@ -195,7 +195,12 @@ class TrackDownloads(AbstractTracker):
 
     def __init__(self, data: 'data.<class>'):
         self.orders = list(range(30))
-        self.generator = generate_page(data.download_path)
+        # TODO: cannot merge yet because ueberzug version prevents 'overflowing'
+        # during initial download
+        if config.use_ueberzug():
+            self.generator = generate_page_ueberzug(data.download_path)
+        else:
+            self.generator = generate_page(data.download_path)
         super().__init__()
 
 
@@ -264,6 +269,30 @@ def generate_page(path: 'Path') -> 'IO':
         yield api.show(
             path / image, left_shifts[x], rowspaces[y % number_of_rows], thumbnail_size
         )
+
+
+def generate_page_ueberzug(path: 'Path') -> 'IO':
+    left_shifts = config.xcoords_config()
+    rowspaces = config.ycoords_config()
+    number_of_cols = config.ncols_config()
+    number_of_rows = config.nrows_config()
+    thumbnail_size = config.thumbnail_size_config()
+
+    os.system('clear')
+    for i in range(number_of_cols * number_of_rows):
+        x = i % number_of_cols
+        y = i // number_of_cols
+
+        image = yield
+        yield api.show(
+            path / image,
+            left_shifts[x],
+            rowspaces[y % number_of_rows],
+            thumbnail_size
+        )
+
+    while True:
+        yield
 
 
 def generate_users(path: 'Path', print_info=True) -> 'IO':

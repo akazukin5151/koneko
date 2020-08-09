@@ -144,15 +144,15 @@ class GalleryUserLoop(AbstractLoop):
         )
 
     @classmethod
-    def for_gallery(cls, data, tracker):
-        result = cls(data, tracker)
+    def for_gallery(cls, data):
+        result = cls(data, lscat.TrackDownloads)
         result.max_images = utils.max_images()
         result.max_scrolls = utils.max_terminal_scrolls(data, True)
         return result
 
     @classmethod
-    def for_user(cls, data, tracker):
-        result = cls(data, tracker)
+    def for_user(cls, data):
+        result = cls(data, lscat.TrackDownloadsUsers)
         result.max_images = utils.max_images_user()
         result.max_scrolls = utils.max_terminal_scrolls(data, False)
         return result

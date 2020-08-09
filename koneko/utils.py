@@ -98,17 +98,20 @@ def max_images():
     """Calculates the maximum number of images that can fit in single terminal page"""
     return config.ncols_config() * config.nrows_config()
 
+
 def max_images_user():
     """Calculates the maximum number of images that can fit in single terminal page
     For User Modes, there are 3 previews + 1 artist image, hence always 4 columns
     """
     return 4 * config.nrows_config()
 
+
 def max_terminal_scrolls(data, is_gallery_mode: bool) -> int:
     number_of_images = len(os.listdir(data.download_path))
     if is_gallery_mode:
         return number_of_images // max_images() + 1
     return number_of_images // max_images_user()
+
 
 def slice_images(max_images: int, terminal_page: int) -> slice:
     return slice(max_images * terminal_page, max_images * (terminal_page + 1))
@@ -179,10 +182,11 @@ def handle_missing_pics() -> 'IO':
 
 def get_cache_size() -> str:
     extra = '' if platform == 'darwin' else '--apparent-size'
-    return check_output(
-        f'du -hs {extra} {KONEKODIR} | cut -f1',
-        shell=True
-    ).decode('utf-8').rstrip()
+    return (
+        check_output(f'du -hs {extra} {KONEKODIR} | cut -f1', shell=True)
+        .decode('utf-8')
+        .rstrip()
+    )
 
 
 def quit_on_q(ans: str):
@@ -197,4 +201,3 @@ def try_import_ueberzug():
     except ImportError as e:
         raise ImportError("Install with `pip install ueberzug`") from e
     return ueberzug
-

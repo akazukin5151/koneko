@@ -41,13 +41,14 @@ def post_title(current_page_illusts: 'Json', post_number: int) -> str:
 
 
 def medium_urls(current_page_illusts: 'Json') -> 'list[str]':
-    return [url_given_size(x, size='square_medium')
-            for x in current_page_illusts]
+    return [url_given_size(x, size='square_medium') for x in current_page_illusts]
 
 
 def post_titles_in_page(current_page_illusts: 'Json') -> 'list[str]':
-    return [post_title(current_page_illusts, num)
-            for num in range(len(current_page_illusts))]
+    return [
+        post_title(current_page_illusts, num)
+        for num in range(len(current_page_illusts))
+    ]
 
 
 def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':
@@ -55,8 +56,7 @@ def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':
     number_of_pages = post_json['page_count']
     if number_of_pages > 1:
         list_of_pages = post_json['meta_pages']
-        return [url_given_size(list_of_pages[i], size)
-                for i in range(number_of_pages)]
+        return [url_given_size(list_of_pages[i], size) for i in range(number_of_pages)]
     return [url_given_size(post_json, size)]
 
 
@@ -96,7 +96,7 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
         len,
         range,
         lambda r: map(_prefix_filename, oldnames_with_ext, newnames, r),
-        list
+        list,
     )
 
 
@@ -131,8 +131,10 @@ def xcoords(term_width: int, img_width=18, padding=2, offset=0) -> 'list[int]':
     Meaning the first col has x-coordinates 2 and second col of 20
     """
     number_of_columns = ncols(term_width, img_width, padding)
-    return [col % number_of_columns * img_width + padding + offset
-            for col in range(number_of_columns)]
+    return [
+        col % number_of_columns * img_width + padding + offset
+        for col in range(number_of_columns)
+    ]
 
 
 def ycoords(term_height: int, img_height=8, padding=1) -> 'list[int]':
@@ -142,8 +144,7 @@ def ycoords(term_height: int, img_height=8, padding=1) -> 'list[int]':
     Meaning the first row has y-coordinates 0 and second row of 9
     """
     number_of_rows = term_height // (img_height + padding)
-    return [row * (img_height + padding)
-            for row in range(number_of_rows)]
+    return [row * (img_height + padding) for row in range(number_of_rows)]
 
 
 def generate_orders(total_pics: int, artists_count: int) -> 'list[int]':

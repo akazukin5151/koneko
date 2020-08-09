@@ -8,20 +8,20 @@ abstract class AbstractImageAdjuster <<(A, red)>>{
     + {abstract} start_spaces
     ..Required behaviours..
     +{abstract}report()
-    +{abstract}maybe_move_up()
-    +{abstract}maybe_move_down()
-    +{abstract}maybe_erase()
     +{abstract}show_func_args()
     +{abstract}return_tup()
     +{abstract}is_input_valid()
     ..Common behaviour..
     +start()
+    ..Empty by default..
+    +maybe_move_up()
+    +maybe_move_down()
+    +maybe_erase()
 }
 
 abstract class AbstractPadding <<(A, red)>>{
     ..Implements..
     + start_spaces
-    +maybe_erase()
     +return_tup()
     +is_input_valid()
     ..Complements..
@@ -38,8 +38,6 @@ class XPadding {
     + show_func
     + side_label
     +report()
-    +maybe_move_up()
-    +maybe_move_down()
     +show_func_args()
     ..New implements..
     + doc
@@ -69,7 +67,6 @@ AbstractPadding <|-- YPadding
 abstract class FindImageDimension <<(A, red)>>{
     ..Implements..
     +report()
-    +maybe_move_down()
     +maybe_erase()
     +show_func_args()
     +return_tup()
@@ -82,7 +79,6 @@ class FindImageWidth {
     + show_func
     + side_label
     + start_spaces
-    +maybe_move_up()
 }
 
 class FindImageHeight {

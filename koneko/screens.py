@@ -1,16 +1,7 @@
 import os
 import shutil
 
-from koneko import (
-    ui,
-    cli,
-    utils,
-    config,
-    lscat,
-    KONEKODIR,
-    __version__,
-    WELCOME_IMAGE
-)
+from koneko import ui, cli, utils, config, lscat, KONEKODIR, __version__, WELCOME_IMAGE
 
 
 def begin_prompt(printmessage=True) -> 'IO[str]':
@@ -24,7 +15,8 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
         '4. Search for artists',
         '5. View illustrations of all following artists',
         '6. View recommended illustrations',
-        'f. Frequent modes and user inputs', '',
+        'f. Frequent modes and user inputs',
+        '',
         '?. Info',
         'm. Manual',
         'b. Browse cache (offline)',

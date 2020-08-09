@@ -33,7 +33,7 @@ def gallery_setup(monkeypatch):
 
     return (
         mocked_data,
-        lscat_prompt.GalleryUserLoop.for_gallery(mocked_data, lscat.TrackDownloads)
+        lscat_prompt.GalleryUserLoop.for_gallery(mocked_data)
     )
 
 
@@ -74,7 +74,7 @@ def test_gallery_user_loop_init_for_user(monkeypatch, patch_cbreak):
     mocked_data = Mock()
     mocked_data.download_path.name = 1
     mocked_data.download_path.parent = ['0', '1']
-    p = lscat_prompt.GalleryUserLoop.for_user(mocked_data, lscat.TrackDownloadsUsers)
+    p = lscat_prompt.GalleryUserLoop.for_user(mocked_data)
     assert p.max_images == 6 * 4  # 4 previews
     assert p.max_scrolls == 2
     assert p.current_page == 1

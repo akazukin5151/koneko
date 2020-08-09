@@ -190,7 +190,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 ## Actor-ish models of ui classes
 ### ui.AbstractUI
   
-![AbstractUI UML](http://plantuml.com:80/plantuml/png/VLLDRzim3BthLt2t1aqFQRQBWNGjsai7h0rQz6oeDfCGaILFajC6o_xx95bs_94c9uQFugCUIVdMMAvjLGXcoGg4ktTZDS_isoDS52f70xCfpAVmVGe_9emvH6buCwWPMopWjui0Wm8pIqh2Oi4y15StK15SNYQ30EQyLmxqGGdScIsiNBRA7w6yveCPA2dsavWeP4fWIP-qSp4ivvQ_SuFW3PPfv3RQFlLDC1CeECcqv7OJlRoig-4Vd6mgr9hanUI89V3hzVa9DFwfq5YcqLPQDZvJAccmb_xLQU24QR5OXZ0Pjp4msEwAUGvUpgtJAsPG7r8edYVm42sWWg_HU6bf5wuJ0TOORS9mYKSV3jSkJE8ufC5dDLuVQoL_85CAlgyfONOUlluw-poouxZeioddtID7lThefIPfWUHAiRLMLGcbnXNQR4DopS3zZcq8MaZyj6cbHS1Yttg-VlzxRUuSwRUwppDkTmSVDxDqrmmHOsMyzvHYAFDcvfPQ5QLbXyCXhDUJkqh8U6Ap0hRqR3q5ezucJjNKAUWaDRMcTTL-eRgwrjmjwLBZZbHblY8k8vvwtArHBFqiSPFx1OD8uwGw0ErInWT28-nL1QRI-BDp8e5x9LUa2zu-AaslxWLo3Lo8K9r9Cvvji2dn1SDZPy0_D6rDpoNAE9xZkeuW6unUSARKjcxutv_47FuAajj_trgs_jQVOEm735dzN4S2Rmx7iB7IkfeTQbeHUbrFl2udHh4p2hTkBFrdWR7_)
+![AbstractUI UML](puml/actors/render/abstractui.png)
   
 ### ui.Gallery classes (extending AbstractUI)
 
@@ -204,7 +204,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 ### ui.Image
 
-![Image UML](http://plantuml.com:80/plantuml/png/bLHDJyCm3BtdLvWRQ73XMAbeIBk0n3PfshaAZJiYkYJ4ITd4-Eya_Tf71nezLCvxp-wp7NLCZbldroLpqfK8Jsk-GdZH0XbBqpe0mX9p9xM2D6KyTzh2aj2o-8Ax1_0IHgEaqTwpS0fOv19uf7SeWjn7fHG76GdCvKPM4MmIk6cgF2zcKx3uuP4Si-YyLHr6HYj29hZZhvmmv8QeJQ_Z11R17D9Usv12VwfISv70f8r0nZufTYChxh2NC853hBKnaMHAlgKc-HQCbSg5aoeqs-rszS1c1bN3ns6TJ6XFTYKZWWA-IgdUlw_wAiSsprGw5WpQxAAifhCAhImaYkkRVpNSsvdYnlrgHGKoCu4BrKzzSDggFElTa95AeRtOHYpNtwM_fh-osXkOMopGvM-rfNOo49w36x9tBDUhpDko5hJB6E0NjnF5G_iHFTVMYQS4baOS2h3T6p5KWrs49YkfFO4vlmxJyjrABhsxu_2j-1jWFm00)
+![Image UML](puml/actors/render/image.png)
 
 
 # Dependencies
@@ -239,17 +239,17 @@ See [import-analyzer](https://github.com/twenty5151/import-analyzer/)
 | files.py        |            5 |              1 |       4 |           83 |
 | config.py       |            8 |              2 |       6 |           80 |
 | printer.py      |            6 |              2 |       4 |           75 |
-| lscat.py        |            7 |              7 |       0 |           50 |
+| lscat.py        |            7 |              6 |       1 |           54 |
 | api.py          |            3 |              3 |       0 |           50 |
 | picker.py       |            3 |              4 |      -1 |           43 |
 | cli.py          |            2 |              3 |      -1 |           40 |
 | prompt.py       |            3 |              5 |      -2 |           38 |
 | data.py         |            1 |              2 |      -1 |           33 |
 | download.py     |            2 |              4 |      -2 |           33 |
+| screens.py      |            2 |              6 |      -4 |           25 |
 | main.py         |            2 |              7 |      -5 |           22 |
-| screens.py      |            2 |              7 |      -5 |           22 |
 | lscat_prompt.py |            1 |              5 |      -4 |           17 |
 | ui.py           |            2 |             12 |     -10 |           14 |
-| assistants.py   |            1 |              8 |      -7 |           11 |
+| assistants.py   |            1 |              7 |      -6 |           12 |
 | lscat_app.py    |            1 |              8 |      -7 |           11 |
 | \_\_main\_\_.py |            0 |              5 |      -5 |            0 |

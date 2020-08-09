@@ -5,7 +5,13 @@ RED = '\x1b[31m'
 MAGENTA = '\x1b[35m'
 BLUE = '\x1b[34m'
 RESET = '\x1b[39m'
-BLUE_N = ''.join([RED, '[', BLUE, 'n', RED, ']', RESET])
+
+# Private constants
+_RED_BRACKET_OPEN = ''.join((RED, '['))
+_RED_BRACKET_CLOSE = ''.join((RED, ']'))
+
+# Public constant
+BLUE_N = ''.join([_RED_BRACKET_OPEN, BLUE, 'n', _RED_BRACKET_CLOSE, RESET])
 
 
 # Private
@@ -14,7 +20,7 @@ def _letter_with_brackets(letter: str) -> str:
     >>> _letter_with_brackets("a")
     ... [a]
     """
-    return ''.join([RED, '[', MAGENTA, letter, RED, ']', RESET])
+    return ''.join([_RED_BRACKET_OPEN, MAGENTA, letter, _RED_BRACKET_CLOSE, RESET])
 
 
 def _letter_with_coords(letter: str) -> str:
@@ -22,8 +28,7 @@ def _letter_with_coords(letter: str) -> str:
     >>> _letter_with_coords("i")
     ... [i][n]
     """
-    return ''.join([RED, '[', MAGENTA, letter, RED, ']',
-                    BLUE_N, RESET])
+    return ''.join([_RED_BRACKET_OPEN, MAGENTA, letter, _RED_BRACKET_CLOSE, BLUE_N, RESET])
 
 
 def _two_letter_with_coords(letter: str) -> str:
@@ -31,15 +36,25 @@ def _two_letter_with_coords(letter: str) -> str:
     >>> _two_letter_with_coords("o")
     ... [o{y}{x}|O[n]]
     """
-    return ''.join([RED, '[', MAGENTA, letter.lower(), RESET, _COORDS, '|',
-                    MAGENTA, letter.upper(), BLUE_N, RED, ']', RESET])
+    return ''.join([
+        _RED_BRACKET_OPEN,
+        MAGENTA,
+        letter.lower(),
+        RESET,
+        _COORDS,
+        '|',
+        MAGENTA,
+        letter.upper(),
+        BLUE_N,
+        _RED_BRACKET_CLOSE,
+        RESET,
+    ])
 
 
 _letters = ['n', 'p', 'r', 'q', 'm', 'b', 'o', 'd', 'f']
 _tlc = ['a', 'o', 'd']
 # {y}{x}
-_COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE,
-                  'y', RED, '}', RESET])
+_COORDS = ''.join([RED, '{', BLUE, 'x', RED, '}{', BLUE, 'y', RED, '}', RESET])
 
 
 # Public constants

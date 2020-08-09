@@ -23,7 +23,7 @@ cmds = (
     'pip install .',
     'python setup.py install',
     'python setup.py develop',
-    'python -m koneko.main'
+    'python -m koneko.__main__'
 )
 
 for cmd in cmds:

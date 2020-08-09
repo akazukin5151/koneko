@@ -20,7 +20,7 @@ from koneko import (
     prompt,
     printer,
     download,
-    KONEKODIR
+    KONEKODIR,
 )
 
 
@@ -102,48 +102,43 @@ class AbstractUI(ABC):
         download.init_download(self._data, tracker)
         self.images = tracker.images
 
-
     def _prefetch(self) -> 'IO':
         """Reassign the thread again and start; as threads can only be started once"""
         self._prefetch_thread = threading.Thread(target=self._prefetch_next_page)
         self._prefetch_thread.start()
 
-    def _request_then_save(self) -> 'IO':
+    def _request_then_save(self, page_num=None) -> 'IO':
         """Do request and save it"""
         result = self._pixivrequest()
-        self._data.update(result)
+        if page_num:
+            self._data.update(result, page_num)
+        else:
+            self._data.update(result)
 
     def _prefetch_next_page(self) -> 'IO':
         # Wait for initial request to finish, so the data object is instantiated
         # Else next_url won't be set yet
         self._maybe_join_thread()
-        if not self._data.next_url:  # Last page
+
+        if not (
+            self._data.next_url
+            or self._data.next_offset.isdigit()
+            or self._data.is_immediate_next
+        ):
             return True
 
-        if not self._data.next_offset.isdigit():
-            return True
-        # Won't download if not immediately next page, eg
-        # p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
-        offset_diffs = int(self._data.next_offset) - int(self._data.offset)
-        immediate_next: bool = offset_diffs <= 30
-        if not immediate_next:
-            return
-
-        oldnum = self._data.page_num
         self._data.offset = self._data.next_offset
-        self._data.page_num = int(self._data.offset) // 30 + 1
-
-        self._request_then_save()
-        download.init_download(self._data, None)
-
-        self._data.page_num = oldnum
+        self._request_then_save(self._data.page_num + 1)
+        new = self._data.clone_with_page(int(self._data.offset) // 30 + 1)
+        download.init_download(new, None)
 
     def next_page(self) -> 'IO':
+        print('Downloading images in the next page...')
         self._prefetch_thread.join()
         self._data.page_num += 1
         self.terminal_page = 0
         self._show_page()
-        self._prefetch_next_page()
+        self._prefetch()
 
     def previous_page(self) -> 'IO':
         if self._data.page_num <= 1:
@@ -163,7 +158,9 @@ class AbstractUI(ABC):
         self._show_page()
 
     def scroll_down(self):
-        if self.terminal_page + 1 >= utils.max_terminal_scrolls(self._data, self._is_gallery_mode):
+        if self.terminal_page + 1 >= utils.max_terminal_scrolls(
+            self._data, self._is_gallery_mode
+        ):
             printer.print_bottom('This is the bottom of the terminal page!')
             return False
 
@@ -191,7 +188,9 @@ class AbstractUI(ABC):
         self._report()
 
     def reload(self) -> 'IO':
-        printer.print_bottom('This will delete cached images and redownload them. Proceed?')
+        printer.print_bottom(
+            'This will delete cached images and redownload them. Proceed?'
+        )
         ans = input(f'Directory to be deleted: {self._data.main_path}\n')
         if ans == 'y' or not ans:
             # Will remove all data, but keep info on the main path
@@ -280,6 +279,7 @@ class ArtistGallery(AbstractGallery):
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
+
     def __init__(self, artist_user_id):
         """Implements abstractmethod: self._artist_user_id only used for
         _pixivrequest() specific to mode 1
@@ -307,10 +307,14 @@ class ArtistGallery(AbstractGallery):
     def help() -> 'IO':
         """Implements abstractmethod"""
         printer.print_bottom('')
-        printer.print_bottom(''.join(
-            colors.base1 + ['view '] + colors.base2
-            + ['view ', colors.m, 'anual; ',
-               colors.b, 'ack\n']))
+        printer.print_bottom(
+            ''.join(
+                colors.base1
+                + ['view ']
+                + colors.base2
+                + ['view ', colors.m, 'anual; ', colors.b, 'ack\n']
+            )
+        )
 
 
 class IllustFollowGallery(AbstractGallery):
@@ -345,6 +349,7 @@ class IllustFollowGallery(AbstractGallery):
         d25   --->  Open the image on column 2, row 5 (index starts at 1) in browser
         o25   --->  Download the image on column 2, row 5 (index starts at 1)
     """
+
     def __init__(self):
         """Implements abstractmethod"""
         super().__init__(KONEKODIR / 'illustfollow')
@@ -353,8 +358,9 @@ class IllustFollowGallery(AbstractGallery):
         """Implements abstractmethod, publicity is private for now
         (might be configurable in the future)
         """
-        return api.myapi.illust_follow_request(restrict='private',
-                                               offset=self._data.offset)
+        return api.myapi.illust_follow_request(
+            restrict='private', offset=self._data.offset
+        )
 
     def go_artist_gallery_coords(self, first_num, second_num: str) -> 'IO':
         """New method for mode 5 only"""
@@ -390,13 +396,18 @@ class IllustFollowGallery(AbstractGallery):
     def help() -> 'IO':
         """Implements abstractmethod"""
         printer.print_bottom('')
-        printer.print_bottom(''.join(colors.base1 + [
-            colors.a, "view artist's illusts; ",
-            colors.n, 'ext page;\n',
-            colors.p, 'revious page; ',
-            colors.r, 'eload and re-download all; ',
-            colors.q, 'uit (with confirmation); ',
-            'view ', colors.m, 'anual\n']))
+        printer.print_bottom(
+            ''.join(
+                colors.base1 + [
+                    colors.a, "view artist's illusts; ",
+                    colors.n, 'ext page;\n',
+                    colors.p, 'revious page; ',
+                    colors.r, 'eload and re-download all; ',
+                    colors.q, 'uit (with confirmation); ',
+                    'view ', colors.m, 'anual\n'
+                ]
+            )
+        )
 
 
 class IllustRelatedGallery(ArtistGallery):
@@ -441,6 +452,7 @@ class AbstractUsers(AbstractUI, ABC):
         q                  -- quit (with confirmation)
 
     """
+
     @abstractmethod
     def __init__(self, main_path):
         """Complements abstractmethod: Define download function for user modes"""
@@ -482,6 +494,7 @@ class SearchUsers(AbstractUsers):
     Inherits from AbstractUsers class, define self._input as the search string (user)
     Parent directory for downloads should go to search/
     """
+
     def __init__(self, user):
         self.user = user  # This is only used for pixivrequest
         super().__init__(KONEKODIR / 'search' / user)
@@ -496,6 +509,7 @@ class FollowingUsers(AbstractUsers):
     (Or any other pixiv ID that the user wants to look at their following users)
     Parent directory for downloads should go to following/
     """
+
     def __init__(self, your_id, publicity='private'):
         """Implements abstractmethod, publicity is private for now
         (might be configurable in the future)
@@ -523,6 +537,7 @@ class ToImage(ABC):
     of the large-res completes. Thus, the initial displaying subroutine will be
     different for a standalone mode or coming from a gallery mode.
     """
+
     def __init__(self):
         self.firstmode: bool
 
@@ -557,6 +572,7 @@ class ToImage(ABC):
 
 class ViewImage(ToImage):
     """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
+
     def __init__(self, gdata, selected_image_num):
         self._gdata = gdata
         self._selected_image_num = selected_image_num
@@ -575,14 +591,13 @@ class ViewImage(ToImage):
 
     def download_image(self, idata) -> 'IO':
         download.download_url(
-            idata.download_path,
-            idata.page_urls[0],
-            idata.large_filename
+            idata.download_path, idata.page_urls[0], idata.large_filename
         )
 
 
 class ViewPostMode(ToImage):
     """Image mode, from main (start -> mode 2)"""
+
     def __init__(self, image_id):
         self._image_id = image_id
         self.firstmode = True
@@ -600,9 +615,7 @@ class ViewPostMode(ToImage):
 
     def download_image(self, idata) -> 'IO':
         download.download_url(
-            idata.download_path,
-            idata.current_url,
-            idata.image_filename
+            idata.download_path, idata.current_url, idata.image_filename
         )
 
 
@@ -621,6 +634,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         m -- show this manual
         q -- quit (with confirmation)
     """
+
     def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         super().__init__(raw, image_id, firstmode)
         self.use_ueberzug = config.use_ueberzug()
@@ -633,7 +647,9 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
     def display_initial(self) -> 'IO':
         os.system('clear')
         self.image = lscat.api.show_center(self.download_path / self.large_filename)
-        printer.print_bottom(f'Page 1/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
+        printer.print_bottom(
+            f'Page 1/{self.number_of_pages}', use_ueberzug=self.use_ueberzug
+        )
 
     def open_image(self) -> 'IO':
         utils.open_in_browser(self.image_id)
@@ -651,10 +667,14 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def next_image(self) -> 'IO':
         if not self.page_urls:
-            printer.print_bottom('This is the only image in the post!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom(
+                'This is the only image in the post!', use_ueberzug=self.use_ueberzug
+            )
             return False
         elif self.page_num + 1 == self.number_of_pages:
-            printer.print_bottom('This is the last image in the post!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom(
+                'This is the last image in the post!', use_ueberzug=self.use_ueberzug
+            )
             return False
 
         # jump_to_image corrects for 1-based
@@ -663,10 +683,14 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def previous_image(self) -> 'IO':
         if not self.page_urls:
-            printer.print_bottom('This is the only image in the post!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom(
+                'This is the only image in the post!', use_ueberzug=self.use_ueberzug
+            )
             return False
         elif self.page_num == 0:
-            printer.print_bottom('This is the first image in the post!', use_ueberzug=self.use_ueberzug)
+            printer.print_bottom(
+                'This is the first image in the post!', use_ueberzug=self.use_ueberzug
+            )
             return False
 
         self.page_num -= 1
@@ -688,9 +712,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         # Pass in path to api.download as planned
         threading.Thread(target=self._prefetch_next_image).start()
         if not (self.download_path / self.image_filename).is_dir():
-            download.async_download_spinner(
-                self.download_path, [self.current_url]
-            )
+            download.async_download_spinner(self.download_path, [self.current_url])
 
         os.system('clear')
         lscat.api.hide(self.image)
@@ -698,7 +720,10 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
         self.image = lscat.api.show_center(self.filepath)
 
-        printer.print_bottom(f'Page {self.page_num+1}/{self.number_of_pages}', use_ueberzug=self.use_ueberzug)
+        printer.print_bottom(
+            f'Page {self.page_num+1}/{self.number_of_pages}',
+            use_ueberzug=self.use_ueberzug,
+        )
         self.start_preview()
 
     def _prefetch_next_image(self) -> 'IO':
@@ -736,9 +761,11 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         """
         tracker = lscat.TrackDownloadsImage(self)
         i = 1
-        while (not self.event.is_set()
-                and i <= 4
-                and self.page_num + i < self.number_of_pages):
+        while (
+            not self.event.is_set()
+            and i <= 4
+            and self.page_num + i < self.number_of_pages
+        ):
 
             url = self.page_urls[self.page_num + i]
             name = pure.split_backslash_last(url)
@@ -748,7 +775,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
                 tracker.update(name)
             else:
                 download.async_download_no_rename(
-                     self.download_path, [url], tracker=tracker
+                    self.download_path, [url], tracker=tracker
                 )
 
             if i == 4:  # Last pic
@@ -757,4 +784,3 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
             self.preview_images = tracker.images
 
             i += 1
-

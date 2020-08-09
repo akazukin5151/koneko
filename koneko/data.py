@@ -1,8 +1,9 @@
 """Stores json data from the api. Acts as frontend to access data in a single line.
 Functionally pure, no side effects (but stores state)
 """
-from abc import ABC, abstractmethod
+from copy import copy
 from functools import lru_cache
+from abc import ABC, abstractmethod
 
 from koneko import pure, KONEKODIR
 
@@ -32,12 +33,17 @@ class AbstractData(ABC):
         self.all_names: 'list[str]'
 
     @abstractmethod
-    def update(self):
+    def update(self, raw, page_num=None):
         raise NotImplementedError
 
     @abstractmethod
-    def artist_user_id(self) -> str:
+    def artist_user_id(self, post_number) -> str:
         raise NotImplementedError
+
+    def clone_with_page(self, page_num):
+        new = copy(self)
+        new.page_num = page_num
+        return new
 
     @property
     def download_path(self) -> str:
@@ -47,6 +53,14 @@ class AbstractData(ABC):
     @property
     def next_offset(self) -> str:
         return self.next_url.split('&')[-1].split('=')[-1]
+
+    @property
+    def is_immediate_next(self) -> bool:
+        """
+        Prevent download if not immediately next page, eg
+        p1 (p2 prefetched) -> p2 (p3) -> p1 -> p2 (p4 won't prefetch)
+        """
+        return (int(self.next_offset) - int(self.offset)) <= 30
 
     @property
     def urls_as_names(self) -> 'list[str]':
@@ -74,10 +88,12 @@ class GalleryData(AbstractData):
             ...
         next_url                (next JSON url)         self.next_url
     """
+
     # Required
-    def update(self, raw: 'Json'):
+    def update(self, raw: 'Json', page_num=None):
         """Adds newly requested raw json into the cache"""
-        self.all_pages_cache[self.page_num] = raw
+        key = page_num or self.page_num
+        self.all_pages_cache[key] = raw
 
     def artist_user_id(self, post_number: int) -> str:
         """Get the artist user id for a specified post number"""
@@ -115,9 +131,10 @@ class GalleryData(AbstractData):
 
 class UserData(AbstractData):
     # Required
-    def update(self, raw: 'Json'):
+    def update(self, raw: 'Json', page_num=None):
         """Adds newly requested raw json into the cache"""
-        self.all_pages_cache[self.page_num] = raw['user_previews']
+        key = page_num or self.page_num
+        self.all_pages_cache[key] = raw['user_previews']
         self.next_url = raw['next_url']
 
     @lru_cache
@@ -149,10 +166,11 @@ class UserData(AbstractData):
 
     @property
     def image_urls(self) -> 'list[str]':
-        return [illust['image_urls']['square_medium']
-                for post in self.all_pages_cache[self.page_num]
-                for illust in post['illusts']]
-
+        return [
+            illust['image_urls']['square_medium']
+            for post in self.all_pages_cache[self.page_num]
+            for illust in post['illusts']
+        ]
 
     @property
     def splitpoint(self) -> int:
@@ -160,9 +178,9 @@ class UserData(AbstractData):
         return len(self.profile_pic_urls)
 
 
-
 class ImageData:
     """Stores data for image view (mode 2)"""
+
     def __init__(self, raw: 'Json', image_id: int, firstmode=False):
         self.image_id = image_id
         self.artist_user_id = raw['user']['id']
@@ -196,4 +214,3 @@ class ImageData:
     @property
     def large_filename(self) -> str:
         return pure.split_backslash_last(self.page_urls[0])
-

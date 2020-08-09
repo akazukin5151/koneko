@@ -2,7 +2,7 @@
 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![commits since](https://img.shields.io/github/commits-since/twenty5151/koneko/latest)](https://GitHub.com/twenty5151/koneko/commit/) ![master](https://github.com/twenty5151/koneko/workflows/master/badge.svg?branch=master) ![dev](https://github.com/twenty5151/koneko/workflows/dev/badge.svg?branch=dev)
 
-> Browse pixiv in the terminal using kitty's icat to display images (in the terminal!)
+> Browse pixiv in the terminal using kitty's icat to display images (or use ueberzug)
 
 Gallery view
 ![Gallery view_square_medium1](pics/gallery_view_square_medium1.png)
@@ -15,6 +15,8 @@ View artists you're following
 ![following_users_view](pics/following_users_view.png)
 
 Requires [kitty](https://github.com/kovidgoyal/kitty). It uses the magical `kitty +kitten icat` 'kitten' to display images. For more info see the [kitty documentation](https://sw.kovidgoyal.net/kitty/kittens/icat.html). Actually, `lscat.py` uses [pixcat](https://github.com/mirukana/pixcat), which is a Python API for icat.
+
+*New in version 0.11.0: [ueberzug](https://github.com/seebye/ueberzug) is now supported as an experimental feature, enable through the config file.*
 
 **Why the name Koneko?** Koneko (こねこ) means kitten, which is what `icat` is, a kitty `+kitten`
 
@@ -58,7 +60,8 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 # Installation (how?)
 See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
-0. Install [kitty](https://github.com/kovidgoyal/kitty)
+0. If you want to use the stable api, install [kitty](https://github.com/kovidgoyal/kitty) (Otherwise, you can use ueberzug with your current terminal, however note that it doesn't seem to work on macOS)
+    * If using ueberzug, run `pip install ueberzug` first
 1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...):
 2. Run `koneko` to login and save credentials
 3. Run `lscat 1 7` to help setup the recommended settings; copy to `~/.config/koneko/config.ini`. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
@@ -69,6 +72,7 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 * Python 3.8+
 * It has been tested on kitty v0.17.2 onwards, but should work on older versions
 * Operating system: all OSes that kitty supports, which means Linux and macOS.
+    * Ueberzug only works on linux
 * Uses `xdg-open` (linux) / `open` (mac) (for opening links in your browser) and `curl` (for safety fallback, see below)
 
 <details>
@@ -114,11 +118,15 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
              * For already downloaded images in Gallery, Users, & Image modes
              * For showing images as they download in Gallery, Users, & Image modes
              * Everywhere else (main screen, info screen, etc)
+* Improved documentation using tables in the manual (MANUAL.md) and developer guide (HACKING.md)
 
 #### Bug fixes
 * Fixed bugs in lscat app's display path (mode p/3):
     * Not working if path given via cli
     * Always showing directory in gallery mode
+* Fixed race conditions while prefetching
+    * eg, viewing an image while prefetching would crash or cause undefined behaviour
+    * Prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
 
 #### Code maintenance
 * Remove circular imports
@@ -144,18 +152,10 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
-* Refine ueberzug (must complete before release)
-    - [ ] BUG: if scrolling while prefetching in koneko gallery & user modes, utils.max_terminal_scrolls() uses the next dir (which doesn't exist yet) and crashes
-        - Also happens with view user/image while prefetching
-        - In particular, prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
-    - [ ] DOC: link to ueberzug section in MANUAL.md in readme, documentate ueberzug usage, & update README.md about ueberzug
-        - [ ] Update diagrams in HACKING
-        - [ ] Help and manual needs to be updated as well
-        - [ ] Center align image config
-    - [ ] Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
-
-- Refine: some info (eg manual) still being hidden by ueberzug, general unreliability of prints (need a rethink of implementation)
-
+* Refactor config functions and confusing extraction of Results. See rust implementation of the config in koneko-rs
+* Some info (eg manual) are still being hidden by ueberzug; general unreliability of prints (need a rethink of implementation)
+    * Help message that responds to terminal width
+* Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
 * Illust-related mode can't go back to image mode
 * Support illust related mode in lscat app mode 2/b
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers

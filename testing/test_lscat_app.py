@@ -72,7 +72,6 @@ def test_browse_cache_noinvis(monkeypatch, tmp_path, argv):
     assert mock.mock_calls == [
         call.for_gallery(
             FakeData(tmp_path),
-            lscat.TrackDownloads,
         ),
         call.for_gallery().start()
     ]
@@ -92,7 +91,6 @@ def test_browse_cache_invis(monkeypatch, tmp_path, argv):
     assert mock.mock_calls == [
         call.for_user(
             FakeData(tmp_path),
-            lscat.TrackDownloadsUsers,
         ),
         call.for_user().start()
     ]
@@ -139,7 +137,6 @@ def test_display_path_cli_complete(monkeypatch, tmp_path):
     assert mock.mock_calls == [
         call.for_gallery(
             FakeData(tmp_path),
-            lscat.TrackDownloads,
         ),
         call.for_gallery().start()
     ]
@@ -159,7 +156,6 @@ def test_display_path_cli_incomplete(monkeypatch, tmp_path):
     assert mock.mock_calls == [
         call.for_gallery(
             FakeData(tmp_path),
-            lscat.TrackDownloads,
         ),
         call.for_gallery().start()
     ]

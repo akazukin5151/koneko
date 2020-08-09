@@ -213,7 +213,9 @@ class _AbstractPadding(_AbstractImageAdjuster, ABC):
         """Complements concrete method: Find image width/height first"""
         printer.print_doc(self.doc)
 
-        self.static = lscat.api.show(WELCOME_IMAGE, self.default_x, 0, self.thumbnail_size)
+        self.static = lscat.api.show(
+            WELCOME_IMAGE, self.default_x, 0, self.thumbnail_size
+        )
 
         self.width_or_height, self.image = self.find_dim_func(
             self.thumbnail_size,
@@ -243,8 +245,7 @@ class _XPadding(_AbstractPadding):
     def show_func_args(self) -> Image:
         """Implements abstractmethod: First argument is unique"""
         return self.show_func(
-            self.default_x + self.width_or_height + self.spaces,
-            self.thumbnail_size
+            self.default_x + self.width_or_height + self.spaces, self.thumbnail_size
         )
 
 
@@ -281,10 +282,7 @@ class _YPadding(_AbstractPadding):
 
     def show_func_args(self) -> Image:
         """Implements abstractmethod: first argument is unique"""
-        return self.show_func(
-            self.width_or_height + self.spaces,
-            self.thumbnail_size
-        )
+        return self.show_func(self.width_or_height + self.spaces, self.thumbnail_size)
 
 
 class _FindImageDimension(_AbstractImageAdjuster, ABC):
@@ -351,18 +349,22 @@ def check_ueberzug() -> bool:
         return False
     return True
 
+
 def page_spacing_assistant(thumbnail_size: int) -> int:
     # This doesn't use print_doc() as a clean state is needed
     if not check_ueberzug():
         return None
 
     os.system('clear')
-    print(*(
-        '=== Page spacing ===',
-        'This will display an image, then print newlines.',
-        'Your desired setting is the number when '
-        'the image completely scrolls out of view',),
-      sep='\n')
+    print(
+        *(
+            '=== Page spacing ===',
+            'This will display an image, then print newlines.',
+            'Your desired setting is the number when '
+            'the image completely scrolls out of view',
+        ),
+        sep='\n',
+    )
 
     input('\nEnter any key to continue\n')
     os.system('clear')
@@ -375,10 +377,11 @@ def page_spacing_assistant(thumbnail_size: int) -> int:
         print(i)
         time.sleep(0.1)
 
-    print('When the image just completely scrolls out of view, '
-          'what is the largest number?')
-    print('(By default on kitty, ctrl+shift+up/down '
-          'scrolls up/down a line)')
+    print(
+        'When the image just completely scrolls out of view, '
+        'what is the largest number?'
+    )
+    print('(By default on kitty, ctrl+shift+up/down ' 'scrolls up/down a line)')
 
     while True:
         ans = input()
@@ -440,13 +443,15 @@ def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: i
                 spacings[current_selection] -= 1
 
             # right arrow
-            elif (ans.name == 'KEY_RIGHT' or ans in {'d', 'l'}
-                    and current_selection < len(spacings) - 1):
+            elif (
+                ans.name == 'KEY_RIGHT'
+                or ans in {'d', 'l'}
+                and current_selection < len(spacings) - 1
+            ):
                 current_selection += 1
 
             # left arrow
-            elif (ans.name == 'KEY_LEFT' or ans in {'a', 'h'}
-                    and current_selection > 0):
+            elif ans.name == 'KEY_LEFT' or ans in {'a', 'h'} and current_selection > 0:
                 current_selection -= 1
 
             elif ans.name == 'KEY_ENTER':
@@ -468,7 +473,9 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     # Start
     printer.print_doc(user_info_assistant.__doc__)
 
-    images = lscat.api.show_user_row(WELCOME_IMAGE, preview_xcoords, xpadding, thumbnail_size)
+    images = lscat.api.show_user_row(
+        WELCOME_IMAGE, preview_xcoords, xpadding, thumbnail_size
+    )
 
     if not config.use_ueberzug():
         printer.move_cursor_up(5)

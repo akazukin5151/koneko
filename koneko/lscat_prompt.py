@@ -132,7 +132,7 @@ class GalleryUserLoop(AbstractLoop):
         self.max_images: int
         self.max_scrolls: int
         self.myslice: slice
-        self.images: 'list[Placement | Image]' = []
+        self.images: 'list[Image]' = []
 
         # Base ABC
         self.condition = 1
@@ -176,23 +176,23 @@ class ImageLoop(AbstractLoop):
         # Unique
         self.use_ueberzug = config.use_ueberzug()
         self.root = root
-
         self.all_images = [f for f in sorted(os.listdir(root)) if (root / f).is_file()]
         self.image_path = self.all_images[0]
-        if len(self.all_images) > 1:
-            self.FakeData = namedtuple('data', ('download_path', 'page_num'))
+        # Only used if show previews is on
+        self.FakeData = namedtuple('data', ('download_path', 'page_num'))
 
 
         # Defined in self.show_func()
-        self.image: 'Optional[ueberzug.Canvas]' = None
+        self.image: 'Optional[Image]' = None
         # Defined in self.maybe_show_preview()
-        self.preview_images: 'list[ueberzug.Canvas]' = []
+        self.preview_images: 'list[Image]' = []
 
         # Base ABC
         self.condition = 0
         self.current_page = 0
         self.max_pages = len(self.all_images) - 1
         self.scrollable = False
+
 
     def show_func(self) -> 'IO':
         self.image = lscat.api.show_center(self.root / self.image_path)

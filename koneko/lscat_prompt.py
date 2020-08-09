@@ -5,12 +5,12 @@ from abc import ABC, abstractmethod
 from koneko import utils, lscat, config, TERM, printer, FakeData
 
 
-def scroll_prompt(cls, data, max_images):
+def scroll_prompt(tracker, data, max_images):
     show = True
     terminal_page = 0
     images = []
 
-    if cls is lscat.TrackDownloadsUsers:
+    if tracker is lscat.TrackDownloadsUsers:
         max_scrolls = utils.max_terminal_scrolls(data, False)
     else:
         max_scrolls = utils.max_terminal_scrolls(data, True)
@@ -20,7 +20,7 @@ def scroll_prompt(cls, data, max_images):
             if show:
                 lscat.api.hide_all(images)
                 myslice = utils.slice_images(max_images, terminal_page)
-                images = lscat.handle_scroll(cls, data, myslice)
+                images = lscat.handle_scroll(tracker, data, myslice)
 
             ans = TERM.inkey()
             utils.quit_on_q(ans)
@@ -123,10 +123,10 @@ class AbstractLoop(ABC):
 
 
 class GalleryUserLoop(AbstractLoop):
-    def __init__(self, data, cls):
+    def __init__(self, data, tracker):
         super().__init__()
         # Unique
-        self.cls = cls
+        self.tracker = tracker
         self.data = data
         # Unique, defined in classmethods
         self.max_images: int
@@ -161,9 +161,9 @@ class GalleryUserLoop(AbstractLoop):
     def show_func(self) -> 'IO':
         if self.scrollable:
             self.myslice = utils.slice_images(self.max_images, self.terminal_page)
-            self.images = lscat.handle_scroll(self.cls, self.data, self.myslice)
+            self.images = lscat.handle_scroll(self.tracker, self.data, self.myslice)
         else:
-            lscat.show_instant(self.cls, self.data)
+            lscat.show_instant(self.tracker, self.data)
 
     def end_func(self):
         lscat.api.hide_all(self.images)

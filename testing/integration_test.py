@@ -9,22 +9,23 @@ import sys
 
 import pytest
 
-from koneko import main, utils
+from koneko import main, utils, __main__
 
 from conftest import CustomExit, raises_customexit
 
 
 @pytest.fixture
 def set_argc_to_one(monkeypatch):
-    monkeypatch.setattr('koneko.main.sys.argv', [1])
+    monkeypatch.setattr('koneko.__main__.sys.argv', [1])
 
 
 def cli_core(monkeypatch, args: tuple, prompt: str):
     monkeypatch.setattr('koneko.main.AbstractLoop._save_history', lambda x: True)
-    monkeypatch.setattr('koneko.main.sys.argv', [None, *args])
+    monkeypatch.setattr('koneko.__main__.sys.argv', [None, *args])
     monkeypatch.setattr(prompt, raises_customexit)
     with pytest.raises(CustomExit):
-        main.main()
+        __main__._main()
+
 
 @pytest.mark.integration
 def test_mode1_cli(monkeypatch):
@@ -53,7 +54,7 @@ def input_core(monkeypatch, responses: iter, prompt: str):
     monkeypatch.setattr('builtins.input', lambda x=None: next(responses))
     monkeypatch.setattr(prompt, raises_customexit)
     with pytest.raises(CustomExit):
-        main.main()
+        __main__._main()
 
 @pytest.mark.integration
 def test_mode1_input(monkeypatch, set_argc_to_one):

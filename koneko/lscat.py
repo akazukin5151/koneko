@@ -285,10 +285,7 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
 
         image = yield
         yield api.show(
-            path / image,
-            left_shifts[x],
-            rowspaces[y % number_of_rows],
-            thumbnail_size
+            path / image, left_shifts[x], rowspaces[y % number_of_rows], thumbnail_size
         )
 
     while True:

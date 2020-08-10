@@ -237,7 +237,8 @@ class AbstractGallery(AbstractUI, ABC):
     def view_image(self, selected_image_num: int) -> 'IO':
         """Image mode, from an artist mode (mode 1/5 -> mode 2)"""
         lscat.api.hide_all(self.images)
-        ViewImage(self._data, selected_image_num).start()
+        idata = Image.from_gallery(self._data, selected_image_num)
+        prompt.image_prompt(idata)
         # Image prompt ends, user presses back
         self._back()
 
@@ -526,7 +527,8 @@ class FollowingUsers(AbstractUsers):
 
 def view_post_mode(image_id) -> 'IO':
     """Image mode, from main (start -> mode 2)"""
-    ViewPostMode(image_id).start()
+    idata = Image.from_main(image_id)
+    prompt.image_prompt(idata)
 
 
 class ToImage(ABC):
@@ -567,7 +569,7 @@ class ToImage(ABC):
         self.download_image(idata)
         idata.display_initial()
         idata.start_preview()
-        prompt.image_prompt(idata)
+        return idata
 
 
 class ViewImage(ToImage):
@@ -643,6 +645,14 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         self.loc: 'tuple[int]'
         self.image: 'list[Image]' = []
         self.preview_images: 'list[Image]' = []
+
+    @classmethod
+    def from_gallery(cls, gdata, selected_image_num):
+        return ViewImage(gdata, selected_image_num).start()
+
+    @classmethod
+    def from_main(cls, image_id):
+        return ViewPostMode(image_id).start()
 
     def display_initial(self) -> 'IO':
         os.system('clear')

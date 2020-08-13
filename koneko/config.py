@@ -32,51 +32,50 @@ class Config:
         }
 
     @safe
-    def get_setting(self, section, setting) -> 'Result[str]':
+    def get_setting(self, section: str, setting: str) -> 'Result[str]':
         return self.config[section][setting]
+
+    def _get_bool(self, section: str, setting: str, default: bool) -> bool:
+        return (self.get_setting(section, setting)
+                .map(parse_bool)
+                .value_or(default))
+
+    def _get_int(self, section: str, setting: str, default: int) -> int:
+        return self.get_setting(section, setting).map(int).value_or(default)
+
 
     @safe
     def credentials(self) -> 'Result[dict[str, str]]':
         return self.config['Credentials']
 
     def use_ueberzug(self) -> bool:
-        return (self.get_setting('experimental', 'use_ueberzug')
-                .map(parse_bool)
-                .value_or(False))
+        return self._get_bool('experimental', 'use_ueberzug', False)
 
     def scroll_display(self) -> bool:
-        return (self.get_setting('experimental', 'scroll_display')
-                .map(parse_bool)
-                .value_or(True))
+        return self._get_bool('experimental', 'scroll_display', True)
 
     def check_image_preview(self) -> bool:
-        return (self.get_setting('experimental', 'image_mode_previews')
-                .map(parse_bool)
-                .value_or(False))
+        return self._get_bool('experimental', 'image_mode_previews', False)
 
     def check_print_info(self) -> bool:
-        return (self.get_setting('misc', 'print_info')
-                .map(parse_bool)
-                .value_or(True))
+        return self._get_bool('misc', 'print_info', False)
 
     def gallery_page_spacing_config(self) -> int:
-        return self.get_setting('lscat', 'page_spacing').map(int).value_or(23)
+        return self._get_int('lscat', 'page_spacing', 23)
 
     def users_page_spacing_config(self) -> int:
         return self.gallery_page_spacing_config() - 3
 
     def thumbnail_size_config(self) -> int:
-        return self.get_setting('lscat', 'image_thumbnail_size').map(int).value_or(310)
+        return self._get_int('lscat', 'image_thumbnail_size', 310)
 
     def ueberzug_center_spaces(self) -> int:
-        return (self.get_setting('experimental', 'ueberzug_center_spaces')
-                .map(int)
-                .value_or(20))
+        return self._get_int('experimental', 'ueberzug_center_spaces', 20)
 
     def get_gen_users_settings(self) -> 'tuple[int, int]':
         return (
-            self.get_setting('lscat', 'users_print_name_xcoord').map(int).value_or(18),
-            self.get_setting('lscat', 'images_x_spacing').map(int).value_or(2),
+            self._get_int('lscat', 'users_print_name_xcoord', 18),
+            self._get_int('lscat', 'images_x_spacing', 2)
         )
 
     def gallery_print_spacing_config(self) -> 'list[int]':
@@ -88,12 +87,8 @@ class Config:
 
     def dimension(self, side, dimension, fallbacks) -> 'tuple[int, int]':
         return (
-            self.get_setting('lscat', f'image_{side}')
-                .map(int)
-                .value_or(fallbacks[0]),
-            self.get_setting('lscat', f'images_{dimension}_spacing')
-                .map(int)
-                .value_or(fallbacks[1]),
+            self._get_int('lscat', f'image_{side}', fallbacks[0]),
+            self._get_int('lscat', f'images_{dimension}_spacing', fallbacks[1]),
         )
 
 

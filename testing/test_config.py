@@ -85,7 +85,7 @@ def test_dimension(tmp_path):
     assert testconfig.dimension('width', 'x', (1, 1)) == (18, 2)
 
 
-def test_begin_config_exists(monkeypatch, tmp_path):
+def test_begin_config_exists(monkeypatch, tmp_path, use_test_cfg_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     monkeypatch.setattr('koneko.config.api', testconfig)
 
@@ -95,7 +95,6 @@ def test_begin_config_exists(monkeypatch, tmp_path):
     assert creds['password'] == 'mypassword'
 
 
-@pytest.mark.skipif(not os.getenv, reason="Can't mock input here")
 @pytest.mark.parametrize('testid, responses', (('myid', ['y', 'myid']), ('', ['n'])))
 def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path, capsys, testid, responses):
     """Config path does not exist"""

@@ -1,11 +1,10 @@
 """Functions to read and write user configuration.
 
 Structure:
-    - Impure config file IO
     - Safe config setting getters, will return default on failure
+    - Calculations
     - Interactive config functions for first launch setup
 """
-
 import os
 from pathlib import Path
 from getpass import getpass
@@ -13,13 +12,13 @@ from configparser import ConfigParser
 
 from placeholder import m
 from returns.result import safe
-from returns.pipeline import flow
 
 from koneko import pure, TERM
 
 
 def parse_bool(string):
     return string.lower() in {'true', 'yes', 'on', '1'}
+
 
 class Config:
     def __init__(self, path):
@@ -95,7 +94,6 @@ class Config:
 api = Config(Path('~/.config/koneko/config.ini').expanduser())
 
 
-# While not pure (as reading config is IO), they will always return a default on fail
 def ncols_config() -> int:
     return pure.ncols(TERM.width, *api.dimension('width', 'x', (18, 2)))
 

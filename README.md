@@ -152,6 +152,11 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 
 ## Features
 
+* Split up UI classes and look for ways to extend data classes by adding an imperative shell around it. Possible ways to split by:
+    * Whether methods need pixivrequest or not (in progress)
+    * Whether methods are for setting up, usage, or both (tried this)
+        * Finite state machine of the modes (tried this; way too many classes)
+        * SetupMixin and UIMixin both inherit a CommonMixin (tried this; problem is exponential explosion of number of classes)
 * Refactor config functions and confusing extraction of Results. See rust implementation of the config in koneko-rs
     * Keep in mind that 'on'/'off' is allowed, which complicates parsing into types
 * Consider using reStructuredText and automate building and hosting of docs

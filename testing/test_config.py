@@ -98,7 +98,7 @@ def test_begin_config_exists(monkeypatch, tmp_path):
 def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path, capsys, testid, responses):
     """Config path does not exist"""
     responses = iter(['myusername'] + responses)
-    monkeypatch.setattr('builtins.input', lambda *a: next(responses))
+    monkeypatch.setattr('builtins.input', lambda x='': next(responses))
     monkeypatch.setattr('koneko.config.getpass', lambda *a: 'mypassword')
     # fix for macOS
     monkeypatch.setattr(

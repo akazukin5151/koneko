@@ -6,6 +6,7 @@ Structure:
     - Interactive config functions for first launch setup
 """
 import os
+from enum import Enum
 from pathlib import Path
 from getpass import getpass
 from configparser import ConfigParser
@@ -18,6 +19,11 @@ from koneko import pure, TERM
 
 def parse_bool(string):
     return string.lower() in {'true', 'yes', 'on', '1'}
+
+
+class Dimension(Enum):
+    x = 'width'
+    y = 'height'
 
 
 class Config:
@@ -84,10 +90,10 @@ class Config:
             .value_or(['9', '17', '17', '17', '17'])
         )
 
-    def dimension(self, side, dimension, fallbacks) -> 'tuple[int, int]':
+    def dimension(self, dimension: Dimension, fallbacks) -> 'tuple[int, int]':
         return (
-            self._get_int('lscat', f'image_{side}', fallbacks[0]),
-            self._get_int('lscat', f'images_{dimension}_spacing', fallbacks[1]),
+            self._get_int('lscat', f'image_{dimension.value}', fallbacks[0]),
+            self._get_int('lscat', f'images_{dimension.name}_spacing', fallbacks[1]),
         )
 
 
@@ -95,19 +101,19 @@ api = Config(Path('~/.config/koneko/config.ini').expanduser())
 
 
 def ncols_config() -> int:
-    return pure.ncols(TERM.width, *api.dimension('width', 'x', (18, 2)))
+    return pure.ncols(TERM.width, *api.dimension(Dimension.x, (18, 2)))
 
 
 def nrows_config() -> int:
-    return pure.nrows(TERM.height, *api.dimension('height', 'y', (8, 1)))
+    return pure.nrows(TERM.height, *api.dimension(Dimension.y, (8, 1)))
 
 
 def xcoords_config(offset=0) -> 'list[int]':
-    return pure.xcoords(TERM.width, *api.dimension('width', 'x', (18, 2)), offset)
+    return pure.xcoords(TERM.width, *api.dimension(Dimension.x, (18, 2)), offset)
 
 
 def ycoords_config() -> 'list[int]':
-    return pure.ycoords(TERM.height, *api.dimension('height', 'y', (8, 1)))
+    return pure.ycoords(TERM.height, *api.dimension(Dimension.y, (8, 1)))
 
 
 # Technically frontend

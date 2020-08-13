@@ -82,7 +82,8 @@ def test_ueberzug_center_spaces_new(tmp_path):
 
 def test_dimension(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.dimension('width', 'x', (1, 1)) == (18, 2)
+    assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
+    assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
 
 
 def test_begin_config_exists(monkeypatch, tmp_path, use_test_cfg_path):

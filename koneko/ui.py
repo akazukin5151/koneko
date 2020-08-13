@@ -44,8 +44,8 @@ class AbstractUI(ABC):
         # Attribute defined in self.prefetch_thread()
         self._prefetch_thread: threading.Thread
 
-        self.use_ueberzug = config.use_ueberzug()
-        self.scrollable = self.use_ueberzug or not config.scroll_display()
+        self.use_ueberzug = config.api.use_ueberzug()
+        self.scrollable = self.use_ueberzug or not config.api.scroll_display()
         self.terminal_page = 0  # starts at zero so the first slice has start=0
         self.start(main_path)
 
@@ -639,7 +639,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         super().__init__(raw, image_id, firstmode)
-        self.use_ueberzug = config.use_ueberzug()
+        self.use_ueberzug = config.api.use_ueberzug()
         self.event = threading.Event()
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'
@@ -761,7 +761,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def start_preview(self) -> 'IO':
         self.loc = TERM.get_location()
-        if config.check_image_preview() and self.number_of_pages > 1:
+        if config.api.check_image_preview() and self.number_of_pages > 1:
             self.event = threading.Event()  # Reset event, in case if it's set
             threading.Thread(target=self.preview).start()
 

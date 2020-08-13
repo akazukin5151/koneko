@@ -151,7 +151,7 @@ def maybe_print_bottom(use_ueberzug: 'Optional[bool]' = None, offset=0):
     if use_ueberzug is None:
         from koneko import config
 
-        use_ueberzug = config.use_ueberzug()
+        use_ueberzug = config.api.use_ueberzug()
 
     if use_ueberzug:
         cursor = TERM.location(0, TERM.height - 5 + offset)

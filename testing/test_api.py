@@ -25,7 +25,7 @@ def test_api_login_without_token_no_error(monkeypatch):
     testapi._token = None
     monkeypatch.setattr('koneko.files.write_token_file', writer_mock)
 
-    testapi.start({'Username': 'test', 'Password': '1234'})
+    testapi.start({'username': 'test', 'password': '1234'})
 
     assert mocked_api.method_calls == [call.login('test', '1234')]
     assert mocked_api.subscripts == ['response', 'refresh_token']
@@ -41,7 +41,7 @@ def test_api_login_with_token_no_error(monkeypatch):
     testapi._token = 'sample_token'
     monkeypatch.setattr('koneko.files.write_token_file', writer_mock)
 
-    testapi.start({'Username': 'test', 'Password': '1234'})
+    testapi.start({'username': 'test', 'password': '1234'})
 
     assert mocked_api.method_calls == [call.auth(refresh_token='sample_token')]
 
@@ -62,7 +62,7 @@ def test_api_login_with_token_token_error_uses_normal_method(monkeypatch):
     testapi._token = "sample_token_that_doesn't_work"
     monkeypatch.setattr('koneko.files.write_token_file', writer_mock)
 
-    testapi.start({'Username': 'test', 'Password': '1234'})
+    testapi.start({'username': 'test', 'password': '1234'})
 
     assert mocked_api.method_calls == [call.login('test', '1234')]
     assert mocked_api.subscripts == ['response', 'refresh_token']
@@ -76,7 +76,7 @@ def test_api_login_without_token_failed(monkeypatch, capsys):
     testapi._api.login = lambda *a: raises()
     testapi._token = None
 
-    testapi.start({'Username': 'test', 'Password': '1234'})
+    testapi.start({'username': 'test', 'password': '1234'})
 
     assert capsys.readouterr().out == 'Login failed! Please correct your credentials in ~/.config/koneko/config.ini\nmessage\nPress \'q\' and enter to exit\n'
 

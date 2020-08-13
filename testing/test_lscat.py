@@ -7,7 +7,6 @@ from collections import namedtuple
 import pytest
 
 from koneko import lscat, pure, WELCOME_IMAGE
-from conftest import setup_test_config
 
 
 FakeData = namedtuple('data', ('download_path',))
@@ -119,7 +118,7 @@ def test_ueberzug_show(monkeypatch, tmp_path):
 def test_ueberzug_show_center(monkeypatch, tmp_path):
     mocked_ueberzug = FakeContextManager()
     monkeypatch.setattr('koneko.utils.try_import_ueberzug', mocked_ueberzug)
-    monkeypatch.setattr('koneko.config.ueberzug_center_spaces', lambda: 20)
+    monkeypatch.setattr('koneko.config.api.ueberzug_center_spaces', lambda: 20)
     monkeypatch.setattr('koneko.lscat.api', lscat.Ueberzug())
     lscat.api.show_center(tmp_path)
 
@@ -227,7 +226,7 @@ def test_show_single_y(monkeypatch, use_pixcat_api):
     ]
 
 
-def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
+def test_show_instant(monkeypatch):
     showed = []
 
     class FakeTracker:
@@ -239,8 +238,7 @@ def test_show_instant(monkeypatch, tmp_path, use_test_cfg_path):
 
     FakeData = namedtuple('data', ('download_path',))
 
-    # This config has print_info = True
-    setup_test_config(tmp_path)
+    monkeypatch.setattr('koneko.config.api.check_print_info', lambda: True)
 
     fakedata = FakeData(Path('testing/files/'))
     lscat.show_instant(FakeTracker, fakedata)
@@ -319,8 +317,6 @@ def test_TrackDownloadsUser():
 
 def test_TrackDownloadsUser_with_koneko_file(tmp_path, use_test_cfg_path):
     """Test with .koneko file"""
-    setup_test_config(tmp_path)
-
     data = FakeData(Path('testing/files/user'))
     data.download_path.mkdir()
     pics = ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png')
@@ -374,8 +370,8 @@ def test_generate_page(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.gallery_page_spacing_config', lambda: 1)
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.gallery_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(30))]
@@ -419,8 +415,8 @@ def test_generate_users(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.users_page_spacing_config', lambda: 1)
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.users_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]
@@ -449,8 +445,8 @@ def test_generate_users_ueberzug(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.users_page_spacing_config', lambda: 1)
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.config.api.users_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
                  for idx in list(range(120))]
@@ -479,7 +475,7 @@ def test_generate_users_ueberzug(monkeypatch, capsys):
 
 
 def test_generate_previews(monkeypatch):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
     mocked_api = Mock()
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)

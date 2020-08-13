@@ -36,7 +36,7 @@ def use_test_cfg_path(monkeypatch, tmp_path):
     monkeypatch.setattr('koneko.config.Path.expanduser',
                         lambda x: Path(tmp_path / 'test_config.ini'))
 
-def setup_test_config(path):
+def setup_test_config(path, Config):
     default = """
 [Credentials]
 username = koneko
@@ -70,7 +70,7 @@ ueberzug_center_spaces = 20
     config_path.touch()
     with open(config_path, 'w') as c:
         config_object.write(c)
-    return config_object
+    return Config(path / 'test_config.ini')
 
 
 

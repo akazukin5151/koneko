@@ -1,3 +1,4 @@
+import os
 import configparser
 
 import pytest
@@ -94,11 +95,12 @@ def test_begin_config_exists(monkeypatch, tmp_path):
     assert creds['password'] == 'mypassword'
 
 
+@pytest.mark.skipif(not os.getenv, reason="Can't mock input here")
 @pytest.mark.parametrize('testid, responses', (('myid', ['y', 'myid']), ('', ['n'])))
 def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path, capsys, testid, responses):
     """Config path does not exist"""
     responses = iter(['myusername'] + responses)
-    monkeypatch.setattr('builtins.input', lambda x='', *a: next(responses))
+    monkeypatch.setattr('builtins.input', lambda *a: next(responses))
     monkeypatch.setattr('koneko.config.getpass', lambda *a: 'mypassword')
     # fix for macOS
     monkeypatch.setattr(

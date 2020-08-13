@@ -42,7 +42,7 @@ class Config:
     def use_ueberzug(self) -> bool:
         return (self.get_setting('experimental', 'use_ueberzug')
                 .map(parse_bool)
-                .value_or(True))
+                .value_or(False))
 
     def scroll_display(self) -> bool:
         return (self.get_setting('experimental', 'scroll_display')

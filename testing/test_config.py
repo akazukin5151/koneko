@@ -5,7 +5,7 @@ import pytest
 from returns.result import Success
 
 from koneko import config
-from conftest import setup_test_config
+from conftest import setup_test_config, Processer
 
 
 def write_print_setting(cfg, setting, tmp_path):
@@ -40,19 +40,54 @@ def write_print_setting(cfg, setting, tmp_path):
 
 
 # Defaults
-def test_scroll_display_new(tmp_path):
+def test_scroll_display_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.scroll_display() is True
+
+
+@pytest.mark.parametrize('setting', ('1', 'yes', 'true', 'on'))
+def test_scroll_display_set_to_true(tmp_path, setting):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set, 'experimental', 'scroll_display', setting
+    )
+    assert testconfig.scroll_display() is True
+
+
+@pytest.mark.parametrize('setting', ('off', 'no', 'false', '0'))
+def test_scroll_display_set_to_false(tmp_path, setting):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set, 'experimental', 'scroll_display', setting
+    )
+    assert testconfig.scroll_display() is False
+
+
+def test_scroll_display_invalid_fallbacks_to_true(tmp_path):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set, 'experimental', 'scroll_display', 'not a boolean'
+    )
+    assert testconfig.scroll_display() is True
+
+
+def test_scroll_display_empty_fallbacks_to_true(tmp_path):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.delete, 'experimental', 'scroll_display'
+    )
+    assert testconfig.scroll_display() is True
+
 
 def test_use_ueberzug(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.use_ueberzug() is False
 
-def test_check_image_preview_new(tmp_path):
+def test_check_image_preview(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.check_image_preview() is False
 
-def test_check_print_info_default_new(tmp_path):
+def test_check_print_info_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.check_print_info() is True
 
@@ -72,11 +107,11 @@ def test_get_gen_users_settings(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.get_gen_users_settings() == (18, 2)
 
-def test_gallery_print_spacing_config_default_new(tmp_path):
+def test_gallery_print_spacing_config_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.gallery_print_spacing_config() == ['9', '17', '17', '17', '17']
 
-def test_ueberzug_center_spaces_new(tmp_path):
+def test_ueberzug_center_spaces(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.ueberzug_center_spaces() == 20
 

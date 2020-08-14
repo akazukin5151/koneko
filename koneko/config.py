@@ -17,8 +17,18 @@ from returns.result import safe
 from koneko import pure, TERM
 
 
-def parse_bool(string):
-    return string.lower() in {'true', 'yes', 'on', '1'}
+@safe
+def parse_bool(string) -> 'Result[bool, ValueError]':
+    if string.lower() in {'true', 'yes', 'on', '1'}:
+        return True
+    elif string.lower() in {'false', 'no', 'off', '0'}:
+        return False
+    raise ValueError('Not a boolean!')
+
+
+@safe
+def parse_int(string) -> 'Result[int, ValueError]':
+    return int(string)
 
 
 class Dimension(Enum):
@@ -37,20 +47,18 @@ class Config:
         }
 
     @safe
-    def get_setting(self, section: str, setting: str) -> 'Result[str]':
+    def get_setting(self, section: str, setting: str) -> 'Result[str, KeyError]':
         return self.config[section][setting]
 
     def _get_bool(self, section: str, setting: str, default: bool) -> bool:
-        return (self.get_setting(section, setting)
-                .map(parse_bool)
-                .value_or(default))
+        return self.get_setting(section, setting).unify(parse_bool).value_or(default)
 
     def _get_int(self, section: str, setting: str, default: int) -> int:
-        return self.get_setting(section, setting).map(int).value_or(default)
+        return self.get_setting(section, setting).unify(parse_int).value_or(default)
 
 
     @safe
-    def credentials(self) -> 'Result[dict[str, str]]':
+    def credentials(self) -> 'Result[dict[str, str], KeyError]':
         return self.config['Credentials']
 
     def use_ueberzug(self) -> bool:

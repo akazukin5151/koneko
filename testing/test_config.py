@@ -21,6 +21,7 @@ defaults = (
 
 
 @pytest.mark.parametrize('_, method, expected', defaults)
+#@pytest.mark.parametrize('set_value', (expected,))
 def test_method_defaults(tmp_path, _, method, expected):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert eval(f'testconfig.{method}()') == expected
@@ -83,15 +84,28 @@ def test_dimension_default(tmp_path):
     assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
 
 
-def test_get_gen_users_settings(tmp_path):
+def test_get_gen_users_settings_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.get_gen_users_settings() == (18, 2)
 
 
-def test_gallery_print_spacing_config_default(tmp_path):
+def test_gallery_print_spacing_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.gallery_print_spacing_config() == [9, 17, 17, 17, 17]
+    assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
 
+
+def test_gallery_print_spacing_invalid(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config,
+        Processer.set, 'lscat', 'gallery_print_spacing', 'not an int'
+    )
+    assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
+
+
+def test_gallery_print_spacing_empty(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config,
+        Processer.delete, 'lscat', 'gallery_print_spacing'
+    )
+    assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
 
 
 def test_begin_config_exists(monkeypatch, tmp_path, use_test_cfg_path):

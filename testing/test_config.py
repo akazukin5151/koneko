@@ -108,6 +108,14 @@ def test_gallery_print_spacing_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
 
+@pytest.mark.parametrize('setting', [range(0,10,2), range(0,20,5)])
+def test_set_gallery_print_spacing(tmp_path, setting):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set, 'lscat', 'gallery_print_spacing',
+        ','.join([str(x) for x in list(setting)])
+    )
+    assert testconfig.gallery_print_spacing() == list(setting)
 
 def test_gallery_print_spacing_invalid(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config,

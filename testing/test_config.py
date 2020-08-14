@@ -8,100 +8,78 @@ from koneko import config
 from conftest import setup_test_config, Processer
 
 
-def write_print_setting(cfg, setting, tmp_path):
-    cfg.set('misc', 'print_info', setting)
-    with open(tmp_path / 'test_config.ini', 'w') as f:
-        cfg.write(f)
+defaults = (
+    ('lscat', 'page_spacing', 23),
+    ('lscat', 'image_thumbnail_size', 310),
+    ('lscat', 'gallery_print_spacing', [9, 17, 17, 17, 17]),
+    ('misc', 'print_info', True),
+    ('experimental', 'use_ueberzug', False),
+    ('experimental', 'scroll_display', True),
+    ('experimental', 'image_mode_previews', False),
+    ('experimental', 'ueberzug_center_spaces', 20),
+    #('lscat', 'users_page_spacing', 20),
+    #('lscat', 'get_gen_users_settings', (18, 2)),
+)
 
 
-#def test_check_print_info_default(tmp_path):
-#    setup_test_config(tmp_path)
-#    assert config.check_print_info() is True
-#
-#
-#@pytest.mark.parametrize('setting', ('1', 'yes', 'true', 'on'))
-#def test_check_print_info_true(tmp_path, setting, use_test_cfg_path):
-#    cfg = setup_test_config(tmp_path)
-#    write_print_setting(cfg, setting, tmp_path)
-#    assert config.check_print_info() is True
-#
-#
-#@pytest.mark.parametrize('setting', ('off', 'no', 'off'))
-#def test_check_print_info_false(tmp_path, setting, use_test_cfg_path):
-#    cfg = setup_test_config(tmp_path)
-#    write_print_setting(cfg, setting, tmp_path)
-#    assert config.check_print_info() is False
-#
-#
-#def test_check_print_info_invalid_true(tmp_path, use_test_cfg_path):
-#    cfg = setup_test_config(tmp_path)
-#    write_print_setting(cfg, 'not_a_boolean', tmp_path)
-#    assert config.check_print_info() is True
-
-
-# Defaults
-def test_scroll_display_default(tmp_path):
+@pytest.mark.parametrize('_, method, expected', defaults)
+def test_method_defaults(tmp_path, _, method, expected):
     testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.scroll_display() is True
+    assert eval(f'testconfig.{method}()') == expected
+
+
+def test_dimension_default(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config)
+    assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
+    assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
+
+
+@pytest.mark.parametrize('section, method, fallback', defaults)
+def test_invalid_setting_fallbacks_to_default(tmp_path, section, method, fallback):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set, section, method, 'not a boolean; not an int or list either'
+    )
+    assert eval(f'testconfig.{method}()') == fallback
+
+
+@pytest.mark.parametrize('section, method, fallback', defaults)
+def test_empty_setting_fallbacks_to_default(tmp_path, section, method, fallback):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.delete, section, method
+    )
+    assert eval(f'testconfig.{method}()') == fallback
+
+
+boolean_settings = (
+    ('misc', 'print_info'),
+    ('experimental', 'use_ueberzug'),
+    ('experimental', 'scroll_display'),
+    ('experimental', 'image_mode_previews')
+)
 
 
 @pytest.mark.parametrize('setting', ('1', 'yes', 'true', 'on'))
-def test_scroll_display_set_to_true(tmp_path, setting):
+@pytest.mark.parametrize('section, method', boolean_settings)
+def test_set_boolean_to_true(tmp_path, setting, section, method):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.set, 'experimental', 'scroll_display', setting
+        Processer.set, section, method, setting
     )
-    assert testconfig.scroll_display() is True
+    assert eval(f'testconfig.{method}()') is True
 
 
 @pytest.mark.parametrize('setting', ('off', 'no', 'false', '0'))
-def test_scroll_display_set_to_false(tmp_path, setting):
+@pytest.mark.parametrize('section, method', boolean_settings)
+def test_set_boolean_to_false(tmp_path, setting, section, method):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.set, 'experimental', 'scroll_display', setting
+        Processer.set, section, method, setting
     )
-    assert testconfig.scroll_display() is False
+    assert eval(f'testconfig.{method}()') is False
 
 
-def test_scroll_display_invalid_fallbacks_to_true(tmp_path):
-    testconfig = setup_test_config(
-        tmp_path, config.Config,
-        Processer.set, 'experimental', 'scroll_display', 'not a boolean'
-    )
-    assert testconfig.scroll_display() is True
-
-
-def test_scroll_display_empty_fallbacks_to_true(tmp_path):
-    testconfig = setup_test_config(
-        tmp_path, config.Config,
-        Processer.delete, 'experimental', 'scroll_display'
-    )
-    assert testconfig.scroll_display() is True
-
-
-def test_use_ueberzug(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.use_ueberzug() is False
-
-def test_check_image_preview(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.check_image_preview() is False
-
-def test_check_print_info_default(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.check_print_info() is True
-
-def test_gallery_page_spacing(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.gallery_page_spacing_config() == 23
-
-def test_users_page_spacing(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.users_page_spacing_config() == 20
-
-def test_thumbnail_size_config(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.thumbnail_size_config() == 310
 
 def test_get_gen_users_settings(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
@@ -109,16 +87,8 @@ def test_get_gen_users_settings(tmp_path):
 
 def test_gallery_print_spacing_config_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.gallery_print_spacing_config() == ['9', '17', '17', '17', '17']
+    assert testconfig.gallery_print_spacing_config() == [9, 17, 17, 17, 17]
 
-def test_ueberzug_center_spaces(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.ueberzug_center_spaces() == 20
-
-def test_dimension(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
-    assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
 
 
 def test_begin_config_exists(monkeypatch, tmp_path, use_test_cfg_path):

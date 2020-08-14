@@ -59,8 +59,7 @@ def setup_test_config(path, Config, processer=None, *args):
             'images_y_spacing': 1,
             'gallery_print_spacing': '9,17,17,17,17',
             'users_print_name_xcoord': 18,
-            'gallery_page_spacing': 23,
-            'users_page_spacing': 20,
+            'page_spacing': 23,
         },
         'misc': {
             'print_info': 'on'

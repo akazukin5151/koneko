@@ -31,6 +31,11 @@ def parse_int(string) -> 'Result[int, ValueError]':
     return int(string)
 
 
+@safe
+def parse_str_list(lst: 'list[str]') -> 'Result[list[int], Exception]':
+    return list(map(int, lst))
+
+
 class Dimension(Enum):
     x = 'width'
     y = 'height'
@@ -51,10 +56,10 @@ class Config:
         return self.config[section][setting]
 
     def _get_bool(self, section: str, setting: str, default: bool) -> bool:
-        return self.get_setting(section, setting).unify(parse_bool).value_or(default)
+        return self.get_setting(section, setting).bind(parse_bool).value_or(default)
 
     def _get_int(self, section: str, setting: str, default: int) -> int:
-        return self.get_setting(section, setting).unify(parse_int).value_or(default)
+        return self.get_setting(section, setting).bind(parse_int).value_or(default)
 
 
     @safe
@@ -68,19 +73,36 @@ class Config:
         return self._get_bool('experimental', 'scroll_display', True)
 
     def check_image_preview(self) -> bool:
+        # FIXME: Depreciated
+        return self.image_mode_previews()
+
+    def image_mode_previews(self) -> bool:
         return self._get_bool('experimental', 'image_mode_previews', False)
 
     def check_print_info(self) -> bool:
-        return self._get_bool('misc', 'print_info', False)
+        # FIXME: Depreciated
+        return self.print_info()
+
+    def print_info(self) -> bool:
+        return self._get_bool('misc', 'print_info', True)
+
+    def page_spacing(self) -> int:
+        return self._get_int('lscat', 'page_spacing', 23)
 
     def gallery_page_spacing_config(self) -> int:
-        return self._get_int('lscat', 'page_spacing', 23)
+        # FIXME: Depreciated
+        return self.page_spacing()
 
     def users_page_spacing_config(self) -> int:
         return self.gallery_page_spacing_config() - 3
 
-    def thumbnail_size_config(self) -> int:
+    def image_thumbnail_size(self) -> int:
+        # FIXME: improve setting name
         return self._get_int('lscat', 'image_thumbnail_size', 310)
+
+    def thumbnail_size_config(self) -> int:
+        # FIXME: Depreciated
+        return self.image_thumbnail_size()
 
     def ueberzug_center_spaces(self) -> int:
         return self._get_int('experimental', 'ueberzug_center_spaces', 20)
@@ -91,12 +113,17 @@ class Config:
             self._get_int('lscat', 'images_x_spacing', 2)
         )
 
-    def gallery_print_spacing_config(self) -> 'list[int]':
+    def gallery_print_spacing(self) -> 'list[int]':
         return (
             self.get_setting('lscat', 'gallery_print_spacing')
             .map(m.split(','))
-            .value_or(['9', '17', '17', '17', '17'])
+            .bind(parse_str_list)
+            .value_or([9, 17, 17, 17, 17])
         )
+
+    def gallery_print_spacing_config(self) -> 'list[int]':
+        # FIXME: Depreciated
+        return self.gallery_print_spacing()
 
     def dimension(self, dimension: Dimension, fallbacks) -> 'tuple[int, int]':
         return (

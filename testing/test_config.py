@@ -21,7 +21,6 @@ defaults = (
 
 
 @pytest.mark.parametrize('_, method, expected', defaults)
-#@pytest.mark.parametrize('set_value', (expected,))
 def test_method_defaults(tmp_path, _, method, expected):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert eval(f'testconfig.{method}()') == expected
@@ -71,6 +70,22 @@ def test_set_boolean_to_false(tmp_path, setting, section, method):
         Processer.set, section, method, setting
     )
     assert eval(f'testconfig.{method}()') is False
+
+
+int_settings = (
+    ('lscat', 'page_spacing'),
+    ('lscat', 'image_thumbnail_size'),
+    ('experimental', 'ueberzug_center_spaces'),
+)
+
+@pytest.mark.parametrize('setting', range(10,2))
+@pytest.mark.parametrize('section, method', int_settings)
+def test_set_ints(tmp_path, setting, section, method):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set, section, method, setting
+    )
+    assert eval(f'testconfig.{method}()') == setting
 
 
 

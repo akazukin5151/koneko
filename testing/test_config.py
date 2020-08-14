@@ -17,8 +17,6 @@ defaults = (
     ('experimental', 'scroll_display', True),
     ('experimental', 'image_mode_previews', False),
     ('experimental', 'ueberzug_center_spaces', 20),
-    #('lscat', 'users_page_spacing', 20),
-    #('lscat', 'get_gen_users_settings', (18, 2)),
 )
 
 
@@ -26,12 +24,6 @@ defaults = (
 def test_method_defaults(tmp_path, _, method, expected):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert eval(f'testconfig.{method}()') == expected
-
-
-def test_dimension_default(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
-    assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
 
 
 @pytest.mark.parametrize('section, method, fallback', defaults)
@@ -81,9 +73,20 @@ def test_set_boolean_to_false(tmp_path, setting, section, method):
 
 
 
+# Slightly more complicated methods return multiple configs, or derived from another
+# TODO: invalid and empty settings
+    #('lscat', 'users_page_spacing', 20),
+    #('lscat', 'get_gen_users_settings', (18, 2)),
+def test_dimension_default(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config)
+    assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
+    assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
+
+
 def test_get_gen_users_settings(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.get_gen_users_settings() == (18, 2)
+
 
 def test_gallery_print_spacing_config_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)

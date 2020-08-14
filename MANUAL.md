@@ -293,7 +293,7 @@ See [example config](example_config.ini) for reference.
 * Your config must be saved as `~/.config/koneko/config.ini` (exact path and name)
 * 'Gallery' means grid: artist illust mode (a/1), illust follow mode (n/5), illust recommended mode (r/6), and illust related mode
 * 'Users' (mode) means: following users mode (3) and search users mode (4)
-* For booleans, anything not exactly ('1', 'yes', 'true', or 'on') will be considered off
+* For booleans, ('1', 'yes', 'true', 'on') will be considered True, while ('0', 'no', 'false', 'off') will be considered False
 
 ## [Credentials]
 

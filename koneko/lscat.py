@@ -140,9 +140,9 @@ def show_instant(cls: 'lscat.<class>', data: 'data.<class>') -> 'IO':
         if not x.startswith('.'):
             tracker.update(x)
 
-    if isinstance(cls, TrackDownloads) and config.api.check_print_info():
+    if isinstance(cls, TrackDownloads) and config.api.print_info():
         number_of_cols = config.ncols_config()
-        spacings = config.api.gallery_print_spacing_config()
+        spacings = config.api.gallery_print_spacing()
         printer.print_cols(spacings, number_of_cols)
         print('\n')
 
@@ -208,7 +208,7 @@ class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
 
     def __init__(self, data: 'data.<class>'):
-        print_info = config.api.check_print_info()
+        print_info = config.api.print_info()
 
         # Tries to access splitpoint attribute in the data instance
         # If it fails, `fix` it by calling the read_invis() function
@@ -250,8 +250,8 @@ def generate_page(path: 'Path') -> 'IO':
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
-    page_spacing = config.api.gallery_page_spacing_config()
-    thumbnail_size = config.api.thumbnail_size_config()
+    page_spacing = config.api.page_spacing()
+    thumbnail_size = config.api.image_thumbnail_size()
 
     os.system('clear')
     while True:
@@ -276,7 +276,7 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
-    thumbnail_size = config.api.thumbnail_size_config()
+    thumbnail_size = config.api.image_thumbnail_size()
 
     os.system('clear')
     for i in range(number_of_cols * number_of_rows):
@@ -296,7 +296,7 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.api.get_gen_users_settings()
     page_spacing = config.api.users_page_spacing_config()
-    thumbnail_size = config.api.thumbnail_size_config()
+    thumbnail_size = config.api.image_thumbnail_size()
 
     os.system('clear')
     while True:
@@ -328,7 +328,7 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
 def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.api.get_gen_users_settings()
-    thumbnail_size = config.api.thumbnail_size_config()
+    thumbnail_size = config.api.image_thumbnail_size()
 
     number_of_rows = config.nrows_config()
     rowspaces = config.ycoords_config()
@@ -367,7 +367,7 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
-    thumbnail_size = config.api.thumbnail_size_config()
+    thumbnail_size = config.api.image_thumbnail_size()
 
     for preview_num in range(4):  # Max 4 previews
         image = yield

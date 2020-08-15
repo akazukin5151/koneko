@@ -172,7 +172,7 @@ def maybe_ask_assistant(actions: 'Optional[list[int]]') -> 'list[int]':
 def maybe_thumbnail_size(actions: 'list[int]') -> int:
     if 1 in actions or 8 in actions:
         return assistants.thumbnail_size_assistant()
-    return config.api.thumbnail_size_config()
+    return config.api.image_thumbnail_size()
 
 
 def maybe_xpadding_img_width(actions: 'list[int]', size: int) -> 'tuple[int]':

@@ -761,7 +761,7 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def start_preview(self) -> 'IO':
         self.loc = TERM.get_location()
-        if config.api.check_image_preview() and self.number_of_pages > 1:
+        if config.api.image_mode_previews() and self.number_of_pages > 1:
             self.event = threading.Event()  # Reset event, in case if it's set
             threading.Thread(target=self.preview).start()
 

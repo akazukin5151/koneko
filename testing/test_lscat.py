@@ -238,7 +238,7 @@ def test_show_instant(monkeypatch):
 
     FakeData = namedtuple('data', ('download_path',))
 
-    monkeypatch.setattr('koneko.config.api.check_print_info', lambda: True)
+    monkeypatch.setattr('koneko.config.api.print_info', lambda: True)
 
     fakedata = FakeData(Path('testing/files/'))
     lscat.show_instant(FakeTracker, fakedata)
@@ -370,7 +370,7 @@ def test_generate_page(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.api.gallery_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.api.page_spacing', lambda: 1)
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"

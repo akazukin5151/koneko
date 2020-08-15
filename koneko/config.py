@@ -72,16 +72,8 @@ class Config:
     def scroll_display(self) -> bool:
         return self._get_bool('experimental', 'scroll_display', True)
 
-    def check_image_preview(self) -> bool:
-        # FIXME: Depreciated
-        return self.image_mode_previews()
-
     def image_mode_previews(self) -> bool:
         return self._get_bool('experimental', 'image_mode_previews', False)
-
-    def check_print_info(self) -> bool:
-        # FIXME: Depreciated
-        return self.print_info()
 
     def print_info(self) -> bool:
         return self._get_bool('misc', 'print_info', True)
@@ -89,20 +81,12 @@ class Config:
     def page_spacing(self) -> int:
         return self._get_int('lscat', 'page_spacing', 23)
 
-    def gallery_page_spacing_config(self) -> int:
-        # FIXME: Depreciated
-        return self.page_spacing()
-
     def users_page_spacing_config(self) -> int:
-        return self.gallery_page_spacing_config() - 3
+        return self.page_spacing() - 3
 
     def image_thumbnail_size(self) -> int:
         # FIXME: improve setting name
         return self._get_int('lscat', 'image_thumbnail_size', 310)
-
-    def thumbnail_size_config(self) -> int:
-        # FIXME: Depreciated
-        return self.image_thumbnail_size()
 
     def ueberzug_center_spaces(self) -> int:
         return self._get_int('experimental', 'ueberzug_center_spaces', 20)
@@ -120,10 +104,6 @@ class Config:
             .bind(parse_str_list)
             .value_or([9, 17, 17, 17, 17])
         )
-
-    def gallery_print_spacing_config(self) -> 'list[int]':
-        # FIXME: Depreciated
-        return self.gallery_print_spacing()
 
     def dimension(self, dimension: Dimension, fallbacks) -> 'tuple[int, int]':
         return (

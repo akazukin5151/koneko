@@ -119,41 +119,25 @@ def test_set_get_gen_users_settings(tmp_path):
     assert testconfig.get_gen_users_settings() == (10, 3)
 
 
-@pytest.mark.parametrize('setting', (
-        'users_print_name_xcoord', 'images_x_spacing',
-        ('users_print_name_xcoord', 'images_x_spacing')
-    )
+# Test either one setting missing and both setting missing
+settings = (
+    'users_print_name_xcoord', 'images_x_spacing',
+    ('users_print_name_xcoord', 'images_x_spacing')
 )
-def test_empty_get_gen_users_settings(tmp_path, setting):
+
+@pytest.mark.parametrize('action', (Processer.set, Processer.delete))
+@pytest.mark.parametrize('setting', settings)
+def test_empty_or_invalid_get_gen_users_settings(tmp_path, action, setting):
     if type(setting) == str:
-        actions = (Processer.delete('lscat', setting),)
+        actions = (action('lscat', setting, 'not at int'),)
     else:
         actions = (
-            Processer.delete('lscat', setting[0]),
-            Processer.delete('lscat', setting[1])
+            action('lscat', setting[0], 'not at int'),
+            action('lscat', setting[1], 'not at int')
         )
 
     testconfig = setup_test_config(tmp_path, config.Config, *actions)
     assert testconfig.get_gen_users_settings() == (18, 2)
-
-
-@pytest.mark.parametrize('setting', (
-        'users_print_name_xcoord', 'images_x_spacing',
-        ('users_print_name_xcoord', 'images_x_spacing')
-    )
-)
-def test_invalid_get_gen_users_settings(tmp_path, setting):
-    if type(setting) == str:
-        actions = (Processer.set('lscat', setting, 'not an int'),)
-    else:
-        actions = (
-            Processer.set('lscat', setting[0], 'not an int'),
-            Processer.set('lscat', setting[1], 'not an int')
-        )
-
-    testconfig = setup_test_config(tmp_path, config.Config, *actions)
-    assert testconfig.get_gen_users_settings() == (18, 2)
-
 
 
 def test_gallery_print_spacing_default(tmp_path):

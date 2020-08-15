@@ -44,7 +44,7 @@ class Processer(Enum):
     delete = auto()
 
 
-def setup_test_config(path, Config, processer=None, *args):
+def setup_test_config(path, Config, *args):
     default = {
         'Credentials': {
             'username': 'koneko',
@@ -72,10 +72,12 @@ def setup_test_config(path, Config, processer=None, *args):
         }
     }
 
-    if processer == Processer.set:
-        default[args[0]][args[1]] = args[2]
-    elif processer == Processer.delete:
-        del default[args[0]][args[1]]
+    for action in args:
+        # actions = (Processer, section, <setting>)
+        if action[0] == Processer.set:
+            default[action[1]][action[2]] = action[3]
+        elif action[0] == Processer.delete:
+            del default[action[1]][action[2]]
 
     config_object = configparser.ConfigParser()
     config_object.read_dict(default)

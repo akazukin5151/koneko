@@ -30,7 +30,7 @@ def test_method_defaults(tmp_path, _, method, expected):
 def test_invalid_setting_fallbacks_to_default(tmp_path, section, method, fallback):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.set, section, method, 'not a boolean; not an int or list either'
+        (Processer.set, section, method, 'not a boolean; not an int or list either')
     )
     assert eval(f'testconfig.{method}()') == fallback
 
@@ -39,7 +39,7 @@ def test_invalid_setting_fallbacks_to_default(tmp_path, section, method, fallbac
 def test_empty_setting_fallbacks_to_default(tmp_path, section, method, fallback):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.delete, section, method
+        (Processer.delete, section, method)
     )
     assert eval(f'testconfig.{method}()') == fallback
 
@@ -57,7 +57,7 @@ boolean_settings = (
 def test_set_boolean_to_true(tmp_path, setting, section, method):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.set, section, method, setting
+        (Processer.set, section, method, setting)
     )
     assert eval(f'testconfig.{method}()') is True
 
@@ -67,7 +67,7 @@ def test_set_boolean_to_true(tmp_path, setting, section, method):
 def test_set_boolean_to_false(tmp_path, setting, section, method):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.set, section, method, setting
+        (Processer.set, section, method, setting)
     )
     assert eval(f'testconfig.{method}()') is False
 
@@ -83,7 +83,7 @@ int_settings = (
 def test_set_ints(tmp_path, setting, section, method):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.set, section, method, setting
+        (Processer.set, section, method, setting)
     )
     assert eval(f'testconfig.{method}()') == setting
 
@@ -91,17 +91,75 @@ def test_set_ints(tmp_path, setting, section, method):
 
 # Slightly more complicated methods return multiple configs, or derived from another
 # TODO: invalid and empty settings
-    #('lscat', 'users_page_spacing', 20),
-    #('lscat', 'get_gen_users_settings', (18, 2)),
 def test_dimension_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
     assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
 
+# Set
+# Empty
+# Invalid
+
+# TODO: Users page spacing
+# Set
+# Empty
+# Invalid
 
 def test_get_gen_users_settings_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.get_gen_users_settings() == (18, 2)
+
+
+def test_set_get_gen_users_settings(tmp_path):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        (Processer.set, 'lscat', 'users_print_name_xcoord', 10),
+        (Processer.set, 'lscat', 'images_x_spacing', 3)
+    )
+    assert testconfig.get_gen_users_settings() == (10, 3)
+
+
+@pytest.mark.parametrize('setting', (
+        'users_print_name_xcoord', 'images_x_spacing',
+        ('users_print_name_xcoord', 'images_x_spacing')
+    )
+)
+def test_empty_get_gen_users_settings(tmp_path, setting):
+    if type(setting) == str:
+        actions = (Processer.delete, 'lscat', setting)
+    else:
+        actions = (
+            (Processer.delete, 'lscat', setting[0]),
+            (Processer.delete, 'lscat', setting[1])
+        )
+
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        actions
+    )
+    assert testconfig.get_gen_users_settings() == (18, 2)
+
+
+@pytest.mark.parametrize('setting', (
+        'users_print_name_xcoord', 'images_x_spacing',
+        ('users_print_name_xcoord', 'images_x_spacing')
+    )
+)
+def test_invalid_get_gen_users_settings(tmp_path, setting):
+    if type(setting) == str:
+        actions = (Processer.set, 'lscat', setting, 'not an int')
+    else:
+        actions = (
+            (Processer.set, 'lscat', setting[0], 'not an int'),
+            (Processer.set, 'lscat', setting[1], 'not an int')
+        )
+
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        actions
+    )
+    assert testconfig.get_gen_users_settings() == (18, 2)
+
 
 
 def test_gallery_print_spacing_default(tmp_path):
@@ -112,21 +170,21 @@ def test_gallery_print_spacing_default(tmp_path):
 def test_set_gallery_print_spacing(tmp_path, setting):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.set, 'lscat', 'gallery_print_spacing',
-        ','.join([str(x) for x in list(setting)])
+        (Processer.set, 'lscat', 'gallery_print_spacing',
+        ','.join([str(x) for x in list(setting)]))
     )
     assert testconfig.gallery_print_spacing() == list(setting)
 
 def test_gallery_print_spacing_invalid(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config,
-        Processer.set, 'lscat', 'gallery_print_spacing', 'not an int'
+        (Processer.set, 'lscat', 'gallery_print_spacing', 'not an int')
     )
     assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
 
 
 def test_gallery_print_spacing_empty(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config,
-        Processer.delete, 'lscat', 'gallery_print_spacing'
+        (Processer.delete, 'lscat', 'gallery_print_spacing')
     )
     assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
 

@@ -128,12 +128,13 @@ settings = (
 @pytest.mark.parametrize('action', (Processer.set, Processer.delete))
 @pytest.mark.parametrize('setting', settings)
 def test_empty_or_invalid_get_gen_users_settings(tmp_path, action, setting):
+    # 'not an int' will be ignored for delete
     if type(setting) == str:
-        actions = (action('lscat', setting, 'not at int'),)
+        actions = (action('lscat', setting, 'not an int'),)
     else:
         actions = (
-            action('lscat', setting[0], 'not at int'),
-            action('lscat', setting[1], 'not at int')
+            action('lscat', setting[0], 'not an int'),
+            action('lscat', setting[1], 'not an int')
         )
 
     testconfig = setup_test_config(tmp_path, config.Config, *actions)

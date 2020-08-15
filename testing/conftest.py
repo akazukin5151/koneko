@@ -1,6 +1,7 @@
 import configparser
 from pathlib import Path
 from enum import Enum, auto
+from collections import namedtuple
 from contextlib import contextmanager
 
 import pytest
@@ -43,6 +44,13 @@ class Processer(Enum):
     set = auto()
     delete = auto()
 
+    def __call__(self, section, setting, new_setting=None):
+        if self.name == 'set':
+            result = namedtuple('action', ('name', 'section', 'setting', 'new_setting'))
+            return result(self.name, section, setting, new_setting)
+        result = namedtuple('action', ('name', 'section', 'setting'))
+        return result(self.name, section, setting)
+
 
 def setup_test_config(path, Config, *args):
     default = {
@@ -73,11 +81,10 @@ def setup_test_config(path, Config, *args):
     }
 
     for action in args:
-        # actions = (Processer, section, <setting>)
-        if action[0] == Processer.set:
-            default[action[1]][action[2]] = action[3]
-        elif action[0] == Processer.delete:
-            del default[action[1]][action[2]]
+        if action.name == 'set':
+            default[action.section][action.setting] = action.new_setting
+        elif action.name == 'delete':
+            del default[action.section][action.setting]
 
     config_object = configparser.ConfigParser()
     config_object.read_dict(default)

@@ -415,7 +415,7 @@ def test_generate_users(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.api.users_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.api.users_page_spacing', lambda: 1)
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
@@ -445,7 +445,7 @@ def test_generate_users_ueberzug(monkeypatch, capsys):
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.api.users_page_spacing_config', lambda: 1)
+    monkeypatch.setattr('koneko.config.api.users_page_spacing', lambda: 1)
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"

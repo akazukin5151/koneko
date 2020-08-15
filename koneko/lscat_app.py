@@ -179,7 +179,7 @@ def maybe_xpadding_img_width(actions: 'list[int]', size: int) -> 'tuple[int]':
     if 2 in actions or 8 in actions:
         return assistants.xpadding_assistant(size)
     return (
-        config.api.get_gen_users_settings()[1],
+        config.api.gen_users_settings()[1],
         config.api.dimension(config.Dimension.x, (0, 2))[0],
     )
 

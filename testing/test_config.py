@@ -81,9 +81,9 @@ def test_set_ints(tmp_path, setting, section, method):
 
 
 
-def test_users_page_spacing_config_default(tmp_path):
+def test_users_page_spacing_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.users_page_spacing_config() == 20
+    assert testconfig.users_page_spacing() == 20
 
 
 # Need to set multiple configs
@@ -120,18 +120,18 @@ def test_empty_or_invalid_setting(tmp_path, action, side, dimension, fallback):
 
 
 
-def test_get_gen_users_settings_default(tmp_path):
+def test_gen_users_settings_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
-    assert testconfig.get_gen_users_settings() == (18, 2)
+    assert testconfig.gen_users_settings() == (18, 2)
 
 
-def test_set_get_gen_users_settings(tmp_path):
+def test_set_gen_users_settings(tmp_path):
     testconfig = setup_test_config(
         tmp_path, config.Config,
         Processer.set('lscat', 'users_print_name_xcoord', 10),
         Processer.set('lscat', 'images_x_spacing', 3)
     )
-    assert testconfig.get_gen_users_settings() == (10, 3)
+    assert testconfig.gen_users_settings() == (10, 3)
 
 
 # Test either one setting missing and both setting missing
@@ -142,7 +142,7 @@ settings = (
 
 @pytest.mark.parametrize('action', (Processer.set, Processer.delete))
 @pytest.mark.parametrize('setting', settings)
-def test_empty_or_invalid_get_gen_users_settings(tmp_path, action, setting):
+def test_empty_or_invalid_gen_users_settings(tmp_path, action, setting):
     # 'not an int' will be ignored for delete
     if type(setting) == str:
         actions = (action('lscat', setting, 'not an int'),)
@@ -153,7 +153,7 @@ def test_empty_or_invalid_get_gen_users_settings(tmp_path, action, setting):
         )
 
     testconfig = setup_test_config(tmp_path, config.Config, *actions)
-    assert testconfig.get_gen_users_settings() == (18, 2)
+    assert testconfig.gen_users_settings() == (18, 2)
 
 
 # Need to set list of values

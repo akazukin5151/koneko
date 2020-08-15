@@ -467,7 +467,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     Use q to exit the program, and press enter to confirm the current position
     """
     # Setup variables
-    spacing, _ = config.api.get_gen_users_settings()  # Default
+    spacing, _ = config.api.gen_users_settings()  # Default
     preview_xcoords = pure.xcoords(TERM.width, image_width, xpadding, 1)[-3:]
 
     # Start

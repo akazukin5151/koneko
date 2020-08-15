@@ -81,7 +81,7 @@ class Config:
     def page_spacing(self) -> int:
         return self._get_int('lscat', 'page_spacing', 23)
 
-    def users_page_spacing_config(self) -> int:
+    def users_page_spacing(self) -> int:
         return self.page_spacing() - 3
 
     def image_thumbnail_size(self) -> int:
@@ -91,7 +91,7 @@ class Config:
     def ueberzug_center_spaces(self) -> int:
         return self._get_int('experimental', 'ueberzug_center_spaces', 20)
 
-    def get_gen_users_settings(self) -> 'tuple[int, int]':
+    def gen_users_settings(self) -> 'tuple[int, int]':
         return (
             self._get_int('lscat', 'users_print_name_xcoord', 18),
             self._get_int('lscat', 'images_x_spacing', 2)

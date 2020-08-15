@@ -294,8 +294,8 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
 
 def generate_users(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
-    message_xcoord, padding = config.api.get_gen_users_settings()
-    page_spacing = config.api.users_page_spacing_config()
+    message_xcoord, padding = config.api.gen_users_settings()
+    page_spacing = config.api.users_page_spacing()
     thumbnail_size = config.api.image_thumbnail_size()
 
     os.system('clear')
@@ -327,7 +327,7 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
 
 def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
-    message_xcoord, padding = config.api.get_gen_users_settings()
+    message_xcoord, padding = config.api.gen_users_settings()
     thumbnail_size = config.api.image_thumbnail_size()
 
     number_of_rows = config.nrows_config()

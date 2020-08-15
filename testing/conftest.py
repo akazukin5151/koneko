@@ -62,7 +62,7 @@ def setup_test_config(path, Config, *args):
         'lscat': {
             'image_width': 18,
             'image_height': 8,
-            'image_thumbnail_size': 310,
+            'thumbnail_size': 310,
             'images_x_spacing': 2,
             'images_y_spacing': 1,
             'gallery_print_spacing': '9,17,17,17,17',

@@ -40,7 +40,7 @@ def _print_info(message_xcoord: int) -> 'IO':
 
 def maybe_print_size(actions: 'list[int]', size: int) -> 'IO':
     if 1 in actions or 8 in actions:
-        print(f'image_thumbnail_size = {size}')
+        print(f'thumbnail_size = {size}')
 
 
 def maybe_print_width_xpadding(actions, image_width: int, xpadding: int) -> 'IO':

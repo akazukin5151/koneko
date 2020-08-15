@@ -175,7 +175,7 @@ def test_maybe_thumbnail_size(monkeypatch, send_enter, capsys):
     lscat_app.config_assistance(['1'])
 
     captured = capsys.readouterr()
-    assert captured.out == '\n\nYour recommended settings are:\nimage_thumbnail_size = 99\n'
+    assert captured.out == '\n\nYour recommended settings are:\nthumbnail_size = 99\n'
 
 
 def test_maybe_xpadding_img_width(monkeypatch, send_enter, capsys):
@@ -244,7 +244,7 @@ def test_config_assistant_1(monkeypatch, capsys, send_enter, argv):
     lscat_app.main()
 
     captured = capsys.readouterr()
-    assert captured.out == '\n\nYour recommended settings are:\nimage_thumbnail_size = 99\n'
+    assert captured.out == '\n\nYour recommended settings are:\nthumbnail_size = 99\n'
 
 
 @pytest.mark.parametrize('argv', ([], ['2']))

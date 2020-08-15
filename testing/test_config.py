@@ -10,7 +10,7 @@ from conftest import setup_test_config, Processer
 
 defaults = (
     ('lscat', 'page_spacing', 23),
-    ('lscat', 'image_thumbnail_size', 310),
+    ('lscat', 'thumbnail_size', 310),
     ('lscat', 'gallery_print_spacing', [9, 17, 17, 17, 17]),
     ('misc', 'print_info', True),
     ('experimental', 'use_ueberzug', False),
@@ -66,7 +66,7 @@ def test_set_boolean_to_false(tmp_path, setting, section, method):
 
 int_settings = (
     ('lscat', 'page_spacing'),
-    ('lscat', 'image_thumbnail_size'),
+    ('lscat', 'thumbnail_size'),
     ('experimental', 'ueberzug_center_spaces'),
 )
 

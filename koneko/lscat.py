@@ -251,7 +251,7 @@ def generate_page(path: 'Path') -> 'IO':
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
     page_spacing = config.api.page_spacing()
-    thumbnail_size = config.api.image_thumbnail_size()
+    thumbnail_size = config.api.thumbnail_size()
 
     os.system('clear')
     while True:
@@ -276,7 +276,7 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
-    thumbnail_size = config.api.image_thumbnail_size()
+    thumbnail_size = config.api.thumbnail_size()
 
     os.system('clear')
     for i in range(number_of_cols * number_of_rows):
@@ -296,7 +296,7 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.api.gen_users_settings()
     page_spacing = config.api.users_page_spacing()
-    thumbnail_size = config.api.image_thumbnail_size()
+    thumbnail_size = config.api.thumbnail_size()
 
     os.system('clear')
     while True:
@@ -328,7 +328,7 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
 def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
     message_xcoord, padding = config.api.gen_users_settings()
-    thumbnail_size = config.api.image_thumbnail_size()
+    thumbnail_size = config.api.thumbnail_size()
 
     number_of_rows = config.nrows_config()
     rowspaces = config.ycoords_config()
@@ -367,7 +367,7 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
-    thumbnail_size = config.api.image_thumbnail_size()
+    thumbnail_size = config.api.thumbnail_size()
 
     for preview_num in range(4):  # Max 4 previews
         image = yield

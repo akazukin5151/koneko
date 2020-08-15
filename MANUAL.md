@@ -362,7 +362,7 @@ See [example config](example_config.ini) for reference.
     <td></td>
   </tr>
   <tr>
-    <td><code>image_thumbnail_size</code></td>
+    <td><code>thumbnail_size</code></td>
     <td>int</td>
     <td>310</td>
     <td>Size of the image for pixcat (I think it's in pixels)</td>

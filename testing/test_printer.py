@@ -79,7 +79,7 @@ def test_print_info(capsys):
 def test_maybe_print_size(capsys, correct, incorrect):
     printer.maybe_print_size(correct, 10)
     captured = capsys.readouterr()
-    assert captured.out == 'image_thumbnail_size = 10\n'
+    assert captured.out == 'thumbnail_size = 10\n'
 
     printer.maybe_print_size(incorrect, 10)
     captured = capsys.readouterr()

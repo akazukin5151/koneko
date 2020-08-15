@@ -84,9 +84,8 @@ class Config:
     def users_page_spacing(self) -> int:
         return self.page_spacing() - 3
 
-    def image_thumbnail_size(self) -> int:
-        # FIXME: improve setting name
-        return self._get_int('lscat', 'image_thumbnail_size', 310)
+    def thumbnail_size(self) -> int:
+        return self._get_int('lscat', 'thumbnail_size', 310)
 
     def ueberzug_center_spaces(self) -> int:
         return self._get_int('experimental', 'ueberzug_center_spaces', 20)

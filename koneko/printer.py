@@ -40,7 +40,7 @@ def _print_info(message_xcoord: int) -> 'IO':
 
 def maybe_print_size(actions: 'list[int]', size: int) -> 'IO':
     if 1 in actions or 8 in actions:
-        print(f'image_thumbnail_size = {size}')
+        print(f'thumbnail_size = {size}')
 
 
 def maybe_print_width_xpadding(actions, image_width: int, xpadding: int) -> 'IO':
@@ -151,7 +151,7 @@ def maybe_print_bottom(use_ueberzug: 'Optional[bool]' = None, offset=0):
     if use_ueberzug is None:
         from koneko import config
 
-        use_ueberzug = config.use_ueberzug()
+        use_ueberzug = config.api.use_ueberzug()
 
     if use_ueberzug:
         cursor = TERM.location(0, TERM.height - 5 + offset)

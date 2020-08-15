@@ -12,8 +12,8 @@ def test_display_gallery(monkeypatch, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
-    monkeypatch.setattr('koneko.config.scroll_display', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.scroll_display', lambda: True)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 3)
 
@@ -32,8 +32,8 @@ def test_display_user(monkeypatch, argv):
     mock = Mock()
     monkeypatch.setattr('koneko.lscat_app.sys.argv', [True] + argv)
     monkeypatch.setattr('koneko.lscat.show_instant', mock)
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
-    monkeypatch.setattr('koneko.config.scroll_display', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.scroll_display', lambda: True)
 
     monkeypatch.setattr('koneko.picker.lscat_app_main', lambda: 4)
 
@@ -50,7 +50,7 @@ def test_display_core(monkeypatch, send_enter):
     this one tests for True
     """
     mock = Mock()
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.lscat_prompt.scroll_prompt', mock)
     lscat_app._display_core('tracker', 'data', 'max_images')
 
@@ -175,7 +175,7 @@ def test_maybe_thumbnail_size(monkeypatch, send_enter, capsys):
     lscat_app.config_assistance(['1'])
 
     captured = capsys.readouterr()
-    assert captured.out == '\n\nYour recommended settings are:\nimage_thumbnail_size = 99\n'
+    assert captured.out == '\n\nYour recommended settings are:\nthumbnail_size = 99\n'
 
 
 def test_maybe_xpadding_img_width(monkeypatch, send_enter, capsys):
@@ -197,7 +197,7 @@ def test_maybe_ypadding_img_height(monkeypatch, send_enter, capsys):
 
 
 def test_maybe_page_spacing(monkeypatch, send_enter, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.assistants.page_spacing_assistant', lambda x: 99)
 
     lscat_app.config_assistance(['4'])
@@ -226,7 +226,7 @@ def test_maybe_print_xcoord(monkeypatch, send_enter, capsys):
 
 def test_maybe_center_spaces(monkeypatch, send_enter, capsys):
     monkeypatch.setattr('koneko.assistants.center_spaces_assistant', lambda *a: 99)
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
 
     lscat_app.config_assistance(['7'])
 
@@ -244,7 +244,7 @@ def test_config_assistant_1(monkeypatch, capsys, send_enter, argv):
     lscat_app.main()
 
     captured = capsys.readouterr()
-    assert captured.out == '\n\nYour recommended settings are:\nimage_thumbnail_size = 99\n'
+    assert captured.out == '\n\nYour recommended settings are:\nthumbnail_size = 99\n'
 
 
 @pytest.mark.parametrize('argv', ([], ['2']))

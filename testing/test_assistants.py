@@ -26,12 +26,12 @@ class FakeInKey:
 
 def test_thumbnail_size_assistant_default(monkeypatch, disable_pixcat, patch_cbreak, disable_print_doc):
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     assert assistants.thumbnail_size_assistant() == 300  # Default
 
 
 def test_page_spacing_assistant(monkeypatch, disable_pixcat, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     responses = iter(['', 'not_a_number', '30'])
     monkeypatch.setattr('builtins.input', lambda *a: next(responses))
     monkeypatch.setattr('koneko.assistants.time.sleep', lambda *a, **k: Mock())
@@ -45,14 +45,14 @@ def test_page_spacing_assistant(monkeypatch, disable_pixcat, capsys):
 
 
 def test_page_spacing_assistant_must_not_use_ueberzug(monkeypatch, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
     assert assistants.page_spacing_assistant(310) == None
     captured = capsys.readouterr()
     assert captured.out == 'The page spacing assistant is not needed if you use ueberzug, because ueberzug does not respond to scroll events\n'
 
 
 def test_gallery_print_spacing_assistant_n(monkeypatch, disable_pixcat, disable_print_doc, patch_cbreak, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: '')
 
@@ -63,7 +63,7 @@ def test_gallery_print_spacing_assistant_n(monkeypatch, disable_pixcat, disable_
     assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2                 3                 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_pixcat, disable_print_doc, patch_cbreak, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: '')
 
@@ -76,7 +76,7 @@ def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_pixcat,
 
 
 def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch_cbreak, capsys, tmp_path):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: 'y')
     monkeypatch.setattr('koneko.picker.pick_dir', lambda *a: tmp_path)
@@ -92,7 +92,7 @@ def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch
 
 @pytest.mark.skipif(platform == 'darwin', reason='Ueberzug does not work on macOS')
 def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_doc, patch_cbreak, capsys, tmp_path):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('koneko.Terminal.height', 25)  # Fixes pytest if launched with -s
     monkeypatch.setattr('builtins.input', lambda: 'y')
@@ -108,7 +108,7 @@ def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_d
 
 
 def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, patch_cbreak, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('koneko.lscat.api.show_user_row', lambda *a: [Mock()])
 
@@ -141,7 +141,7 @@ def test_ypadding_assistant(monkeypatch, disable_pixcat, patch_cbreak, disable_p
 
 
 def test_center_spaces_assistant(monkeypatch, disable_pixcat, patch_cbreak, disable_print_doc, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: True)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('koneko.Terminal.height', 25)  # Fixes pytest if launched with -s
     monkeypatch.setattr('koneko.lscat.api', Mock())
@@ -154,7 +154,7 @@ def test_center_spaces_assistant(monkeypatch, disable_pixcat, patch_cbreak, disa
 
 
 def test_center_spaces_assistant_must_use_ueberzug(monkeypatch, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     assert assistants.center_spaces_assistant() == -1
     captured = capsys.readouterr()
     assert captured.out == 'Center images assistant is only for ueberzug!\n'

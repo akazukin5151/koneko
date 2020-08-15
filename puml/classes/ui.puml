@@ -182,9 +182,9 @@ class ui.Image <<(C, cyan)>>{
 
 main.ViewPostModeLoop ..right.> ui.ViewPostMode
 
-ui.ViewPostMode ..> ui.Image
-ui.ViewImage ..> ui.Image
-ui.ViewImage <.left. ui.AbstractGallery
+ui.ViewPostMode ..* ui.Image
+ui.ViewImage ..* ui.Image
+ui.ViewImage .left.* ui.AbstractGallery
 
 ui.Image ..> ui.IllustRelatedGallery
 

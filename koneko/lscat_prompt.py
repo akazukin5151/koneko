@@ -45,7 +45,7 @@ class AbstractLoop(ABC):
         self.condition: int
         self.current_page: int
         self.scrollable: bool
-        self.use_ueberzug = config.use_ueberzug()
+        self.use_ueberzug = config.api.use_ueberzug()
         # Defined in start
         self.terminal_page: int
 
@@ -137,7 +137,7 @@ class GalleryUserLoop(AbstractLoop):
         # Base ABC
         self.condition = 1
         self.current_page = int(data.download_path.name)
-        self.scrollable = self.use_ueberzug or not config.scroll_display()
+        self.scrollable = self.use_ueberzug or not config.api.scroll_display()
         self.max_pages = len(
             [x for x in os.listdir(data.download_path.parent)
              if x.isdigit()]
@@ -174,7 +174,7 @@ class ImageLoop(AbstractLoop):
     def __init__(self, root):
         super().__init__()
         # Unique
-        self.use_ueberzug = config.use_ueberzug()
+        self.use_ueberzug = config.api.use_ueberzug()
         self.root = root
         self.all_images = [f for f in sorted(os.listdir(root)) if (root / f).is_file()]
         self.image_path = self.all_images[0]

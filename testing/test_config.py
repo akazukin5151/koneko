@@ -1,79 +1,201 @@
+import os
 import configparser
 
 import pytest
 from returns.result import Success
 
 from koneko import config
-from conftest import setup_test_config
+from conftest import setup_test_config, Processer
 
 
-def write_print_setting(cfg, setting, tmp_path):
-    cfg.set('misc', 'print_info', setting)
-    with open(tmp_path / 'test_config.ini', 'w') as f:
-        cfg.write(f)
+defaults = (
+    ('lscat', 'page_spacing', 23),
+    ('lscat', 'thumbnail_size', 310),
+    ('lscat', 'gallery_print_spacing', [9, 17, 17, 17, 17]),
+    ('misc', 'print_info', True),
+    ('experimental', 'use_ueberzug', False),
+    ('experimental', 'scroll_display', True),
+    ('experimental', 'image_mode_previews', False),
+    ('experimental', 'ueberzug_center_spaces', 20),
+)
 
 
-def test_scroll_display(tmp_path, use_test_cfg_path):
-    setup_test_config(tmp_path)
-    assert config.scroll_display() is True
+@pytest.mark.parametrize('_, method, expected', defaults)
+def test_method_defaults(tmp_path, _, method, expected):
+    testconfig = setup_test_config(tmp_path, config.Config)
+    assert eval(f'testconfig.{method}()') == expected
 
 
-def test_ueberzug_center_spaces(tmp_path, use_test_cfg_path):
-    setup_test_config(tmp_path)
-    assert config.ueberzug_center_spaces() == 20
+@pytest.mark.parametrize('action', (Processer.set, Processer.delete))
+@pytest.mark.parametrize('section, method, fallback', defaults)
+def test_empty_or_invalid_setting(tmp_path, action, section, method, fallback):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        action(section, method, 'not a boolean; not an int or list either')
+    )
+    assert eval(f'testconfig.{method}()') == fallback
 
 
-def test_check_print_info_default(tmp_path):
-    setup_test_config(tmp_path)
-    assert config.check_print_info() is True
+boolean_settings = (
+    ('misc', 'print_info'),
+    ('experimental', 'use_ueberzug'),
+    ('experimental', 'scroll_display'),
+    ('experimental', 'image_mode_previews')
+)
 
 
 @pytest.mark.parametrize('setting', ('1', 'yes', 'true', 'on'))
-def test_check_print_info_true(tmp_path, setting, use_test_cfg_path):
-    cfg = setup_test_config(tmp_path)
-    write_print_setting(cfg, setting, tmp_path)
-    assert config.check_print_info() is True
+@pytest.mark.parametrize('section, method', boolean_settings)
+def test_set_boolean_to_true(tmp_path, setting, section, method):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set(section, method, setting)
+    )
+    assert eval(f'testconfig.{method}()') is True
 
 
-@pytest.mark.parametrize('setting', ('off', 'no', 'off'))
-def test_check_print_info_false(tmp_path, setting, use_test_cfg_path):
-    cfg = setup_test_config(tmp_path)
-    write_print_setting(cfg, setting, tmp_path)
-    assert config.check_print_info() is False
+@pytest.mark.parametrize('setting', ('off', 'no', 'false', '0'))
+@pytest.mark.parametrize('section, method', boolean_settings)
+def test_set_boolean_to_false(tmp_path, setting, section, method):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set(section, method, setting)
+    )
+    assert eval(f'testconfig.{method}()') is False
 
 
-def test_check_print_info_invalid_true(tmp_path, use_test_cfg_path):
-    cfg = setup_test_config(tmp_path)
-    write_print_setting(cfg, 'not_a_boolean', tmp_path)
-    assert config.check_print_info() is True
+int_settings = (
+    ('lscat', 'page_spacing'),
+    ('lscat', 'thumbnail_size'),
+    ('experimental', 'ueberzug_center_spaces'),
+)
+
+@pytest.mark.parametrize('setting', range(10,2))
+@pytest.mark.parametrize('section, method', int_settings)
+def test_set_ints(tmp_path, setting, section, method):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set(section, method, setting)
+    )
+    assert eval(f'testconfig.{method}()') == setting
 
 
-def test_get_settings_default(tmp_path, use_test_cfg_path):
-    setup_test_config(tmp_path)
-    assert config.get_settings('Credentials', 'username') == Success('koneko')
-    assert config.get_settings('Credentials', 'password') == Success('mypassword')
-    assert config.get_settings('Credentials', 'ID') == Success('1234')
-    assert config.get_settings('experimental', 'image_mode_previews') == Success('off')
-    assert config.get_settings('misc', 'print_info') == Success('on')
+
+def test_users_page_spacing_default(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config)
+    assert testconfig.users_page_spacing() == 20
 
 
-def test_get_settings_nonexistent(use_test_cfg_path):
-    assert isinstance(config.get_settings('wewr', 'asda').failure(), KeyError)
+# Need to set multiple configs
+def test_dimension_default(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config)
+    assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
+    assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
+
+dimensions = (
+    ('width', 'x', (18, 2)),
+    ('height', 'y', (8, 1))
+)
+
+@pytest.mark.parametrize('side, dimension, _', dimensions)
+def test_set_dimension(tmp_path, side, dimension, _):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set('lscat', f'image_{side}', 15),
+        Processer.set('lscat', f'images_{dimension}_spacing', 3)
+    )
+    assert testconfig.dimension(eval(f'config.Dimension.{dimension}'), (1, 1)) == (15, 3)
+
+
+@pytest.mark.parametrize('action', (Processer.set, Processer.delete))
+@pytest.mark.parametrize('side, dimension, fallback', dimensions)
+def test_empty_or_invalid_setting(tmp_path, action, side, dimension, fallback):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        action('lscat', f'image_{side}', 'not an int'),
+        action('lscat', f'images_{dimension}_spacing', 'not an int')
+    )
+    assert testconfig.dimension(eval(f'config.Dimension.{dimension}'), fallback) == fallback
+    assert testconfig.dimension(eval(f'config.Dimension.{dimension}'), (1, 1)) == (1, 1)
+
+
+
+def test_gen_users_settings_default(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config)
+    assert testconfig.gen_users_settings() == (18, 2)
+
+
+def test_set_gen_users_settings(tmp_path):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set('lscat', 'users_print_name_xcoord', 10),
+        Processer.set('lscat', 'images_x_spacing', 3)
+    )
+    assert testconfig.gen_users_settings() == (10, 3)
+
+
+# Test either one setting missing and both setting missing
+settings = (
+    'users_print_name_xcoord', 'images_x_spacing',
+    ('users_print_name_xcoord', 'images_x_spacing')
+)
+
+@pytest.mark.parametrize('action', (Processer.set, Processer.delete))
+@pytest.mark.parametrize('setting', settings)
+def test_empty_or_invalid_gen_users_settings(tmp_path, action, setting):
+    # 'not an int' will be ignored for delete
+    if type(setting) == str:
+        actions = (action('lscat', setting, 'not an int'),)
+    else:
+        actions = (
+            action('lscat', setting[0], 'not an int'),
+            action('lscat', setting[1], 'not an int')
+        )
+
+    testconfig = setup_test_config(tmp_path, config.Config, *actions)
+    assert testconfig.gen_users_settings() == (18, 2)
+
+
+# Need to set list of values
+def test_gallery_print_spacing_default(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config)
+    assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
+
+
+@pytest.mark.parametrize('setting', [range(0,10,2), range(0,20,5)])
+def test_set_gallery_print_spacing(tmp_path, setting):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set('lscat', 'gallery_print_spacing',
+        ','.join([str(x) for x in list(setting)]))
+    )
+    assert testconfig.gallery_print_spacing() == list(setting)
+
+
+@pytest.mark.parametrize('action', (Processer.set, Processer.delete))
+def test_gallery_print_spacing_empty_or_invalid(tmp_path, action):
+    testconfig = setup_test_config(tmp_path, config.Config,
+        action('lscat', 'gallery_print_spacing', 'not an int')
+    )
+    assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
 
 
 def test_begin_config_exists(monkeypatch, tmp_path, use_test_cfg_path):
-    setup_test_config(tmp_path)
+    testconfig = setup_test_config(tmp_path, config.Config)
+    monkeypatch.setattr('koneko.config.api', testconfig)
+
     creds, your_id = config.begin_config()
     assert your_id == '1234'
-    assert type(creds) is configparser.SectionProxy
+    assert creds['username'] == 'koneko'
+    assert creds['password'] == 'mypassword'
 
 
-def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path, capsys):
-    """Config path does not exist, user saves their ID"""
-    # It asks for multiple inputs: username, whether to save user id, user id
-    responses = iter(['myusername', 'y', 'myid'])
-    monkeypatch.setattr('builtins.input', lambda x='': next(responses))
-    monkeypatch.setattr('koneko.config.getpass', lambda: 'mypassword')
+@pytest.mark.parametrize('testid, responses', (('myid', ['y', 'myid']), ('', ['n'])))
+def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path, capsys, testid, responses):
+    """Config path does not exist"""
+    responses = iter(['myusername'] + responses)
+    monkeypatch.setattr('builtins.input', lambda *a: next(responses))
+    monkeypatch.setattr('koneko.config.getpass', lambda *a: 'mypassword')
     # fix for macOS
     monkeypatch.setattr(
         'koneko.config.os.system',
@@ -81,47 +203,13 @@ def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path, c
     )
 
     creds, your_id = config.begin_config()
-    assert your_id == 'myid'
-    assert type(creds) is configparser.SectionProxy
+    assert your_id == testid
+    assert creds['username'] == 'myusername'
+    assert creds['password'] == 'mypassword'
 
-    assert config.get_settings('Credentials', 'username') == Success('myusername')
-    assert config.get_settings('Credentials', 'password') == Success('mypassword')
-
-    captured = capsys.readouterr()
-    assert captured.out == '\nPlease enter your password:\n\nDo you want to save your pixiv ID? It will be more convenient\nto view artists you are following\n'
-
-
-def test_begin_config_nonexistant_no_id(monkeypatch, tmp_path, use_test_cfg_path, capsys):
-    """Config path does not exist, user does not save their ID"""
-    # It asks for multiple inputs: username, whether to save user id, user id
-    responses = iter(['myusername', 'n'])
-    monkeypatch.setattr('builtins.input', lambda x='': next(responses))
-    monkeypatch.setattr('koneko.config.getpass', lambda: 'mypassword')
-    # fix for macOS
-    monkeypatch.setattr(
-        'koneko.config.os.system',
-        lambda x: f'tail example_config.ini -n +9 >> {tmp_path / "test_config.ini"}'
-    )
-
-    creds, your_id = config.begin_config()
-    assert your_id == ''
-    assert type(creds) is configparser.SectionProxy
-
-    assert config.get_settings('Credentials', 'username') == Success('myusername')
-    assert config.get_settings('Credentials', 'password') == Success('mypassword')
+    testconfig = config.Config(tmp_path / 'test_config.ini')
+    assert testconfig.get_setting('Credentials', 'username') == Success('myusername')
+    assert testconfig.get_setting('Credentials', 'password') == Success('mypassword')
 
     captured = capsys.readouterr()
-    assert captured.out == '\nPlease enter your password:\n\nDo you want to save your pixiv ID? It will be more convenient\nto view artists you are following\n'
-
-
-def test_gallery_print_spacing_config(tmp_path, use_test_cfg_path):
-    setup_test_config(tmp_path)
-    assert config.gallery_print_spacing_config() == ['9', '17', '17', '17', '17']
-
-def test_gallery_print_spacing_config_default(use_test_cfg_path):
-    assert config.gallery_print_spacing_config() == ['9', '17', '17', '17', '17']
-
-
-def test_check_image_preview(tmp_path, use_test_cfg_path):
-    setup_test_config(tmp_path)
-    assert config.check_image_preview() is False
+    assert captured.out == '\nDo you want to save your pixiv ID? It will be more convenient\nto view artists you are following\n'

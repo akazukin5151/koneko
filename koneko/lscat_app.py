@@ -95,7 +95,7 @@ def display_user() -> 'IO':
 
 
 def _display_core(tracker, data, max_images):
-    if config.use_ueberzug() or not config.scroll_display():
+    if config.api.use_ueberzug() or not config.api.scroll_display():
         lscat_prompt.scroll_prompt(tracker, data, max_images)
         input()  # On program exit all images are cleared
     else:
@@ -172,15 +172,15 @@ def maybe_ask_assistant(actions: 'Optional[list[int]]') -> 'list[int]':
 def maybe_thumbnail_size(actions: 'list[int]') -> int:
     if 1 in actions or 8 in actions:
         return assistants.thumbnail_size_assistant()
-    return config.thumbnail_size_config()
+    return config.api.thumbnail_size()
 
 
 def maybe_xpadding_img_width(actions: 'list[int]', size: int) -> 'tuple[int]':
     if 2 in actions or 8 in actions:
         return assistants.xpadding_assistant(size)
     return (
-        config.get_gen_users_settings()[1],
-        config._width_padding('width', 'x', (0, 2))[0],
+        config.api.gen_users_settings()[1],
+        config.api.dimension(config.Dimension.x, (0, 2))[0],
     )
 
 

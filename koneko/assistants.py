@@ -263,7 +263,7 @@ class _YPadding(_AbstractPadding):
         self.find_dim_func = _FindImageHeight
 
         # Unique
-        self.use_ueberzug = not config.use_ueberzug()
+        self.use_ueberzug = not config.api.use_ueberzug()
 
     def report(self) -> 'IO':
         """Implements abstractmethod"""
@@ -340,7 +340,7 @@ class _FindImageHeight(_FindImageDimension):
 
 
 def check_ueberzug() -> bool:
-    if config.use_ueberzug():
+    if config.api.use_ueberzug():
         os.system('clear')
         print(
             'The page spacing assistant is not needed if you use ueberzug, '
@@ -397,13 +397,13 @@ def _display_inital_row(ans, size, xpadding, image_width, image_height):
         _data = FakeData(_path)
         images = lscat.handle_scroll(lscat.TrackDownloads, _data, slice(None))
         ncols = config.ncols_config()  # Default fallback, on user choice
-        if config.use_ueberzug():
+        if config.api.use_ueberzug():
             print('\n' * (image_height * config.nrows_config() + 1))
         return ncols, images
 
     images = lscat.api.show_row(WELCOME_IMAGE, xpadding, image_width, size)
     ncols = pure.ncols(TERM.width, xpadding, image_width)
-    if config.use_ueberzug():
+    if config.api.use_ueberzug():
         print('\n' * (image_height - 2))
     return ncols, images
 
@@ -467,7 +467,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
     Use q to exit the program, and press enter to confirm the current position
     """
     # Setup variables
-    spacing, _ = config.get_gen_users_settings()  # Default
+    spacing, _ = config.api.gen_users_settings()  # Default
     preview_xcoords = pure.xcoords(TERM.width, image_width, xpadding, 1)[-3:]
 
     # Start
@@ -477,7 +477,7 @@ def user_info_assistant(thumbnail_size, xpadding, image_width: int) -> int:
         WELCOME_IMAGE, preview_xcoords, xpadding, thumbnail_size
     )
 
-    if not config.use_ueberzug():
+    if not config.api.use_ueberzug():
         printer.move_cursor_up(5)
     else:
         printer.move_cursor_down(3)
@@ -508,7 +508,7 @@ def center_spaces_assistant():
 
     Use q to exit the program, and press enter to confirm the current position
     """
-    if not config.use_ueberzug():
+    if not config.api.use_ueberzug():
         print('Center images assistant is only for ueberzug!')
         return -1
 

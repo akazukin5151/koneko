@@ -1,192 +1,179 @@
 """Functions to read and write user configuration.
-The IOResult type is just to mark functions using IO;
-they don't return an IOResult container
 
 Structure:
-    - Impure config file IO
     - Safe config setting getters, will return default on failure
+    - Calculations
     - Interactive config functions for first launch setup
 """
-
 import os
+from enum import Enum
 from pathlib import Path
 from getpass import getpass
 from configparser import ConfigParser
 
 from placeholder import m
 from returns.result import safe
-from returns.pipeline import flow
 
 from koneko import pure, TERM
 
 
-# Impure
 @safe
-def get_config_section(section: str) -> 'IOResult[config]':
-    config_object = ConfigParser()
-    config_path = Path('~/.config/koneko/config.ini').expanduser()
-    config_object.read(config_path)
-    section = config_object[section]
-    return section
-
-
-def get_settings(section: str, setting: str) -> 'IOResult[str]':
-    cfgsection: 'Result[config]' = get_config_section(section)
-    return cfgsection.map(m.get(setting, ''))
+def parse_bool(string) -> 'Result[bool, ValueError]':
+    if string.lower() in {'true', 'yes', 'on', '1'}:
+        return True
+    elif string.lower() in {'false', 'no', 'off', '0'}:
+        return False
+    raise ValueError('Not a boolean!')
 
 
 @safe
-def unsafe_get_bool_config(section, setting: str, fallback: bool) -> 'IOResult[bool]':
-    """Returns either Success(True), Success(False) or Failure.
-    Inner boolean represents the value
-    Failure represents no key/setting/config found
-    """
-    section = get_config_section(section)
-    return section.map(m.getboolean(setting, fallback=fallback)).value_or(fallback)
+def parse_int(string) -> 'Result[int, ValueError]':
+    return int(string)
 
 
-# While not pure (as reading config is IO), they will always return a default on fail
-def get_bool_config(section: str, setting: str, fallback: bool) -> bool:
-    """Reads requested section and setting, returning the fallback on failure
-    (setting not found)
-    """
-    return unsafe_get_bool_config(section, setting, fallback).value_or(fallback)
+@safe
+def parse_str_list(lst: 'list[str]') -> 'Result[list[int], Exception]':
+    return list(map(int, lst))
 
 
-def check_image_preview() -> bool:
-    return get_bool_config('experimental', 'image_mode_previews', False)
+class Dimension(Enum):
+    x = 'width'
+    y = 'height'
 
 
-def check_print_info() -> bool:
-    return get_bool_config('misc', 'print_info', True)
+class Config:
+    def __init__(self, path):
+        self.config_path = path
+        config_object = ConfigParser()
+        config_object.read(self.config_path)
+        self.config: 'dict[str, dict[str, str]' = {
+            section: dict(config_object.items(section))
+            for section in config_object.sections()
+        }
+
+    @safe
+    def get_setting(self, section: str, setting: str) -> 'Result[str, KeyError]':
+        return self.config[section][setting]
+
+    def _get_bool(self, section: str, setting: str, default: bool) -> bool:
+        return self.get_setting(section, setting).bind(parse_bool).value_or(default)
+
+    def _get_int(self, section: str, setting: str, default: int) -> int:
+        return self.get_setting(section, setting).bind(parse_int).value_or(default)
 
 
-def use_ueberzug() -> bool:
-    return get_bool_config('experimental', 'use_ueberzug', False)
+    @safe
+    def credentials(self) -> 'Result[dict[str, str], KeyError]':
+        return self.config['Credentials']
+
+    def use_ueberzug(self) -> bool:
+        return self._get_bool('experimental', 'use_ueberzug', False)
+
+    def scroll_display(self) -> bool:
+        return self._get_bool('experimental', 'scroll_display', True)
+
+    def image_mode_previews(self) -> bool:
+        return self._get_bool('experimental', 'image_mode_previews', False)
+
+    def print_info(self) -> bool:
+        return self._get_bool('misc', 'print_info', True)
+
+    def page_spacing(self) -> int:
+        return self._get_int('lscat', 'page_spacing', 23)
+
+    def users_page_spacing(self) -> int:
+        return self.page_spacing() - 3
+
+    def thumbnail_size(self) -> int:
+        return self._get_int('lscat', 'thumbnail_size', 310)
+
+    def ueberzug_center_spaces(self) -> int:
+        return self._get_int('experimental', 'ueberzug_center_spaces', 20)
+
+    def gen_users_settings(self) -> 'tuple[int, int]':
+        return (
+            self._get_int('lscat', 'users_print_name_xcoord', 18),
+            self._get_int('lscat', 'images_x_spacing', 2)
+        )
+
+    def gallery_print_spacing(self) -> 'list[int]':
+        return (
+            self.get_setting('lscat', 'gallery_print_spacing')
+            .map(m.split(','))
+            .bind(parse_str_list)
+            .value_or([9, 17, 17, 17, 17])
+        )
+
+    def dimension(self, dimension: Dimension, fallbacks) -> 'tuple[int, int]':
+        return (
+            self._get_int('lscat', f'image_{dimension.value}', fallbacks[0]),
+            self._get_int('lscat', f'images_{dimension.name}_spacing', fallbacks[1]),
+        )
 
 
-def scroll_display() -> bool:
-    return get_bool_config('experimental', 'scroll_display', True)
-
-
-def _width_padding(side: str, dimension: str, fallbacks: (int, int)) -> (int, int):
-    settings = get_config_section('lscat')
-    return (
-        settings.map(m.getint(f'image_{side}', fallback=fallbacks[0])).value_or(
-            fallbacks[0]
-        ),
-        settings.map(
-            m.getint(f'images_{dimension}_spacing', fallback=fallbacks[1])
-        ).value_or(fallbacks[1]),
-    )
+api = Config(Path('~/.config/koneko/config.ini').expanduser())
 
 
 def ncols_config() -> int:
-    return pure.ncols(TERM.width, *_width_padding('width', 'x', (18, 2)))
+    return pure.ncols(TERM.width, *api.dimension(Dimension.x, (18, 2)))
 
 
 def nrows_config() -> int:
-    return pure.nrows(TERM.height, *_width_padding('height', 'y', (8, 1)))
+    return pure.nrows(TERM.height, *api.dimension(Dimension.y, (8, 1)))
 
 
 def xcoords_config(offset=0) -> 'list[int]':
-    return pure.xcoords(TERM.width, *_width_padding('width', 'x', (18, 2)), offset)
+    return pure.xcoords(TERM.width, *api.dimension(Dimension.x, (18, 2)), offset)
 
 
 def ycoords_config() -> 'list[int]':
-    return pure.ycoords(TERM.height, *_width_padding('height', 'y', (8, 1)))
-
-
-def gallery_page_spacing_config() -> int:
-    settings = get_config_section('lscat')
-    return settings.map(m.getint('page_spacing', fallback=23)).value_or(23)
-
-
-def users_page_spacing_config() -> int:
-    # Because user modes print two lines of info. The other 1 is an offset
-    return gallery_page_spacing_config() - 3
-
-
-def thumbnail_size_config() -> int:
-    settings = get_config_section('lscat')
-    return settings.map(m.getint('image_thumbnail_size', fallback=310)).value_or(310)
-
-
-def get_gen_users_settings() -> (int, int):
-    settings = get_config_section('lscat')
-    return (
-        settings.map(m.getint('users_print_name_xcoord', fallback=18)).value_or(18),
-        settings.map(m.getint('images_x_spacing', fallback=2)).value_or(2),
-    )
-
-
-def gallery_print_spacing_config() -> 'list[str]':
-    return (
-        get_settings('lscat', 'gallery_print_spacing')
-        .map(m.split(','))
-        .value_or(['9', '17', '17', '17', '17'])
-    )
-
-
-def ueberzug_center_spaces() -> int:
-    settings = get_config_section('experimental')
-    return settings.map(m.getint('ueberzug_center_spaces', fallback=20)).value_or(20)
-
-
-def credentials_from_config(config_object, config_path) -> 'IO[(config, str)]':
-    credentials = get_config_section('Credentials').unwrap()
-    your_id = credentials.get('ID', '')
-    return credentials, your_id
+    return pure.ycoords(TERM.height, *api.dimension(Dimension.y, (8, 1)))
 
 
 # Technically frontend
-def begin_config() -> 'IO[(config, str)]':
+def begin_config() -> 'tuple[dict[str, str], str]':
     os.system('clear')
     config_path = Path('~/.config/koneko/config.ini').expanduser()
-    config_object = ConfigParser()
     if config_path.exists():
-        return credentials_from_config(config_object, config_path)
-    return init_config(config_object, config_path)
+        return api.credentials().unwrap(), api.get_setting('Credentials', 'id').unwrap()
+    return init_config(config_path)
 
 
-def init_config(config_object, config_path) -> 'IO[(config, str)]':
-    # Identical to `_ask_your_id(_ask_credentials(config_object))`
-    config_object, your_id = flow(
-        config_object,
-        _ask_credentials,
-        _ask_your_id
-    )
+def init_config(config_path) -> 'tuple[dict[str, str], str]':
+    credentials = _ask_credentials()
+    credentials, your_id = _ask_your_id(credentials)
 
-    _write_config(config_object, config_path)
+    _write_config(credentials, config_path)
     _append_default_config(config_path)
-    return config_object['Credentials'], your_id
+    return credentials, your_id
 
 
-def _ask_credentials(config_object) -> 'IO[config]':
-    username = input('Please enter your username:\n')
-    print('\nPlease enter your password:')
-    password = getpass()
-    config_object['Credentials'] = {'Username': username, 'Password': password}
-    return config_object
+def _ask_credentials() -> 'dict[str, str]':
+    return {
+        'username': input('Please enter your username:\n'),
+        'password': getpass('\nPlease enter your password: ')
+    }
 
 
-def _ask_your_id(config_object) -> 'IO[(config, str)]':
+def _ask_your_id(credentials) -> 'tuple[dict[str, str], str]':
     print('\nDo you want to save your pixiv ID? It will be more convenient')
     print('to view artists you are following')
     ans = input()
     if ans == 'y' or not ans:
         your_id = input('Please enter your pixiv ID:\n')
-        config_object['Credentials'].update({'ID': your_id})
-        return config_object, your_id
-    return config_object, ''
+        credentials.update({'ID': your_id})
+        return credentials, your_id
+    return credentials, ''
 
 
-def _write_config(config_object, config_path) -> 'IO':
+def _write_config(credentials, config_path) -> 'IO':
     os.system('clear')
+    parser = ConfigParser()
+    parser.read_dict({'Credentials': credentials})
     config_path.parent.mkdir(exist_ok=True)
     config_path.touch()
     with open(config_path, 'w') as c:
-        config_object.write(c)
+        parser.write(c)
 
 
 def _append_default_config(config_path) -> 'IO':

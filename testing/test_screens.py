@@ -16,7 +16,7 @@ def disable_pixcat(monkeypatch):
 
 def test_begin_prompt(monkeypatch, disable_pixcat, capsys):
     # Send a "1" as input
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     monkeypatch.setattr('builtins.input', lambda x: '1')
     returned = screens.begin_prompt()
     assert returned == '1'
@@ -36,7 +36,7 @@ def test_clear_cache_loop(monkeypatch, turn_off_print):
     screens.clear_cache_loop()
 
 def test_info_screen_loop(monkeypatch, disable_pixcat, send_enter, capsys):
-    monkeypatch.setattr('koneko.config.use_ueberzug', lambda: False)
+    monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     screens.info_screen_loop()
 
     captured = capsys.readouterr()

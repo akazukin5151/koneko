@@ -101,7 +101,7 @@ class Ueberzug(Display):
         return self.canvas.create_placement(
             str(image_path) + str(self._counter),
             path=str(image_path),
-            x=config.ueberzug_center_spaces(),
+            x=config.api.ueberzug_center_spaces(),
             y=0,
             scaler=self.scaler,
             visibility=self.visible,
@@ -112,7 +112,7 @@ class Ueberzug(Display):
             placement.visibility = self.invisible
 
 
-api = Ueberzug() if config.use_ueberzug() else Pixcat()
+api = Ueberzug() if config.api.use_ueberzug() else Pixcat()
 
 
 def show_single_x(x: int, thumbnail_size: int) -> 'IO[Image]':
@@ -140,9 +140,9 @@ def show_instant(cls: 'lscat.<class>', data: 'data.<class>') -> 'IO':
         if not x.startswith('.'):
             tracker.update(x)
 
-    if isinstance(cls, TrackDownloads) and config.check_print_info():
+    if isinstance(cls, TrackDownloads) and config.api.print_info():
         number_of_cols = config.ncols_config()
-        spacings = config.gallery_print_spacing_config()
+        spacings = config.api.gallery_print_spacing()
         printer.print_cols(spacings, number_of_cols)
         print('\n')
 
@@ -197,7 +197,7 @@ class TrackDownloads(AbstractTracker):
         self.orders = list(range(30))
         # TODO: cannot merge yet because ueberzug version prevents 'overflowing'
         # during initial download
-        if config.use_ueberzug():
+        if config.api.use_ueberzug():
             self.generator = generate_page_ueberzug(data.download_path)
         else:
             self.generator = generate_page(data.download_path)
@@ -208,7 +208,7 @@ class TrackDownloadsUsers(AbstractTracker):
     """For user modes (3 & 4)"""
 
     def __init__(self, data: 'data.<class>'):
-        print_info = config.check_print_info()
+        print_info = config.api.print_info()
 
         # Tries to access splitpoint attribute in the data instance
         # If it fails, `fix` it by calling the read_invis() function
@@ -222,7 +222,7 @@ class TrackDownloadsUsers(AbstractTracker):
         self.orders = pure.generate_orders(splitpoint * 4, splitpoint)
 
         # TODO: Cannot merge yet because generate_users() goes to a new terminal page for every row
-        if config.use_ueberzug():
+        if config.api.use_ueberzug():
             self.generator = generate_users_ueberzug(data.download_path, print_info)
         else:
             self.generator = generate_users(data.download_path, print_info)
@@ -250,8 +250,8 @@ def generate_page(path: 'Path') -> 'IO':
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
-    page_spacing = config.gallery_page_spacing_config()
-    thumbnail_size = config.thumbnail_size_config()
+    page_spacing = config.api.page_spacing()
+    thumbnail_size = config.api.thumbnail_size()
 
     os.system('clear')
     while True:
@@ -276,7 +276,7 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
     rowspaces = config.ycoords_config()
     number_of_cols = config.ncols_config()
     number_of_rows = config.nrows_config()
-    thumbnail_size = config.thumbnail_size_config()
+    thumbnail_size = config.api.thumbnail_size()
 
     os.system('clear')
     for i in range(number_of_cols * number_of_rows):
@@ -294,9 +294,9 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
 
 def generate_users(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
-    message_xcoord, padding = config.get_gen_users_settings()
-    page_spacing = config.users_page_spacing_config()
-    thumbnail_size = config.thumbnail_size_config()
+    message_xcoord, padding = config.api.gen_users_settings()
+    page_spacing = config.api.users_page_spacing()
+    thumbnail_size = config.api.thumbnail_size()
 
     os.system('clear')
     while True:
@@ -327,8 +327,8 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
 
 def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
     preview_xcoords = config.xcoords_config(offset=1)[-3:]
-    message_xcoord, padding = config.get_gen_users_settings()
-    thumbnail_size = config.thumbnail_size_config()
+    message_xcoord, padding = config.api.gen_users_settings()
+    thumbnail_size = config.api.thumbnail_size()
 
     number_of_rows = config.nrows_config()
     rowspaces = config.ycoords_config()
@@ -367,7 +367,7 @@ def generate_previews(path: 'Path', min_num: int) -> 'IO':
     rowspaces = config.ycoords_config()
     left_shifts = config.xcoords_config()
     _xcoords = (left_shifts[0], left_shifts[-1])
-    thumbnail_size = config.thumbnail_size_config()
+    thumbnail_size = config.api.thumbnail_size()
 
     for preview_num in range(4):  # Max 4 previews
         image = yield

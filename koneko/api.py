@@ -59,7 +59,7 @@ class APIHandler:
     def _login_with_creds(self) -> 'Optional[dict[str, dict[str]]]':
         try:
             return self._api.login(
-                self._credentials['Username'], self._credentials['Password']
+                self._credentials['username'], self._credentials['password']
             )
 
         except PixivError as e:

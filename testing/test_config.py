@@ -88,9 +88,32 @@ def test_dimension_default(tmp_path):
     assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
     assert testconfig.dimension(config.Dimension.y, (1, 1)) == (8, 1)
 
-# Set
-# Empty
-# Invalid
+dimensions = (
+    ('width', 'x', (18, 2)),
+    ('height', 'y', (8, 1))
+)
+
+@pytest.mark.parametrize('side, dimension, _', dimensions)
+def test_set_dimension(tmp_path, side, dimension, _):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        Processer.set('lscat', f'image_{side}', 15),
+        Processer.set('lscat', f'images_{dimension}_spacing', 3)
+    )
+    assert testconfig.dimension(eval(f'config.Dimension.{dimension}'), (1, 1)) == (15, 3)
+
+
+@pytest.mark.parametrize('action', (Processer.set, Processer.delete))
+@pytest.mark.parametrize('side, dimension, fallback', dimensions)
+def test_empty_or_invalid_setting(tmp_path, action, side, dimension, fallback):
+    testconfig = setup_test_config(
+        tmp_path, config.Config,
+        action('lscat', f'image_{side}', 'not an int'),
+        action('lscat', f'images_{dimension}_spacing', 'not an int')
+    )
+    assert testconfig.dimension(eval(f'config.Dimension.{dimension}'), fallback) == fallback
+    assert testconfig.dimension(eval(f'config.Dimension.{dimension}'), (1, 1)) == (1, 1)
+
 
 # TODO: Users page spacing
 # Set

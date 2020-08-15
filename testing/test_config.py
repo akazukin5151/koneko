@@ -26,20 +26,12 @@ def test_method_defaults(tmp_path, _, method, expected):
     assert eval(f'testconfig.{method}()') == expected
 
 
+@pytest.mark.parametrize('action', (Processer.set, Processer.delete))
 @pytest.mark.parametrize('section, method, fallback', defaults)
-def test_invalid_setting_fallbacks_to_default(tmp_path, section, method, fallback):
+def test_empty_or_invalid_setting(tmp_path, action, section, method, fallback):
     testconfig = setup_test_config(
         tmp_path, config.Config,
-        Processer.set(section, method, 'not a boolean; not an int or list either')
-    )
-    assert eval(f'testconfig.{method}()') == fallback
-
-
-@pytest.mark.parametrize('section, method, fallback', defaults)
-def test_empty_setting_fallbacks_to_default(tmp_path, section, method, fallback):
-    testconfig = setup_test_config(
-        tmp_path, config.Config,
-        Processer.delete(section, method)
+        action(section, method, 'not a boolean; not an int or list either')
     )
     assert eval(f'testconfig.{method}()') == fallback
 
@@ -141,9 +133,11 @@ def test_empty_or_invalid_get_gen_users_settings(tmp_path, action, setting):
     assert testconfig.get_gen_users_settings() == (18, 2)
 
 
+
 def test_gallery_print_spacing_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
+
 
 @pytest.mark.parametrize('setting', [range(0,10,2), range(0,20,5)])
 def test_set_gallery_print_spacing(tmp_path, setting):
@@ -154,16 +148,11 @@ def test_set_gallery_print_spacing(tmp_path, setting):
     )
     assert testconfig.gallery_print_spacing() == list(setting)
 
-def test_gallery_print_spacing_invalid(tmp_path):
-    testconfig = setup_test_config(tmp_path, config.Config,
-        Processer.set('lscat', 'gallery_print_spacing', 'not an int')
-    )
-    assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
 
-
-def test_gallery_print_spacing_empty(tmp_path):
+@pytest.mark.parametrize('action', (Processer.set, Processer.delete))
+def test_gallery_print_spacing_empty_or_invalid(tmp_path, action):
     testconfig = setup_test_config(tmp_path, config.Config,
-        Processer.delete('lscat', 'gallery_print_spacing')
+        action('lscat', 'gallery_print_spacing', 'not an int')
     )
     assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]
 

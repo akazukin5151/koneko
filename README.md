@@ -96,56 +96,14 @@ See the [manual](MANUAL.md) here
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.11.0
+### Version 0.11.1
 
 #### Features
-* Ueberzug support to work with other terminals (but seems to be linux only)
-    * New configuration options in the experimental section
-        * `use_ueberzug` (default: off)
-        * `scroll_display` (default: on)
-            * On means you have to manually scroll the terminal with mouse/keyboard shortcuts
-            * Off means you can use up/down keys to view more images
-            * This option is always on if `use_ueberzug` is on
-        * `ueberzug_center_spaces` (default: 20)
-    * If `scroll_display` is off, then use up/down keys to view more images
-    * Should work on everything:
-         * lscat app
-             * In lscat config assistant
-                 * Page spacing is disabled for ueberzug
-             * Browse cache, display path
-             * testgallery, testuser
-         * koneko app
-             * For already downloaded images in Gallery, Users, & Image modes
-             * For showing images as they download in Gallery, Users, & Image modes
-             * Everywhere else (main screen, info screen, etc)
-* Improved documentation using tables in the manual (MANUAL.md) and developer guide (HACKING.md)
 
 #### Bug fixes
-* Fixed bugs in lscat app's display path (mode p/3):
-    * Not working if path given via cli
-    * Always showing directory in gallery mode
-* Fixed race conditions while prefetching
-    * eg, viewing an image while prefetching would crash or cause undefined behaviour
-    * Prefetching in user mode takes longer, making it likely to trigger an action before prefetch has finished
 
 #### Code maintenance
-* Remove circular imports
-    - [x] prompt importing ui
-    - [x] assistants importing lscat_app
-    - [x] main importing cli
-    - [x] picker importing assistants
-* Updated and improved diagrams in HACKING.md
-* Methods starting with `maybe` (formerly abstractmethods) now do nothing by default, override to do something
-    * Rename middle() to maybe_show_preview() in lscat prompt
-* Inline in yield expression in users preview (lscat)
-* Replace while loop with a for loop and a guard at the end in lscat
-* Use Keystroke name attribute rather than its key code (blessed.Terminal)
-* Rename utils.check_quit() to quit_on_q()
-* Move lscat related functions in utils to lscat
-* print_doc now restores previous cursor location
-* Rewrite of core lscat functions: **new unified API (lscat.api)** with the same interface for both pixcat and ueberzug
-    * For ueberzug, only one ueberzug process and canvas is instantiated in the program
-* Added more tests
+* Refactored config functions into unified api and enhanced unit tests
 
 
 # Roadmap
@@ -157,8 +115,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
     * Whether methods are for setting up, usage, or both (tried this)
         * Finite state machine of the modes (tried this; way too many classes)
         * SetupMixin and UIMixin both inherit a CommonMixin (tried this; problem is exponential explosion of number of classes)
-* Refactor config functions and confusing extraction of Results. See rust implementation of the config in koneko-rs
-    * Keep in mind that 'on'/'off' is allowed, which complicates parsing into types
 * Consider using reStructuredText and automate building and hosting of docs
 * Some info (eg manual) are still being hidden by ueberzug; general unreliability of prints (need a rethink of implementation)
     * Help message that responds to terminal width

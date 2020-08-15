@@ -81,8 +81,12 @@ def test_set_ints(tmp_path, setting, section, method):
 
 
 
-# Slightly more complicated methods return multiple configs, or derived from another
-# TODO: invalid and empty settings
+def test_users_page_spacing_config_default(tmp_path):
+    testconfig = setup_test_config(tmp_path, config.Config)
+    assert testconfig.users_page_spacing_config() == 20
+
+
+# Need to set multiple configs
 def test_dimension_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.dimension(config.Dimension.x, (1, 1)) == (18, 2)
@@ -115,10 +119,6 @@ def test_empty_or_invalid_setting(tmp_path, action, side, dimension, fallback):
     assert testconfig.dimension(eval(f'config.Dimension.{dimension}'), (1, 1)) == (1, 1)
 
 
-# TODO: Users page spacing
-# Set
-# Empty
-# Invalid
 
 def test_get_gen_users_settings_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
@@ -156,7 +156,7 @@ def test_empty_or_invalid_get_gen_users_settings(tmp_path, action, setting):
     assert testconfig.get_gen_users_settings() == (18, 2)
 
 
-
+# Need to set list of values
 def test_gallery_print_spacing_default(tmp_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     assert testconfig.gallery_print_spacing() == [9, 17, 17, 17, 17]

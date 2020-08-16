@@ -14,6 +14,7 @@
         - [main.py to prompt.py](#mainpy-to-promptpy)
         - [main.py to ui.py](#mainpy-to-uipy)
         - [ui.py](#uipy)
+        - [UI class methods](#ui-class-methods)
     - [Actor-ish models of ui classes](#actor-ish-models-of-ui-classes)
         - [ui.AbstractUI](#uiabstractui)
         - [ui.Gallery classes (extending AbstractUI)](#uigallery-classes-extending-abstractui)
@@ -184,6 +185,11 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 ### ui.py
 
 ![ui UML](puml/classes/render/ui.png)
+
+
+### UI class methods
+
+![ui methods UML](puml/classes/render/ui_methods.png)
 
 
 

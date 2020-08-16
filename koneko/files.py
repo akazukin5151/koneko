@@ -144,6 +144,11 @@ def valid_mode5(path: 'Path') -> bool:
     return path.parent.name == 'illustfollow'
 
 
+def valid_mode15(path: 'Path') -> bool:
+    """Pure"""
+    return path.parent.name == 'illustrelated'
+
+
 def path_valid(path: 'Path') -> bool:
     return any((
         valid_mode1(path),
@@ -151,4 +156,5 @@ def path_valid(path: 'Path') -> bool:
         valid_mode3(path),
         valid_mode4(path),
         valid_mode5(path),
+        valid_mode15(path),
     ))

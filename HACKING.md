@@ -155,6 +155,12 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 ![Flowchart UML](http://plantuml.com:80/plantuml/png/bPLFYy8m4CNl-HG1pnxyUn9nNLXPTc5XFIuYeHrhQDf8qhBuxRU9IMsQiR97Ex-ycNbzgHjTCLNLXI14vxoyCCKAMcj8c8RLYgtNMvRacP9rcRvA8HNzvDcvskVNhQW1EyAn8mNi5429yQUO_pYpd6EiZjb4yK9BLBcCwI-Ld7cAmGg3MPcXEoeGCRwJ8YN4CVH5LLnNnum90UeweTRBjlfUi0ocrBhLFdoJGiXVNcP7PW_h6RNsjC0UM3E_hywfDUIkAKJTT3nvbGMr5hJrRn2iWlJ8JMyzCMMxHmT8P550cKAwfDOHGk93uv-HsVGmNhijxZlRA4teA8X8P4GZq0KEolner6wdd_EF6azDOnyqNCLLEnB-HOHb9qXy6HcXRqo0TleCSBc9-HF6nVi9TOir2lLCcj5RMuA5hJjJpq3Kq1PsPWvgrXTdwwmtqfpwBKaKyD21_an3UDjkZexUKKN3jA3EL89Sgy1n7wGXJC2fSkCiq77-9-TlJD-FS8MbMS5-mSABRNNCy_3cBHzYqMq9Id7YDes4-KFv0m00)
 
+
+## Flowchart as a finite state machine
+
+![api UML](puml/classes/render/state_flowchart.png)
+
+
 ## Simplified UML diagram of the classes
 
 ### api.py

@@ -1,0 +1,70 @@
+@startuml
+
+skinparam usecase<<a>>BackgroundColor LightSkyBlue
+skinparam usecase<<i>>BackgroundColor LimeGreen
+skinparam usecase<<f>>BackgroundColor GreenYellow
+skinparam usecase<<s>>BackgroundColor crimson
+skinparam usecase<<n>>BackgroundColor Orchid
+skinparam usecase<<r>>BackgroundColor Orange
+skinparam usecase<<rel>>BackgroundColor Gold
+
+usecase Artist_gallery1 <<a>>
+usecase Image2 <<i>>
+usecase Following_artists3 <<f>>
+usecase Search_artists4 <<s>>
+usecase Illust_following5 <<n>>
+usecase Related_images15 <<rel>>
+usecase Recommended6 <<r>>
+
+
+usecase start1 #LightSkyBlue
+Artist_gallery1 <-[#LightSkyBlue]right-- start1: __Mode1Setup__
+Artist_gallery1 --[#LightSkyBlue]right-> start1: **back**
+Artist_gallery1 --[#LightSkyBlue]-> Image2: **ViewImage**
+Artist_gallery1 <--[#LightSkyBlue]- Image2: **back**
+
+
+usecase start2 #LimeGreen
+Image2 <--[#LimeGreen]right- start2: **ViewPostMode**
+Image2 --[#LimeGreen]up-> Artist_gallery1: __Mode1Setup__
+
+
+usecase start3 #GreenYellow
+Following_artists3 <--[#GreenYellow]up- start3: __Mode3Setup__
+Following_artists3 -[#GreenYellow]--> Artist_gallery1: __Mode1Setup__
+Following_artists3 <-[#GreenYellow]-- Artist_gallery1: **back**
+
+
+usecase start4 #crimson
+Search_artists4 <--[#crimson]up- start4: __Mode4Setup__
+Search_artists4 <--[#crimson]- Artist_gallery1: **back**
+Search_artists4 -[#crimson]--> Artist_gallery1: __Mode1Setup__
+
+
+usecase start5 #Orchid
+Illust_following5 <--[#Orchid]left- start5: __Mode5Setup__
+Illust_following5 -[#Orchid]--> Image2: **ViewImage**
+Illust_following5 <-[#Orchid]-- Image2: **back**
+Illust_following5 -[#Orchid]right--> Artist_gallery1: __Mode1Setup__
+Illust_following5 <--[#Orchid]right- Artist_gallery1: **back**
+
+
+usecase start6 #Orange
+Recommended6 <-[#Orange]right-- start6: __Mode6Setup__
+Recommended6 -[#Orange]right--> start6: **back**
+Recommended6 -[#Orange]--> Image2: **ViewImage**
+Recommended6 <-[#Orange]-- Image2: **back**
+
+
+Related_images15 <-[#LimeGreen]up- Image2: __Mode15Setup__
+Related_images15 -[#LimeGreen]up-> Image2: **back**
+
+note "ModeXSetup in italic means\nit's not a separate class" as N1
+(start3) .. N1
+N1 .. (Following_artists3)
+
+note "Bold labels mean it's a \nseparate class or method" as N2
+(Illust_following5) .. N2
+N2 .. (Image2)
+
+@enduml

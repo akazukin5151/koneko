@@ -49,13 +49,13 @@ def filter_history(path: 'Path') -> 'list[str]':
     )
 
 
-def _dir_up_to_date(data, _dir) -> bool:
+def _dir_up_to_date(data, sorted_dir) -> bool:
     # O(1) time
-    if len(_dir) < len(data.all_names):
+    if len(sorted_dir) < len(data.all_names):
         return False
 
     # Should not fail because try-except early returned
-    for name, _file in zip(data.all_names, sorted(_dir)):
+    for name, _file in zip(data.all_names, sorted_dir):
         if name.replace('/', '') not in _file:
             return False
     return True
@@ -63,19 +63,10 @@ def _dir_up_to_date(data, _dir) -> bool:
 
 def dir_not_empty(data: 'Data') -> bool:
     if data.download_path.is_dir() and (_dir := os.listdir(data.download_path)):
-
-        # Is a valid directory and it's not empty, but data has not been fetched yet
-        try:
-            data.all_names
-        except (KeyError, AttributeError):
-            return True
-
-        # Exclude the .koneko file
-        if '.koneko' in sorted(_dir)[0]:
-            return _dir_up_to_date(data, sorted(_dir)[1:])
-
-        return _dir_up_to_date(data, _dir)
-
+        sorted_dir = sorted(_dir)
+        if '.koneko' in sorted_dir[0]:
+            return _dir_up_to_date(data, sorted_dir[1:])
+        return _dir_up_to_date(data, sorted_dir)
     return False
 
 
@@ -153,6 +144,11 @@ def valid_mode5(path: 'Path') -> bool:
     return path.parent.name == 'illustfollow'
 
 
+def valid_mode15(path: 'Path') -> bool:
+    """Pure"""
+    return path.parent.name == 'illustrelated'
+
+
 def path_valid(path: 'Path') -> bool:
     return any((
         valid_mode1(path),
@@ -160,4 +156,5 @@ def path_valid(path: 'Path') -> bool:
         valid_mode3(path),
         valid_mode4(path),
         valid_mode5(path),
+        valid_mode15(path),
     ))

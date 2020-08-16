@@ -77,19 +77,6 @@ def test_dir_not_empty_all_images_present(tmp_path):
 
     assert files.dir_not_empty(data)
 
-@pytest.mark.parametrize('error', (KeyError, AttributeError))
-def test_dir_not_empty_errors_return_true(tmp_path, error):
-    class FakeData:
-        def __init__(self):
-            self.download_path = Path('testing/files/')
-
-        @property
-        def first_img(self):
-            raise error
-
-    data = FakeData()
-    assert files.dir_not_empty(data)
-
 
 def test_filter_dir_1(monkeypatch, tmp_path):
     monkeypatch.setattr('koneko.files.KONEKODIR', tmp_path)

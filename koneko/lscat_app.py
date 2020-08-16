@@ -123,7 +123,7 @@ def browse_cache() -> 'IO':
 def _lscat_prompt_switcher(path, data):
     if '.koneko' in os.listdir(path):
         lscat_prompt.GalleryUserLoop.for_user(data).start()
-    elif 'individual' in str(path):
+    elif 'individual' in str(path) and 'illustrelated' not in str(path):
         lscat_prompt.ImageLoop(path).start()
     else:
         lscat_prompt.GalleryUserLoop.for_gallery(data).start()

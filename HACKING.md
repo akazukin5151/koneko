@@ -14,6 +14,7 @@
         - [main.py to prompt.py](#mainpy-to-promptpy)
         - [main.py to ui.py](#mainpy-to-uipy)
         - [ui.py](#uipy)
+        - [UI class methods](#ui-class-methods)
     - [Actor-ish models of ui classes](#actor-ish-models-of-ui-classes)
         - [ui.AbstractUI](#uiabstractui)
         - [ui.Gallery classes (extending AbstractUI)](#uigallery-classes-extending-abstractui)
@@ -119,8 +120,8 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 │   │   ├── 2                     # │   │   ├── Page 2                                  │   ├── Mode 1
 │   │   └── individual            # │   │   └── Posts with a single image               │   └── Mode 2
 │   │       └── 76695217          # │   │       └── ID of posts with multiple images    │       ├── Mode 2
-│   │           └── illustrelated # │   │       └── Related images mode                 │       └── Mode 6
-│   │               └── 1         # │   │           └── Page 1                          │           └── Mode 6
+│   │           └── illustrelated # │   │       └── Related images mode                 │       └── Mode 1.5
+│   │               └── 1         # │   │           └── Page 1                          │           └── Mode 1.5
 
 │   ├── following                 # │   ├── Following users mode                        ├── Mode 3
 │   │   └── *your_id*             # │   │   └── Your pixiv ID                           │
@@ -133,7 +134,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 │   │   ├── 1                     # │   │   ├── Page 1                                  │
 │   │   └── 2                     # │   │   └── Page 2                                  │
 
-│   ├── recommended               # │   ├── Search users mode                           ├── Mode 6
+│   ├── recommended               # │   ├── Illust recommended mode                     ├── Mode 6
 │   │   └── 1                     # │   │   └── Page 1
 
 │   ├── search                    # │   ├── Search users mode                           ├── Mode 4
@@ -152,7 +153,13 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 ## Flowchart of modes and their connections
 
-![Flowchart UML](http://plantuml.com:80/plantuml/png/bPLFYy8m4CNl-HG1pnxyUn9nNLXPTc5XFIuYeHrhQDf8qhBuxRU9IMsQiR97Ex-ycNbzgHjTCLNLXI14vxoyCCKAMcj8c8RLYgtNMvRacP9rcRvA8HNzvDcvskVNhQW1EyAn8mNi5429yQUO_pYpd6EiZjb4yK9BLBcCwI-Ld7cAmGg3MPcXEoeGCRwJ8YN4CVH5LLnNnum90UeweTRBjlfUi0ocrBhLFdoJGiXVNcP7PW_h6RNsjC0UM3E_hywfDUIkAKJTT3nvbGMr5hJrRn2iWlJ8JMyzCMMxHmT8P550cKAwfDOHGk93uv-HsVGmNhijxZlRA4teA8X8P4GZq0KEolner6wdd_EF6azDOnyqNCLLEnB-HOHb9qXy6HcXRqo0TleCSBc9-HF6nVi9TOir2lLCcj5RMuA5hJjJpq3Kq1PsPWvgrXTdwwmtqfpwBKaKyD21_an3UDjkZexUKKN3jA3EL89Sgy1n7wGXJC2fSkCiq77-9-TlJD-FS8MbMS5-mSABRNNCy_3cBHzYqMq9Id7YDes4-KFv0m00)
+![Flowchart UML](puml/render/flowchart.png)
+
+
+## Flowchart as a finite state machine
+
+![api UML](puml/classes/render/state_flowchart.png)
+
 
 ## Simplified UML diagram of the classes
 
@@ -184,6 +191,11 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 ### ui.py
 
 ![ui UML](puml/classes/render/ui.png)
+
+
+### UI class methods
+
+![ui methods UML](puml/classes/render/ui_methods.png)
 
 
 

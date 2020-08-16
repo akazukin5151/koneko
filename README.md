@@ -99,6 +99,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ### Version 0.11.1
 
 #### Features
+* Support illust related mode in lscat app mode 2/b
 
 #### Bug fixes
 
@@ -111,7 +112,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ## Features
 
 * Illust-related mode can't go back to image mode
-* Support illust related mode in lscat app mode 2/b
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date
 * Option to save username, but prompt for password (and not save it) every time

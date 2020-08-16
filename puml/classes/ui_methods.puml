@@ -7,6 +7,10 @@ skinparam linetype polyline
 skinparam object<<attr>>BackgroundColor GreenYellow
 ' Needs pixivrequest
 skinparam object<<request>>BackgroundColor Gold
+' In files module
+skinparam object<<files>>BackgroundColor Bisque
+
+title (Excludes access of self._data attribute)
 
 object self.use_ueberzug <<attr>>
 object self.scrollable <<attr>>
@@ -15,6 +19,8 @@ object self.images <<attr>>
 object self.max_images <<attr>>
 object self.terminal_page <<attr>>
 object self.is_gallery_mode <<attr>>
+object self.prompt <<attr>>
+object self.prefetch_thread <<attr>>
 
 object print_page_info
 object maybe_join_thread
@@ -25,12 +31,11 @@ object previous_page
 object scroll_up
 object scroll_down
 object show_page
-object remove_dir_if_exist
-object dir_not_empty
-object dir_up_to_date
+object remove_dir_if_exist <<files>>
+object dir_not_empty <<files>>
+object dir_up_to_date <<files>>
 
 object pixivrequest <<request>>
-object dir_exists
 object start <<request>>
 object prefetch <<request>>
 object prefetch_next_page <<request>>
@@ -77,12 +82,12 @@ show_page ---> report
 dir_not_empty ---> dir_up_to_date
 
 
-start ---> dir_exists
 start ---> show_then_fetch
 start ---> download_from_scratch
 start ---> prefetch
 
 prefetch ---> prefetch_next_page
+prefetch ---> self.prefetch_thread
 
 prefetch_next_page ---> maybe_join_thread
 prefetch_next_page ---> request_then_save
@@ -107,9 +112,11 @@ download_save_images ---> self.tracker_class
 download_save_images ---> self.images
 
 reload --> self.images
+reload --> self.prompt
 reload --> start
 
 next_page ---> self.terminal_page
+next_page ---> self.prefetch_thread
 next_page ---> show_page
 next_page ---> prefetch
 
@@ -118,6 +125,7 @@ handle_prompt --> self.images
 handle_prompt --> reload
 
 view_image ---> self.images
+' view_image ----> back
 
 back ---> scroll_or_show
 back ---> report
@@ -128,9 +136,11 @@ object go_artist_gallery_coords
 object go_artist_gallery_num
 object go_artist_mode
 
-go_artist_gallery_coords ---> go_artist_gallery_num
+go_artist_gallery_coords --> go_artist_gallery_num
 go_artist_gallery_num ---> self.images
+' go_artist_gallery_num ---> back
 
 go_artist_mode ---> self.images
+'go_artist_mode ---> show_page
 
 @enduml

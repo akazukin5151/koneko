@@ -63,19 +63,9 @@ def _dir_up_to_date(data, _dir) -> bool:
 
 def dir_not_empty(data: 'Data') -> bool:
     if data.download_path.is_dir() and (_dir := os.listdir(data.download_path)):
-
-        # Is a valid directory and it's not empty, but data has not been fetched yet
-        try:
-            data.all_names
-        except (KeyError, AttributeError):
-            return True
-
-        # Exclude the .koneko file
         if '.koneko' in sorted(_dir)[0]:
             return _dir_up_to_date(data, sorted(_dir)[1:])
-
         return _dir_up_to_date(data, _dir)
-
     return False
 
 

@@ -120,8 +120,8 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 │   │   ├── 2                     # │   │   ├── Page 2                                  │   ├── Mode 1
 │   │   └── individual            # │   │   └── Posts with a single image               │   └── Mode 2
 │   │       └── 76695217          # │   │       └── ID of posts with multiple images    │       ├── Mode 2
-│   │           └── illustrelated # │   │       └── Related images mode                 │       └── Mode 6
-│   │               └── 1         # │   │           └── Page 1                          │           └── Mode 6
+│   │           └── illustrelated # │   │       └── Related images mode                 │       └── Mode 1.5
+│   │               └── 1         # │   │           └── Page 1                          │           └── Mode 1.5
 
 │   ├── following                 # │   ├── Following users mode                        ├── Mode 3
 │   │   └── *your_id*             # │   │   └── Your pixiv ID                           │
@@ -134,7 +134,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 │   │   ├── 1                     # │   │   ├── Page 1                                  │
 │   │   └── 2                     # │   │   └── Page 2                                  │
 
-│   ├── recommended               # │   ├── Search users mode                           ├── Mode 6
+│   ├── recommended               # │   ├── Illust recommended mode                     ├── Mode 6
 │   │   └── 1                     # │   │   └── Page 1
 
 │   ├── search                    # │   ├── Search users mode                           ├── Mode 4

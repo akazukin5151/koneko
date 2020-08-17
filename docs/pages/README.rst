@@ -175,8 +175,8 @@ Version 0.11.1
 Features
 """"""""
 
-
 * Support illust related mode in lscat app mode 2/b
+* Documentation is now built using reStructuredText and hosted at `readthedocs <https://koneko.readthedocs.io/en/latest/>`_
 
 Bug fixes
 """""""""
@@ -228,7 +228,6 @@ Code
     * Finite state machine of the modes (tried this; way too many classes)
     * SetupMixin and UIMixin both inherit a CommonMixin (tried this; problem is exponential explosion of number of classes)
 
-* Consider using reStructuredText and automate building and hosting of docs
 
 FAQ
 ---

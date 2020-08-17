@@ -20,6 +20,10 @@ setup(
     long_description=README,
     long_description_content_type='text/markdown',
     url='https://github.com/twenty5151/koneko',
+    project_urls={
+        'Source Code': 'https://github.com/twenty5151/koneko',
+        'Documentation': 'https://koneko.readthedocs.io/en/latest/',
+    },
     author='twenty5151',
     license='GPLv3',
     classifiers=[

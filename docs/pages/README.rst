@@ -22,6 +22,10 @@ koneko
    :target: https://github.com/twenty5151/koneko/workflows/dev/badge.svg?branch=dev
    :alt: dev
 
+.. image:: https://readthedocs.org/projects/koneko/badge/?version=latest
+    :target: https://koneko.readthedocs.io/en/latest/?badge=latest
+    :alt: docs
+
 
 ..
 

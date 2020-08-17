@@ -1,0 +1,15 @@
+@startuml
+title Users (mode 3 or 4)
+
+
+== Go artist mode ==
+User -> ui ++: go_artist_mode()
+ui -> data ++: artist_user_id
+return artist_user_id
+return ArtistGallery
+|||
+
+
+@enduml
+
+

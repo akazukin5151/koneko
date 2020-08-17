@@ -21,7 +21,7 @@ Requires [kitty](https://github.com/kovidgoyal/kitty). It uses the magical `kitt
 **Why the name Koneko?** Koneko (こねこ) means kitten, which is what `icat` is, a kitty `+kitten`
 
 
-# Features (what?)
+## Features (what?)
 See the [manual](MANUAL.md) for more details
 
 1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
@@ -39,7 +39,7 @@ See the [manual](MANUAL.md) for more details
 * Browse an offline cache
 
 
-# Why?
+## Why?
 * Terminal user interfaces are minimalist, fast, and doesn't load Javascript that slows down your entire browser or track you
     * Image loading is *so* much faster, especially if you don't delete the cache
 
@@ -57,7 +57,7 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 * I use arch btw
 
 
-# Installation (how?)
+## Installation (how?)
 See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
 0. If you want to use the stable api, install [kitty](https://github.com/kovidgoyal/kitty) (Otherwise, you can use ueberzug with your current terminal, however note that it doesn't seem to work on macOS)
@@ -67,7 +67,7 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 3. Run `lscat 1 7` to help setup the recommended settings; copy to `~/.config/koneko/config.ini`. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
 4. See [usage](#usage) for how to use.
 
-## Requirements
+### Requirements
 
 * Python 3.8+
 * It has been tested on kitty v0.17.2 onwards, but should work on older versions
@@ -87,36 +87,36 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
  ```
 </details>
 
-# Usage and manual
+## Usage and manual
 
 See the [manual](MANUAL.md) here
 
 
-## Upcoming changelog (in dev branch)
+### Upcoming changelog (in dev branch)
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-### Version 0.11.1
+#### Version 0.11.1
 
-#### Features
+##### Features
 * Support illust related mode in lscat app mode 2/b
 
-#### Bug fixes
+##### Bug fixes
 
-#### Code maintenance
+##### Code maintenance
 * Refactored config functions into unified api and enhanced unit tests
 
 
-# Roadmap
+## Roadmap
 
-## Features
+### Features
 
 * Illust-related mode can't go back to image mode
 * In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
     * Make sure the diagrams in HACKING.md is up-to-date
 * Option to save username, but prompt for password (and not save it) every time
 
-## Known bugs
+### Known bugs
 
 * Some info (eg manual) are still being hidden by ueberzug; general unreliability of prints (need a rethink of implementation)
     * Help message that responds to terminal width
@@ -125,7 +125,7 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 * Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
 * There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay. Directly running the script using `python koneko/main.py` or `python koneko/lscat_app.py` is faster as well. Seems like it's a delay in going to `miniconda/lib/python3.8/site-packages/koneko.egg-link` (installed with `python setup.py develop`)?
 
-## Code
+### Code
 
 * Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
 * Split up UI classes and look for ways to extend data classes by adding an imperative shell around it. Possible ways to split by:
@@ -135,14 +135,14 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
         * SetupMixin and UIMixin both inherit a CommonMixin (tried this; problem is exponential explosion of number of classes)
 * Consider using reStructuredText and automate building and hosting of docs
 
-# FAQ
+## FAQ
 * I'm having problems with lscat
 
 For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
 
 You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
 
-# Contributing
+## Contributing
 1. Fork it
 2. Run tests with `pytest testing/ -vvvv -l`
 3. Make your changes
@@ -157,10 +157,10 @@ Tips:
 
 See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 
-## Unit tests
+### Unit tests
 Run `pytest testing/ -vvvv -l`. Add `-s --inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
 
-## Build and upload to PyPI
+### Build and upload to PyPI
 
 0. Run integration tests locally
 1. Review github action logs to make sure nothing is wrong
@@ -175,7 +175,7 @@ twine upload dist/*
 pip install koneko --upgrade
 ```
 
-# Trackers avoided
+## Trackers avoided
 <details>
 <summary>This is a list of trackers present when you use the official pixiv website or app. koneko frees you from them.</summary>
 

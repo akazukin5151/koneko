@@ -1,3 +1,5 @@
+# Manual
+
 ## Contents
 
 * [Usage](#Usage)
@@ -20,9 +22,9 @@
         * [Ueberzug](#ueberzug)
 
 
-# Usage
+## Usage
 
-## Initial setup
+### Initial setup
 
 On your first time, be sure to use the configuration assistant at `lscat 1 7`, and copy + paste the suggestions to your config at `~/.local/config/koneko/config.ini` (exact path)
 
@@ -39,7 +41,7 @@ Launch `koneko`. There are six modes of operation reachable from the main screen
 Enter digits 1-6 to proceed. If prompted, paste in an appropriate pixiv ID or url. See the [command line usage](#command-line-usage) section for url examples.
 
 
-## Tutorial
+### Tutorial
 
 * Coordinates are two digits in the form `xy` where x is column and y is row.
     * For example, a command of `25` refers to the item at column 2, row 5
@@ -51,7 +53,7 @@ Enter digits 1-6 to proceed. If prompted, paste in an appropriate pixiv ID or ur
     * **Indices less than 10 need to have a leading zero in the front** (eg third image => `02`)
     * The first item has index `00`
 
-## Mode a/1
+### Mode a/1
 
 ![Gallery view_square_medium1](pics/gallery_view_square_medium1.png)
 
@@ -96,7 +98,7 @@ Examples:
     o25   --->  Download the image on column 2, row 5 (index starts at 1)
 ```
 
-## Mode i/2
+### Mode i/2
 
 ![Image_view](pics/image_view.png)
 
@@ -118,7 +120,7 @@ Image view commands (No need to press enter):
     q -- quit (with confirmation)
 ```
 
-## Mode f/3 and s/4
+### Mode f/3 and s/4
 
 ![artist_search](pics/artist_search.png)
 
@@ -136,7 +138,7 @@ User view commands (No need to press enter):
     q                  -- quit (with confirmation)
 ```
 
-## Mode n/5
+### Mode n/5
 
 * The only difference between this and mode a/1, is the `a`/`A` command. As usual, the lowercase version is for coordinates, and the uppercase one is for indices
 * Entering `a42` means "view the illustrations by the artist of the post at column 4, row 2"
@@ -174,12 +176,12 @@ Examples:
     o25   --->  Download the image on column 2, row 5 (index starts at 1)
 ```
 
-## Mode r/6
+### Mode r/6
 
 * This mode is functionally identical to [mode a/1](#mode-a1)
 
 
-## Command line usage
+### Command line usage
 
 As an alternative to the main screen, you can supply a pixiv url as a command line argument, bypassing the first interactive prompt. The pixiv url must be either the url of the artist's page, or a pixiv post.
 
@@ -240,7 +242,7 @@ Options:
   (-v | --version)  Show version number
 ```
 
-## lscat app
+### lscat app
 
 1. Configuration assistant: Interactively guides you to setting up your own config.
 2. Browse and manage the cache, filter dirs by mode, and view the illustrations/images offline, with similar but reduced functionality
@@ -281,21 +283,21 @@ Possible configuration assistants:
   a  All of the above
 ```
 
-# Configuration
+## Configuration
 
-## It is highly recommended to use the interactive configuration assistant!
+### It is highly recommended to use the interactive configuration assistant!
 
 After installing, type `lscat 1 7` and follow the instructions. Just copy the suggested settings to your config in `~/.config/koneko/config.ini`. The below text are just for documentation, so don't worry if it is confusing -- it is always better to configure it interactively.
 
 See [example config](example_config.ini) for reference.
 
-### In general
+#### In general
 * Your config must be saved as `~/.config/koneko/config.ini` (exact path and name)
 * 'Gallery' means grid: artist illust mode (a/1), illust follow mode (n/5), illust recommended mode (r/6), and illust related mode
 * 'Users' (mode) means: following users mode (3) and search users mode (4)
 * For booleans, ('1', 'yes', 'true', 'on') will be considered True, while ('0', 'no', 'false', 'off') will be considered False
 
-## [Credentials]
+### [Credentials]
 
 * The credentials section will be automatically generated on first launch
 
@@ -334,8 +336,8 @@ See [example config](example_config.ini) for reference.
 </tbody>
 </table>
 
-## [lscat]
-### Image configuration
+### [lscat]
+#### Image configuration
 <table>
 <thead>
   <tr>
@@ -385,7 +387,7 @@ See [example config](example_config.ini) for reference.
 </tbody>
 </table>
 
-### Print spacing
+#### Print spacing
 
 <table>
 <thead>
@@ -424,7 +426,7 @@ See [example config](example_config.ini) for reference.
 * Both of them act on the x-axis
 * These settings are ignored if the `print_info` option is off
 
-### Page spacing
+#### Page spacing
 
 <table>
 <thead>
@@ -450,7 +452,7 @@ See [example config](example_config.ini) for reference.
 </tbody>
 </table>
 
-## [misc]
+### [misc]
 
 <table>
 <thead>
@@ -473,7 +475,7 @@ See [example config](example_config.ini) for reference.
 </tbody>
 </table>
 
-## [experimental]
+### [experimental]
 
 <table>
 <thead>
@@ -496,7 +498,7 @@ See [example config](example_config.ini) for reference.
 </tbody>
 </table>
 
-### Ueberzug
+#### Ueberzug
 
 (Note: these settings still belong inside the `[experimental]` section)
 

@@ -1,0 +1,46 @@
+@startuml
+
+skinparam usecase<<a>>BackgroundColor LightSkyBlue
+skinparam usecase<<i>>BackgroundColor LimeGreen
+skinparam usecase<<f>>BackgroundColor Khaki
+skinparam usecase<<s>>BackgroundColor crimson
+skinparam usecase<<n>>BackgroundColor Orchid
+skinparam usecase<<r>>BackgroundColor Orange
+skinparam usecase<<rel>>BackgroundColor Gold
+
+usecase Artist_gallery1 <<a>>
+usecase Image2 <<i>>
+usecase Following_artists3 <<f>>
+usecase Search_artists4 <<s>>
+usecase Illust_following5 <<n>>
+usecase Related_images15 <<rel>>
+usecase Recommended6 <<r>>
+
+Related_images15 <-[#Gold]> Image2
+
+usecase start1 #LightSkyBlue
+Artist_gallery1 <-[#LightSkyBlue]right-> start1
+Artist_gallery1 <-[#LightSkyBlue]-> Image2
+
+usecase start2 #LimeGreen
+Artist_gallery1 <-[#LimeGreen]-> Image2
+Image2 <-[#LimeGreen]- start2
+
+usecase start3 #khaki
+Following_artists3 <-[#khaki]-> Artist_gallery1
+Following_artists3 <-[#khaki]up- start3
+
+usecase start4 #crimson
+Search_artists4 <-[#crimson]-> Artist_gallery1
+Search_artists4 <-[#crimson]up- start4
+
+usecase start5 #Orchid
+Illust_following5 <-[#Orchid]-> Image2
+Illust_following5 <-[#Orchid]left- start5
+Illust_following5 <-[#Orchid]right-> Artist_gallery1
+
+usecase start6 #Orange
+Recommended6 <-[#Orange]right-> start6
+Recommended6 <-[#Orange]-> Image2
+
+@enduml

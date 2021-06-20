@@ -13,16 +13,17 @@ class APIHandler:
 
     def __init__(self):
         self._api_thread = threading.Thread(target=self._login)
-        self._token_file = KONEKODIR.parent / 'token'
-        self._token = files.read_token_file(self._token_file)
         self._login_started = False
         self._login_done = False
 
         self._api = AppPixivAPI()  # Object to login and request on
+        # Set in self.start() (because singleton is instantiated before config)
+        self._credentials: 'dict[str, str]'
 
-    def start(self):
+    def start(self, credentials):
         """Start logging in. The only setup entry point that is public"""
         if not self._login_started:
+            self._credentials = credentials
             self._api_thread.start()
             self._login_started = True
 
@@ -39,7 +40,7 @@ class APIHandler:
         # FIXME: Cloudflare captcha might complain, catch exception and prompt retry
         # TODO: refresh the token if it expired
         try:
-            self._api.auth(refresh_token=self._token)
+            self._api.auth(refresh_token=self._credentials['refresh_token'])
         except PixivError as e:
             print(e)
             print('If this is a cloudflare captcha issue, just quit and retry')

@@ -135,24 +135,20 @@ def begin_config() -> 'tuple[dict[str, str], str]':
     os.system('clear')
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     if config_path.exists():
-        return api.credentials().unwrap(), api.get_setting('Credentials', 'id').unwrap()
+        # TODO: doesn't this None removes the point of the Result monad?
+        return api.credentials().unwrap(), api.get_setting('Credentials', 'id').value_or(None)
     return init_config(config_path)
 
 
 def init_config(config_path) -> 'tuple[dict[str, str], str]':
-    credentials = _ask_credentials()
+    credentials = {
+        'refresh_token': input('Please enter your refresh token:\n')
+    }
     credentials, your_id = _ask_your_id(credentials)
 
     _write_config(credentials, config_path)
     _append_default_config(config_path)
     return credentials, your_id
-
-
-def _ask_credentials() -> 'dict[str, str]':
-    return {
-        'username': input('Please enter your username:\n'),
-        'password': getpass('\nPlease enter your password: ')
-    }
 
 
 def _ask_your_id(credentials) -> 'tuple[dict[str, str], str]':

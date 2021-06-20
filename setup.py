@@ -12,6 +12,7 @@ README = (HERE / 'README.md').read_text()
 os.system('mkdir -p ~/.local/share/koneko')
 os.system('cp -r ./pics/ ~/.local/share/koneko/')
 os.system('cp example_config.ini ~/.local/share/koneko/')
+os.system('cp pixiv-url.desktop ~/.local/share/koneko/')
 
 setup(
     name='koneko',

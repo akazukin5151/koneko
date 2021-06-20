@@ -13,7 +13,7 @@ def _main() -> 'IO':
 
     utils.handle_missing_pics()
 
-    api.myapi.start(credentials)
+    api.myapi.start()
 
     if len(sys.argv) != 1:
         func = cli.launch_mode

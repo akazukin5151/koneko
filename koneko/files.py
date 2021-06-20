@@ -32,7 +32,8 @@ def write_token_file(token_dir, token) -> 'IO':
 def read_token_file(token_dir) -> 'Optional[str]':
     if token_dir.is_file():
         with open(token_dir, 'r') as f:
-            return f.read()
+            # Token must be on the first line
+            return f.read().replace('\n', '')
     return None
 
 

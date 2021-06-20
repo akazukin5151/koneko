@@ -19,13 +19,10 @@ class APIHandler:
         self._login_done = False
 
         self._api = AppPixivAPI()  # Object to login and request on
-        # Set in self.start() (because singleton is instantiated before config)
-        self._credentials: 'dict[str, str]'
 
-    def start(self, credentials):
+    def start(self):
         """Start logging in. The only setup entry point that is public"""
         if not self._login_started:
-            self._credentials = credentials
             self._api_thread.start()
             self._login_started = True
 
@@ -36,39 +33,22 @@ class APIHandler:
             self._login_done = True
 
     def _login(self):
-        """Logins to pixiv in the background, using credentials from config file"""
-        if self._token:  # Token is set if file found in self.start()
-            token_success = self._login_with_token()
+        self._login_with_token()
 
-        if not self._token or not token_success:
-            response = self._login_with_creds()
-            if response:
-                self._token = response['response']['refresh_token']
-                files.write_token_file(self._token_file, self._token)
-
-    def _login_with_token(self) -> bool:
-        """Tries to login with saved token to avoid pixiv emails
-        Returns True on successful login with token, False otherwise
-        """
+    def _login_with_token(self):
+        # FIXME: Cloudflare captcha might complain, catch exception and prompt retry
+        # TODO: refresh the token if it expired
         try:
             self._api.auth(refresh_token=self._token)
-        except PixivError:
-            return False
-        return True
-
-    def _login_with_creds(self) -> 'Optional[dict[str, dict[str]]]':
-        try:
-            return self._api.login(
-                self._credentials['username'], self._credentials['password']
-            )
-
         except PixivError as e:
-            print(
-                'Login failed! Please correct your credentials in '
-                '~/.config/koneko/config.ini'
-            )
             print(e)
+            print('If this is a cloudflare captcha issue, just quit and retry')
+            print('It is not a problem with koneko or pixivpy')
+            print('Otherwise, please report to https://github.com/twenty5151/koneko/issues/4')
             print("Press 'q' and enter to exit")
+        else:
+            # Debugging issue #4
+            print('Login success! Please notify https://github.com/twenty5151/koneko/issues/4')
 
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))

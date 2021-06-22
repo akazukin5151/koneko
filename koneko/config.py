@@ -144,10 +144,10 @@ def begin_config() -> 'tuple[dict[str, str], str]':
             api.credentials().unwrap(),
             api.get_setting('Credentials', 'id').value_or('')
         )
-    first_start()
+    return first_start()
 
 
-def first_start():
+def first_start() -> 'bottom':
     os.system('cp ~/.local/share/koneko/pixiv-url.desktop ~/.local/share/applications')
     os.system('xdg-mime default pixiv-url.desktop x-scheme-handler/pixiv')
     os.system('update-desktop-database ~/.local/share/applications')
@@ -162,41 +162,3 @@ def login_then_save_verifier():
     path.touch(exist_ok=True)
     with open(path, 'w') as f:
         f.write(code_verifier)
-
-def init_config(config_path) -> 'tuple[dict[str, str], str]':
-    credentials = {
-        'refresh_token': input('Please enter your refresh token:\n')
-    }
-    credentials, your_id = _ask_your_id(credentials)
-
-    _write_config(credentials, config_path)
-    _append_default_config(config_path)
-    return credentials, your_id
-
-
-def _ask_your_id(credentials) -> 'tuple[dict[str, str], str]':
-    print('\nDo you want to save your pixiv ID? It will be more convenient')
-    print('to view artists you are following')
-    ans = input()
-    if ans == 'y' or not ans:
-        your_id = input('Please enter your pixiv ID:\n')
-        credentials.update({'ID': your_id})
-        return credentials, your_id
-    return credentials, ''
-
-
-def _write_config(credentials, config_path) -> 'IO':
-    os.system('clear')
-    parser = ConfigParser()
-    parser.read_dict({'Credentials': credentials})
-    config_path.parent.mkdir(exist_ok=True)
-    config_path.touch()
-    with open(config_path, 'w') as c:
-        parser.write(c)
-
-
-def _append_default_config(config_path) -> 'IO':
-    # Why not use python? Because it's functional, readable, and
-    # this one liner defeats any potential speed benefits
-    example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()
-    os.system(f'tail {example_cfg} -n +9 >> {config_path}')

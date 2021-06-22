@@ -37,12 +37,18 @@ def append_default_config(config_path) -> 'IO':
     os.system(f'tail {example_cfg} -n +8 >> {config_path}')
 
 def main():
-    url = sys.argv[1]
-    code = parse(url)
-    code_verifier = get_verifier(remove=True)
-    _, token, _ = script.login(code, code_verifier)
-    write_to_config(token)
-    os.system('rm ~/.local/share/applications/pixiv-url.desktop')
+    try:
+        url = sys.argv[1]
+        code = parse(url)
+        code_verifier = get_verifier(remove=True)
+        _, token, _ = script.login(code, code_verifier)
+        write_to_config(token)
+        os.system('rm ~/.local/share/applications/pixiv-url.desktop')
+    except:
+        # Bare except to prevent xdg-open from opening the url
+        # containing the sensitive code
+        # Logging the exception could be useful for debugging
+        pass
 
 
 if __name__ == '__main__':

@@ -12,13 +12,15 @@ def parse(url: str) -> str:
     remove_tail = remove_head.split('&')
     return remove_tail[0]
 
-def get_verifier():
+def get_verifier(remove=True):
     path = Path('~/.local/share/koneko/code_verifier').expanduser()
     with open(path, 'r') as f:
-        return f.read().replace('\n', '')
+        res = f.read().replace('\n', '')
+    if remove:
+        path.unlink()
+    return res
 
 def write_to_config(token: str) -> 'IO ()':
-    # TODO: adapted from config.py
     parser = ConfigParser()
     parser.read_dict({'Credentials': {'refresh_token': token}})
     config_path = Path('~/.config/koneko/config.ini').expanduser()
@@ -34,15 +36,14 @@ def append_default_config(config_path) -> 'IO':
     example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()
     os.system(f'tail {example_cfg} -n +8 >> {config_path}')
 
-
 def main():
     url = sys.argv[1]
     code = parse(url)
-    code_verifier = get_verifier()
+    code_verifier = get_verifier(remove=True)
     _, token, _ = script.login(code, code_verifier)
-    #token = 'test'
     write_to_config(token)
     os.system('rm ~/.local/share/applications/pixiv-url.desktop')
+
 
 if __name__ == '__main__':
     main()

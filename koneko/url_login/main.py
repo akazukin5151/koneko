@@ -47,12 +47,12 @@ def main():
         _, token, _ = script.login(code, code_verifier)
         write_to_config(token)
         os.system('rm ~/.local/share/applications/pixiv-url.desktop')
-        notification.notify(title='Login finished', message='Please run koneko again')
+        notification.notify(title='Login finished!', message='Please run koneko again')
     except:
         # Bare except to prevent xdg-open from opening the url
         # containing the sensitive code
         # Logging the exception could be useful for debugging
-        pass
+        notification.notify(title='Login failed!', message='Please submit a bug report')
 
 
 if __name__ == '__main__':

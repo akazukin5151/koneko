@@ -22,8 +22,9 @@ from subprocess import check_output
 from logging.handlers import RotatingFileHandler
 
 import funcy
+from returns.pipeline import is_successful
 
-from koneko import config, KONEKODIR
+from koneko import api, config, KONEKODIR
 
 
 # History and logging
@@ -192,6 +193,16 @@ def get_cache_size() -> str:
 def quit_on_q(ans: str):
     if ans == 'q':
         sys.exit(0)
+
+
+def get_id_then_save():
+    if is_successful(config.api.get_setting('Credentials', 'id')):
+        return config.api.get_setting('Credentials', 'id').unwrap()
+    pixiv_id = api.myapi.get_user_id()
+    config.api.config_parser.set('Credentials', 'id', pixiv_id)
+    with open(config.api.config_path, 'w') as f:
+        config.api.config_parser.write(f)
+    return pixiv_id
 
 
 # Ueberzug

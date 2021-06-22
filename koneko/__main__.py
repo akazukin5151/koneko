@@ -9,7 +9,7 @@ def _main() -> 'IO':
     if not (args := cli.handle_vh()):
         sys.exit(0)
 
-    credentials, your_id = config.begin_config()
+    credentials = config.begin_config()
 
     utils.handle_missing_pics()
 
@@ -22,12 +22,12 @@ def _main() -> 'IO':
 
     while True:
         try:
-            func(args, your_id)
+            func(args)
         except KeyboardInterrupt:
             pass
 
         os.system('clear')
-        main.main_loop(None, your_id)
+        main.main_loop(None)
 
 
 if __name__ == '__main__':

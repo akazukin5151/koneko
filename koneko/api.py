@@ -19,6 +19,7 @@ class APIHandler:
         self._api = AppPixivAPI()  # Object to login and request on
         # Set in self.start() (because singleton is instantiated before config)
         self._credentials: 'dict[str, str]'
+        self._response: 'Json'
 
     def start(self, credentials):
         """Start logging in. The only setup entry point that is public"""
@@ -39,8 +40,11 @@ class APIHandler:
     def _login_with_token(self):
         # TODO: refresh the token if it expired
         try:
-            self._api.auth(refresh_token=self._credentials['refresh_token'])
+            self._response = self._api.auth(
+                refresh_token=self._credentials['refresh_token']
+            )
         except PixivError as e:
+            print('')
             print(e)
             print('If this is a cloudflare captcha issue, just quit and retry')
             print('It is not a problem with koneko or pixivpy')
@@ -51,6 +55,11 @@ class APIHandler:
             print("Press 'q' and enter to exit")
         #else:
             #print('Login success!')
+
+    # Public API requests for user id
+    def get_user_id(self) -> 'Json':
+        self._await_login()
+        return self._response['user']['id']
 
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))

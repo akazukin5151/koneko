@@ -47,11 +47,11 @@ class Dimension(Enum):
 class Config:
     def __init__(self, path):
         self.config_path = path
-        config_object = ConfigParser()
-        config_object.read(self.config_path)
+        self.config_parser = ConfigParser()
+        self.config_parser.read(self.config_path)
         self.config: 'dict[str, dict[str, str]' = {
-            section: dict(config_object.items(section))
-            for section in config_object.sections()
+            section: dict(self.config_parser.items(section))
+            for section in self.config_parser.sections()
         }
 
     @safe
@@ -134,16 +134,13 @@ def ycoords_config() -> 'list[int]':
 
 
 # Technically frontend
-def begin_config() -> 'tuple[dict[str, str], str]':
+def begin_config() -> 'dict[str, str]':
     # Check if config exists and refresh_token is in the config
     # If yes, proceed normally. Else, launch first_start() and exit
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     if is_successful(api.get_setting('Credentials', 'refresh_token')):
         os.system('clear')
-        return (
-            api.credentials().unwrap(),
-            api.get_setting('Credentials', 'id').value_or('')
-        )
+        return api.credentials().unwrap()
     return first_start()
 
 

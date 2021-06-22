@@ -44,7 +44,7 @@ setup(
         'pick>=0.6,<2.0',
         'plyer~=2.0.0',
         'funcy~=1.14',
-        'returns~=0.14',
+        'returns==0.14',
         'placeholder~=1.1',
     ],
     tests_require=['pytest>=5.4,<7.0'],

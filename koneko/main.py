@@ -15,16 +15,16 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
-from koneko import ui, pure, utils, prompt, screens, picker, lscat_app
+from koneko import ui, api, pure, utils, prompt, screens, picker, lscat_app
 
 
-def main_loop(_, your_id: str) -> 'IO':
+def main_loop(_) -> 'IO':
     """Ask for a mode and launch it (mode might ask for more info), for no cli args"""
     printmessage = True
     case = {
         '1': ArtistModeLoop('').start,
         '2': ViewPostModeLoop('').start,
-        '3': FollowingUserModeLoop(your_id).start,
+        '3': FollowingUserModeLoop('').start,
         '4': SearchUsersModeLoop('').start,
         '5': illust_follow_mode,
         '6': illust_recommended_mode,
@@ -39,10 +39,7 @@ def main_loop(_, your_id: str) -> 'IO':
 
         func = case.get(main_command, None)
 
-        if main_command == '3':
-            return func(your_id)
-
-        elif func:
+        if func:
             return func()
 
         elif main_command == 'q':
@@ -173,23 +170,21 @@ class FollowingUserModeLoop(AbstractLoop):
     If not, ask for pixiv ID or url and process it.
     """
 
-    def _prompt_url_id(self) -> str:
-        """Implements abstractmethod: prompt for artist ID or url"""
-        self._raw_answer = input('Enter your pixiv ID or url: ')
+    def _prompt_url_id(self):
+        return
+
+    def _process_raw_answer(self):
+        return
+
+    def _validate_input(self) -> bool:
+        return True
 
     def _go_to_mode(self) -> 'IO':
         """Implements abstractmethod: Go to mode 3"""
         os.system('clear')
-        self.mode = ui.FollowingUsers(self._user_input)
+        pixiv_id = utils.get_id_then_save()
+        self.mode = ui.FollowingUsers(pixiv_id)
         prompt.user_prompt(self.mode)
-
-    def start(self, your_id=None) -> 'IO':
-        """Complements base method: If ID not given, ask if config ID should be used,
-        or enter a custom ID
-        """
-        if your_id:
-            self._user_input = ask_your_id(your_id)
-        super().start()
 
     def __str__(self) -> str:
         """Implements abstractmethod: return string of mode number"""
@@ -265,11 +260,3 @@ def _frequent(actions: 'list[str]', history: 'dict[str, int]') -> 'IO':
         func()
 
 
-def ask_your_id(your_id: str):
-    if your_id:  # your_id stored in config file
-        ans = input('Do you want to use the Pixiv ID saved in your config? [Y/n]\n')
-        if ans in {'y', ''}:
-            return your_id
-
-    # If your_id not stored, or if ans is no, or if id provided, via cli
-    return ''

@@ -37,7 +37,6 @@ class APIHandler:
         self._login_with_token()
 
     def _login_with_token(self):
-        # FIXME: Cloudflare captcha might complain, catch exception and prompt retry
         # TODO: refresh the token if it expired
         try:
             self._api.auth(refresh_token=self._credentials['refresh_token'])
@@ -45,11 +44,13 @@ class APIHandler:
             print(e)
             print('If this is a cloudflare captcha issue, just quit and retry')
             print('It is not a problem with koneko or pixivpy')
-            print('Otherwise, please report to https://github.com/twenty5151/koneko/issues/4')
+            print(
+                'Otherwise, please report to '
+                'https://github.com/twenty5151/koneko/issues'
+            )
             print("Press 'q' and enter to exit")
-        else:
-            # Debugging issue #4
-            print('Login success! Please notify https://github.com/twenty5151/koneko/issues/4')
+        #else:
+            #print('Login success!')
 
     # Public API request functions for each mode
     @funcy.retry(tries=3, errors=(ConnectionError, PixivError))

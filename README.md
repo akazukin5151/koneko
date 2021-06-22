@@ -62,9 +62,9 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
 0. If you want to use the stable api, install [kitty](https://github.com/kovidgoyal/kitty) (Otherwise, you can use ueberzug with your current terminal, however note that it doesn't seem to work on macOS)
     * If using ueberzug, run `pip install ueberzug` first
-1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...):
+1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...)
 2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
-3. Login to pixiv on your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!"
+3. Login to pixiv on your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/twenty5151/koneko/issues/
 4. Run `lscat 1 7` to help setup the recommended settings; copy to `~/.config/koneko/config.ini`. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
 5. Run `koneko` again. Hopefully you don't see any error messages about login failing. See [usage](#usage) for how to use.
 
@@ -142,6 +142,16 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
 
 You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
+
+* I'm having problems logging in
+
+Try these steps in order:
+
+- Update your system and reboot. No seriously, that's what worked for me.
+- Try a different browser
+- Set said different browser as your default browser
+- Make a bug report at https://github.com/twenty5151/koneko/issues/ for support and debugging
+- Use the original script [here](https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362) to get your refresh token. Copy the example config to `~/.config/koneko`, and add the line `refresh_token=XXXX` under the `[Credentials]` section.
 
 ## Contributing
 1. Fork it

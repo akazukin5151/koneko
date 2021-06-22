@@ -1,0 +1,48 @@
+import os
+import sys
+from pathlib import Path
+from configparser import ConfigParser
+
+from koneko.url_login import script
+
+
+def parse(url: str) -> str:
+    #format: 'pixiv://account/login?code=xxxx&via=login'
+    remove_head = url.split('code=')[1]
+    remove_tail = remove_head.split('&')
+    return remove_tail[0]
+
+def get_verifier():
+    path = Path('~/.local/share/koneko/code_verifier').expanduser()
+    with open(path, 'r') as f:
+        return f.read().replace('\n', '')
+
+def write_to_config(token: str) -> 'IO ()':
+    # TODO: adapted from config.py
+    parser = ConfigParser()
+    parser.read_dict({'Credentials': {'refresh_token': token}})
+    config_path = Path('~/.config/koneko/config.ini').expanduser()
+    config_path.parent.mkdir(exist_ok=True)
+    config_path.touch()
+    with open(config_path, 'w') as c:
+        parser.write(c)
+    append_default_config(config_path)
+
+def append_default_config(config_path) -> 'IO':
+    # Why not use python? Because it's functional, readable, and
+    # this one liner defeats any potential speed benefits
+    example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()
+    os.system(f'tail {example_cfg} -n +8 >> {config_path}')
+
+
+def main():
+    url = sys.argv[1]
+    code = parse(url)
+    code_verifier = get_verifier()
+    _, token, _ = script.login(code, code_verifier)
+    #token = 'test'
+    write_to_config(token)
+    os.system('rm ~/.local/share/applications/pixiv-url.desktop')
+
+if __name__ == '__main__':
+    main()

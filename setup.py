@@ -51,7 +51,8 @@ setup(
     entry_points={
         'console_scripts': [
             'koneko=koneko.__main__:_main',
-            'lscat=koneko.lscat_app:main'
+            'lscat=koneko.lscat_app:main',
+            'koneko-url-login=koneko.url_login.main:main'
         ]
     },
 )

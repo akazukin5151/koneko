@@ -6,6 +6,7 @@ Structure:
     - Interactive config functions for first launch setup
 """
 import os
+import sys
 from enum import Enum
 from pathlib import Path
 from getpass import getpass
@@ -13,8 +14,10 @@ from configparser import ConfigParser
 
 from placeholder import m
 from returns.result import safe
+from returns.pipeline import is_successful
 
 from koneko import pure, TERM
+from koneko.url_login.script import open_pixiv_login
 
 
 @safe
@@ -132,13 +135,33 @@ def ycoords_config() -> 'list[int]':
 
 # Technically frontend
 def begin_config() -> 'tuple[dict[str, str], str]':
+    # Check if config exists and refresh_token is in the config
+    # If yes, proceed normally. Else, launch first_start() and exit
     os.system('clear')
     config_path = Path('~/.config/koneko/config.ini').expanduser()
-    if config_path.exists():
-        # TODO: doesn't this None removes the point of the Result monad?
-        return api.credentials().unwrap(), api.get_setting('Credentials', 'id').value_or(None)
-    return init_config(config_path)
+    if is_successful(api.get_setting('Credentials', 'refresh_token')):
+        return (
+            api.credentials().unwrap(),
+            api.get_setting('Credentials', 'id').value_or('')
+        )
+    first_start()
 
+
+def first_start():
+    os.system('cp ~/.local/share/koneko/pixiv-url.desktop ~/.local/share/applications')
+    os.system('xdg-mime default pixiv-url.desktop x-scheme-handler/pixiv')
+    os.system('update-desktop-database ~/.local/share/applications')
+    print('Please log to pixiv in your browser then run koneko again')
+    login_then_save_verifier()
+    sys.exit(0)
+
+
+def login_then_save_verifier():
+    code_verifier = open_pixiv_login()
+    path = Path('~/.local/share/koneko/code_verifier').expanduser()
+    path.touch(exist_ok=True)
+    with open(path, 'w') as f:
+        f.write(code_verifier)
 
 def init_config(config_path) -> 'tuple[dict[str, str], str]':
     credentials = {

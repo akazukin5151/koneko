@@ -42,6 +42,7 @@ setup(
         'docopt~=0.6',
         'blessed~=1.17',
         'pick>=0.6,<2.0',
+        'plyer~=2.0.0',
         'funcy~=1.14',
         'returns~=0.14',
         'placeholder~=1.1',

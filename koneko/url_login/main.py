@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 from configparser import ConfigParser
 
+from plyer import notification
+
 from koneko.url_login import script
 
 
@@ -45,6 +47,7 @@ def main():
         _, token, _ = script.login(code, code_verifier)
         write_to_config(token)
         os.system('rm ~/.local/share/applications/pixiv-url.desktop')
+        notification.notify(title='Login finished', message='Please run koneko again')
     except:
         # Bare except to prevent xdg-open from opening the url
         # containing the sensitive code

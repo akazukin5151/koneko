@@ -6,5 +6,6 @@ pick~=1.0
 funcy~=1.14
 returns~=0.14
 placeholder~=1.1
+plyer~=2.0.0
 
 pytest~=6.0

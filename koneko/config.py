@@ -17,7 +17,7 @@ from returns.result import safe
 from returns.pipeline import is_successful
 
 from koneko import pure, TERM
-from koneko.url_login.script import open_pixiv_login
+from koneko.url_login.open_login_link import open_pixiv_login
 
 
 @safe

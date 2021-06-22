@@ -1,3 +1,4 @@
+"""Protocol handler for pixiv:// links"""
 import os
 import sys
 from pathlib import Path

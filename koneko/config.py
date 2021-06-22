@@ -137,9 +137,9 @@ def ycoords_config() -> 'list[int]':
 def begin_config() -> 'tuple[dict[str, str], str]':
     # Check if config exists and refresh_token is in the config
     # If yes, proceed normally. Else, launch first_start() and exit
-    os.system('clear')
     config_path = Path('~/.config/koneko/config.ini').expanduser()
     if is_successful(api.get_setting('Credentials', 'refresh_token')):
+        os.system('clear')
         return (
             api.credentials().unwrap(),
             api.get_setting('Credentials', 'id').value_or('')

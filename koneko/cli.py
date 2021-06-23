@@ -5,7 +5,7 @@ Usage:
   koneko       [<link> | <searchstr>]
   koneko [1|a] <link_or_id>
   koneko [2|i] <link_or_id>
-  koneko (3|f) <link_or_id>
+  koneko (3|f)
   koneko [4|s] <searchstr>
   koneko [5|n]
   koneko [6|r]
@@ -56,11 +56,11 @@ def handle_vh() -> 'Optional[dict]':
     return args
 
 
-def launch_mode(args: 'docopt.Dict[str, str]', your_id: str):
+def launch_mode(args: 'docopt.Dict[str, str]'):
     print('Logging in...')
 
     if (url_or_str := args['<link>']):
-        return parse_no_mode(url_or_str, your_id)
+        return parse_no_mode(url_or_str)
 
     elif (search := args['<searchstr>']):
         return main.SearchUsersModeLoop(search).start()
@@ -68,7 +68,7 @@ def launch_mode(args: 'docopt.Dict[str, str]', your_id: str):
     return parse_mode_given(args)
 
 
-def parse_no_mode(url_or_str: str, your_id: str):
+def parse_no_mode(url_or_str: str):
     if 'users' in url_or_str:
         return main.ArtistModeLoop(pure.process_user_url(url_or_str)).start()
 
@@ -77,7 +77,7 @@ def parse_no_mode(url_or_str: str, your_id: str):
 
     # Assume you won't search for '3' or 'f'
     elif url_or_str == '3' or url_or_str == 'f':
-        return main.FollowingUserModeLoop(your_id).start(your_id)
+        return main.FollowingUserModeLoop('').start()
 
     # Assume you won't search for '5' or 'n'
     elif url_or_str == '5' or url_or_str == 'n':
@@ -103,7 +103,7 @@ def parse_mode_given(args: 'docopt.Dict[str, str]'):
         return main.ViewPostModeLoop(pure.process_artwork_url(url_or_id)).start()
 
     elif args['3'] or args['f']:
-        return main.FollowingUserModeLoop(pure.process_user_url(url_or_id)).start()
+        return main.FollowingUserModeLoop('').start()
 
     # Mode 4 isn't needed here, because docopt catches <searchstr>
 

@@ -223,7 +223,7 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 There are two dependencies that aren't necessary: returns and placeholder (both on the right edge). Code can always be rewritten to remove those two dependencies. That said, they don't introduce their own dependency tree, so only a total of three dependencies are added. Compared to the core dependencies (pixivpy, pixcat, and blessed), that's insignificant.
 
-![dep tree](dependencies.png)
+![dep tree](docs/pics/dependencies.png)
 
 ```sh
 $ pipdeptree -v

@@ -97,15 +97,16 @@ See the [manual](MANUAL.md) here
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-#### Version 0.11.1
+#### Version 0.12
 
 ##### Features
-* Support illust related mode in lscat app mode 2/b
+* Custom user ID for mode 3 (view following users) has been removed, to reduce complexity of first-time setup
 
 ##### Bug fixes
+* Fixed broken pixiv login
 
 ##### Code maintenance
-* Refactored config functions into unified api and enhanced unit tests
+*
 
 
 ## Roadmap

@@ -66,14 +66,12 @@ Note: if you want to make some edits, you should install it in a conda environme
    # Use the latest stable version (recommended for usage)
    # Make sure the version number is the latest
    git clone -b 'v0.11.0' --depth 1 https://github.com/twenty5151/koneko.git
-   # Use the master branch for upcoming features:
+   # ...or Use the master branch for nightly builds
    git clone -b master https://github.com/twenty5151/koneko.git
-   # Use the dev branch for latest features, fixes, and instability (recommended for contributers):
-   git clone -b dev https://github.com/twenty5151/koneko.git
 
    # Run the tests (for those who want to edit)
    # Add --inte for integration testing, but don't be surprised if it fails
-   pytest testing/ -vvvv -l -s 
+   pytest testing/ -vvvv -l -s
 
    cd koneko
    # Manually install without PyPI; for general usage

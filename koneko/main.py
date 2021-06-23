@@ -26,7 +26,7 @@ def main_loop(_) -> 'IO':
     case = {
         '1': ArtistModeLoop('').start,
         '2': ViewPostModeLoop('').start,
-        '3': FollowingUserModeLoop('').start,
+        '3': following_users_mode,
         '4': SearchUsersModeLoop('').start,
         '5': illust_follow_mode,
         '6': illust_recommended_mode,
@@ -165,32 +165,12 @@ class ViewPostModeLoop(AbstractLoop):
         return '2'
 
 
-class FollowingUserModeLoop(AbstractLoop):
-    """If ID given via cli, immediately go to mode 3
-    Else, ask if the ID saved in the config should be used.
-    If yes, prompt_url_id() will be skipped
-    If not, ask for pixiv ID or url and process it.
-    """
-
-    def _prompt_url_id(self):
-        return
-
-    def _process_raw_answer(self):
-        return
-
-    def _validate_input(self) -> bool:
-        return True
-
-    def _go_to_mode(self) -> 'IO':
-        """Implements abstractmethod: Go to mode 3"""
-        os.system('clear')
-        pixiv_id = get_id_then_save()
-        self.mode = ui.FollowingUsers(pixiv_id)
-        prompt.user_prompt(self.mode)
-
-    def __str__(self) -> str:
-        """Implements abstractmethod: return string of mode number"""
-        return '3'
+def following_users_mode():
+    """Get pixiv id then immediately goes to ui.FollowingUsers"""
+    os.system('clear')
+    pixiv_id = utils.get_id_then_save()
+    mode = ui.FollowingUsers(pixiv_id)
+    prompt.user_prompt(mode)
 
 
 class SearchUsersModeLoop(AbstractLoop):
@@ -254,7 +234,6 @@ def _frequent(actions: 'list[str]', history: 'dict[str, int]') -> 'IO':
     case = {
         '1': ArtistModeLoop(user_input).start,
         '2': ViewPostModeLoop(user_input).start,
-        '3': FollowingUserModeLoop(user_input).start,
         '4': SearchUsersModeLoop(user_input).start,
     }
     func = case.get(mode, None)

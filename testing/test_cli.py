@@ -41,16 +41,15 @@ def test_mode2(monkeypatch, args, capsys):
     capture_logging_in(capsys)
 
 @pytest.mark.parametrize('args', (['3'], ['f']))
-def test_mode3_no_input(monkeypatch, args, capsys):
+def test_mode3(monkeypatch, args, capsys):
     mock = Mock()
     monkeypatch.setattr('koneko.cli.sys.argv', (['koneko'] + args))
-    monkeypatch.setattr('koneko.cli.main.FollowingUserModeLoop', mock)
+    monkeypatch.setattr('koneko.cli.main.following_users_mode', mock)
 
     args = cli.handle_vh()
     assert cli.launch_mode(args)
-    # In the absence of user input... (user ID is now fetched from API)
-    assert mock.call_args_list == [call('')]
-    assert mock.mock_calls == [call(''), call('').start()]
+    assert mock.call_args_list == [call()]
+    assert mock.mock_calls == [call()]
     capture_logging_in(capsys)
 
 

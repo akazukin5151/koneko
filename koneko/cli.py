@@ -75,7 +75,7 @@ def parse_no_mode(url_or_str: str):
 
     # Assume you won't search for '3' or 'f'
     elif url_or_str == '3' or url_or_str == 'f':
-        return main.FollowingUserModeLoop('').start()
+        return main.following_users_mode()
 
     # Assume you won't search for '5' or 'n'
     elif url_or_str == '5' or url_or_str == 'n':
@@ -101,7 +101,7 @@ def parse_mode_given(args: 'docopt.Dict[str, str]'):
         return main.ViewPostModeLoop(pure.process_artwork_url(url_or_id)).start()
 
     elif args['3'] or args['f']:
-        return main.FollowingUserModeLoop('').start()
+        return main.following_users_mode()
 
     # Mode 4 isn't needed here, because docopt catches <searchstr>
 

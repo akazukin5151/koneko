@@ -126,7 +126,7 @@ See also: :ref:`manual installation <manual-installation>`
 #. Run ``koneko``. It will open a pixiv login page in your default browser and quit.
 #. Login to pixiv on your browser. If prompted, open the ``pixiv://`` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/twenty5151/koneko/issues/
 #. Run ``lscat 1 7`` to help setup the recommended settings; copy to ``~/.config/koneko/config.ini``. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
-#. Read the :ref:`usage manual <manual>`.
+#. Run ``koneko`` again. Hopefully you don't see any error messages about login failing. See the :ref:`usage manual <manual>` for how to use.
 
 Requirements
 ^^^^^^^^^^^^
@@ -138,7 +138,13 @@ Requirements
 
   * Ueberzug only works on linux
 
-* Uses ``xdg-open`` (linux) / ``open`` (mac) (for opening links in your browser) and ``curl`` (for safety fallback, see below)
+* Dependencies on external programs (your responsibility to install them):
+
+  * ``xdg-open`` (linux) or ``open`` (mac) for opening links in your browser
+  * ``curl`` for safety fallback (not necessarily needed), see below
+  * ``xdg-mime`` and ``update-desktop-database`` to handle the pixiv login callback
+
+    * For ``update-desktop-database``, try install the ``desktop-file-utils`` package with your package manager
 
 
 .. raw:: html
@@ -161,28 +167,27 @@ Usage and manual
 
 See the :ref:`manual <manual>` here
 
-Upcoming changelog (in dev branch)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Upcoming changelog
+^^^^^^^^^^^^^^^^^^
 
 For full changelogs please see `releases <https://github.com/twenty5151/koneko/releases>`_
 
-Version 0.11.1
+Version 0.12
 ~~~~~~~~~~~~~~
 
 Features
 """"""""
 
-* Support illust related mode in lscat app mode 2/b
-* Documentation is now built using reStructuredText and hosted at `readthedocs <https://koneko.readthedocs.io/en/latest/>`_
+* Custom user ID for mode 3 (view following users) has been removed, to reduce complexity of first-time setup
 
 Bug fixes
 """""""""
+* Fixed broken pixiv login
 
 Code maintenance
 """"""""""""""""
 
-
-* Refactored config functions into unified api and enhanced unit tests
+* Todo
 
 Roadmap
 -------
@@ -196,16 +201,14 @@ Features
 
   * Make sure the diagrams in HACKING.md is up-to-date
 
-* Option to save username, but prompt for password (and not save it) every time
-
 Known bugs
 ^^^^^^^^^^
 
 
 * Some info (eg manual) are still being hidden by ueberzug; general unreliability of prints (need a rethink of implementation)
 
-
   * Help message that responds to terminal width
+  * Consider `ucollage <https://github.com/ckardaris/ucollage/>`_
 
 * In the logs, urllib3 warns that ``Connection pool is full, discarding connection: i.pximg.net``. See `customising pool behaviour <https://urllib3.readthedocs.io/en/latest/advanced-usage.html#customizing-pool-behavior>`_ from urllib3.
 
@@ -244,7 +247,6 @@ Try these steps in order:
 - Try a different browser
 - Set said different browser as your default browser
 - Make a bug report at https://github.com/twenty5151/koneko/issues/ for support and debugging
-
 - Use the original script `here <https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362>`_ to get your refresh token. Copy the example config to ``~/.config/koneko``, and add the line ``refresh_token=XXXX`` under the ``[Credentials]`` section.
 
 Contributing

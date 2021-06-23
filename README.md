@@ -74,7 +74,11 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 * It has been tested on kitty v0.17.2 onwards, but should work on older versions
 * Operating system: all OSes that kitty supports, which means Linux and macOS.
     * Ueberzug only works on linux
-* Uses `xdg-open` (linux) / `open` (mac) (for opening links in your browser) and `curl` (for safety fallback, see below)
+* Dependencies on external programs (your responsibility to install them):
+    - `xdg-open` (linux) or `open` (mac) for opening links in your browser
+    - `curl` for safety fallback (not necessarily needed), see below
+    - `xdg-mime` and `update-desktop-database` to handle the pixiv login callback
+        - For `update-desktop-database`, try install the `desktop-file-utils` package with your package manager
 
 <details>
   <summary>If it crashes (it shouldn't), it might be because pip didn't 'install' the welcome pictures, *and* the script failed to download them for some reason. Try:</summary>

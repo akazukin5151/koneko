@@ -37,6 +37,9 @@ jobs:
         if [[ "$OSTYPE" == "linux-gnu"* ]]; then
           pip install ueberzug
         fi
+    - name: Install desktop-file-utils
+      run: |
+        sudo apt-get install desktop-file-utils
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names

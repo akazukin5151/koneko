@@ -46,17 +46,19 @@ class Dimension(Enum):
 
 class Config:
     def __init__(self, path):
-        self.config_path = path
-        self.config_parser = ConfigParser()
-        self.config_parser.read(self.config_path)
-        self.config: 'dict[str, dict[str, str]' = {
-            section: dict(self.config_parser.items(section))
-            for section in self.config_parser.sections()
-        }
+        self._config_path = path
+        self._config_parser = ConfigParser()
+        self._config_parser.read(self._config_path)
+
+    def set(self, section: str, setting: str, value: str):
+        """Just a convenient proxy to the config parser object"""
+        self._config_parser.set(section, setting, value)
+        with open(self._config_path, 'w') as f:
+            self._config_parser.write(f)
 
     @safe
     def get_setting(self, section: str, setting: str) -> 'Result[str, KeyError]':
-        return self.config[section][setting]
+        return self._config_parser.get(section, setting)
 
     def _get_bool(self, section: str, setting: str, default: bool) -> bool:
         return self.get_setting(section, setting).bind(parse_bool).value_or(default)
@@ -64,10 +66,12 @@ class Config:
     def _get_int(self, section: str, setting: str, default: int) -> int:
         return self.get_setting(section, setting).bind(parse_int).value_or(default)
 
-
     @safe
     def credentials(self) -> 'Result[dict[str, str], KeyError]':
-        return self.config['Credentials']
+        return {
+            item[0]: item[1]
+            for item in self._config_parser.items(section='Credentials')
+        }
 
     def use_ueberzug(self) -> bool:
         return self._get_bool('experimental', 'use_ueberzug', False)
@@ -137,7 +141,6 @@ def ycoords_config() -> 'list[int]':
 def begin_config() -> 'dict[str, str]':
     # Check if config exists and refresh_token is in the config
     # If yes, proceed normally. Else, launch first_start() and exit
-    config_path = Path('~/.config/koneko/config.ini').expanduser()
     if is_successful(api.get_setting('Credentials', 'refresh_token')):
         os.system('clear')
         return api.credentials().unwrap()

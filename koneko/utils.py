@@ -199,9 +199,7 @@ def get_id_then_save():
     if is_successful(config.api.get_setting('Credentials', 'id')):
         return config.api.get_setting('Credentials', 'id').unwrap()
     pixiv_id = api.myapi.get_user_id()
-    config.api.config_parser.set('Credentials', 'id', pixiv_id)
-    with open(config.api.config_path, 'w') as f:
-        config.api.config_parser.write(f)
+    config.api.set('Credentials', 'id', pixiv_id)
     return pixiv_id
 
 

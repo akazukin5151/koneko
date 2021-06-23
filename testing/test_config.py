@@ -197,7 +197,7 @@ def test_first_start(monkeypatch, capsys):
     monkeypatch.setattr('koneko.config.sys.exit', raises_customexit)
 
     with pytest.raises(CustomExit):
-        config.first_start()
+        config.first_start('_')
 
     assert mock_os.call_args_list == [
         call('cp ~/.local/share/koneko/pixiv-url.desktop ~/.local/share/applications'),

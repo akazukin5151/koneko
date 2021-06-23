@@ -14,7 +14,6 @@ from configparser import ConfigParser
 
 from placeholder import m
 from returns.result import safe
-from returns.pipeline import is_successful
 
 from koneko import pure, TERM
 from koneko.url_login.open_login_link import open_pixiv_login
@@ -139,15 +138,14 @@ def ycoords_config() -> 'list[int]':
 
 # Technically frontend
 def begin_config() -> 'dict[str, str]':
-    # Check if config exists and refresh_token is in the config
-    # If yes, proceed normally. Else, launch first_start() and exit
-    if is_successful(api.get_setting('Credentials', 'refresh_token')):
+    def normal(_):
         os.system('clear')
         return api.credentials().unwrap()
-    return first_start()
+    # first_start is bottom, so normal will never be called on Failure
+    return api.get_setting('Credentials', 'refresh_token').alt(first_start).bind(normal)
 
 
-def first_start() -> 'bottom':
+def first_start(_) -> 'bottom':
     os.system('cp ~/.local/share/koneko/pixiv-url.desktop ~/.local/share/applications')
     os.system('xdg-mime default pixiv-url.desktop x-scheme-handler/pixiv')
     os.system('update-desktop-database ~/.local/share/applications')

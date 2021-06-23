@@ -22,7 +22,6 @@ from subprocess import check_output
 from logging.handlers import RotatingFileHandler
 
 import funcy
-from returns.pipeline import is_successful
 
 from koneko import api, config, KONEKODIR
 
@@ -195,12 +194,14 @@ def quit_on_q(ans: str):
         sys.exit(0)
 
 
-def get_id_then_save():
-    if is_successful(config.api.get_setting('Credentials', 'id')):
-        return config.api.get_setting('Credentials', 'id').unwrap()
-    pixiv_id = api.myapi.get_user_id()
-    config.api.set('Credentials', 'id', pixiv_id)
-    return pixiv_id
+def get_id_then_save() -> str:
+    def id_(x): return x
+    def on_fail(_):
+        pixiv_id = api.myapi.get_user_id()
+        config.api.set('Credentials', 'id', pixiv_id)
+        return pixiv_id
+
+    return config.api.get_setting('Credentials', 'id').fix(on_fail).bind(id_)
 
 
 # Ueberzug

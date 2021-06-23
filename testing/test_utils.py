@@ -2,6 +2,7 @@ from unittest.mock import Mock, call
 from logging.handlers import RotatingFileHandler
 
 import pytest
+from returns.result import Success, Failure
 
 from koneko import utils
 from conftest import CustomExit, raises_customexit
@@ -190,3 +191,15 @@ def test_quit_on_q_quit(monkeypatch):
 
 def test_quit_on_q_no_quit(monkeypatch):
     assert utils.quit_on_q('not_q') is None
+
+
+def test_get_id_then_save_on_success(monkeypatch):
+    monkeypatch.setattr('koneko.config.api.get_setting', lambda _, __: Success('1234'))
+    assert utils.get_id_then_save() == '1234'
+
+def test_get_id_then_save_on_fail(monkeypatch):
+    """Successfully recovers from failure"""
+    monkeypatch.setattr('koneko.config.api.get_setting', lambda _, __: Failure('foo'))
+    monkeypatch.setattr('koneko.api.myapi.get_user_id', lambda: '5678')
+    monkeypatch.setattr('koneko.config.api.set', lambda _, __, ___: 0)
+    assert utils.get_id_then_save() == '5678'

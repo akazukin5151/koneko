@@ -15,6 +15,8 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
+from returns.result import Success
+
 from koneko import ui, api, pure, config, utils, prompt, screens, picker, lscat_app
 
 
@@ -265,6 +267,6 @@ def get_id_then_save() -> str:
     def on_fail(_):
         pixiv_id = api.myapi.get_user_id()
         config.api.set('Credentials', 'id', pixiv_id)
-        return pixiv_id
+        return Success(pixiv_id)
 
-    return config.api.get_setting('Credentials', 'id').fix(on_fail).bind(id_)
+    return config.api.get_setting('Credentials', 'id').lash(on_fail).bind(id_)

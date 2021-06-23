@@ -21,7 +21,7 @@ import threading
 from abc import ABC, abstractmethod
 
 from pixcat import Image
-from returns.result import safe
+from returns.result import Success, safe
 
 from koneko import pure, TERM, utils, files, config, printer, WELCOME_IMAGE
 
@@ -211,10 +211,12 @@ class TrackDownloadsUsers(AbstractTracker):
         print_info = config.api.print_info()
 
         # Tries to access splitpoint attribute in the data instance
-        # If it fails, `fix` it by calling the read_invis() function
-        # Either way, the Success() result is inside the Result[] monad, so unwrap() it
+        # If it fails, fix it by calling the read_invis() function
+        # Either way, the Success result is inside the Result monad, so unwrap() it
         safe_func: 'func[Result[int]]' = safe(lambda: data.splitpoint)
-        splitpoint: int = safe_func().fix(lambda x: files.read_invis(data)).unwrap()
+        splitpoint: int = safe_func().lash(
+            lambda _: Success(files.read_invis(data))
+        ).unwrap()
 
         # splitpoint == number of artists
         # Each artist has 3 previews, so the total number of pics is

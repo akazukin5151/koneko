@@ -34,7 +34,7 @@ setup(
         'Operating System :: MacOS',
         'Environment :: Console'
     ],
-    packages=['koneko'],
+    packages=['koneko', 'koneko.url_login'],
     include_package_data=True,
     install_requires=[
         'PixivPy~=3.5',

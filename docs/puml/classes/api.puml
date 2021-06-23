@@ -5,10 +5,11 @@ title api
 class api.APIHandler << (S,#FF7700) Singleton >> {
     ..Initial login..
     - api
-    - token
     - credentials
+    - response
     +start()
     ..Requests..
+    +get_user_id()
     +artist_gallery()
     +protected_illust_detail()
     +following_user_request()

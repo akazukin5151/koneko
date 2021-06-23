@@ -215,7 +215,7 @@ Examples
    # Mode specified
    koneko a 2232374    # Mode 1
    koneko i 78823485   # Mode 2
-   koneko f 2232374    # Mode 3
+   koneko f            # Mode 3
    koneko s "gomzi"    # Mode 4
    koneko n            # Mode 5
    koneko r            # Mode 6
@@ -231,7 +231,7 @@ Manual
      koneko       [<link> | <searchstr>]
      koneko [1|a] <link_or_id>
      koneko [2|i] <link_or_id>
-     koneko (3|f) <link_or_id>
+     koneko (3|f)
      koneko [4|s] <searchstr>
      koneko [5|n]
      koneko [6|r]
@@ -240,8 +240,6 @@ Manual
      koneko (-v | --version)
 
    Notes:
-   *  If you supply a link and want to go to mode 3, you must give the (3|f) argument,
-      otherwise your link would default to mode 1.
    *  It is assumed you won't need to search for an artist named '5' or 'n' from the
       command line, because it would go to mode 5.
 
@@ -339,15 +337,10 @@ In general
      - Default
      - Description
      - Notes
-   * - ``username``
+   * - ``refresh_token``
      - string
      -
-     - Your pixiv username
-     -
-   * - ``password``
-     - string
-     -
-     - Your pixiv password
+     - Your pixiv refresh token
      -
    * - ``id``
      - int

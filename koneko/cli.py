@@ -14,8 +14,6 @@ Usage:
   koneko (-v | --version)
 
 Notes:
-*  If you supply a link and want to go to mode 3, you must give the (3|f) argument,
-   otherwise your link would default to mode 1.
 *  It is assumed you won't need to search for an artist named '5' or 'n' from the
    command line, because it would go to mode 5.
 

@@ -1,11 +1,12 @@
 import os
 import configparser
+from unittest.mock import Mock, call
 
 import pytest
 from returns.result import Success
 
 from koneko import config
-from conftest import setup_test_config, Processer
+from conftest import setup_test_config, Processer, CustomExit, raises_customexit
 
 
 defaults = (
@@ -184,32 +185,26 @@ def test_begin_config_exists(monkeypatch, tmp_path, use_test_cfg_path):
     testconfig = setup_test_config(tmp_path, config.Config)
     monkeypatch.setattr('koneko.config.api', testconfig)
 
-    creds, your_id = config.begin_config()
-    assert your_id == '1234'
-    assert creds['username'] == 'koneko'
-    assert creds['password'] == 'mypassword'
+    creds = config.begin_config()
+    assert creds['refresh_token'] == 'token'
 
 
-@pytest.mark.parametrize('testid, responses', (('myid', ['y', 'myid']), ('', ['n'])))
-def test_begin_config_nonexistant_id(monkeypatch, tmp_path, use_test_cfg_path, capsys, testid, responses):
-    """Config path does not exist"""
-    responses = iter(['myusername'] + responses)
-    monkeypatch.setattr('builtins.input', lambda *a: next(responses))
-    monkeypatch.setattr('koneko.config.getpass', lambda *a: 'mypassword')
-    # fix for macOS
-    monkeypatch.setattr(
-        'koneko.config.os.system',
-        lambda x: f'tail example_config.ini -n +9 >> {tmp_path / "test_config.ini"}'
-    )
+def test_first_start(monkeypatch, capsys):
+    mock_os = Mock()
+    monkeypatch.setattr('koneko.config.os.system', mock_os)
+    mock_login = Mock()
+    monkeypatch.setattr('koneko.config.login_then_save_verifier', mock_login)
+    monkeypatch.setattr('koneko.config.sys.exit', raises_customexit)
 
-    creds, your_id = config.begin_config()
-    assert your_id == testid
-    assert creds['username'] == 'myusername'
-    assert creds['password'] == 'mypassword'
+    with pytest.raises(CustomExit):
+        config.first_start()
 
-    testconfig = config.Config(tmp_path / 'test_config.ini')
-    assert testconfig.get_setting('Credentials', 'username') == Success('myusername')
-    assert testconfig.get_setting('Credentials', 'password') == Success('mypassword')
+    assert mock_os.call_args_list == [
+        call('cp ~/.local/share/koneko/pixiv-url.desktop ~/.local/share/applications'),
+        call('xdg-mime default pixiv-url.desktop x-scheme-handler/pixiv'),
+        call('update-desktop-database ~/.local/share/applications')
+    ]
+    assert mock_login.called
 
     captured = capsys.readouterr()
-    assert captured.out == '\nDo you want to save your pixiv ID? It will be more convenient\nto view artists you are following\n'
+    assert captured.out == 'Please log to pixiv in your browser then run koneko again\n'

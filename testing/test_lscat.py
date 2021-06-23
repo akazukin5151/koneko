@@ -314,17 +314,16 @@ def test_TrackDownloadsUser():
         call.send(None),
     ]
 
-
 def test_TrackDownloadsUser_with_koneko_file(tmp_path, use_test_cfg_path):
     """Test with .koneko file"""
-    data = FakeData(Path('testing/files/user'))
-    data.download_path.mkdir()
+    data = FakeData(tmp_path)
     pics = ('004_祝！！！.jpg', '017_ミコニャン.jpg', '008_77803142_p0.png')
     for pic in pics:
-        os.system(f'cp testing/files/{pic} testing/files/user/')
+        os.system(f'cp testing/files/{pic} {tmp_path}')
 
-    os.system('touch testing/files/user/.koneko')
-    with open('testing/files/user/.koneko', 'w') as f:
+    invis_file = tmp_path / '.koneko'
+    invis_file.touch()
+    with open(invis_file, 'w') as f:
         f.write('3')
 
     lscat.show_instant(lscat.TrackDownloadsUsers, data)
@@ -332,8 +331,6 @@ def test_TrackDownloadsUser_with_koneko_file(tmp_path, use_test_cfg_path):
     tracker = lscat.TrackDownloadsUsers(data)
     for pic in pics:
         tracker.update(pic)
-
-    os.system(f'rm -r {data.download_path}')
 
 
 def test_TrackDownloadsImage(monkeypatch):

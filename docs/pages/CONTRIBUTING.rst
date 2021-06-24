@@ -8,6 +8,7 @@ Contributing
 #. Run tests with ``pytest testing/ -vvvv -l``
 #. Make your changes
 #. Run tests again
+#. You can also double check the docs by running ``cd docs`` then ``make html``
 #. Submit a pull request
 
 Tips: 

@@ -3,7 +3,8 @@
 2. Run tests with `pytest testing/ -vvvv -l`
 3. Make your changes
 4. Run tests again
-5. Submit a pull request
+5. You can also double check the docs by running `cd docs` then `make html`
+6. Submit a pull request
 
 Tips: 
 * If your git client complains about committing to master, just remove `.pre-commit-config.yaml`

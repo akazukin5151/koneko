@@ -102,7 +102,7 @@ I get 32 trackers on Pixiv. Plus, you have to disable ublock if you ever get log
    :scale: 50%
    :align: center
 
-The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See `prompt 1 </pics/ads1.png>`_ , `prompt 2 </pics/ads2.png>`_ and this `list <#trackers-avoided>`_ of trackers
+The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See `prompt 1 <https://raw.githubusercontent.com/twenty5151/koneko/master/docs/pics/ads1.png>`_ , `prompt 2 <https://raw.githubusercontent.com/twenty5151/koneko/master/docs/pics/ads2.png>`_ and this `list <#trackers-avoided>`_ of trackers
 
 
 * TUIs make you cool

@@ -155,9 +155,9 @@ Requirements
    <pre><code>
    mkdir -p ~/.local/share/koneko/pics
 
-   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/../pics/71471144_p0.png -o ~/.local/share/koneko/../pics/71471144_p0.png
+   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/71471144_p0.png -o ~/.local/share/koneko/../pics/71471144_p0.png
 
-   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/../pics/79494300_p0.png -o ~/.local/share/koneko/../pics/79494300_p0.png
+   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300_p0.png -o ~/.local/share/koneko/../pics/79494300_p0.png
     </code></pre>
    </details>
 

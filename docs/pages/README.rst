@@ -30,31 +30,31 @@ koneko
 
 Gallery view
 
-.. image:: ../pics/gallery_view_square_medium1.png
-   :target: ../pics/gallery_view_square_medium1.png
+.. image:: /pics/gallery_view_square_medium1.png
+   :target: /pics/gallery_view_square_medium1.png
    :alt: Gallery view_square_medium1
 
 
-.. image:: ../pics/gallery_view_square_medium2.png
-   :target: ../pics/gallery_view_square_medium2.png
+.. image:: /pics/gallery_view_square_medium2.png
+   :target: /pics/gallery_view_square_medium2.png
    :alt: Gallery view_square_medium2
 
 Image view
 
-.. image:: ../pics/image_view.png
-   :target: ../pics/image_view.png
+.. image:: /pics/image_view.png
+   :target: /pics/image_view.png
    :alt: Image_view
 
 Artist search (artist profile picture on the left, 3 previews on right)
 
-.. image:: ../pics/artist_search.png
-   :target: ../pics/artist_search.png
+.. image:: /pics/artist_search.png
+   :target: /pics/artist_search.png
    :alt: artist_search
 
 View artists you're following
 
-.. image:: ../pics/following_users_view.png
-   :target: ../pics/following_users_view.png
+.. image:: /pics/following_users_view.png
+   :target: /pics/following_users_view.png
    :alt: following_users_view
 
 
@@ -96,13 +96,13 @@ Why?
 
 I get 32 trackers on Pixiv. Plus, you have to disable ublock if you ever get logged out
 
-.. image:: ../pics/pixiv_ublock.png
-   :target: ../pics/pixiv_ublock.png
+.. image:: /pics/pixiv_ublock.png
+   :target: /pics/pixiv_ublock.png
    :alt: pixiv_ublock
    :scale: 50%
    :align: center
 
-The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See `prompt 1 <https://raw.githubusercontent.com/twenty5151/koneko/master/../pics/ads1.png>`_\ , `prompt 2 <https://raw.githubusercontent.com/twenty5151/koneko/master/../pics/ads2.png>`_ (Github can't render the images correctly for some reason) and this `list <#trackers-avoided>`_
+The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See `prompt 1 </pics/ads1.png>`_ , `prompt 2 </pics/ads2.png>`_ and this `list <#trackers-avoided>`_ of trackers
 
 
 * TUIs make you cool
@@ -155,9 +155,9 @@ Requirements
    <pre><code>
    mkdir -p ~/.local/share/koneko/pics
 
-   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/71471144_p0.png -o ~/.local/share/koneko/../pics/71471144_p0.png
+   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/71471144_p0.png -o ~/.local/share/koneko/pics/71471144_p0.png
 
-   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300_p0.png -o ~/.local/share/koneko/../pics/79494300_p0.png
+   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300_p0.png -o ~/.local/share/koneko/pics/79494300_p0.png
     </code></pre>
    </details>
 

@@ -161,7 +161,7 @@ Try these steps in order:
 1. Fork it
 2. Run tests with `pytest testing/ -vvvv -l`
 3. Make your changes
-4. Run tests again (add `-s --inte` for integration tests if you want)
+4. Run tests again
 5. Submit a pull request
 
 Tips: 
@@ -172,12 +172,9 @@ Tips:
 
 See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
 
-### Unit tests
-Run `pytest testing/ -vvvv -l`. Add `-s --inte` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
-
 ### Build and upload to PyPI
 
-0. Run integration tests locally
+0. Run `pytest testing/ -vvvv -l`.
 1. Review github action logs to make sure nothing is wrong
 2. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
 3. Run:

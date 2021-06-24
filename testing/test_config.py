@@ -107,7 +107,7 @@ def test_set_dimension(tmp_path, side, dimension, _):
 
 @pytest.mark.parametrize('action', (Processer.set, Processer.delete))
 @pytest.mark.parametrize('side, dimension, fallback', dimensions)
-def test_empty_or_invalid_setting(tmp_path, action, side, dimension, fallback):
+def test_empty_or_invalid_image_setting(tmp_path, action, side, dimension, fallback):
     testconfig = setup_test_config(
         tmp_path, config.Config,
         action('lscat', f'image_{side}', 'not an int'),

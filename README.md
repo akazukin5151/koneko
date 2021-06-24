@@ -97,22 +97,6 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
 See the [MANUAL.md](MANUAL.md)
 
 
-### Upcoming changelog
-
-For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
-
-#### Version 0.12
-
-##### Features
-* Custom user ID for mode 3 (view following users) has been removed, to reduce complexity of first-time setup
-
-##### Bug fixes
-* Fixed broken pixiv login
-
-##### Code maintenance
-* todo
-
-
 ## FAQ
 * I'm having problems with lscat
 
@@ -133,6 +117,26 @@ Try these steps in order:
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+
+## Upcoming changelog for version 0.12
+
+For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+
+### Features
+* Remove the need to ask for your pixiv user ID; koneko will now get it from the API response
+    * Custom user ID for mode 3 (view following users) has thus been removed, to reduce complexity of first-time setup
+
+### Bug fixes
+* Fixed broken pixiv login
+* Fixed broken curl fallback commands in the .rst version
+
+### Code maintenance
+* Update dependencies
+* Unit tests: Use tmp_path fixture instead of manually creating paths
+* Replace FollowingUserModeLoop class with following_user_mode function
+* Removed integration tests due to unreliability of new pixiv login method
+* Simplified the README
 
 
 ## Trackers avoided

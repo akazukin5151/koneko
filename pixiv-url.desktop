@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=koneko pixiv login handler
+Exec=koneko-url-login %u
+MimeType=x-scheme-handler/pixiv;

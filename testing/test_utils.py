@@ -190,3 +190,4 @@ def test_quit_on_q_quit(monkeypatch):
 
 def test_quit_on_q_no_quit(monkeypatch):
     assert utils.quit_on_q('not_q') is None
+

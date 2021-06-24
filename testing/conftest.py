@@ -55,9 +55,7 @@ class Processer(Enum):
 def setup_test_config(path, Config, *args):
     default = {
         'Credentials': {
-            'username': 'koneko',
-            'password': 'mypassword',
-            'id': 1234
+            'refresh_token': 'token',
         },
         'lscat': {
             'image_width': 18,

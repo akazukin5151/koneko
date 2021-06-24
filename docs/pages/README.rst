@@ -122,8 +122,9 @@ See also: :ref:`manual installation <manual-installation>`
 
    * If using ueberzug, run ``pip install ueberzug`` first
 
-#. ``pip install koneko`` (or if you use :ref:`conda <conda-environment>`...):
-#. Run ``koneko`` to login and save credentials
+#. ``pip install koneko`` (or if you use :ref:`conda <conda-environment>`...)
+#. Run ``koneko``. It will open a pixiv login page in your default browser and quit.
+#. Login to pixiv on your browser. If prompted, open the ``pixiv://`` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/twenty5151/koneko/issues/
 #. Run ``lscat 1 7`` to help setup the recommended settings; copy to ``~/.config/koneko/config.ini``. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
 #. Read the :ref:`usage manual <manual>`.
 
@@ -234,6 +235,17 @@ FAQ
 For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
 
 You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
+
+* I'm having problems logging in
+
+Try these steps in order:
+
+- Update your system and reboot. No seriously, that's what worked for me.
+- Try a different browser
+- Set said different browser as your default browser
+- Make a bug report at https://github.com/twenty5151/koneko/issues/ for support and debugging
+
+- Use the original script `here <https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362>`_ to get your refresh token. Copy the example config to ``~/.config/koneko``, and add the line ``refresh_token=XXXX`` under the ``[Credentials]`` section.
 
 Contributing
 ------------

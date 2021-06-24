@@ -12,6 +12,7 @@ README = (HERE / 'README.md').read_text()
 os.system('mkdir -p ~/.local/share/koneko')
 os.system('cp -r ./pics/ ~/.local/share/koneko/')
 os.system('cp example_config.ini ~/.local/share/koneko/')
+os.system('cp pixiv-url.desktop ~/.local/share/koneko/')
 
 setup(
     name='koneko',
@@ -33,24 +34,26 @@ setup(
         'Operating System :: MacOS',
         'Environment :: Console'
     ],
-    packages=['koneko'],
+    packages=['koneko', 'koneko.url_login'],
     include_package_data=True,
     install_requires=[
         'PixivPy~=3.5',
         'pixcat~=0.1',
         'docopt~=0.6',
-        'blessed~=1.17',
-        'pick>=0.6,<2.0',
-        'funcy~=1.14',
-        'returns~=0.14',
-        'placeholder~=1.1',
+        'blessed~=1.18',
+        'pick~=1.0',
+        'plyer~=2.0.0',
+        'funcy~=1.16',
+        'returns==0.14',
+        'placeholder~=1.2',
     ],
-    tests_require=['pytest>=5.4,<7.0'],
+    tests_require=['pytest~=6.2'],
     extras_require={'ueberzug': ['ueberzug~=18.1']},
     entry_points={
         'console_scripts': [
             'koneko=koneko.__main__:_main',
-            'lscat=koneko.lscat_app:main'
+            'lscat=koneko.lscat_app:main',
+            'koneko-url-login=koneko.url_login.main:main'
         ]
     },
 )

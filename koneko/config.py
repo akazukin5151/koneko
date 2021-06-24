@@ -6,6 +6,7 @@ Structure:
     - Interactive config functions for first launch setup
 """
 import os
+import sys
 from enum import Enum
 from pathlib import Path
 from getpass import getpass
@@ -15,6 +16,7 @@ from placeholder import m
 from returns.result import safe
 
 from koneko import pure, TERM
+from koneko.url_login.open_login_link import open_pixiv_login
 
 
 @safe
@@ -43,17 +45,19 @@ class Dimension(Enum):
 
 class Config:
     def __init__(self, path):
-        self.config_path = path
-        config_object = ConfigParser()
-        config_object.read(self.config_path)
-        self.config: 'dict[str, dict[str, str]' = {
-            section: dict(config_object.items(section))
-            for section in config_object.sections()
-        }
+        self._config_path = path
+        self._config_parser = ConfigParser()
+        self._config_parser.read(self._config_path)
+
+    def set(self, section: str, setting: str, value: str):
+        """Just a convenient proxy to the config parser object"""
+        self._config_parser.set(section, setting, value)
+        with open(self._config_path, 'w') as f:
+            self._config_parser.write(f)
 
     @safe
     def get_setting(self, section: str, setting: str) -> 'Result[str, KeyError]':
-        return self.config[section][setting]
+        return self._config_parser.get(section, setting)
 
     def _get_bool(self, section: str, setting: str, default: bool) -> bool:
         return self.get_setting(section, setting).bind(parse_bool).value_or(default)
@@ -61,10 +65,12 @@ class Config:
     def _get_int(self, section: str, setting: str, default: int) -> int:
         return self.get_setting(section, setting).bind(parse_int).value_or(default)
 
-
     @safe
     def credentials(self) -> 'Result[dict[str, str], KeyError]':
-        return self.config['Credentials']
+        return {
+            item[0]: item[1]
+            for item in self._config_parser.items(section='Credentials')
+        }
 
     def use_ueberzug(self) -> bool:
         return self._get_bool('experimental', 'use_ueberzug', False)
@@ -131,53 +137,26 @@ def ycoords_config() -> 'list[int]':
 
 
 # Technically frontend
-def begin_config() -> 'tuple[dict[str, str], str]':
-    os.system('clear')
-    config_path = Path('~/.config/koneko/config.ini').expanduser()
-    if config_path.exists():
-        return api.credentials().unwrap(), api.get_setting('Credentials', 'id').unwrap()
-    return init_config(config_path)
+def begin_config() -> 'dict[str, str]':
+    def normal(_):
+        os.system('clear')
+        return api.credentials().unwrap()
+    # first_start is bottom, so normal will never be called on Failure
+    return api.get_setting('Credentials', 'refresh_token').alt(first_start).bind(normal)
 
 
-def init_config(config_path) -> 'tuple[dict[str, str], str]':
-    credentials = _ask_credentials()
-    credentials, your_id = _ask_your_id(credentials)
-
-    _write_config(credentials, config_path)
-    _append_default_config(config_path)
-    return credentials, your_id
-
-
-def _ask_credentials() -> 'dict[str, str]':
-    return {
-        'username': input('Please enter your username:\n'),
-        'password': getpass('\nPlease enter your password: ')
-    }
+def first_start(_) -> 'bottom':
+    os.system('cp ~/.local/share/koneko/pixiv-url.desktop ~/.local/share/applications')
+    os.system('xdg-mime default pixiv-url.desktop x-scheme-handler/pixiv')
+    os.system('update-desktop-database ~/.local/share/applications')
+    print('Please log to pixiv in your browser then run koneko again')
+    login_then_save_verifier()
+    sys.exit(0)
 
 
-def _ask_your_id(credentials) -> 'tuple[dict[str, str], str]':
-    print('\nDo you want to save your pixiv ID? It will be more convenient')
-    print('to view artists you are following')
-    ans = input()
-    if ans == 'y' or not ans:
-        your_id = input('Please enter your pixiv ID:\n')
-        credentials.update({'ID': your_id})
-        return credentials, your_id
-    return credentials, ''
-
-
-def _write_config(credentials, config_path) -> 'IO':
-    os.system('clear')
-    parser = ConfigParser()
-    parser.read_dict({'Credentials': credentials})
-    config_path.parent.mkdir(exist_ok=True)
-    config_path.touch()
-    with open(config_path, 'w') as c:
-        parser.write(c)
-
-
-def _append_default_config(config_path) -> 'IO':
-    # Why not use python? Because it's functional, readable, and
-    # this one liner defeats any potential speed benefits
-    example_cfg = Path('~/.local/share/koneko/example_config.ini').expanduser()
-    os.system(f'tail {example_cfg} -n +9 >> {config_path}')
+def login_then_save_verifier():
+    code_verifier = open_pixiv_login()
+    path = Path('~/.local/share/koneko/code_verifier').expanduser()
+    path.touch(exist_ok=True)
+    with open(path, 'w') as f:
+        f.write(code_verifier)

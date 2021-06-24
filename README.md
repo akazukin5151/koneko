@@ -62,10 +62,11 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
 0. If you want to use the stable api, install [kitty](https://github.com/kovidgoyal/kitty) (Otherwise, you can use ueberzug with your current terminal, however note that it doesn't seem to work on macOS)
     * If using ueberzug, run `pip install ueberzug` first
-1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...):
-2. Run `koneko` to login and save credentials
-3. Run `lscat 1 7` to help setup the recommended settings; copy to `~/.config/koneko/config.ini`. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
-4. See [usage](#usage) for how to use.
+1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...)
+2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
+3. Login to pixiv on your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/twenty5151/koneko/issues/
+4. Run `lscat 1 7` to help setup the recommended settings; copy to `~/.config/koneko/config.ini`. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
+5. Run `koneko` again. Hopefully you don't see any error messages about login failing. See [usage](#usage) for how to use.
 
 ### Requirements
 
@@ -73,7 +74,11 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 * It has been tested on kitty v0.17.2 onwards, but should work on older versions
 * Operating system: all OSes that kitty supports, which means Linux and macOS.
     * Ueberzug only works on linux
-* Uses `xdg-open` (linux) / `open` (mac) (for opening links in your browser) and `curl` (for safety fallback, see below)
+* Dependencies on external programs (your responsibility to install them):
+    - `xdg-open` (linux) or `open` (mac) for opening links in your browser
+    - `curl` for safety fallback (not necessarily needed), see below
+    - `xdg-mime` and `update-desktop-database` to handle the pixiv login callback
+        - For `update-desktop-database`, try install the `desktop-file-utils` package with your package manager
 
 <details>
   <summary>If it crashes (it shouldn't), it might be because pip didn't 'install' the welcome pictures, *and* the script failed to download them for some reason. Try:</summary>
@@ -96,15 +101,16 @@ See the [manual](MANUAL.md) here
 
 For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
 
-#### Version 0.11.1
+#### Version 0.12
 
 ##### Features
-* Support illust related mode in lscat app mode 2/b
+* Custom user ID for mode 3 (view following users) has been removed, to reduce complexity of first-time setup
 
 ##### Bug fixes
+* Fixed broken pixiv login
 
 ##### Code maintenance
-* Refactored config functions into unified api and enhanced unit tests
+*
 
 
 ## Roadmap
@@ -141,6 +147,16 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
 
 You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
+
+* I'm having problems logging in
+
+Try these steps in order:
+
+- Update your system and reboot. No seriously, that's what worked for me.
+- Try a different browser
+- Set said different browser as your default browser
+- Make a bug report at https://github.com/twenty5151/koneko/issues/ for support and debugging
+- Use the original script [here](https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362) to get your refresh token. Copy the example config to `~/.config/koneko`, and add the line `refresh_token=XXXX` under the `[Credentials]` section.
 
 ## Contributing
 1. Fork it

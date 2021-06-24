@@ -27,6 +27,8 @@ cmds = (
 )
 
 for cmd in cmds:
+    print(f'========={cmd}=========')
     os.system(cmd)
     test_launch()
+    print('=========pip uninstall koneko -y=========')
     os.system('pip uninstall koneko -y')

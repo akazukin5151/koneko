@@ -17,11 +17,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        experimental: [false]
         include:
+          - os: ubuntu-latest
+            experimental: false
+            installer: "sudo apt-get install desktop-file-utils"
           - os: macos-latest
             experimental: true
+            installer: "sudo brew install desktop-file-utils"
 
     steps:
     - uses: actions/checkout@v2
@@ -37,6 +39,10 @@ jobs:
         if [[ "$OSTYPE" == "linux-gnu"* ]]; then
           pip install ueberzug
         fi
+    - name: Install desktop-file-utils
+      env:
+        CMD: ${{ matrix.desktop-file-utils-installer }}
+      run: eval $CMD
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names

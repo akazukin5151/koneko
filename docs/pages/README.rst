@@ -167,41 +167,19 @@ Usage and manual
 
 See :ref:`MANUAL.rst <manual>`
 
-Upcoming changelog
-^^^^^^^^^^^^^^^^^^
-
-For full changelogs please see `releases <https://github.com/twenty5151/koneko/releases>`_
-
-Version 0.12
-~~~~~~~~~~~~~~
-
-Features
-""""""""
-
-* Custom user ID for mode 3 (view following users) has been removed, to reduce complexity of first-time setup
-
-Bug fixes
-"""""""""
-* Fixed broken pixiv login
-
-Code maintenance
-""""""""""""""""
-
-* Todo
-
-
-
 FAQ
 ---
 
 
-* I'm having problems with lscat
+I'm having problems with lscat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
 
 You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
 
-* I'm having problems logging in
+I'm having problems logging in
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Try these steps in order:
 
@@ -215,6 +193,33 @@ Contributing
 ------------
 
 See :ref:`CONTRIBUTING.rst <contributing>`
+
+
+Upcoming changelog for version 0.12
+-----------------------------------
+
+For full changelogs please see `releases <https://github.com/twenty5151/koneko/releases>`_
+
+Features
+^^^^^^^^
+
+* Remove the need to ask for your pixiv user ID; koneko will now get it from the API response
+
+    * Custom user ID for mode 3 (view following users) has thus been removed, to reduce complexity of first-time setup
+
+Bug fixes
+^^^^^^^^^
+* Fixed broken pixiv login
+* Fixed broken curl fallback commands in the .rst version
+
+Code maintenance
+^^^^^^^^^^^^^^^^
+
+* Update dependencies
+* Unit tests: Use tmp_path fixture instead of manually creating paths
+* Replace FollowingUserModeLoop class with following_user_mode function
+* Removed integration tests due to unreliability of new pixiv login method
+* Simplified the README
 
 
 Trackers avoided

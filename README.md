@@ -98,13 +98,13 @@ See the [MANUAL.md](MANUAL.md)
 
 
 ## FAQ
-* I'm having problems with lscat
+### I'm having problems with lscat
 
 For the best experience use the terminal in full screen, unless your screen is big enough. Moving and resizing it abruptly will not be good for icat, which is really kitty's problem not mine. Extra information can be disabled from being printed.
 
 You can also use versions less than v0.5.1, which retains legacy support for the original lsix shell script. Note that I've never really tested it, which is why I decided to be honest and depreciated legacy support from v0.6 onwards. The current lscat API has matured to the point where it's simple to write a replacement anyway.
 
-* I'm having problems logging in
+### I'm having problems logging in
 
 Try these steps in order:
 

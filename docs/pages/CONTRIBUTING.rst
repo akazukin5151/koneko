@@ -7,7 +7,7 @@ Contributing
 #. Fork it
 #. Run tests with ``pytest testing/ -vvvv -l``
 #. Make your changes
-#. Run tests again (add ``-s --inte`` for integration tests if you want)
+#. Run tests again
 #. Submit a pull request
 
 Tips: 
@@ -70,8 +70,7 @@ Note: if you want to make some edits, you should install it in a conda environme
    git clone -b master https://github.com/twenty5151/koneko.git
 
    # Run the tests (for those who want to edit)
-   # Add --inte for integration testing, but don't be surprised if it fails
-   pytest testing/ -vvvv -l -s
+   pytest testing/ -vvvv -l
 
    cd koneko
    # Manually install without PyPI; for general usage
@@ -89,16 +88,12 @@ Note: if you want to make some edits, you should install it in a conda environme
    # Use anywhere:
    koneko
 
-Unit tests
-----------
-
-Run ``pytest testing/ -vvvv -l``. Add ``-s --inte`` for integration testing, but don't be surprised if it fails, because integration tests require a valid config/account + internet connection
 
 Build and upload to PyPI
 ------------------------
 
 
-#. Run integration tests locally
+#. Run ``pytest testing/ -vvvv -l``.
 #. Review github action logs to make sure nothing is wrong
 #. Bump version info in ``__init__.py``\ , ``setup.py``\ , and ``CONTRIBUTING.md``
 #. Run:

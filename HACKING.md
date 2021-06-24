@@ -21,7 +21,6 @@
         - [ui.User classes (extending AbstractUI)](#uiuser-classes-extending-abstractui)
         - [ui.Image](#uiimage)
 - [Dependencies](#dependencies)
-- [Internal imports](#internal-imports)
 
 ## 'Functional core, imperative shell' + MVA?
 

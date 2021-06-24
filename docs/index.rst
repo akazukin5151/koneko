@@ -8,6 +8,7 @@
    pages/MANUAL.rst
    pages/HACKING.rst
    pages/CONTRIBUTING.rst
+   pages/ROADMAP.rst
    pages/Reference.rst
 
 

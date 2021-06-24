@@ -94,7 +94,7 @@ curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300
 
 ## Usage and manual
 
-See the [manual](MANUAL.md) here
+See the [MANUAL.md](MANUAL.md)
 
 
 ### Upcoming changelog
@@ -112,33 +112,6 @@ For full changelogs please see [releases](https://github.com/twenty5151/koneko/r
 ##### Code maintenance
 * todo
 
-
-## Roadmap
-
-### Features
-
-* Illust-related mode can't go back to image mode
-* In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
-    * Make sure the diagrams in HACKING.md is up-to-date
-
-### Known bugs
-
-* Some info (eg manual) are still being hidden by ueberzug; general unreliability of prints (need a rethink of implementation)
-    * Help message that responds to terminal width
-    * Consider [ucollage](https://github.com/ckardaris/ucollage/)
-
-* In the logs, urllib3 warns that `Connection pool is full, discarding connection: i.pximg.net`. See [customising pool behaviour](https://urllib3.readthedocs.io/en/latest/advanced-usage.html#customizing-pool-behavior) from urllib3.
-* Prefetch thread still running (downloading) hangs the entire app, even when user quits. Cannot use daemon threads as it still hangs then noisly aborts. Changing prompt.ask_quit() into a UI method so that it can pass a threading.Event() to downloads, doesn't work either as all the downloads has already been submitted to the ThreadPoolExecutor before the user is quick enough to send 'q'. The only way is to interrupt the urllib download process, which is going to be unsafe if you don't know what you're doing.
-* There seems to be a delay between entering `koneko` and startup, but the delay is before the first line of the script even executes. Import time is fast. `pip install` using the wheel seems to reduce the delay. Directly running the script using `python koneko/main.py` or `python koneko/lscat_app.py` is faster as well. Seems like it's a delay in going to `miniconda/lib/python3.8/site-packages/koneko.egg-link` (installed with `python setup.py develop`)?
-
-### Code
-
-* Refine ueberzug dependency in setup.py/requirements.txt, keeping in mind that ueberzug only builds on linux
-* Split up UI classes and look for ways to extend data classes by adding an imperative shell around it. Possible ways to split by:
-    * Whether methods need pixivrequest or not (tried this, but methods are too entangled, see [HACKING.md](HACKING.md#ui-class-methods))
-    * Whether methods are for setting up, usage, or both (tried this)
-        * Finite state machine of the modes (tried this; way too many classes)
-        * SetupMixin and UIMixin both inherit a CommonMixin (tried this; problem is exponential explosion of number of classes)
 
 ## FAQ
 * I'm having problems with lscat
@@ -158,34 +131,9 @@ Try these steps in order:
 - Use the original script [here](https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362) to get your refresh token. Copy the example config to `~/.config/koneko`, and add the line `refresh_token=XXXX` under the `[Credentials]` section.
 
 ## Contributing
-1. Fork it
-2. Run tests with `pytest testing/ -vvvv -l`
-3. Make your changes
-4. Run tests again
-5. Submit a pull request
 
-Tips: 
-* See [HACKING.md](HACKING.md) to understand the code.
-* If your git client complains about committing to master, just remove `.pre-commit-config.yaml`
-* If you want to, you can create an issue first. Ask any questions by opening a new issue.
-* If you're encountering/fixing a bug and you're stuck, try clearing the cache. For example, a bug might have downloaded to the wrong folder, but after fixing the bug, you need to clear the cache, otherwise it would not download anything and display the wrong contents.
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-See the rest in [CONTRIBUTING.md](CONTRIBUTING.md)
-
-### Build and upload to PyPI
-
-0. Run `pytest testing/ -vvvv -l`.
-1. Review github action logs to make sure nothing is wrong
-2. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
-3. Run:
-
-```sh
-# Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
-java -jar ~/Applications/plantuml.jar puml/classes -o render
-python setup.py sdist bdist_wheel
-twine upload dist/*
-pip install koneko --upgrade
-```
 
 ## Trackers avoided
 <details>

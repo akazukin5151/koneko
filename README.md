@@ -5,14 +5,14 @@
 > Browse pixiv in the terminal using kitty's icat to display images (or use ueberzug)
 
 Gallery view
-![Gallery view_square_medium1](pics/gallery_view_square_medium1.png)
-![Gallery view_square_medium2](pics/gallery_view_square_medium2.png)
+![Gallery view_square_medium1](docs/pics/gallery_view_square_medium1.png)
+![Gallery view_square_medium2](docs/pics/gallery_view_square_medium2.png)
 Image view
-![Image_view](pics/image_view.png)
+![Image_view](docs/pics/image_view.png)
 Artist search (artist profile picture on the left, 3 previews on right)
-![artist_search](pics/artist_search.png)
+![artist_search](docs/pics/artist_search.png)
 View artists you're following
-![following_users_view](pics/following_users_view.png)
+![following_users_view](docs/pics/following_users_view.png)
 
 Requires [kitty](https://github.com/kovidgoyal/kitty). It uses the magical `kitty +kitten icat` 'kitten' to display images. For more info see the [kitty documentation](https://sw.kovidgoyal.net/kitty/kittens/icat.html). Actually, `lscat.py` uses [pixcat](https://github.com/mirukana/pixcat), which is a Python API for icat.
 
@@ -45,9 +45,9 @@ See the [manual](MANUAL.md) for more details
 
 I get 32 trackers on Pixiv. Plus, you have to disable ublock if you ever get logged out
 
-<a href="url"><img src="pics/pixiv_ublock.png" height="350"></a>
+<a href="url"><img src="docs/pics/pixiv_ublock.png" height="350"></a>
 
-The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See [prompt 1](https://raw.githubusercontent.com/twenty5151/koneko/master/pics/ads1.png), [prompt 2](https://raw.githubusercontent.com/twenty5151/koneko/master/pics/ads2.png) (Github can't render the images correctly for some reason) and this [list](#trackers-avoided)
+The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See [prompt 1](docs/pics/ads1.png), [prompt 2](docs/pics/ads2.png) and this [list](#trackers-avoided) of trackers
 
 * TUIs make you cool
 * TUIs *with embedded pictures* make you even cooler

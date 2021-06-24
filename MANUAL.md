@@ -55,7 +55,7 @@ Enter digits 1-6 to proceed. If prompted, paste in an appropriate pixiv ID or ur
 
 ### Mode a/1
 
-![Gallery view_square_medium1](pics/gallery_view_square_medium1.png)
+![Gallery view_square_medium1](docs/pics/gallery_view_square_medium1.png)
 
 * Press `h` to show a preview of keys
 * To view a post in full, enter their coordinates.
@@ -100,7 +100,7 @@ Examples:
 
 ### Mode i/2
 
-![Image_view](pics/image_view.png)
+![Image_view](docs/pics/image_view.png)
 
 * Press `r` to view other images related to this post
     * This mode is functionally identical to [mode a/1](#mode-a1)
@@ -122,7 +122,7 @@ Image view commands (No need to press enter):
 
 ### Mode f/3 and s/4
 
-![artist_search](pics/artist_search.png)
+![artist_search](docs/pics/artist_search.png)
 
 * The two digit numbers on top of the user name is the index.
 * Enter both digits to view that user's illustrations

@@ -152,13 +152,13 @@ Requirements
    <details>
      <summary>If it crashes (it shouldn't), it might be because pip didn't 'install' the welcome pictures, *and* the script failed to download them for some reason. Try:</summary>
 
-   <code>
+   <pre><code>
    mkdir -p ~/.local/share/koneko/pics
 
    curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/../pics/71471144_p0.png -o ~/.local/share/koneko/../pics/71471144_p0.png
 
    curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/../pics/79494300_p0.png -o ~/.local/share/koneko/../pics/79494300_p0.png
-    </code>
+    </code></pre>
    </details>
 
 
@@ -300,55 +300,60 @@ Trackers avoided
    <details>
    <summary>This is a list of trackers present when you use the official pixiv website or app. koneko frees you from them.</summary>
 
-   Nine trackers in the Android app, according to [exodus](https://reports.exodus-privacy.eu.org/en/reports/jp.pxv.android/latest/):
+   Nine trackers in the Android app, according to <a href=https://reports.exodus-privacy.eu.org/en/reports/jp.pxv.android/latest/>exodus</a>:
 
-   * Amazon Advertisement
-   * AMoAd
-   * Google Ads
-   * Google CrashLytics
-   * Google DoubleClick
-   * Google Firebase Analytics
-   * Integral Ad Science
-   * Moat
-   * Twitter MoPub
+   <ul>
+       <li>Amazon Advertisement</li>
+       <li>AMoAd</li>
+       <li>Google Ads</li>
+       <li>Google CrashLytics</li>
+       <li>Google DoubleClick</li>
+       <li>Google Firebase Analytics</li>
+       <li>Integral Ad Science</li>
+       <li>Moat</li>
+       <li>Twitter MoPub</li>
+   </ul>
 
-   Advertisers from pixiv's [privacy policy](https://policies.pixiv.net/en.html#booth):
+   Advertisers from pixiv's <a href=https://policies.pixiv.net/en.html#booth>privacy policy</a>:
 
-   * Looker
-   * Repro
-   * Qualaroo
-   * DDAI（Date Driven Advertising Initiative）
-   * YourAdChoices
-   * Rubicon Project
-   * i-Mobile Co., Ltd.
-   * Akinasista Corporation
-   * Axel Mark Inc.
-   * AppLovin
-   * Amazon Japan G.K.
-   * AmoAd Inc.
-   * AOL Platforms Japan K.K.
-   * OpenX
-   * Google Inc.
-   * CRITEO K.K.
-   * CyberAgent, Inc.
-   * Geniee, Inc.
-   * Supership Inc.
-   * GMO AD Marketing Inc.
-   * F@N Communications, Inc.
-   * Facebook Inc.
-   * Fluct, Inc.
-   * Platform One Inc.
-   * MicroAd Inc.
-   * MoPub Inc.
-   * Yahoo! Japan Corporation
-   * United, Inc.
-   * 株式会社Zucks
-   * PubMatic, Inc.
-   * Liftoff Mobile, Inc.
-   * Mobfox US LLC
-   * OneSignal
-   * Smaato, Inc.
-   * SMN株式会社
-   * 株式会社アドインテ
+   <ul>
+       <li>Looker</li>
+       <li>Repro</li>
+       <li>Qualaroo</li>
+       <li>DDAI（Date Driven Advertising Initiative）</li>
+       <li>YourAdChoices</li>
+       <li>Rubicon Project</li>
+       <li>i-Mobile Co., Ltd.</li>
+       <li>Akinasista Corporation</li>
+       <li>Axel Mark Inc.</li>
+       <li>AppLovin</li>
+       <li>Amazon Japan G.K.</li>
+       <li>AmoAd Inc.</li>
+       <li>AOL Platforms Japan K.K.</li>
+       <li>OpenX</li>
+       <li>Google Inc.</li>
+       <li>CRITEO K.K.</li>
+       <li>CyberAgent, Inc.</li>
+       <li>Geniee, Inc.</li>
+       <li>Supership Inc.</li>
+       <li>GMO AD Marketing Inc.</li>
+       <li>F@N Communications, Inc.</li>
+       <li>Facebook Inc.</li>
+       <li>Fluct, Inc.</li>
+       <li>Platform One Inc.</li>
+       <li>MicroAd Inc.</li>
+       <li>MoPub Inc.</li>
+       <li>Yahoo! Japan Corporation</li>
+       <li>United, Inc.</li>
+       <li>株式会社Zucks</li>
+       <li>PubMatic, Inc.</li>
+       <li>Liftoff Mobile, Inc.</li>
+       <li>Mobfox US LLC</li>
+       <li>OneSignal</li>
+       <li>Smaato, Inc.</li>
+       <li>SMN株式会社</li>
+       <li>株式会社アドインテ</li>
+   </ul>
+
    </details>
 

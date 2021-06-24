@@ -142,7 +142,7 @@ def test_gallery_like_prompt_previous(monkeypatch, patch_cbreak, capsys):
         assert prompt.gallery_like_prompt(fakegallery)
 
     captured = capsys.readouterr()
-    assert captured.out == f'Enter a gallery view command:\np'
+    assert captured.out == 'Enter a gallery view command:\np'
 
 
 def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak, capsys):
@@ -157,7 +157,7 @@ def test_gallery_like_prompt_ask_quit(monkeypatch, patch_cbreak, capsys):
         assert prompt.gallery_like_prompt(fakegallery)
 
     captured = capsys.readouterr()
-    assert captured.out == f'Enter a gallery view command:\nq'
+    assert captured.out == 'Enter a gallery view command:\nq'
 
 
 def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak, capsys):
@@ -171,7 +171,7 @@ def test_gallery_like_prompt_digits_seq(monkeypatch, patch_cbreak, capsys):
         assert prompt.gallery_like_prompt(fakegallery)
 
     captured = capsys.readouterr()
-    assert captured.out == f'Enter a gallery view command:\n11'
+    assert captured.out == 'Enter a gallery view command:\n11'
 
 # Doesn't work for some reason, but sequencable_keys did trigger
 #def test_gallery_like_prompt_3_seq(monkeypatch, patch_cbreak):

@@ -1,9 +1,6 @@
-import os
-import configparser
 from unittest.mock import Mock, call
 
 import pytest
-from returns.result import Success
 
 from koneko import config
 from conftest import setup_test_config, Processer, CustomExit, raises_customexit

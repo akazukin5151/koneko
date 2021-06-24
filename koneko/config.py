@@ -9,7 +9,6 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
-from getpass import getpass
 from configparser import ConfigParser
 
 from placeholder import m

@@ -6,7 +6,7 @@ from collections import namedtuple
 
 import pytest
 
-from koneko import lscat, pure, WELCOME_IMAGE
+from koneko import lscat, WELCOME_IMAGE
 
 
 FakeData = namedtuple('data', ('download_path',))

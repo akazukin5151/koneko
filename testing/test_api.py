@@ -2,8 +2,9 @@ from unittest.mock import Mock, call
 
 import pytest
 from pixivpy3 import PixivError
+from returns.result import Success, Failure
 
-from koneko import api
+from koneko import api, main
 
 
 def raises():
@@ -155,3 +156,16 @@ def test_api_protected_download(monkeypatch):
     assert mocked_api.mock_calls == [call.download('url', path='path', name='name')]
     assert mock_thread.mock_calls == [call.join()]
     assert testapi._login_done == True
+
+
+def test_get_id_then_save_on_success(monkeypatch):
+    monkeypatch.setattr('koneko.config.api.get_setting', lambda _, __: Success('1234'))
+    assert main.get_id_then_save() == '1234'
+
+def test_get_id_then_save_on_fail(monkeypatch):
+    """Successfully recovers from failure"""
+    monkeypatch.setattr('koneko.config.api.get_setting', lambda _, __: Failure('foo'))
+    monkeypatch.setattr('koneko.api.myapi.get_user_id', lambda: '5678')
+    monkeypatch.setattr('koneko.config.api.set', lambda _, __, ___: 0)
+    assert main.get_id_then_save() == '5678'
+

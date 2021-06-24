@@ -23,7 +23,7 @@ from logging.handlers import RotatingFileHandler
 
 import funcy
 
-from koneko import api, config, KONEKODIR
+from koneko import config, KONEKODIR
 
 
 # History and logging
@@ -192,16 +192,6 @@ def get_cache_size() -> str:
 def quit_on_q(ans: str):
     if ans == 'q':
         sys.exit(0)
-
-
-def get_id_then_save() -> str:
-    def id_(x): return x
-    def on_fail(_):
-        pixiv_id = api.myapi.get_user_id()
-        config.api.set('Credentials', 'id', pixiv_id)
-        return pixiv_id
-
-    return config.api.get_setting('Credentials', 'id').fix(on_fail).bind(id_)
 
 
 # Ueberzug

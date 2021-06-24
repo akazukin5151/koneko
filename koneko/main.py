@@ -15,7 +15,7 @@ import os
 import sys
 from abc import ABC, abstractmethod
 
-from koneko import ui, api, pure, utils, prompt, screens, picker, lscat_app
+from koneko import ui, api, pure, config, utils, prompt, screens, picker, lscat_app
 
 
 def main_loop(_) -> 'IO':
@@ -182,7 +182,7 @@ class FollowingUserModeLoop(AbstractLoop):
     def _go_to_mode(self) -> 'IO':
         """Implements abstractmethod: Go to mode 3"""
         os.system('clear')
-        pixiv_id = utils.get_id_then_save()
+        pixiv_id = get_id_then_save()
         self.mode = ui.FollowingUsers(pixiv_id)
         prompt.user_prompt(self.mode)
 
@@ -260,3 +260,11 @@ def _frequent(actions: 'list[str]', history: 'dict[str, int]') -> 'IO':
         func()
 
 
+def get_id_then_save() -> str:
+    def id_(x): return x
+    def on_fail(_):
+        pixiv_id = api.myapi.get_user_id()
+        config.api.set('Credentials', 'id', pixiv_id)
+        return pixiv_id
+
+    return config.api.get_setting('Credentials', 'id').fix(on_fail).bind(id_)

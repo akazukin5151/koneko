@@ -16,7 +16,7 @@ os.system('cp pixiv-url.desktop ~/.local/share/koneko/')
 
 setup(
     name='koneko',
-    version='0.11.0',
+    version='0.12.0',
     description='Browse pixiv in the terminal',
     long_description=README,
     long_description_content_type='text/markdown',

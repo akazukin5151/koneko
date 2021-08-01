@@ -102,7 +102,7 @@ Build and upload to PyPI
 .. code-block:: sh
 
    # Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
-   java -jar ~/Applications/plantuml.jar docs/puml/classes -o render
+   java -jar ~/Applications/plantuml.jar docs/puml/*/ -o render
    python setup.py sdist bdist_wheel
    twine upload dist/*
    pip install koneko --upgrade

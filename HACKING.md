@@ -66,70 +66,70 @@ $ tree -d  # (Edited: .koneko and history are files not directories)
 
 ### Flowchart of modes and their connections
 
-![Flowchart UML](puml/render/flowchart.png)
+![Flowchart UML](docs/puml/flowchart/render/flowchart.png)
 
 
 ### Flowchart as a finite state machine
 
-![api UML](puml/classes/render/state_flowchart.png)
+![api UML](docs/puml/classes/render/state_flowchart.png)
 
 
 ### Simplified UML diagram of the classes
 
 #### api.py
 
-![api UML](puml/classes/render/api.png)
+![api UML](docs/puml/classes/render/api.png)
 
 #### download.py
 
-![download UML](puml/classes/render/download.png)
+![download UML](docs/puml/classes/render/download.png)
 
 #### Image Adjuster in assistants.py
 
-![image adjuster UML](puml/classes/render/image_adjuster.png)
+![image adjuster UML](docs/puml/classes/render/image_adjuster.png)
 
 #### lscat.py and data.py
 
-![lscat and data UML](puml/classes/render/lscat_and_data.png)
+![lscat and data UML](docs/puml/classes/render/lscat_and_data.png)
 
 #### main.py to prompt.py
 
-![main to prompt UML](puml/classes/render/main_to_prompt.png)
+![main to prompt UML](docs/puml/classes/render/main_to_prompt.png)
 
 #### main.py to ui.py
 
-![main to ui UML](puml/classes/render/main_to_ui.png)
+![main to ui UML](docs/puml/classes/render/main_to_ui.png)
 
 
 #### ui.py
 
-![ui UML](puml/classes/render/ui.png)
+![ui UML](docs/puml/classes/render/ui.png)
 
 
 #### UI class methods
 
-![ui methods UML](puml/classes/render/ui_methods.png)
+![ui methods UML](docs/puml/classes/render/ui_methods.png)
 
 
 
 ### Actor-ish models of ui classes
 #### ui.AbstractUI
   
-![AbstractUI UML](puml/actors/render/abstractui.png)
+![AbstractUI UML](docs/puml/actors/render/abstractui.png)
   
 #### ui.Gallery classes (extending AbstractUI)
 
-![Gallery UML](http://plantuml.com:80/plantuml/png/RL71QiCm3BthAtHCA3liq4iWeuD2Fw1iLwFL9dWuLh0LIY0VFzjnM3TwilJq93q_dQ9Ga7bq85QSmGivPyA28siJiSaFlY9vZSSMW6x20J-Y2G1zZv_MtD6ED1Xi1aRXckIk5liUCXDVtd2sU3Xq3tn8IC87JKAbD74KzHtPGp0o1_y0PCuNHOCsHt0BXcHFjZ4bxl2Qn2NHlvrRDOley6pZv6Y9V_Phldl7f8k4yvuKHXFRAcLNL60r1HudQLfOrnMA2nV6PA6DKlvTFJiYUxSyCs5WjT5L9gP1_wserJcrAQltxS_HzuBMessIJiRhV4-07m00)
+![Gallery UML](docs/puml/actors/render/gallery.png)
 
 
 #### ui.User classes (extending AbstractUI)
   
-![User UML](http://plantuml.com:80/plantuml/png/TOun2iCm40JxUyMMDYPLKWKKdCelI2q4Ee90jk1qAW9wl2KbRTgPMTWrgnCjUoGD6Xclp98nxSaphaY2sqn4nc1BQ678Yk6CePxYya09M9Oxtib-0zk3QQR6c_LEtV0_MThA1a_2MkJuGv-3RYv6bW_LMjk7bG_VVnAT)
+![User UML](docs/puml/actors/render/users.png)
 
 
 #### ui.Image
 
-![Image UML](puml/actors/render/image.png)
+![Image UML](docs/puml/actors/render/image.png)
 
 
 ## Dependencies

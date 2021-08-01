@@ -56,8 +56,8 @@ Flowchart of modes and their connections
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. image:: ../puml/render/flowchart.png
-   :target: ../puml/render/flowchart.png
+.. image:: ../puml/flowchart/render/flowchart.png
+   :target: ../puml/flowchart/render/flowchart.png
    :alt: Flowchart UML
 
 

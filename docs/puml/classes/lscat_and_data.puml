@@ -140,9 +140,11 @@ class data.ImageData {
     + page_num
     + firstmode
     + page_urls
+    + original_urls
     + number_of_pages
     + download_path
     + current_url
+    + current_original_url
     + next_img_url
     + image_filename
     + filepath

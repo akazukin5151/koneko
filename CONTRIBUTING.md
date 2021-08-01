@@ -80,7 +80,7 @@ koneko
 
 ```sh
 # Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
-java -jar ~/Applications/plantuml.jar puml/classes -o render
+java -jar ~/Applications/plantuml.jar docs/puml/classes -o render
 python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade

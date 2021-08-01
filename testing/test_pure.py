@@ -72,12 +72,6 @@ def test_post_titles_in_page():
     assert pure.post_titles_in_page(page_illusts_new)[1] == 'おりじなる'
 
 
-def test_change_url_to_full():
-    assert (
-        pure.change_url_to_full('https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p0_master1200.jpg')
-        == 'https://i.pximg.net/c/540x540_70/img-master/img/2019/09/09/04/32/38/76695217_p0.jpg'
-    )
-
 def test_process_user_url():
     assert pure.process_user_url('https://www.pixiv.net/en/users/2232374') == '2232374'
     assert pure.process_user_url('2232374') == '2232374'

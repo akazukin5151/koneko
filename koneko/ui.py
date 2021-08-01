@@ -665,14 +665,11 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
         utils.open_in_browser(self.image_id)
 
     def download_image(self) -> 'IO':
-        download.download_url_verified(self.current_url)
+        download.download_url_verified(self.current_original_url)
 
     def show_full_res(self) -> 'IO':
-        # FIXME: some images that need to be downloaded in png won't work
-        # Can use verified function above
-        large_url = pure.change_url_to_full(self.current_url)
-        filename = pure.split_backslash_last(large_url)
-        download.download_url(self.download_path, large_url, filename)
+        filename = pure.split_backslash_last(self.current_original_url)
+        download.download_url(self.download_path, self.current_original_url, filename)
         lscat.api.show_center(self.download_path / filename)
 
     def next_image(self) -> 'IO':

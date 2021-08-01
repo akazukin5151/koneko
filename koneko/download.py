@@ -113,16 +113,16 @@ def download_url(download_path: Path, url, filename: str) -> 'IO':
         api.myapi.protected_download(url, download_path, filename)
 
 
-def download_url_verified(url, png=False) -> 'IO':
+def download_url_verified(url) -> 'IO':
     # Returned url might be different if png is True
-    url, filename, filepath = pure.full_img_details(url, png=png)
+    filename, filepath = pure.full_img_details(url)
     download_path = Path('~/Downloads').expanduser()
 
     download_url(download_path, url, filename)
 
     verified = files.verify_full_download(filepath)
     if not verified:
-        download_url_verified(url, png=True)
+        download_url_verified(url)
     else:
         print(f'Image downloaded at {filepath}')
 

@@ -30,7 +30,7 @@ def _prefix_filename(old_name_with_ext: str, new_name: str, number: int) -> str:
 def url_given_size(post_json: 'Json', size: str) -> str:
     """
     size : str
-        One of: ("square-medium", "medium", "large")
+        One of: ("square-medium", "medium", "large", "original")
     """
     return post_json['image_urls'][size]
 
@@ -60,20 +60,6 @@ def page_urls_in_post(post_json: 'Json', size='medium') -> 'list[str]':
     return [url_given_size(post_json, size)]
 
 
-def change_url_to_full(url: str, png=False) -> str:
-    """
-    The 'large' resolution url isn't the largest. This uses changes the url to
-    the highest resolution available
-    """
-    url = re.sub(r'_master\d+', '', url)
-    url = re.sub(r'c\/\d+x\d+_\d+_\w+\/img-master', 'img-original', url)
-
-    # If it doesn't work, try changing to png
-    if png:
-        url = url.replace('jpg', 'png')
-    return url
-
-
 def process_user_url(url_or_id: str) -> str:
     if 'users' in url_or_id:
         if '\\' in url_or_id:
@@ -100,12 +86,21 @@ def newnames_with_ext(urls, oldnames_with_ext, newnames: 'list[str]') -> 'list[s
     )
 
 
-def full_img_details(url: str, png=False) -> (str, str, Path):
-    # Example of an image that needs to be downloaded in png: 77803142
-    url = change_url_to_full(url, png=png)
+def full_img_details(url: str) -> (str, Path):
     filename = split_backslash_last(url)
     filepath = _generate_filepath(filename)
-    return url, filename, filepath
+    return filename, filepath
+
+
+def get_original_urls(post_json):
+    if (single := post_json['meta_single_page']):
+        return [single['original_image_url']]
+    number_of_pages = post_json['page_count']
+    list_of_pages = post_json['meta_pages']
+    return [
+        url_given_size(list_of_pages[i], 'original')
+        for i in range(number_of_pages)
+    ]
 
 
 def concat_seqs_to_int(keyseqs: 'list[str]', start: int = 0) -> int:

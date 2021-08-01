@@ -83,6 +83,7 @@ def test_show_full_res(monkeypatch):
     monkeypatch.setattr('koneko.lscat.api.show_center', lambda *a: True)
     data.current_url = 'fake'
     data.download_path = Path('fake')
+    data.current_original_url = 'fake'
     ui.Image.show_full_res(data)
 
 def test_next_image(monkeypatch, capsys):

@@ -189,6 +189,7 @@ class ImageData:
 
         # These are assigned here not as a method, as raw won't be updated
         self.page_urls = pure.page_urls_in_post(raw, 'large')
+        self.original_urls = pure.get_original_urls(raw)
         self.number_of_pages = len(self.page_urls)
         self.download_path = KONEKODIR / str(self.artist_user_id) / 'individual'
         # Store multi image posts within their own dir
@@ -198,6 +199,10 @@ class ImageData:
     @property
     def current_url(self) -> str:
         return self.page_urls[self.page_num]
+
+    @property
+    def current_original_url(self) -> str:
+        return self.original_urls[self.page_num]
 
     @property
     def next_img_url(self) -> str:

@@ -94,15 +94,15 @@ Build and upload to PyPI
 ------------------------
 
 
-#. Run ``pytest testing/ -vvvv -l``.
+#. Run `pytest testing/ -vvvv -l`.
 #. Review github action logs to make sure nothing is wrong
-#. Bump version info in ``__init__.py``\ , ``setup.py``\ , and ``CONTRIBUTING.md``
+#. Run `java -jar ~/Applications/plantuml.jar docs/puml/*/ -o render` (change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored)
+#. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
 #. Run:
 
 .. code-block:: sh
 
-   # Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
-   java -jar ~/Applications/plantuml.jar docs/puml/*/ -o render
+   rm -r dist
    python setup.py sdist bdist_wheel
    twine upload dist/*
    pip install koneko --upgrade

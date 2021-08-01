@@ -75,12 +75,12 @@ koneko
 
 0. Run `pytest testing/ -vvvv -l`.
 1. Review github action logs to make sure nothing is wrong
-2. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
-3. Run:
+2. Run `java -jar ~/Applications/plantuml.jar docs/puml/*/ -o render` (change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored)
+3. Bump version info in `__init__.py`, `setup.py`, and `CONTRIBUTING.md`
+4. Run:
 
 ```sh
-# Change 1st argument to where [`plantuml.jar`](https://plantuml.com/download) is stored
-java -jar ~/Applications/plantuml.jar docs/puml/*/ -o render
+rm -r dist
 python setup.py sdist bdist_wheel
 twine upload dist/*
 pip install koneko --upgrade

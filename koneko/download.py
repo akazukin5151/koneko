@@ -122,7 +122,7 @@ def download_url_verified(url) -> 'IO':
 
     verified = files.verify_full_download(filepath)
     if not verified:
-        download_url_verified(url)
+        print(f'Image failed to download! Please submit a bug report')
     else:
         print(f'Image downloaded at {filepath}')
 

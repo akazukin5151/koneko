@@ -168,7 +168,7 @@ class ViewPostModeLoop(AbstractLoop):
 def following_users_mode():
     """Get pixiv id then immediately goes to ui.FollowingUsers"""
     os.system('clear')
-    pixiv_id = utils.get_id_then_save()
+    pixiv_id = get_id_then_save()
     mode = ui.FollowingUsers(pixiv_id)
     prompt.user_prompt(mode)
 

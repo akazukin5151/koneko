@@ -52,7 +52,12 @@ class AbstractData(ABC):
 
     @property
     def next_offset(self) -> str:
-        return self.next_url.split('&')[-1].split('=')[-1]
+        xs = self.next_url.split('&')
+        for x in xs:
+            key, value = x.split('=')
+            if key == 'offset':
+                return value
+        raise Exception('next_offset not found')
 
     @property
     def is_immediate_next(self) -> bool:
@@ -115,7 +120,11 @@ class GalleryData(AbstractData):
     @property
     def current_illusts(self) -> 'Json':
         """Get the illusts json for this page"""
-        return self.all_pages_cache[self.page_num]['illusts']
+        try:
+            t = self.all_pages_cache[self.page_num]['illusts']
+        except KeyError:
+            breakpoint()
+        return t
 
     def post_json(self, post_number: int) -> 'Json':
         """Get the post json for a specified post number"""

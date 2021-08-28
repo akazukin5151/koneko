@@ -127,7 +127,10 @@ class AbstractUI(ABC):
         ):
             return True
 
-        self._data.offset = self._data.next_offset
+        next_offset = self._data.next_offset
+        if self._data.offset == next_offset:
+            return
+        self._data.offset = next_offset
         self._request_then_save(self._data.page_num + 1)
         new = self._data.clone_with_page(int(self._data.offset) // 30 + 1)
         download.init_download(new, None)

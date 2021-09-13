@@ -5,7 +5,7 @@ blessed~=1.18
 pick~=1.0
 funcy~=1.16
 returns==0.16
-placeholder~=1.2
+placeholder~=1.3
 plyer~=2.0.0
 
 pytest~=6.2

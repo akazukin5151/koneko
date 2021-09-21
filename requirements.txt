@@ -1,7 +1,7 @@
 PixivPy~=3.6
 pixcat~=0.1
 docopt~=0.6
-blessed~=1.18
+blessed~=1.19
 pick~=1.0
 funcy~=1.16
 returns==0.16

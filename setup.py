@@ -20,12 +20,12 @@ setup(
     description='Browse pixiv in the terminal',
     long_description=README,
     long_description_content_type='text/markdown',
-    url='https://github.com/twenty5151/koneko',
+    url='https://github.com/akazukin5151/koneko',
     project_urls={
-        'Source Code': 'https://github.com/twenty5151/koneko',
+        'Source Code': 'https://github.com/akazukin5151/koneko',
         'Documentation': 'https://koneko.readthedocs.io/en/latest/',
     },
-    author='twenty5151',
+    author='akazukin5151',
     license='GPLv3',
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',

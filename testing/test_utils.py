@@ -148,11 +148,11 @@ def test_handle_missing_pics_missing(monkeypatch, capsys):
     #]
     assert mocked_system.call_args_list[2] == call('clear')
 
-    assert str(mocked_system.call_args_list[0]).split(' <FakePath')[0] == 'call("curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/71471144_p0.png -o'  # No ending quote and bracket
+    assert str(mocked_system.call_args_list[0]).split(' <FakePath')[0] == 'call("curl -s https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/71471144_p0.png -o'  # No ending quote and bracket
 
     assert str(mocked_system.call_args_list[0]).split('/')[-1] == '71471144_p0.png")'
 
-    assert str(mocked_system.call_args_list[1]).split(' <FakePath')[0] == 'call("curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300_p0.png -o'
+    assert str(mocked_system.call_args_list[1]).split(' <FakePath')[0] == 'call("curl -s https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/79494300_p0.png -o'
 
     assert str(mocked_system.call_args_list[1]).split('/')[-1] == '79494300_p0.png")'
 

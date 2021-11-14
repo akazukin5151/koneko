@@ -10,12 +10,12 @@ koneko
    :target: https://pypi.org/project/koneko/
    :alt: PyPI
 
-.. image:: https://img.shields.io/github/commits-since/twenty5151/koneko/latest
-   :target: https://GitHub.com/twenty5151/koneko/commit/
+.. image:: https://img.shields.io/github/commits-since/akazukin5151/koneko/latest
+   :target: https://GitHub.com/akazukin5151/koneko/commit/
    :alt: commits since
 
-.. image:: https://github.com/twenty5151/koneko/workflows/master/badge.svg?branch=master
-   :target: https://github.com/twenty5151/koneko/workflows/master/badge.svg?branch=master
+.. image:: https://github.com/akazukin5151/koneko/workflows/master/badge.svg?branch=master
+   :target: https://github.com/akazukin5151/koneko/workflows/master/badge.svg?branch=master
    :alt: master
 
 .. image:: https://readthedocs.org/projects/koneko/badge/?version=latest
@@ -102,7 +102,7 @@ I get 32 trackers on Pixiv. Plus, you have to disable ublock if you ever get log
    :scale: 50%
    :align: center
 
-The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See `prompt 1 <https://raw.githubusercontent.com/twenty5151/koneko/master/docs/pics/ads1.png>`_ , `prompt 2 <https://raw.githubusercontent.com/twenty5151/koneko/master/docs/pics/ads2.png>`_ and this `list <#trackers-avoided>`_ of trackers
+The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See `prompt 1 <https://raw.githubusercontent.com/akazukin5151/koneko/master/docs/pics/ads1.png>`_ , `prompt 2 <https://raw.githubusercontent.com/akazukin5151/koneko/master/docs/pics/ads2.png>`_ and this `list <#trackers-avoided>`_ of trackers
 
 
 * TUIs make you cool
@@ -124,7 +124,7 @@ See also: :ref:`manual installation <manual-installation>`
 
 #. ``pip install koneko`` (or if you use :ref:`conda <conda-environment>`...)
 #. Run ``koneko``. It will open a pixiv login page in your default browser and quit.
-#. Login to pixiv on your browser. If prompted, open the ``pixiv://`` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/twenty5151/koneko/issues/
+#. Login to pixiv on your browser. If prompted, open the ``pixiv://`` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/
 #. Run ``lscat 1 7`` to help setup the recommended settings; copy to ``~/.config/koneko/config.ini``. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
 #. Run ``koneko`` again. Hopefully you don't see any error messages about login failing. See the :ref:`usage manual <manual>` for how to use.
 
@@ -155,9 +155,9 @@ Requirements
    <pre><code>
    mkdir -p ~/.local/share/koneko/pics
 
-   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/71471144_p0.png -o ~/.local/share/koneko/pics/71471144_p0.png
+   curl -s https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/71471144_p0.png -o ~/.local/share/koneko/pics/71471144_p0.png
 
-   curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300_p0.png -o ~/.local/share/koneko/pics/79494300_p0.png
+   curl -s https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/79494300_p0.png -o ~/.local/share/koneko/pics/79494300_p0.png
     </code></pre>
    </details>
 
@@ -186,7 +186,7 @@ Try these steps in order:
 - Update your system and reboot. No seriously, that's what worked for me.
 - Try a different browser
 - Set said different browser as your default browser
-- Make a bug report at https://github.com/twenty5151/koneko/issues/ for support and debugging
+- Make a bug report at https://github.com/akazukin5151/koneko/issues/ for support and debugging
 - Use the original script `here <https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362>`_ to get your refresh token. Copy the example config to ``~/.config/koneko``, and add the line ``refresh_token=XXXX`` under the ``[Credentials]`` section.
 
 Contributing
@@ -198,7 +198,7 @@ See :ref:`CONTRIBUTING.rst <contributing>`
 Upcoming changelog for version 0.12
 -----------------------------------
 
-For full changelogs please see `releases <https://github.com/twenty5151/koneko/releases>`_
+For full changelogs please see `releases <https://github.com/akazukin5151/koneko/releases>`_
 
 Features
 ^^^^^^^^

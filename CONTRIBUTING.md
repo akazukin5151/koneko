@@ -47,9 +47,9 @@ Note: if you want to make some edits, you should install it in a conda environme
 ```sh
 # Use the latest stable version (recommended for usage)
 # Make sure the version number is the latest
-git clone -b 'v0.12.2' --depth 1 https://github.com/twenty5151/koneko.git
+git clone -b 'v0.12.2' --depth 1 https://github.com/akazukin5151/koneko.git
 # ...or Use the master branch for nightly builds
-git clone -b master https://github.com/twenty5151/koneko.git
+git clone -b master https://github.com/akazukin5151/koneko.git
 
 # Run the tests (for those who want to edit)
 pytest testing/ -vvvv -l

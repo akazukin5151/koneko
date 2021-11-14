@@ -171,7 +171,7 @@ def handle_missing_pics() -> 'IO':
         return True
 
     print('Please wait, downloading welcome image (this will only occur once)...')
-    baseurl = 'https://raw.githubusercontent.com/twenty5151/koneko/master/pics/'
+    baseurl = 'https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/'
 
     basedir.mkdir(parents=True)
     for pic in ('71471144_p0.png', '79494300_p0.png'):

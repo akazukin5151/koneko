@@ -50,7 +50,7 @@ class APIHandler:
             print('It is not a problem with koneko or pixivpy')
             print(
                 'Otherwise, please report to '
-                'https://github.com/twenty5151/koneko/issues'
+                'https://github.com/akazukin5151/koneko/issues'
             )
             print("Press 'q' and enter to exit")
         #else:

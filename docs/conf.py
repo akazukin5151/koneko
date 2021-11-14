@@ -17,8 +17,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'koneko'
-copyright = '2020, twenty5151'
-author = 'twenty5151'
+copyright = '2020, akazukin5151'
+author = 'akazukin5151'
 
 
 # -- General configuration ---------------------------------------------------
@@ -49,7 +49,7 @@ html_theme_options = {
     'nav_title': 'koneko',
     'color_primary': 'blue',
     'color_accent': 'orange',
-    'repo_url': 'https://github.com/twenty5151/koneko/',
+    'repo_url': 'https://github.com/akazukin5151/koneko/',
     'repo_name': 'koneko',
 }
 html_sidebars = {

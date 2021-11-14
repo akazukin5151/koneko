@@ -81,7 +81,7 @@ def info_screen_loop() -> 'IO':
         '5. View latest illustrations from artist you follow.\n',
         'Thank you for using koneko!',
         'Please star, report bugs and contribute in:',
-        'https://github.com/twenty5151/koneko',
+        'https://github.com/akazukin5151/koneko',
         'GPLv3 licensed\n',
         'Credits to amasyrup (甘城なつき):',
         'Welcome image: https://www.pixiv.net/en/artworks/71471144',

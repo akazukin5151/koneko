@@ -1,6 +1,6 @@
 # koneko
 
-[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![commits since](https://img.shields.io/github/commits-since/twenty5151/koneko/latest)](https://GitHub.com/twenty5151/koneko/commit/) ![master](https://github.com/twenty5151/koneko/workflows/master/badge.svg?branch=master) [![docs](https://readthedocs.org/projects/koneko/badge/?version=latest)](https://koneko.readthedocs.io/en/latest/?badge=latest) [![status](https://img.shields.io/badge/status-maintenance-green)](https://img.shields.io/badge/status-maintenance-green)
+[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![commits since](https://img.shields.io/github/commits-since/akazukin5151/koneko/latest)](https://GitHub.com/akazukin5151/koneko/commit/) ![master](https://github.com/akazukin5151/koneko/workflows/master/badge.svg?branch=master) [![docs](https://readthedocs.org/projects/koneko/badge/?version=latest)](https://koneko.readthedocs.io/en/latest/?badge=latest) [![status](https://img.shields.io/badge/status-maintenance-green)](https://img.shields.io/badge/status-maintenance-green)
 
 > Browse pixiv in the terminal using kitty's icat to display images (or use ueberzug)
 
@@ -47,7 +47,7 @@ I get 32 trackers on Pixiv. Plus, you have to disable ublock if you ever get log
 
 <a href="url"><img src="docs/pics/pixiv_ublock.png" height="350"></a>
 
-The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See [prompt 1](https://raw.githubusercontent.com/twenty5151/koneko/master/docs/pics/ads1.png), [prompt 2](https://raw.githubusercontent.com/twenty5151/koneko/master/docs/pics/ads2.png) and this [list](#trackers-avoided) of trackers
+The mobile app even directly tells you Google "and our 198 partners" "collect and use data"! See [prompt 1](https://raw.githubusercontent.com/akazukin5151/koneko/master/docs/pics/ads1.png), [prompt 2](https://raw.githubusercontent.com/akazukin5151/koneko/master/docs/pics/ads2.png) and this [list](#trackers-avoided) of trackers
 
 * TUIs make you cool
 * TUIs *with embedded pictures* make you even cooler
@@ -64,7 +64,7 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
     * If using ueberzug, run `pip install ueberzug` first
 1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...)
 2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
-3. Login to pixiv on your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/twenty5151/koneko/issues/
+3. Login to pixiv on your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/
 4. Run `lscat 1 7` to help setup the recommended settings; copy to `~/.config/koneko/config.ini`. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
 5. Run `koneko` again. Hopefully you don't see any error messages about login failing. See [usage](#usage) for how to use.
 
@@ -86,9 +86,9 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 ```sh
 mkdir -p ~/.local/share/koneko/pics
    
-curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/71471144_p0.png -o ~/.local/share/koneko/pics/71471144_p0.png
+curl -s https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/71471144_p0.png -o ~/.local/share/koneko/pics/71471144_p0.png
     
-curl -s https://raw.githubusercontent.com/twenty5151/koneko/master/pics/79494300_p0.png -o ~/.local/share/koneko/pics/79494300_p0.png
+curl -s https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/79494300_p0.png -o ~/.local/share/koneko/pics/79494300_p0.png
  ```
 </details>
 
@@ -111,7 +111,7 @@ Try these steps in order:
 - Update your system and reboot. No seriously, that's what worked for me.
 - Try a different browser
 - Set said different browser as your default browser
-- Make a bug report at https://github.com/twenty5151/koneko/issues/ for support and debugging
+- Make a bug report at https://github.com/akazukin5151/koneko/issues/ for support and debugging
 - Use the original script [here](https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362) to get your refresh token. Copy the example config to `~/.config/koneko`, and add the line `refresh_token=XXXX` under the `[Credentials]` section.
 
 ## Contributing
@@ -121,7 +121,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Upcoming changelog for version 0.12
 
-For full changelogs please see [releases](https://github.com/twenty5151/koneko/releases)
+For full changelogs please see [releases](https://github.com/akazukin5151/koneko/releases)
 
 ### Features
 * Remove the need to ask for your pixiv user ID; koneko will now get it from the API response

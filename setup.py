@@ -47,7 +47,7 @@ setup(
         'returns==0.17.0',
         'placeholder~=1.2',
     ],
-    tests_require=['pytest~=6.2'],
+    tests_require=['pytest>=6.2,<8.0'],
     extras_require={'ueberzug': ['ueberzug~=18.1']},
     entry_points={
         'console_scripts': [

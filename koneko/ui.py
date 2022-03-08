@@ -120,6 +120,9 @@ class AbstractUI(ABC):
         # Else next_url won't be set yet
         self._maybe_join_thread()
 
+        if self._data.next_url is None:
+            return True
+        # For some reason, if next_url is None, this statement doesn't catch it (???)
         if not (
             self._data.next_url
             or self._data.next_offset.isdigit()

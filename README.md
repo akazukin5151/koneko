@@ -118,27 +118,6 @@ Try these steps in order:
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-
-## Upcoming changelog for version 0.12
-
-For full changelogs please see [releases](https://github.com/akazukin5151/koneko/releases)
-
-### Features
-* Remove the need to ask for your pixiv user ID; koneko will now get it from the API response
-    * Custom user ID for mode 3 (view following users) has thus been removed, to reduce complexity of first-time setup
-
-### Bug fixes
-* Fixed broken pixiv login
-* Fixed broken curl fallback commands in the .rst version
-
-### Code maintenance
-* Update dependencies
-* Unit tests: Use tmp_path fixture instead of manually creating paths
-* Replace FollowingUserModeLoop class with following_user_mode function
-* Removed integration tests due to unreliability of new pixiv login method
-* Simplified the README
-
-
 ## Trackers avoided
 <details>
 <summary>This is a list of trackers present when you use the official pixiv website or app. koneko frees you from them.</summary>

@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from setuptools import setup
+from setuptools.command.install import install
 
 # The directory containing this file
 HERE = Path(__file__).parent
@@ -13,6 +14,16 @@ os.system('mkdir -p ~/.local/share/koneko')
 os.system('cp -r ./pics/ ~/.local/share/koneko/')
 os.system('cp example_config.ini ~/.local/share/koneko/')
 os.system('cp pixiv-url.desktop ~/.local/share/koneko/')
+
+
+class InstallCommand(install):
+    def run(self):
+        install.run(self)
+        os.system('mkdir -p ~/.local/share/koneko')
+        os.system('cp -r ./pics/ ~/.local/share/koneko/')
+        os.system('cp example_config.ini ~/.local/share/koneko/')
+        os.system('cp pixiv-url.desktop ~/.local/share/koneko/')
+
 
 setup(
     name='koneko',
@@ -55,5 +66,8 @@ setup(
             'lscat=koneko.lscat_app:main',
             'koneko-url-login=koneko.url_login.main:main'
         ]
+    },
+    cmdclass={
+        'install' : InstallCommand,
     },
 )

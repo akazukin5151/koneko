@@ -1,1 +1,3 @@
 include pics/*
+include example_config.ini
+include pixiv-url.desktop

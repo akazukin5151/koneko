@@ -29,6 +29,7 @@ from koneko import config, KONEKODIR
 # History and logging
 def setup_history_log() -> 'logging.Logger':
     logger = logging.getLogger('history')
+    KONEKODIR.mkdir(exist_ok=True, parents=True)
     handler = RotatingFileHandler(KONEKODIR / 'history', maxBytes=1e6, backupCount=3)
     formatter = logging.Formatter('%(message)s')
 

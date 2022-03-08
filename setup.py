@@ -27,7 +27,7 @@ class InstallCommand(install):
 
 setup(
     name='koneko',
-    version='0.12.2',
+    version='0.12.3',
     description='Browse pixiv in the terminal',
     long_description=README,
     long_description_content_type='text/markdown',

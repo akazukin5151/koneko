@@ -1,3 +1,5 @@
+Note: the [haskell](https://github.com/akazukin5151/koneko/tree/haskell) branch is an ongoing rewrite of koneko in Haskell using Brick, to enable a more responsive, less buggy, and easier to maintain code
+
 # koneko
 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![commits since](https://img.shields.io/github/commits-since/akazukin5151/koneko/latest)](https://GitHub.com/akazukin5151/koneko/commit/) ![master](https://github.com/akazukin5151/koneko/workflows/master/badge.svg?branch=master) [![docs](https://readthedocs.org/projects/koneko/badge/?version=latest)](https://koneko.readthedocs.io/en/latest/?badge=latest) [![status](https://img.shields.io/badge/status-maintenance-green)](https://img.shields.io/badge/status-maintenance-green)

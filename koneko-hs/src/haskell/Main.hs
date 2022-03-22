@@ -113,7 +113,7 @@ main = do
     -- it doesn't seem to clean the process up when haskell program is killed
     -- but it does close the socket, and the python program can be set to exit
     -- when the socket is closed
-    (\a -> cleanupProcess a >> close sock)
+    (\a -> cleanupProcess a *> close sock)
     (const (main' home config sock))
 
 main' :: [Char] -> Config -> Socket -> IO ()

@@ -74,7 +74,7 @@ displayPrevInOrder :: (Eq a, Num a, Monad m) => (a -> b -> m c) -> a -> [(a, b)]
 displayPrevInOrder _ i []                  = pure i
 displayPrevInOrder g cur_idx ((i, p) : xs) = do
   if cur_idx == i
-     then g cur_idx p >> displayPrevInOrder g (cur_idx + 1) xs
+     then g cur_idx p *> displayPrevInOrder g (cur_idx + 1) xs
      else pure cur_idx
 
 sortByFst :: Ord a => [(a, b)] -> [(a, b)]

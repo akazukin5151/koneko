@@ -1,0 +1,5 @@
+
+.stack-work
+src/pixiv/__pycache__
+src/pixiv/__pypackages__
+src/pixiv/.pdm.toml

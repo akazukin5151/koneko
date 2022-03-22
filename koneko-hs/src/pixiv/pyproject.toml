@@ -1,0 +1,35 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "akazukin5151", email = "tsuiyikching@protonmail.com"},
+]
+dependencies = [
+    "pixivpy>=3.7.0",
+    "funcy>=1.17",
+]
+requires-python = ">=3.9"
+license = {text = "GPL-3"}
+
+[project.urls]
+homepage = ""
+
+[tool]
+[tool.pdm]
+
+[tool.mypy]
+disallow_untyped_defs = true
+strict = true
+warn_return_any = true
+#disallow_any_expr = true
+disallow_untyped_calls = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_optional = true
+warn_unreachable = true
+ignore_missing_imports = true
+
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"

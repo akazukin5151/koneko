@@ -14,7 +14,7 @@ cabal-version:       >=1.10
 extra-source-files:  README.md
 
 executable koneko-hs
-  hs-source-dirs:      src
+  hs-source-dirs:      src/haskell
   main-is:             Main.hs
   other-modules:       Types,
 

@@ -120,7 +120,7 @@ main' :: [Char] -> Config -> Socket -> IO ()
 main' home config sock = do
   (conn, _) <- accept sock
 
-  let ub' = newUeberzug
+  ub' <- newUeberzug
   let konekoDir = home </> ".local/share/koneko/cache"
 
   chan <- newBChan 10

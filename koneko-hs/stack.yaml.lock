@@ -9,12 +9,12 @@ packages:
     version: 0.1.0.0
     git: https://github.com/akazukin5151/ueberzug-hs.git
     pantry-tree:
-      size: 641
-      sha256: eb0a494bbc5be11858e097b52febf9dd0bdb2bd30422ba5ae57d039ea7543399
-    commit: 30314b8bfd9ba58d14d0e5c005b1eb9dca1068ee
+      size: 642
+      sha256: 6de7b35eb44287dd52e295aa2d361aeee374e3440c6f9f3cb6da885d10a495b5
+    commit: 57ba4bcce3f2671d8c30cfe882aa4d6efb97a27a
   original:
     git: https://github.com/akazukin5151/ueberzug-hs.git
-    commit: 30314b8bfd9ba58d14d0e5c005b1eb9dca1068ee
+    commit: 57ba4bcce3f2671d8c30cfe882aa4d6efb97a27a
 snapshots:
 - completed:
     size: 590102

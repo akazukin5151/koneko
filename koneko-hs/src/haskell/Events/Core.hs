@@ -33,7 +33,7 @@ import Brick.Widgets.Edit (applyEdit)
 import Data.Text.Zipper (clearZipper)
 import Events.ShowImages (showImagesView)
 import Events.FindImages (findImagesView)
-import Events.Common ( clearThenUpdate, getDirectory, listDirectoryFullSorted, getFirstDirectory, wrapped)
+import Events.Common ( getDirectory, listDirectoryFullSorted, getFirstDirectory, wrapped)
 import System.Directory (doesDirectoryExist, listDirectory)
 import Download.Core (downloadFromScratch, fetchFirst)
 import Brick (txt)
@@ -67,22 +67,16 @@ handleJ = handleOnYAxis (+1)
 handleK :: St -> IO St
 handleK = handleOnYAxis (subtract 1)
 
-clearImages :: St -> IO Ueberzug
+clearImages :: St -> IO ()
 clearImages st =
-   foldM clearImage (st^.ub) $ st^.displayedImages
-
-clearImage :: Ueberzug -> String -> IO Ueberzug
-clearImage ub' fn = do
-  Right new_ub <- clear ub' fn
-  pure new_ub
+   mapM_ (clear (st^.ub)) $ st^.displayedImages
 
 handleSliceOrPage :: (Int -> Int) -> Bool -> Int -> St -> IO St
 handleSliceOrPage f cond sliceReset st =
   if cond
      then do
-       newub <- clearImages st
+       clearImages st
        let new_st = st & currentSlice %~ f
-                       & ub .~ newub
                        & displayedImages .~ []
        showImagesView st new_st
      else do
@@ -90,12 +84,11 @@ handleSliceOrPage f cond sliceReset st =
        has_next <- doesDirectoryExist next_dir
        if has_next
          then do
-           newub <- clearImages st
+           clearImages st
            new_images <- listDirectoryFullSorted next_dir
            let new_st = st & currentSlice .~ sliceReset
                            & currentPage1 %~ f
                            & offset %~ f
-                           & ub .~ newub
                            & displayedImages .~ []
                            & images .~ new_images
            showImagesView st new_st
@@ -117,12 +110,12 @@ totalSlices st
 
 back :: St -> IO St
 back st = do
-  new_st <- foldM clearThenUpdate st (takeFileName <$> st^.displayedImages)
+  mapM_ (clear (st^.ub)) (takeFileName <$> st^.displayedImages)
   writeBChan (st^.chan) (ModeEnter Home)
-  pure $ new_st & editor %~ applyEdit clearZipper
-                & activeView .~ WelcomeView
-                & displayedImages .~ []
-                & updateFooter
+  pure $ st & editor %~ applyEdit clearZipper
+            & activeView .~ WelcomeView
+            & displayedImages .~ []
+            & updateFooter
 
 handleEnterView :: St -> Mode -> IO St
 handleEnterView st mode = do

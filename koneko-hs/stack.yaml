@@ -42,7 +42,7 @@ packages:
 #
 extra-deps:
 - git: https://github.com/akazukin5151/ueberzug-hs.git
-  commit: 30314b8bfd9ba58d14d0e5c005b1eb9dca1068ee
+  commit: 57ba4bcce3f2671d8c30cfe882aa4d6efb97a27a
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

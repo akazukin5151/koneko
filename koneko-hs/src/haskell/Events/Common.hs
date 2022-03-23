@@ -22,21 +22,6 @@ wrapped :: Int -> (Int -> Int) -> Int -> Int
 wrapped lim f x' | 0 <= f x' && f x' <= lim = f x'
                  | otherwise                = x'
 
-clearThenUpdate :: St -> String -> IO St
-clearThenUpdate st iden = do
-  Right new_ub <- clear (st^.ub) iden
-  -- This is a performance hack -- it seemed this made clearing the grid
-  -- more visually inconsistent. While the total time to clear all images
-  -- were faster on average, individual images are less consistent.
-  -- Sometimes all images get cleared at the same time, but sometimes some
-  -- images stick around then get cleared. The overall performance increase
-  -- was not visually apparent, in fact it looked like it was slower
-  -- Not filtering the displayedImages list on every call makes it slightly more consistent
-  -- and faster. This works as long as the caller knows exactly what images will be cleared
-  -- and manually set displayedImages afterwards. For example if the caller knows
-  -- all images will be cleared, simply set it to empty list []
-  pure $ st & ub .~ new_ub -- & displayedImages %~ filter (/= iden)
-
 historyDown :: St -> St
 historyDown st = st & historyIdx %~ wrapped (length (st ^. history) - 1) (+1)
 

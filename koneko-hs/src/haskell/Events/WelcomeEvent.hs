@@ -3,7 +3,7 @@ module Events.WelcomeEvent where
 import Core ( modes, modeIdxtoMode, highlightedMode, strToInt )
 import Common ( validInput, modeToView, updateFooter )
 import Graphics ( onAppStart, radioInner )
-import Events.Common ( clearThenUpdate, historyDown, historyUp, wrapped)
+import Events.Common ( historyDown, historyUp, wrapped)
 import Types
     ( activeView,
       chan,
@@ -15,7 +15,7 @@ import Types
       Mode(Home, ArtistIllustrations, SingleIllustration,
            SearchArtists),
       St,
-      View(PromptView), isHistoryFocused, historyIdx, history, editor )
+      View(PromptView), isHistoryFocused, historyIdx, history, editor, ub )
 import Brick ( continue, halt )
 import qualified Graphics.Vty as V
 import Lens.Micro ((^.), (.~), (&), (%~))
@@ -27,6 +27,7 @@ import Data.Text.Zipper (textZipper)
 import Data.Char (isDigit)
 import Events.Core (handleLogin)
 import Data.Text (unpack)
+import Graphics.Ueberzug (clear)
 
 welcomeEvent :: St -> BrickEvent n1 Event -> EventM n2 (Next St)
 welcomeEvent st e =
@@ -93,12 +94,12 @@ radio _ f st = do
 handleEnter :: St -> EventM n (Next St)
 handleEnter = handle historySelect modeSelect
 
-select :: MonadIO m => St -> m St
+select :: St -> IO St
 select st = do
-  new_st' <- liftIO $ clearThenUpdate st "welcome"
-  pure $ new_st' & displayedImages .~ []
-                 & isHistoryFocused .~ False
-                 & historyIdx .~ 0
+  Right () <- clear (st^.ub) "welcome"
+  pure $ st & displayedImages .~ []
+            & isHistoryFocused .~ False
+            & historyIdx .~ 0
 
 historySelect :: St -> EventM n (Next St)
 historySelect st = do
@@ -106,14 +107,14 @@ historySelect st = do
   let new_mode = modeIdxtoMode (st ^. modeIdx)
   if validInput new_mode $ unpack input
      then do
-       new_st <- select st
+       new_st <- liftIO $ select st
        let newer_st = new_st & editor %~ applyEdit (const $ textZipper [input] Nothing)
        onSelectNoPrompt new_mode newer_st
      else continue st
 
 modeSelect :: St -> EventM n (Next St)
 modeSelect st = do
-  new_st <- select st
+  new_st <- liftIO $ select st
   onSelect (modeIdxtoMode (new_st ^. modeIdx)) new_st
 
 onSelectNoPrompt :: Mode -> St -> EventM n (Next St)

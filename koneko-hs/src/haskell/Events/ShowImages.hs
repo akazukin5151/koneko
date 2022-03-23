@@ -16,7 +16,6 @@ import Graphics.Ueberzug
       Scalers(FitContain),
       UbConf(identifier, path, x, y, width, height, scaler),
       Ueberzug )
-import Control.Monad (foldM)
 import Lens.Micro ((^.), (.~), (&))
 import System.FilePath (takeFileName)
 
@@ -27,7 +26,7 @@ showImagesView st =
     ArtistListView -> showImagesSimple (showImageView st) (subtract 1)
     SingleImageView -> showImagesSingle
 
-showImageView :: St -> Ueberzug -> (Int, FilePath) -> IO Ueberzug
+showImageView :: St -> Ueberzug -> (Int, FilePath) -> IO ()
 showImageView st =
   case st^.activeView of
     GalleryView ->
@@ -45,9 +44,9 @@ showImageInner
   -> (a -> b -> Maybe Int)
   -> Ueberzug
   -> FilePath
-  -> IO Ueberzug
+  -> IO ()
 showImageInner px py xposF yposF wF hF ub' filepath = do
-  Right new_ub <-
+  Right () <-
     draw ub' $ defaultUbConf
       { identifier = takeFileName filepath
       , path = filepath
@@ -57,7 +56,7 @@ showImageInner px py xposF yposF wF hF ub' filepath = do
       , height = hF px py
       , scaler = Just FitContain
       }
-  pure new_ub
+  pure ()
 
 showImageSimple
   :: Int
@@ -65,7 +64,7 @@ showImageSimple
   -> (Int -> Int)
   -> Ueberzug
   -> (Int, FilePath)
-  -> IO Ueberzug
+  -> IO ()
 showImageSimple ncols xposF yposF ub' (idx, filepath) =
   showImageInner px py xposF yposF (const2 $ Just 15) (const2 $ Just 15) ub' filepath
     where
@@ -73,15 +72,14 @@ showImageSimple ncols xposF yposF ub' (idx, filepath) =
       const2 x _ _ = x
 
 showImagesSimple
-  :: (Ueberzug -> (Int, String) -> IO Ueberzug) -> (Int -> Int) -> St -> IO St
+  :: (Ueberzug -> (Int, String) -> IO ()) -> (Int -> Int) -> St -> IO St
 showImagesSimple f g st = do
    let (nrows, ncols_) = viewToNRowsCols st
    let ncols = g ncols_
    let c = st^.currentSlice
    let subset = take (ncols * nrows) $ drop (c * ncols * nrows) (st^.images)
-   xx <- foldM f (st^.ub) (enumerate subset)
-   pure $ st & ub .~ xx
-             & displayedImages .~ (takeFileName <$> subset)
+   mapM_ (f (st^.ub)) (enumerate subset)
+   pure $ st & displayedImages .~ (takeFileName <$> subset)
 
 showImagesSingle :: St -> IO St
 showImagesSingle st = do
@@ -89,9 +87,8 @@ showImagesSingle st = do
   case st^.images of
     [] -> pure st
     [main_img] -> do
-      new_ub <- showImageSingle (st^.ub) (1, main_img)
-      pure $ st & ub .~ new_ub
-                & displayedImages .~ [takeFileName main_img]
+      showImageSingle (st^.ub) (1, main_img)
+      pure $ st & displayedImages .~ [takeFileName main_img]
     _ -> do
       let main_img = (st^.images) !! c
       let other_imgs = drop (c + 1) (st^.images)
@@ -99,17 +96,14 @@ showImagesSingle st = do
       case subset of
         (x : xs) -> do
           let i = [x] <> [main_img] <> xs
-          new_ub <-
-            foldM showImageSingle (st^.ub) (enumerate i)
-          pure $ st & ub .~ new_ub
-                    & displayedImages .~ (takeFileName <$> i)
+          mapM_ (showImageSingle (st^.ub)) (enumerate i)
+          pure $ st & displayedImages .~ (takeFileName <$> i)
         [] -> do
-          new_ub <- showImageSingle (st^.ub) (1, main_img)
-          pure $ st & ub .~ new_ub
-                    & displayedImages .~ [takeFileName main_img]
+          showImageSingle (st^.ub) (1, main_img)
+          pure $ st & displayedImages .~ [takeFileName main_img]
 
 -- todo replace this one with showImageSingle'
-showImageSingle :: Ueberzug -> (Int, FilePath) -> IO Ueberzug
+showImageSingle :: Ueberzug -> (Int, FilePath) -> IO ()
 showImageSingle ub' (idx, filepath) = do
   showImageInner px py xposF yposF wF hF ub' filepath
     where
@@ -150,7 +144,7 @@ showImageSingle ub' (idx, filepath) = do
 --
 -- This guarantees that the first image is in the center, which is better
 -- because it does not require knowledge of the total number of images
-showImageSingle' :: Ueberzug -> (Int, FilePath) -> IO Ueberzug
+showImageSingle' :: Ueberzug -> (Int, FilePath) -> IO ()
 showImageSingle' ub' (idx, filepath) = do
   showImageInner px py xposF yposF wF hF ub' filepath
     where

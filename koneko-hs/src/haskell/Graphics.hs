@@ -26,7 +26,7 @@ onAppStart st = liftIO (radioInner st >>= displayWelcomeImage)
 
 displayWelcomeImage :: St -> IO St
 displayWelcomeImage st = do
-  Right new_ub <-
+  Right () <-
     draw (st^.ub) $ defaultUbConf
       { identifier = "welcome"
       , path = takeDirectory (st^.konekoDir) </> "pics/71471144_p0.png"
@@ -35,4 +35,4 @@ displayWelcomeImage st = do
       , width = Just 28
       , height = Just 28
       }
-  pure $ st & ub .~ new_ub & displayedImages .~ ["welcome"]
+  pure $ st & displayedImages .~ ["welcome"]

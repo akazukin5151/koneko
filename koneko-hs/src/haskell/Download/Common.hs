@@ -58,7 +58,6 @@ showImages'' g assoc (currentIdx, prev_not_shown) path = do
     Just idx | idx > currentIdx -> pure (currentIdx, path : prev_not_shown)
     Just idx | idx < currentIdx -> pure (currentIdx, prev_not_shown)
     Just _ -> do
-      -- TODO: this will return a new ub instance, need to fold that in
       g currentIdx path
 
       let prev_with_idx =

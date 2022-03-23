@@ -5,16 +5,12 @@
 
 packages:
 - completed:
-    name: ueberzug
-    version: 0.1.0.0
-    git: https://github.com/akazukin5151/ueberzug-hs.git
+    hackage: ueberzug-0.2.0.0@sha256:34740f72c6c511e0346c0c10af4a0143301c50da41d9236fba614ae222572f9f,2413
     pantry-tree:
-      size: 642
-      sha256: 6de7b35eb44287dd52e295aa2d361aeee374e3440c6f9f3cb6da885d10a495b5
-    commit: 57ba4bcce3f2671d8c30cfe882aa4d6efb97a27a
+      size: 371
+      sha256: 91749061f57f41997de2face2100b5277cf321f14e9fe3e221b2683936b1703d
   original:
-    git: https://github.com/akazukin5151/ueberzug-hs.git
-    commit: 57ba4bcce3f2671d8c30cfe882aa4d6efb97a27a
+    hackage: ueberzug-0.2.0.0
 snapshots:
 - completed:
     size: 590102

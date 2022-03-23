@@ -2,14 +2,8 @@ module Events.ShowImages where
 
 import Common ( indexToCoords, viewToNRowsCols )
 import Core ( enumerate )
+import Config.Types
 import Types
-    ( St,
-      View(SingleImageView, GalleryView, ArtistListView),
-      activeView,
-      currentSlice,
-      displayedImages,
-      images,
-      ub )
 import Graphics.Ueberzug
     ( defaultUbConf,
       draw,
@@ -30,9 +24,9 @@ showImageView :: St -> Ueberzug -> (Int, FilePath) -> IO ()
 showImageView st =
   case st^.activeView of
     GalleryView ->
-        showImageSimple 5 (\px -> 2 + px * 19) (\py -> 3 + py * 10)
+        showImageSimple st (st^.config.ncols) (\px -> 2 + px * 19) (\py -> 3 + py * 10)
     ArtistListView ->
-        showImageSimple 4 (\px -> 5 + px * 20) (\py -> 2 + py * 12)
+        showImageSimple st 4 (\px -> 5 + px * 20) (\py -> 2 + py * 12)
     SingleImageView -> showImageSingle'
 
 showImageInner
@@ -59,16 +53,19 @@ showImageInner px py xposF yposF wF hF ub' filepath = do
   pure ()
 
 showImageSimple
-  :: Int
+  :: St
+  -> Int
   -> (Int -> Int)
   -> (Int -> Int)
   -> Ueberzug
   -> (Int, FilePath)
   -> IO ()
-showImageSimple ncols xposF yposF ub' (idx, filepath) =
-  showImageInner px py xposF yposF (const2 $ Just 15) (const2 $ Just 15) ub' filepath
+showImageSimple st ncols xposF yposF ub' (idx, filepath) =
+  showImageInner px py xposF yposF w h ub' filepath
     where
       (px, py) = indexToCoords ncols idx
+      w = const2 (Just $ st^.config.imageWidth)
+      h = const2 (Just $ st^.config.imageHeight)
       const2 x _ _ = x
 
 showImagesSimple

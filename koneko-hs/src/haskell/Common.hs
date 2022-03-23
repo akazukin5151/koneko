@@ -10,17 +10,11 @@ import Types
     ( activeView,
       editor,
       footer,
-      ncols_ArtistListView,
-      ncols_GalleryView,
-      ncols_SingleImageView,
-      nrows_ArtistListView,
-      nrows_GalleryView,
-      nrows_SingleImageView,
       Field,
       Mode(SingleIllustration, FollowingArtists, SearchArtists,
            FollowingArtistsIllustrations, RecommendedIllustrations, ArtistIllustrations, Home),
       St,
-      View(WelcomeView, GalleryView, ArtistListView, SingleImageView), )
+      View(WelcomeView, GalleryView, ArtistListView, SingleImageView), config )
 import Data.Char (isDigit)
 import Brick.Widgets.Edit (getEditContents)
 import Brick ( Widget, txt )
@@ -32,6 +26,7 @@ import Maybes (firstJusts)
 import Control.Monad ((>=>))
 import Data.Bifunctor (Bifunctor (first))
 import Core (highlightedMode)
+import Config.Types (ncols, nrows)
 
 -- | Bind a function to the second argument of a bifunctor, then append
 -- a value to the first argument of the bifunctor
@@ -88,17 +83,17 @@ validInput _ = const True
 viewToNRowsCols :: St -> (Int, Int)
 viewToNRowsCols st =
   case st^.activeView of
-    ArtistListView -> (st^.nrows_ArtistListView, st^.ncols_ArtistListView)
-    SingleImageView -> (st^.nrows_SingleImageView, st^.ncols_SingleImageView)
-    _ -> (st^.nrows_GalleryView, st^.ncols_GalleryView)
+    ArtistListView -> (st^.config.nrows, 5)
+    SingleImageView -> (2, 3)
+    _ -> (st^.config.nrows, st^.config.ncols)
 
 -- | Uses highlighted mode, which is not necessarily the current mode
 modeToNRowsCols :: St -> (Int, Int)
 modeToNRowsCols st =
   case modeToView $ highlightedMode st of
-    ArtistListView -> (st^.nrows_ArtistListView, st^.ncols_ArtistListView)
-    SingleImageView -> (st^.nrows_SingleImageView, st^.ncols_SingleImageView)
-    _ -> (st^.nrows_GalleryView, st^.ncols_GalleryView)
+    ArtistListView -> (st^.config.nrows, 5)
+    SingleImageView -> (2, 3)
+    _ -> (st^.config.nrows, st^.config.ncols)
 
 modeToView :: Mode -> View
 modeToView ArtistIllustrations           = GalleryView

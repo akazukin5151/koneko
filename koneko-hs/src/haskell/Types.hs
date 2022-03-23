@@ -94,17 +94,12 @@ data St =
     , _pendingOnLogin :: Maybe (St -> IO St)
 
     -- config stuff
-    , _config :: Config.Types.Config
+    , _config :: Config
+    -- ^ the config file
     , _konekoDir :: FilePath
     -- ^ the koneko dir
-    , _ncols_GalleryView :: Int
-    , _nrows_GalleryView :: Int
-    , _ncols_ArtistListView :: Int
-    , _nrows_ArtistListView :: Int
-    , _ncols_SingleImageView :: Int
-    , _nrows_SingleImageView :: Int
 
-    -- requests
+    -- requests (stored here because it is never asked, so the editor won't store this)
     , _your_id :: Maybe String
     -- ^ the currently logged in user's pixiv id
     }

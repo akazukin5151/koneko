@@ -10,6 +10,7 @@
 - download progress indicator
 - check cached contents to see if they need to be re-downloaded or continue an interrupted download
 - continuously show new images in current slice as they finish downloading
+- move magic numbers into config (see old config)
 
 ## code
 - restore catch exceptions in python

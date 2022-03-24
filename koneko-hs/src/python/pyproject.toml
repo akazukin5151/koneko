@@ -30,6 +30,17 @@ strict_optional = true
 warn_unreachable = true
 ignore_missing_imports = true
 
+allow_redefinition = false
+ignore_errors = false
+implicit_reexport = false
+local_partial_types = true
+strict_equality = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_no_return = true
+
+
 [build-system]
 requires = ["pdm-pep517"]
 build-backend = "pdm.pep517.api"

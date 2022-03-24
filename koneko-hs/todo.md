@@ -5,7 +5,7 @@
     - still a delay for artistlistview
 - mode 2: when download finishes, going next doesn't clear the first image. it will clear when you go back and next again
     - mode 3 and 4 too, but the entire first page isn't cleared
-- fix the width of the label in artist view so that images can be consistently placed
+- fix (as in freeze) the width of the label in artist view so that images can be consistently placed
 
 ## features
 - download progress indicator

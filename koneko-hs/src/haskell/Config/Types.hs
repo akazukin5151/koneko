@@ -6,6 +6,30 @@ import Lens.Micro.TH (makeLenses)
 import Data.Aeson.TH ( deriveJSON )
 import Data.Aeson (defaultOptions, Options (fieldLabelModifier))
 
+data GalleryViewConfig =
+  GalleryViewConfig
+    { galleryViewConfig_image_xcoords :: [Int]
+    -- ^ The x-coordinates of every image in a given row
+    , galleryViewConfig_image_ycoords :: [Int]
+    -- ^ The y-coordinates of every image in a given row
+    }
+    deriving (Show)
+
+$(deriveJSON defaultOptions
+  {fieldLabelModifier = drop (length "galleryViewConfig_")} ''GalleryViewConfig)
+
+data ArtistListViewConfig =
+  ArtistListViewConfig
+    { artistListViewConfig_image_xcoords :: [Int]
+    -- ^ The x-coordinates of every image in a given row
+    , artistListViewConfig_image_ycoords :: [Int]
+    -- ^ The y-coordinates of every image in a given row
+    }
+    deriving (Show)
+
+$(deriveJSON defaultOptions
+  {fieldLabelModifier = drop (length "artistListViewConfig_")} ''ArtistListViewConfig)
+
 data Config =
   Config
     { _pythonProcessPath :: FilePath
@@ -24,6 +48,8 @@ data Config =
     -- ^ Number of columns in a slice for the grid (the artist list is always fixed
     -- at one profile pic + 3 previews per row; and the post view is also fixed at
     -- displaying a single image, but this might change)
+    , _galleryView :: GalleryViewConfig
+    , _artistListView :: ArtistListViewConfig
     }
     deriving (Show)
 

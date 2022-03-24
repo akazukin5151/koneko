@@ -23,29 +23,33 @@ showImagesView st =
 showImageView :: St -> Ueberzug -> (Int, FilePath) -> IO ()
 showImageView st =
   case st^.activeView of
-    GalleryView ->
-        showImageSimple st (st^.config.ncols) (\px -> 2 + px * 19) (\py -> 3 + py * 10)
-    ArtistListView ->
-        showImageSimple st 4 (\px -> 5 + px * 20) (\py -> 2 + py * 12)
+    GalleryView -> do
+      let xs = st^.config.galleryView & galleryViewConfig_image_xcoords
+      let ys = st^.config.galleryView & galleryViewConfig_image_ycoords
+      showImageSimple st (st^.config.ncols) xs ys
+    ArtistListView -> do
+      let xs = st^.config.artistListView & artistListViewConfig_image_xcoords
+      let ys = st^.config.artistListView & artistListViewConfig_image_ycoords
+      showImageSimple st 4 xs ys
     SingleImageView -> showImageSingle'
 
 showImageInner
   :: a
   -> b
-  -> (a -> Int)
-  -> (b -> Int)
+  -> Int
+  -> Int
   -> (a -> b -> Maybe Int)
   -> (a -> b -> Maybe Int)
   -> Ueberzug
   -> FilePath
   -> IO ()
-showImageInner px py xposF yposF wF hF ub' filepath = do
+showImageInner px py xpos ypos wF hF ub' filepath = do
   Right () <-
     draw ub' $ defaultUbConf
       { identifier = takeFileName filepath
       , path = filepath
-      , x = xposF px
-      , y = yposF py
+      , x = xpos
+      , y = ypos
       , width = wF px py
       , height = hF px py
       , scaler = Just FitContain
@@ -55,13 +59,13 @@ showImageInner px py xposF yposF wF hF ub' filepath = do
 showImageSimple
   :: St
   -> Int
-  -> (Int -> Int)
-  -> (Int -> Int)
+  -> [Int]
+  -> [Int]
   -> Ueberzug
   -> (Int, FilePath)
   -> IO ()
-showImageSimple st ncols xposF yposF ub' (idx, filepath) =
-  showImageInner px py xposF yposF w h ub' filepath
+showImageSimple st ncols xs ys ub' (idx, filepath) =
+  showImageInner px py (xs !! px) (ys !! py) w h ub' filepath
     where
       (px, py) = indexToCoords ncols idx
       w = const2 (Just $ st^.config.imageWidth)
@@ -107,8 +111,8 @@ showImageSingle ub' (idx, filepath) = do
       tmp = indexToCoords 3 idx
       -- pretend last image is in the corner
       (px, py) = if tmp == (1, 1) then (2, 1) else tmp
-      xposF px' = if (px', py) == (1, 0) then 34 else 2 + px' * 38
-      yposF py' = 2 + py' * 11
+      xposF = if (px, py) == (1, 0) then 34 else 2 + px * 38
+      yposF = 2 + py * 11
       wF px' py' = if (px', py') == (1, 0) then Just 30 else Just 13
       hF px' py' = if (px', py') == (1, 0) then Just 19 else Just 13
 
@@ -152,7 +156,7 @@ showImageSingle' ub' (idx, filepath) = do
           (1, 0) -> (0, 0)  -- swap 2
           (1, 1) -> (2, 1)  -- shift 1
           _ -> tmp
-      xposF px' = if (px', py) == (1, 0) then 34 else 2 + px' * 38
-      yposF py' = 2 + py' * 11
+      xposF = if (px, py) == (1, 0) then 34 else 2 + px * 38
+      yposF = 2 + py * 11
       wF px' py' = if (px', py') == (1, 0) then Just 30 else Just 13
       hF px' py' = if (px', py') == (1, 0) then Just 19 else Just 13

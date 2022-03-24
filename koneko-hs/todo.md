@@ -8,17 +8,22 @@
 - remove file extension and number from artist label in artist list view
 
 ## features
-- download progress indicator
-- check cached contents to see if they need to be re-downloaded or continue an interrupted download
+### feature parity
 - prefetch next page
 - continuously show new images in current slice as they finish downloading
+- check cached contents to see if they need to be re-downloaded or continue an interrupted download
+- actions on selected image (view post)
+- download progress indicator (a progress bar would be a new feature, above parity)
+- interactive lscat assistant
+
+### new features
 - more ergonomic views
     - artist list: a border surrounding every row with the artist name as the border label. inside that row would be the profile pic + 3 previews, each inside a box as well. this is the only reason to keep a separate config for image x/ycoords for this view.
     - pixiv post: show single image with in depth info next to it (eg, caption, tags, comments). the challenge is that images might be big enough to cover that section
 
 ## code
 - restore catch exceptions in python
-- [ ] error messages shouldn't crash anyway, just display in footer
+- error messages shouldn't crash anyway, just display in footer
 - refactoring and de-duplicate code
     - reducing the size of St
 

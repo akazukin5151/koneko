@@ -41,6 +41,10 @@ data Config =
     -- ^ Width of all images (except on the welcome and info pages)
     , _imageHeight :: Int
     -- ^ Height of all images (except on the welcome and info pages)
+    , _boxWidth :: Int
+    -- ^ Width of all boxes (around the images)
+    , _boxHeight :: Int
+    -- ^ Height of all boxes (around the images)
     , _nrows :: Int
     -- ^ Number of rows in a slice for the grid and artist list (the post view is
     -- always fixed at displaying a single image)

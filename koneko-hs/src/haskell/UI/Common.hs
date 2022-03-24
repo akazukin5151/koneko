@@ -20,14 +20,14 @@ import Lens.Micro ((^.))
 mapEnumerate :: (Int -> b -> c) -> [b] -> [c]
 mapEnumerate f xs = zipWith f [0 .. length xs] xs
 
-mkEmptyCell :: Widget n
-mkEmptyCell = mkCell $ fill ' '
+mkEmptyCell :: (Int, Int) -> Widget n
+mkEmptyCell size = mkCell size $ fill ' '
 
-mkCell :: Widget n -> Widget n
-mkCell =
+mkCell :: (Int, Int) -> Widget n -> Widget n
+mkCell size =
   withBorderStyle BS.unicode .
   B.border .
-  setAvailableSize (17, 8)
+  setAvailableSize size
 
 mkCellWithSize :: (Int, Int) -> Widget n -> Widget n
 mkCellWithSize size =

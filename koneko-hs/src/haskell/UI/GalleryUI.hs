@@ -12,7 +12,7 @@ galleryUI st = [a]
   where
     a = C.center $ vBox vs <=> (st^.footer)
     -- total_slices = length (st^.images) `div` (ncols*nrows) - 1
-    vs = mapEnumerate f $ replicate nrows $ replicate 5 mkEmptyCell
+    vs = mapEnumerate f $ replicate nrows $ replicate ncols mkEmptyCell
       where
         f idx hbox | idx == py = hBox $ mapEnumerate g hbox
                    | otherwise = hBox hbox

@@ -130,11 +130,11 @@ handleEnterView st mode = do
       pure $ new_st' & labels .~ (pack <$> labels')
     else
       case st^.your_id of
-        Nothing -> pure $ st & pendingOnLogin ?~ func mode dir
-        Just _ -> func mode dir st
+        Nothing -> pure $ st & pendingOnLogin ?~ downloadInBg mode dir
+        Just _ -> downloadInBg mode dir st
 
-func :: Mode -> String -> St -> IO St
-func mode dir st = do
+downloadInBg :: Mode -> String -> St -> IO St
+downloadInBg mode dir st = do
   void $ forkIO $ do
     Right (labels', imgs, urls) <- fetchFirst mode st dir
     let new_st = st & images .~ imgs & labels .~ (pack <$> labels')

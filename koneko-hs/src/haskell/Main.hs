@@ -73,6 +73,7 @@ initialState ub' chan config konekoDir socket conn =
      , _conn = conn
      , _pendingOnLogin = Nothing
      , _your_id = Nothing
+     , _nextUrl = Nothing
      }
 
 theMap = attrMap V.defAttr

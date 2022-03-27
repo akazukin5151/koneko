@@ -50,6 +50,12 @@ getFirstDirectory st =
     SingleIllustration -> getDirectory st
     _ -> getDirectory st </> intToStr (st^.currentPage1)
 
+getNextDirectory :: St -> FilePath
+getNextDirectory st =
+  case highlightedMode st of
+    SingleIllustration -> getDirectory st
+    _ -> getDirectory st </> intToStr (st^.currentPage1 + 1)
+
 listDirectoryFullSorted :: FilePath -> IO [FilePath]
 listDirectoryFullSorted dir = do
   filenames <- listDirectory dir

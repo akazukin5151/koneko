@@ -102,6 +102,8 @@ data St =
     -- requests (stored here because it is never asked, so the editor won't store this)
     , _your_id :: Maybe String
     -- ^ the currently logged in user's pixiv id
+    , _nextUrl :: Maybe String
+    -- ^ The next url as given by the latest pixiv response
     }
 
 makeLenses ''St

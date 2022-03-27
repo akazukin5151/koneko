@@ -10,6 +10,16 @@ import System.FilePath (takeFileName, takeDirectory)
 import Data.Tuple (swap)
 import Download.Common ( download, showImagesConcurrently )
 
+emptyCb :: Applicative f => (a1, b) -> p -> f (a1, [a2])
+emptyCb (a, _) _ = pure (a, [])
+
+downloadUserIllust' :: St -> String -> [FilePath] -> [String] -> IO [FilePath]
+downloadUserIllust' st dir sorted urls = do
+  download emptyCb (st^.conn) urls dirs names
+    where
+      dirs = replicate (length urls) dir
+      names = takeFileName <$> sorted
+
 downloadUserIllust :: St -> String -> [FilePath] -> [String] -> IO [FilePath]
 downloadUserIllust st dir sorted urls = do
   download (showImagesConcurrently st assoc) (st^.conn) urls dirs names
@@ -17,6 +27,13 @@ downloadUserIllust st dir sorted urls = do
       (nrows, ncols_) = viewToNRowsCols st
       subset = take (ncols_ * nrows) sorted
       assoc = swap <$> enumerate subset
+      dirs = replicate (length urls) dir
+      names = takeFileName <$> sorted
+
+downloadIllustDetail' :: St -> String -> [FilePath] -> [String] -> IO [FilePath]
+downloadIllustDetail' st dir sorted urls =
+  download emptyCb (st^.conn) urls dirs names
+    where
       dirs = replicate (length urls) dir
       names = takeFileName <$> sorted
 
@@ -28,6 +45,13 @@ downloadIllustDetail st dir sorted urls =
       subset = take 5 sorted
       assoc = swap <$> enumerate subset
       dirs = replicate (length urls) dir
+      names = takeFileName <$> sorted
+
+downloadUserFollowing' :: St -> [FilePath] -> [String] -> IO [FilePath]
+downloadUserFollowing' st sorted urls =
+  download emptyCb (st^.conn) urls dirs names
+    where
+      dirs = takeDirectory <$> sorted
       names = takeFileName <$> sorted
 
 downloadUserFollowing :: St -> [FilePath] -> [String] -> IO [FilePath]

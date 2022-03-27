@@ -1,9 +1,7 @@
 module Events where
 
 import Types
-    ( Event (ModeEnter, LoginResult, DownloadFinished, RequestFinished),
-      Field,
-      St, View (WelcomeView, PromptView), activeView )
+    ( activeView, Event(..), Field, St, View(PromptView, WelcomeView) )
 import Brick ( EventM, BrickEvent, Next )
 import Events.Core
     ( back,
@@ -13,7 +11,7 @@ import Events.Core
       handleK,
       handleL,
       handleN,
-      handleP, handleLogin )
+      handleP, handleLogin, prefetchInBg )
 import Brick.Types ( BrickEvent(AppEvent, VtyEvent) )
 import qualified Graphics.Vty as V
 import Brick.Main ( continue, halt )
@@ -39,6 +37,6 @@ appEvent st e =
         VtyEvent (V.EvKey (V.KChar 'p') []) -> continue =<< liftIO (handleP st)
         AppEvent (ModeEnter mode)           -> continue =<< liftIO (handleEnterView st mode)
         AppEvent (LoginResult e_i)          -> continue =<< liftIO (handleLogin st e_i)
-        AppEvent (DownloadFinished new_st)  -> continue new_st
+        AppEvent (DownloadFinished new_st)  -> continue =<< liftIO (prefetchInBg new_st)
         AppEvent (RequestFinished new_st)   -> continue new_st
         _                                   -> continue st

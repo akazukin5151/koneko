@@ -2,8 +2,8 @@
 
 module Events.Core where
 
-import Common ( coordsToIndex, indexToCoords,  viewToNRowsCols, updateFooter)
-import Core ( intToStr)
+import Common ( coordsToIndex, indexToCoords,  viewToNRowsCols, updateFooter, nextOffset, logger)
+import Core ( intToStr, highlightedMode)
 import Types
     ( St,
       Event(ModeEnter, DownloadFinished, RequestFinished),
@@ -22,9 +22,9 @@ import Types
       your_id,
       footer,
       offset,
-      pendingOnLogin )
-import Graphics.Ueberzug ( clear, Ueberzug )
-import Control.Monad (foldM, void)
+      pendingOnLogin, nextUrl )
+import Graphics.Ueberzug ( clear )
+import Control.Monad (void, unless)
 import Lens.Micro ((^.), (.~), (&), (%~), (?~), (<&>))
 import Data.Maybe (fromMaybe)
 import System.FilePath (takeFileName, (</>))
@@ -33,12 +33,12 @@ import Brick.Widgets.Edit (applyEdit)
 import Data.Text.Zipper (clearZipper)
 import Events.ShowImages (showImagesView)
 import Events.FindImages (findImagesView)
-import Events.Common ( getDirectory, listDirectoryFullSorted, getFirstDirectory, wrapped)
+import Events.Common ( getDirectory, listDirectoryFullSorted, getFirstDirectory, wrapped, getNextDirectory)
 import System.Directory (doesDirectoryExist, listDirectory)
-import Download.Core (downloadFromScratch, fetchFirst)
+import Download.Core (downloadFromScratch, fetchFirst, downloadWithoutShowing, fetch)
 import Brick (txt)
 import Data.Text (pack)
-import Control.Arrow ((<<<))
+import Control.Arrow ((<<<), (>>>))
 import Control.Concurrent (forkIO)
 import System.Directory.Internal (andM)
 
@@ -86,12 +86,24 @@ handleSliceOrPage f cond sliceReset st =
          then do
            clearImages st
            new_images <- listDirectoryFullSorted next_dir
-           let new_st = st & currentSlice .~ sliceReset
-                           & currentPage1 %~ f
-                           & offset %~ f
-                           & displayedImages .~ []
-                           & images .~ new_images
+           -- TODO: next page -> set nextUrl to the next one (aka, set the "current"
+           -- json to the next page, so that the next url points to the next-next)
+           -- eg page 1 -> page 2
+           -- page_1_response -> page_2_response
+           -- page_1_response.next_url (page_2_url) -> page_2_response.next_url (page_3_url)
+           let new_st =
+                 st^.nextUrl
+                 >>= (pack >>> nextOffset)
+                 <&> (\o -> st & offset .~ o)
+                 & fromMaybe st
+                 & currentSlice .~ sliceReset
+                 & currentPage1 %~ f
+                 -- & offset %~ f
+                 & displayedImages .~ []
+                 & images .~ new_images
+           logger "new_st^.nextUrl" $ new_st^.nextUrl
            showImagesView st new_st
+           prefetchInBg new_st
          else pure st
 
 handleP :: St -> IO St
@@ -126,20 +138,54 @@ handleEnterView st mode = do
       (labels', imgs) <- findImagesView mode st
       let new_st = st & images .~ imgs
       new_st' <- showImagesView new_st new_st
-      -- TODO: request in background and verify cache up-to-date
+      -- TODO: verify cache up-to-date
+      void $ forkIO $ do
+        Right (labels', imgs, urls, m_nextUrl) <- fetchFirst mode new_st' dir
+        let new_st'' =
+              st & images .~ imgs
+                 & labels .~ (pack <$> labels')
+                 & nextUrl .~ m_nextUrl
+        writeBChan (st^.chan) (RequestFinished new_st'')
+        prefetchInner new_st'' mode
       pure $ new_st' & labels .~ (pack <$> labels')
     else
       case st^.your_id of
         Nothing -> pure $ st & pendingOnLogin ?~ downloadInBg mode dir
         Just _ -> downloadInBg mode dir st
 
+prefetchInner :: St -> Mode -> IO ()
+prefetchInner st mode = do
+  let dir = getNextDirectory st
+  cond <- andM (doesDirectoryExist dir) (listDirectory dir <&> (not <<< null))
+  logger "st^.nextUrl" $ st^.nextUrl
+  -- prefetch only if dir doesn't exist or is empty
+  unless cond $
+    void $ forkIO $ do
+      case st^.nextUrl >>= (pack >>> nextOffset) of
+        Nothing -> pure ()
+        Just no -> do
+          Right (_labels', imgs, urls, m_nextUrl) <- fetch no mode st dir
+          -- TODO: do i need to store these in next_labels/imgs?
+          let new_st = st & nextUrl .~ m_nextUrl
+          writeBChan (st^.chan) (RequestFinished new_st)
+          downloadWithoutShowing mode st dir imgs urls
+
+prefetchInBg :: St -> IO St
+prefetchInBg st = do
+  let mode = highlightedMode st
+  prefetchInner st mode
+  pure st
+
 downloadInBg :: Mode -> String -> St -> IO St
 downloadInBg mode dir st = do
   void $ forkIO $ do
-    Right (labels', imgs, urls) <- fetchFirst mode st dir
-    let new_st = st & images .~ imgs & labels .~ (pack <$> labels')
+    Right (labels', imgs, urls, m_nextUrl) <- fetchFirst mode st dir
+    let new_st =
+          st & images .~ imgs
+             & labels .~ (pack <$> labels')
+             & nextUrl .~ m_nextUrl
     writeBChan (st^.chan) (RequestFinished new_st)
-    new_st' <- downloadFromScratch mode st dir imgs urls
+    new_st' <- downloadFromScratch mode new_st dir imgs urls
     writeBChan (st^.chan) (DownloadFinished new_st')
   pure st
 

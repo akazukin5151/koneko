@@ -13,8 +13,8 @@ import Serialization.In
       ProfileImageUrl(profileImageUrl_medium),
       User(user_profile_image_urls, user_name),
       UserPreview(userPreview_user, userPreview_illusts),
-      UserDetailResponse(userDetailResponse_user_previews),
-      IllustDetail(illustDetail_meta_pages, illustDetail_image_urls, illustDetail_title, illustDetail_user), IllustUser (illustUser_name) )
+      UserDetailResponse(userDetailResponse_user_previews, userDetailResponse_next_url),
+      IllustDetail(illustDetail_meta_pages, illustDetail_image_urls, illustDetail_title, illustDetail_user), IllustUser (illustUser_name), next_url )
 import Data.List ( sort )
 import Data.Text ( pack, unpack, splitOn )
 
@@ -43,9 +43,11 @@ window3 [x] = [[x]]
 window3 [a, b] = [[a, b]]
 window3 (a : b : c : xs) = [[a, b, c]] <> window3 xs
 
-parseUserIllustResponse :: String -> UserIllustResponse -> ([a], [FilePath], [String])
-parseUserIllustResponse dir r = ([], sorted, urls)
+parseUserIllustResponse
+  :: String -> UserIllustResponse -> ([a], [FilePath], [String], Maybe String)
+parseUserIllustResponse dir r = ([], sorted, urls, Just n)
     where
+      n = next_url r
       illusts' = illusts r
       titles = title <$> illusts'
       -- default sort is by date; enumerate preserves this order
@@ -54,8 +56,9 @@ parseUserIllustResponse dir r = ([], sorted, urls)
       sorted = sort paths
       urls = square_medium . userIllust_image_url <$> illusts'
 
-parseIllustDetailResponse :: String -> IllustDetailResponse -> ([a], [FilePath], [String])
-parseIllustDetailResponse dir r = ([], sorted, urls)
+parseIllustDetailResponse
+  :: String -> IllustDetailResponse -> ([a], [FilePath], [String], Maybe String)
+parseIllustDetailResponse dir r = ([], sorted, urls, Nothing)
     where
       meta_pages = illustDetail_meta_pages $ illustDetailResponse_illust r
       -- it's not possible to get the titles without another query, so whatever
@@ -67,9 +70,11 @@ parseIllustDetailResponse dir r = ([], sorted, urls)
       paths = [dir </> name' | name' <- names]
       sorted = sort paths
 
-parseUserDetailResponse :: String -> UserDetailResponse -> ([String], [FilePath], [String])
-parseUserDetailResponse dir r = (user_name <$> users', full_paths, urls)
+parseUserDetailResponse
+  :: String -> UserDetailResponse -> ([String], [FilePath], [String], Maybe String)
+parseUserDetailResponse dir r = (user_name <$> users', full_paths, urls, Just n)
     where
+      n = userDetailResponse_next_url r
       -- adapted from show Images Simple
       user_previews = userDetailResponse_user_previews r
       users' = userPreview_user <$> user_previews

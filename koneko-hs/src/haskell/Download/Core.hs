@@ -22,18 +22,27 @@ import Download.Parsers
       parseIllustDetailResponse,
       parseUserDetailResponse )
 import Download.Downloaders
-    ( downloadUserIllust, downloadIllustDetail, downloadUserFollowing )
+    ( downloadUserIllust, downloadIllustDetail, downloadUserFollowing, downloadUserIllust', downloadIllustDetail', downloadUserFollowing' )
+import Control.Monad (void)
 
 fetchFirst
   :: Mode
   -> St
   -> String
-  -> IO (Either String ([String], [FilePath], [String]))
-fetchFirst mode st dir =
+  -> IO (Either String ([String], [FilePath], [String], Maybe String))
+fetchFirst = fetch 0
+
+fetch
+  :: Int
+  -> Mode
+  -> St
+  -> String
+  -> IO (Either String ([String], [FilePath], [String], Maybe String))
+fetch offset mode st dir =
   case mode of
     ArtistIllustrations -> do
       let artist_id = unpack $ getEditorText st
-      r <- userIllustRequest artist_id 0 (st^.conn)
+      r <- userIllustRequest artist_id offset (st^.conn)
       pure $ parseUserIllustResponse dir <$> r
     SingleIllustration -> do
       let image_id = unpack $ getEditorText st
@@ -41,16 +50,16 @@ fetchFirst mode st dir =
       pure $ parseIllustDetailResponse dir <$> r
     SearchArtists -> do
       let searchstr = unpack $ getEditorText st
-      r <- searchUserRequest searchstr 0 (st^.conn)
+      r <- searchUserRequest searchstr offset (st^.conn)
       pure $ parseUserDetailResponse dir <$> r
     FollowingArtists -> do
-      r <- userFollowingRequest (fromJust $ st^.your_id) 0 (st^.conn)
+      r <- userFollowingRequest (fromJust $ st^.your_id) offset (st^.conn)
       pure $ parseUserDetailResponse dir <$> r
     FollowingArtistsIllustrations -> do
-      r <- illustFollowRequest 0 (st^.conn)
+      r <- illustFollowRequest offset (st^.conn)
       pure $ parseUserIllustResponse dir <$> r
     RecommendedIllustrations -> do
-      r <- illustRecommendedRequest 0 (st^.conn)
+      r <- illustRecommendedRequest offset (st^.conn)
       pure $ parseUserIllustResponse dir <$> r
 
 downloadFromScratch :: Mode -> St -> String -> [FilePath] -> [String] -> IO St
@@ -81,3 +90,19 @@ downloadThenUpdate io_imgs mode st = do
   let new_st' = st & images .~ sort imgs
   --new_st' <- showImagesView new_st new_st
   pure $ new_st' & labels .~ (pack <$> labels')
+
+downloadWithoutShowing :: Mode -> St -> String -> [FilePath] -> [String] -> IO ()
+downloadWithoutShowing mode st dir sorted urls =
+  case mode of
+    ArtistIllustrations ->
+      void (downloadUserIllust' st dir sorted urls)
+    SingleIllustration ->
+      void (downloadIllustDetail' st dir sorted urls)
+    SearchArtists ->
+      void (downloadUserFollowing' st sorted urls)
+    FollowingArtists ->
+      void (downloadUserFollowing' st sorted urls)
+    FollowingArtistsIllustrations ->
+      void (downloadUserIllust' st dir sorted urls)
+    RecommendedIllustrations ->
+      void (downloadUserIllust' st dir sorted urls)

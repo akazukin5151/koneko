@@ -13,7 +13,7 @@ import Graphics.Ueberzug
 import Lens.Micro ((^.), (.~), (&))
 import System.FilePath (takeFileName)
 
-showImagesView :: St -> St -> IO St
+showImagesView :: St -> St -> [FilePath] -> IO St
 showImagesView st =
   case st^.activeView of
     GalleryView -> showImagesSimple (showImageView st) id
@@ -73,26 +73,30 @@ showImageSimple st ncols xs ys ub' (idx, filepath) =
       const2 x _ _ = x
 
 showImagesSimple
-  :: (Ueberzug -> (Int, String) -> IO ()) -> (Int -> Int) -> St -> IO St
-showImagesSimple f g st = do
+  :: (Ueberzug -> (Int, FilePath) -> IO b)
+  -> (Int -> Int)
+  -> St
+  -> [FilePath]
+  -> IO St
+showImagesSimple f g st images = do
    let (nrows, ncols_) = viewToNRowsCols st
    let ncols = g ncols_
    let c = st^.currentSlice
-   let subset = take (ncols * nrows) $ drop (c * ncols * nrows) (st^.images)
+   let subset = take (ncols * nrows) $ drop (c * ncols * nrows) images
    mapM_ (f (st^.ub)) (enumerate subset)
    pure $ st & displayedImages .~ (takeFileName <$> subset)
 
-showImagesSingle :: St -> IO St
-showImagesSingle st = do
+showImagesSingle :: St -> [FilePath] -> IO St
+showImagesSingle st images = do
   let c = st^.currentSlice
-  case st^.images of
+  case images of
     [] -> pure st
     [main_img] -> do
       showImageSingle (st^.ub) (1, main_img)
       pure $ st & displayedImages .~ [takeFileName main_img]
     _ -> do
-      let main_img = (st^.images) !! c
-      let other_imgs = drop (c + 1) (st^.images)
+      let main_img = images !! c
+      let other_imgs = drop (c + 1) images
       let subset = take 4 other_imgs
       case subset of
         (x : xs) -> do

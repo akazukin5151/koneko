@@ -17,6 +17,7 @@ import Serialization.In
       IllustDetail(illustDetail_meta_pages, illustDetail_image_urls, illustDetail_title, illustDetail_user), IllustUser (illustUser_name), next_url )
 import Data.List ( sort )
 import Data.Text ( pack, unpack, splitOn )
+import Types (Request(..))
 
 leftPad :: Int -> String
 leftPad num | num <= 9 = "0" <> intToStr num
@@ -43,9 +44,14 @@ window3 [x] = [[x]]
 window3 [a, b] = [[a, b]]
 window3 (a : b : c : xs) = [[a, b, c]] <> window3 xs
 
-parseUserIllustResponse
-  :: String -> UserIllustResponse -> ([a], [FilePath], [String], Maybe String)
-parseUserIllustResponse dir r = ([], sorted, urls, Just n)
+parseUserIllustResponse :: String -> UserIllustResponse -> Request
+parseUserIllustResponse dir r =
+  Request
+    { labels_ = []
+    , paths = sorted
+    , urls = urls
+    , nextUrl_ = Just n
+    }
     where
       n = next_url r
       illusts' = illusts r
@@ -56,9 +62,14 @@ parseUserIllustResponse dir r = ([], sorted, urls, Just n)
       sorted = sort paths
       urls = square_medium . userIllust_image_url <$> illusts'
 
-parseIllustDetailResponse
-  :: String -> IllustDetailResponse -> ([a], [FilePath], [String], Maybe String)
-parseIllustDetailResponse dir r = ([], sorted, urls, Nothing)
+parseIllustDetailResponse :: String -> IllustDetailResponse -> Request
+parseIllustDetailResponse dir r =
+  Request
+    { labels_ = []
+    , paths = sorted
+    , urls = urls
+    , nextUrl_ = Nothing
+    }
     where
       meta_pages = illustDetail_meta_pages $ illustDetailResponse_illust r
       -- it's not possible to get the titles without another query, so whatever
@@ -70,9 +81,14 @@ parseIllustDetailResponse dir r = ([], sorted, urls, Nothing)
       paths = [dir </> name' | name' <- names]
       sorted = sort paths
 
-parseUserDetailResponse
-  :: String -> UserDetailResponse -> ([String], [FilePath], [String], Maybe String)
-parseUserDetailResponse dir r = (user_name <$> users', full_paths, urls, Just n)
+parseUserDetailResponse :: String -> UserDetailResponse -> Request
+parseUserDetailResponse dir r =
+  Request
+    { labels_ = user_name <$> users'
+    , paths = full_paths
+    , urls = urls
+    , nextUrl_ = Just n
+    }
     where
       n = userDetailResponse_next_url r
       -- adapted from show Images Simple

@@ -49,11 +49,11 @@ import Requests (login)
 import Control.Concurrent (forkIO)
 import Control.Monad (void)
 import Common (initialFooter)
+import Data.IntMap.Lazy (empty)
 
 initialState ub' chan config konekoDir socket conn =
   St { _selectedCellIdx = 0
      , _ub = ub'
-     , _images = []
      , _displayedImages = []
      , _currentPage1 = 1
      , _currentSlice = 0
@@ -68,12 +68,10 @@ initialState ub' chan config konekoDir socket conn =
      , _footer = initialFooter
      , _config = config
      , _konekoDir = konekoDir
-     , _labels = []
-     --, _socket = socket
      , _conn = conn
      , _pendingOnLogin = Nothing
      , _your_id = Nothing
-     , _nextUrl = Nothing
+     , _request = empty
      }
 
 theMap = attrMap V.defAttr

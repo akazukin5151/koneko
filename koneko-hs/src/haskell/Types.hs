@@ -10,6 +10,7 @@ import Network.Socket (Socket)
 import Config.Types ( Config )
 import Brick (Widget)
 import Data.Text (Text)
+import Data.IntMap.Lazy (IntMap)
 
 data View = GalleryView
           | WelcomeView
@@ -38,13 +39,22 @@ data Event = ModeEnter Mode
            | DownloadFinished St
            | RequestFinished St
 
+data Request =
+  Request
+    { labels_ :: [String]
+    -- ^ text to display in the second horizontal cell for ArtistListView
+    , paths :: [String]
+    -- ^ images to display (not all of them will fit in screen)
+    , urls :: [String]
+    , nextUrl_ :: Maybe String
+    }
+    deriving Show
+
 data St =
   St
     {
     -- UI position stuff
-      _images :: [String]
-    -- ^ images to display (not all of them will fit in screen)
-    , _displayedImages :: [String]
+    _displayedImages :: [String]
     -- ^ currently displayed images
     , _activeView :: View
     -- ^ the currently active view
@@ -74,8 +84,6 @@ data St =
     -- UI stuff
     , _editor :: Editor Text Field
     -- ^ The editor for prompts that ask for artist id or search str
-    , _labels :: [Text]
-    -- ^ text to display in the second horizontal cell for ArtistListView
     , _history :: [Text]
     -- ^ history of highlighted mode to display
     , _isHistoryFocused :: Bool
@@ -99,11 +107,12 @@ data St =
     , _konekoDir :: FilePath
     -- ^ the koneko dir
 
-    -- requests (stored here because it is never asked, so the editor won't store this)
+    -- requests
+    , _request :: IntMap Request
+    -- ^ All the parsed requests for every page for this mode,
+    -- indexed by _currentPage1
     , _your_id :: Maybe String
     -- ^ the currently logged in user's pixiv id
-    , _nextUrl :: Maybe String
-    -- ^ The next url as given by the latest pixiv response
     }
 
 makeLenses ''St

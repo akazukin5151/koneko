@@ -14,15 +14,13 @@ import Types
       currentSlice,
       displayedImages,
       editor,
-      images,
-      labels,
       selectedCellIdx,
       ub,
       currentPage1,
       your_id,
       footer,
       offset,
-      pendingOnLogin, nextUrl )
+      pendingOnLogin, request, Request (paths, urls, nextUrl_) )
 import Graphics.Ueberzug ( clear )
 import Control.Monad (void, unless)
 import Lens.Micro ((^.), (.~), (&), (%~), (?~), (<&>))
@@ -35,12 +33,13 @@ import Events.ShowImages (showImagesView)
 import Events.FindImages (findImagesView)
 import Events.Common ( getDirectory, listDirectoryFullSorted, getFirstDirectory, wrapped, getNextDirectory)
 import System.Directory (doesDirectoryExist, listDirectory)
-import Download.Core (downloadFromScratch, fetchFirst, downloadWithoutShowing, fetch)
+import Download.Core (fetchFirst, downloadWithoutShowing, fetch)
 import Brick (txt)
 import Data.Text (pack)
 import Control.Arrow ((<<<), (>>>))
 import Control.Concurrent (forkIO)
 import System.Directory.Internal (andM)
+import Data.IntMap (insert, singleton, (!))
 
 handleInner :: (Int -> Int) -> St -> IO St
 handleInner f st = do
@@ -72,13 +71,14 @@ clearImages st =
    mapM_ (clear (st^.ub)) $ st^.displayedImages
 
 handleSliceOrPage :: (Int -> Int) -> Bool -> Int -> St -> IO St
-handleSliceOrPage f cond sliceReset st =
-  if cond
+handleSliceOrPage f isSamePage sliceReset st =
+  if isSamePage
      then do
        clearImages st
        let new_st = st & currentSlice %~ f
                        & displayedImages .~ []
-       showImagesView st new_st
+       let images = (st^.request) ! (st^.currentPage1) & paths
+       showImagesView st new_st images
      else do
        let next_dir = getDirectory st </> intToStr (f (st^.currentPage1))
        has_next <- doesDirectoryExist next_dir
@@ -86,23 +86,13 @@ handleSliceOrPage f cond sliceReset st =
          then do
            clearImages st
            new_images <- listDirectoryFullSorted next_dir
-           -- TODO: next page -> set nextUrl to the next one (aka, set the "current"
-           -- json to the next page, so that the next url points to the next-next)
-           -- eg page 1 -> page 2
-           -- page_1_response -> page_2_response
-           -- page_1_response.next_url (page_2_url) -> page_2_response.next_url (page_3_url)
            let new_st =
-                 st^.nextUrl
-                 >>= (pack >>> nextOffset)
-                 <&> (\o -> st & offset .~ o)
-                 & fromMaybe st
+                 st
                  & currentSlice .~ sliceReset
                  & currentPage1 %~ f
                  -- & offset %~ f
                  & displayedImages .~ []
-                 & images .~ new_images
-           logger "new_st^.nextUrl" $ new_st^.nextUrl
-           showImagesView st new_st
+           showImagesView st new_st new_images
            prefetchInBg new_st
          else pure st
 
@@ -116,9 +106,11 @@ handleN st = handleSliceOrPage (+1) (st^.currentSlice < totalSlices st) 0 st
 -- currentSlice is 0-indexed so need to subtract 1
 totalSlices :: St -> Int
 totalSlices st
-  | st^.activeView == SingleImageView = length (st^.images) - 1
-  | otherwise = length (st^.images) `div` (ncols*nrows) - 1
-  where (nrows, ncols) = viewToNRowsCols st
+  | st^.activeView == SingleImageView = length images - 1
+  | otherwise = length images `div` (ncols*nrows) - 1
+  where
+    (nrows, ncols) = viewToNRowsCols st
+    images = (st^.request) ! (st^.currentPage1) & paths
 
 back :: St -> IO St
 back st = do
@@ -136,18 +128,14 @@ handleEnterView st mode = do
   if cond
     then do
       (labels', imgs) <- findImagesView mode st
-      let new_st = st & images .~ imgs
-      new_st' <- showImagesView new_st new_st
+      new_st' <- showImagesView st st imgs
       -- TODO: verify cache up-to-date
       void $ forkIO $ do
-        Right (labels', imgs, urls, m_nextUrl) <- fetchFirst mode new_st' dir
-        let new_st'' =
-              st & images .~ imgs
-                 & labels .~ (pack <$> labels')
-                 & nextUrl .~ m_nextUrl
+        Right r <- fetchFirst mode new_st' dir
+        let new_st'' = st & request .~ singleton 1 r
         writeBChan (st^.chan) (RequestFinished new_st'')
         prefetchInner new_st'' mode
-      pure $ new_st' & labels .~ (pack <$> labels')
+      pure $ new_st'
     else
       case st^.your_id of
         Nothing -> pure $ st & pendingOnLogin ?~ downloadInBg mode dir
@@ -155,20 +143,26 @@ handleEnterView st mode = do
 
 prefetchInner :: St -> Mode -> IO ()
 prefetchInner st mode = do
+  -- idx is copied from getNextDirectory
+  let idx = st^.currentPage1 + 1
   let dir = getNextDirectory st
   cond <- andM (doesDirectoryExist dir) (listDirectory dir <&> (not <<< null))
-  logger "st^.nextUrl" $ st^.nextUrl
-  -- prefetch only if dir doesn't exist or is empty
-  unless cond $
-    void $ forkIO $ do
-      case st^.nextUrl >>= (pack >>> nextOffset) of
-        Nothing -> pure ()
-        Just no -> do
-          Right (_labels', imgs, urls, m_nextUrl) <- fetch no mode st dir
-          -- TODO: do i need to store these in next_labels/imgs?
-          let new_st = st & nextUrl .~ m_nextUrl
-          writeBChan (st^.chan) (RequestFinished new_st)
-          downloadWithoutShowing mode st dir imgs urls
+  void $ forkIO $ do
+    let d = (st^.request) ! (st^.currentPage1)
+    case d & nextUrl_ >>= (pack >>> nextOffset) of
+      Nothing -> pure ()
+      Just no -> do
+        r' <- fetch no mode st dir
+        -- TODO: see if this is still needed after fixing 'extra data' bug
+        case r' of
+          Left _ -> pure ()
+          Right r -> do
+            -- TODO: do i need to store these in next_labels/imgs?
+            let new_st = st & request %~ insert idx r
+            writeBChan (st^.chan) (RequestFinished new_st)
+            -- download only if dir doesn't exist or is empty
+            unless cond $
+              downloadWithoutShowing mode st dir (paths r) (urls r)
 
 prefetchInBg :: St -> IO St
 prefetchInBg st = do
@@ -179,14 +173,12 @@ prefetchInBg st = do
 downloadInBg :: Mode -> String -> St -> IO St
 downloadInBg mode dir st = do
   void $ forkIO $ do
-    Right (labels', imgs, urls, m_nextUrl) <- fetchFirst mode st dir
-    let new_st =
-          st & images .~ imgs
-             & labels .~ (pack <$> labels')
-             & nextUrl .~ m_nextUrl
+    Right r <- fetchFirst mode st dir
+    let new_st = st & request .~ singleton 0 r
     writeBChan (st^.chan) (RequestFinished new_st)
-    new_st' <- downloadFromScratch mode new_st dir imgs urls
-    writeBChan (st^.chan) (DownloadFinished new_st')
+    downloadWithoutShowing mode new_st dir (paths r) (urls r)
+    -- TODO remove DownloadFinished
+    -- writeBChan (st^.chan) (DownloadFinished new_st')
   pure st
 
 handleLogin :: St -> Either a String -> IO St

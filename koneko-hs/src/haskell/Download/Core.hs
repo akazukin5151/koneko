@@ -6,11 +6,9 @@ module Download.Core where
 import Common ( getEditorText)
 import Types
     ( conn,
-      images,
-      labels,
       Mode(FollowingArtists, ArtistIllustrations, SingleIllustration,
            SearchArtists, FollowingArtistsIllustrations, RecommendedIllustrations),
-      St, your_id )
+      St, your_id, Request )
 import Lens.Micro ((^.), (.~), (&))
 import Events.FindImages (findImagesView)
 import Requests (userIllustRequest, illustDetailRequest, searchUserRequest, userFollowingRequest, illustFollowRequest, illustRecommendedRequest )
@@ -29,7 +27,7 @@ fetchFirst
   :: Mode
   -> St
   -> String
-  -> IO (Either String ([String], [FilePath], [String], Maybe String))
+  -> IO (Either String Request)
 fetchFirst = fetch 0
 
 fetch
@@ -37,7 +35,7 @@ fetch
   -> Mode
   -> St
   -> String
-  -> IO (Either String ([String], [FilePath], [String], Maybe String))
+  -> IO (Either String Request)
 fetch offset mode st dir =
   case mode of
     ArtistIllustrations -> do
@@ -61,35 +59,6 @@ fetch offset mode st dir =
     RecommendedIllustrations -> do
       r <- illustRecommendedRequest offset (st^.conn)
       pure $ parseUserIllustResponse dir <$> r
-
-downloadFromScratch :: Mode -> St -> String -> [FilePath] -> [String] -> IO St
-downloadFromScratch mode st dir sorted urls =
-  case mode of
-    ArtistIllustrations ->
-      downloadThenUpdate (downloadUserIllust st dir sorted urls) mode st
-    SingleIllustration ->
-      downloadThenUpdate (downloadIllustDetail st dir sorted urls) mode st
-    SearchArtists ->
-      downloadThenUpdate (downloadUserFollowing st sorted urls) mode st
-    FollowingArtists ->
-      downloadThenUpdate (downloadUserFollowing st sorted urls) mode st
-    FollowingArtistsIllustrations ->
-      downloadThenUpdate (downloadUserIllust st dir sorted urls) mode st
-    RecommendedIllustrations ->
-      downloadThenUpdate (downloadUserIllust st dir sorted urls) mode st
-
--- technically imgs and labels are already updated,
--- but need to update the ub instance anyway
-downloadThenUpdate :: IO [String] -> Mode -> St -> IO St
-downloadThenUpdate io_imgs mode st = do
-  imgs <- io_imgs
-  (labels', _) <- findImagesView mode st
-  -- it's probably reversed because the first images to be downloaded
-  -- will finish downloading first, and the last image in order
-  -- will download last and thus be the first item of @imgs@
-  let new_st' = st & images .~ sort imgs
-  --new_st' <- showImagesView new_st new_st
-  pure $ new_st' & labels .~ (pack <$> labels')
 
 downloadWithoutShowing :: Mode -> St -> String -> [FilePath] -> [String] -> IO ()
 downloadWithoutShowing mode st dir sorted urls =

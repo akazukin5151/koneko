@@ -8,39 +8,39 @@ from internal_types import Response
 from pixivpy3 import PixivError
 import funcy
 
-def login(api: Any, refresh_token: str) -> Tuple[Any, str]:
+def login(api: Any, refresh_token: str, ident: int) -> Tuple[Any, str]:
     r = api.auth(refresh_token=refresh_token)
-    response: Response = {'response': {'tag': 'LoginInfo', 'contents': r}}
+    response: Response = {'ident': ident, 'response': {'tag': 'LoginInfo', 'contents': r}}
     return (api, json.dumps(response))
 
-def user_illusts(api: Any, user_id: str, offset: int) -> str:
+def user_illusts(api: Any, user_id: str, offset: int, ident: int) -> str:
     r = api.user_illusts(user_id, offset=offset)
-    response: Response = {'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
+    response: Response = {'ident': ident, 'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
     return (json.dumps(response))
 
-def illust_detail(api: Any, image_id: str) -> str:
+def illust_detail(api: Any, image_id: str, ident: int) -> str:
     r = api.illust_detail(image_id)
-    response: Response = {'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
+    response: Response = {'ident': ident, 'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
     return (json.dumps(response))
 
-def search_user(api: Any, query: str, offset: int) -> str:
+def search_user(api: Any, query: str, offset: int, ident: int) -> str:
     r = api.search_user(query, offset=offset)
-    response: Response = {'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
+    response: Response = {'ident': ident, 'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
     return (json.dumps(response))
 
-def user_following(api: Any, user_id: str, offset: int) -> str:
+def user_following(api: Any, user_id: str, offset: int, ident: int) -> str:
     r = api.user_following(user_id, offset=offset, restrict='private')
-    response: Response = {'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
+    response: Response = {'ident': ident, 'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
     return (json.dumps(response))
 
-def illust_follow(api: Any, offset: int) -> str:
+def illust_follow(api: Any, offset: int, ident: int) -> str:
     r = api.illust_follow(restrict='private', offset=offset)
-    response: Response = {'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
+    response: Response = {'ident': ident, 'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
     return (json.dumps(response))
 
-def illust_recommended(api: Any, offset: int) -> str:
+def illust_recommended(api: Any, offset: int, ident: int) -> str:
     r = api.illust_recommended(offset=offset)
-    response: Response = {'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
+    response: Response = {'ident': ident, 'response': {'tag': 'Requested', 'contents': json.dumps(r)}}
     return json.dumps(response)
 
 @funcy.retry(tries=3, errors=(ConnectionError, PixivError))

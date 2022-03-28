@@ -5,7 +5,7 @@ module Main where
 import Graphics ( onAppStart )
 import Types
 import Serialization.In
-    ( LoginResponse(_LoginResponse_user), LoginUser(_LoginUser_id) )
+    ( LoginResponse(_LoginResponse_user), LoginUser(_LoginUser_id), IPCResponses (LoginInfo) )
 import Events ( appEvent )
 import UI ( drawUI )
 import Lens.Micro ((^.))
@@ -48,10 +48,11 @@ import Config.Types ( Config, pythonProcessPath, refreshToken )
 import Requests (login)
 import Control.Concurrent (forkIO)
 import Control.Monad (void)
-import Common (initialFooter)
+import Common (initialFooter, logger)
 import Data.IntMap.Lazy (empty)
+import Sockets (recvAll)
 
-initialState ub' chan config konekoDir socket conn =
+initialState ub' chan config konekoDir conn =
   St { _selectedCellIdx = 0
      , _ub = ub'
      , _displayedImages = []
@@ -72,6 +73,7 @@ initialState ub' chan config konekoDir socket conn =
      , _pendingOnLogin = Nothing
      , _your_id = Nothing
      , _request = empty
+     , _messageQueue = empty
      }
 
 theMap = attrMap V.defAttr
@@ -118,15 +120,26 @@ main' home config sock = do
 
   chan <- newBChan 10
 
+  void $ forkIO $
+    recvAll chan conn
+
+  let st = initialState ub' chan config konekoDir conn
   void $ forkIO $ do
-    login_response <- login (config^.refreshToken) conn
-    let e_id = fmap (_LoginUser_id . _LoginResponse_user) login_response
-    writeBChan chan (LoginResult e_id)
+    new_st <- login (config^.refreshToken) st $ \ir -> do
+      res <-
+        case ir of
+          LoginInfo lr -> do
+            let e_id = _LoginUser_id $ _LoginResponse_user lr
+            pure (LoginResult $ Right e_id)
+          _ -> pure (LoginResult $ Left "Wrong response type")
+      writeBChan chan res
+    case new_st of
+      Left _ -> pure ()
+      Right x -> writeBChan chan (RequestFinished x)
 
   let buildVty = V.mkVty V.defaultConfig
   initialVty <- buildVty
   let app = theApp
-  let st = initialState ub' chan config konekoDir sock conn
   _final_state <- customMain initialVty buildVty (Just chan) app st
   --threadDelay 1000000
   -- _ <- clear (_final_state^.ub) "crab"

@@ -3,14 +3,14 @@
 module Download.Common where
 
 import Common ( bindWithMsg )
-import Sockets ( catchSomeException, recvAll, sendAll')
-import Data.Maybe (fromJust)
+import Sockets ( catchSomeException, recvAll, sendAllWithLen, sendEither)
+import Data.Maybe (fromJust, fromMaybe)
 import Serialization.In
     ( IPCResponse(response), IPCResponses(Downloaded) )
 import Serialization.Out
     ( DownloadInfo(DownloadInfo, url, path, name),
       IPCActions(Download),
-      IPCJson(IPCJson, action) )
+      IPCJson(IPCJson, action, ident) )
 import Data.List ( sortBy )
 import qualified Data.ByteString.Char8 as B
 import Data.ByteString.Char8 (ByteString)
@@ -25,8 +25,9 @@ import Data.Functor ((<&>))
 import Data.Either (rights)
 import System.Directory (createDirectoryIfMissing)
 import Events.ShowImages ( showImageView )
-import Types ( ub, St )
+import Types ( ub, St, messageQueue, conn )
 import Lens.Micro ((^.))
+import Data.IntMap (lookupMax)
 
 showImagesConcurrently
   :: St -> [(String, Int)] -> (Int, [String]) -> String -> IO (Int, [String])
@@ -79,63 +80,52 @@ displayPrevInOrder g cur_idx ((i, p) : xs) = do
 sortByFst :: Ord a => [(a, b)] -> [(a, b)]
 sortByFst = sortBy (\(a, _) (b, _) -> compare a b)
 
-download
-  :: Num a
-  => ((a, [b]) -> FilePath -> IO (a, [b])) -- ^ callback drawing function
-  -> Socket
-  -> [String] -- ^ urls to download
-  -> [FilePath] -- ^ output paths
-  -> [String] -- ^ output names
-  -> IO [FilePath]
-download cb conn urls dirs names = do
-  mapM_ (createDirectoryIfMissing True) dirs
-  tryAll cb conn total $ toStrict $ encode (IPCJson {action = Download info})
-  where
-    total = length names
-    info =
-        [ DownloadInfo
-           { url = url'
-           , path = dir
-           , name = name'
-           }
-        | (url', dir, name') <- zip3 urls dirs names]
+--download
+--  :: St
+--  -> [String] -- ^ urls to download
+--  -> [FilePath] -- ^ output paths
+--  -> [String] -- ^ output names
+--  -> IO (Either String ())
+--download st urls dirs names = do
+--  mapM_ (createDirectoryIfMissing True) dirs
+--  let i = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
+--  sendEither st $ toStrict $ encode (IPCJson {ident = i, action = Download info})
+--  where
+--    -- total = length names
+--    -- recvToTotal cb conn total [] (0, [])
+--    info =
+--        [ DownloadInfo
+--           { url = url'
+--           , path = dir
+--           , name = name'
+--           }
+--        | (url', dir, name') <- zip3 urls dirs names]
 
-tryAll
-  :: Num a
-  => ((a, [b]) -> FilePath -> IO (a, [b]))
-  -> Socket
-  -> Int
-  -> ByteString
-  -> IO [FilePath]
-tryAll cb conn total text = do
-  _i <- catchSomeException (sendAll' conn text)
-  recvToTotal cb conn total [] (0, [])
-
-recvToTotal :: (a -> FilePath -> IO a) -> Socket -> Int -> [FilePath] -> a -> IO [FilePath]
-recvToTotal cb conn total res arg = do
-  d <- recvAll conn
-  -- TODO: arguably, the download functions should return Either
-  -- flatten the either from recvAll and decoding
-  let files =
-        d
-        -- This crashes if recvAll failed
-        & fromRight
-        & B.lines
-        <&> (\bytestring ->
-              bytestring
-                & eitherDecodeStrict
-                & first ("Decoding bytestring into IPCResponse failed: " <>)
-                & bindWithMsg (response >>> decodeDownloaded)
-                    "Decoding Download from IPCResponse failed: "
-          )
-        -- this ignores all Lefts (decode failures ignored)
-        & rights
-
-  let new = files <> res
-  newImageIdx <- foldM cb arg new
-  if length new < total
-     then recvToTotal cb conn total new newImageIdx
-     else pure new
+--recvToTotal :: (a -> FilePath -> IO a) -> Socket -> Int -> [FilePath] -> a -> IO [FilePath]
+--recvToTotal cb conn total res arg = do
+--  d <- recvAll conn
+--  -- TODO: arguably, the download functions should return Either
+--  -- flatten the either from recvAll and decoding
+--  let files =
+--        d
+--        -- This crashes if recvAll failed
+--        & fromRight
+--        & B.lines
+--        <&> (\bytestring ->
+--              bytestring
+--                & eitherDecodeStrict
+--                & first ("Decoding bytestring into IPCResponse failed: " <>)
+--                & bindWithMsg (response >>> decodeDownloaded)
+--                    "Decoding Download from IPCResponse failed: "
+--          )
+--        -- this ignores all Lefts (decode failures ignored)
+--        & rights
+--
+--  let new = files <> res
+--  newImageIdx <- foldM cb arg new
+--  if length new < total
+--     then recvToTotal cb conn total new newImageIdx
+--     else pure new
 
 decodeDownloaded :: IPCResponses -> Either String FilePath
 decodeDownloaded = \case

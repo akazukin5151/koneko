@@ -10,7 +10,7 @@ import Graphics.Ueberzug
       Scalers(FitContain),
       UbConf(identifier, path, x, y, width, height, scaler),
       Ueberzug )
-import Lens.Micro ((^.), (.~), (&))
+import Lens.Micro ((^.), (.~), (&), (^?), ix)
 import System.FilePath (takeFileName)
 
 showImagesView :: St -> St -> [FilePath] -> IO St
@@ -65,8 +65,12 @@ showImageSimple
   -> (Int, FilePath)
   -> IO ()
 showImageSimple st ncols xs ys ub' (idx, filepath) =
-  showImageInner px py (xs !! px) (ys !! py) w h ub' filepath
+  case (m_xpos, m_ypos) of
+    (Just xp, Just yp) -> showImageInner px py xp yp w h ub' filepath
+    _ -> pure ()
     where
+      m_xpos = xs ^? ix px
+      m_ypos = ys ^? ix py
       (px, py) = indexToCoords ncols idx
       w = const2 (Just $ st^.config.imageWidth)
       h = const2 (Just $ st^.config.imageHeight)

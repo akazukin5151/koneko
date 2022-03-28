@@ -22,5 +22,6 @@ class Responses(TypedDict):
     contents: Optional[Union[int, PythonError, str]]
 
 class Response(TypedDict):
+    ident: int
     response: Responses
 

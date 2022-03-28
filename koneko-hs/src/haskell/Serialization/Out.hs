@@ -46,7 +46,11 @@ $(deriveJSON defaultOptions {constructorTagModifier = camelTo2 '_'} ''PixivReque
 
 $(deriveJSON defaultOptions ''IPCActions)
 
-data IPCJson = IPCJson { action :: IPCActions }
+data IPCJson =
+  IPCJson
+    { ident :: Int
+    , action :: IPCActions
+    }
   deriving (Show)
 
 $(deriveJSON defaultOptions ''IPCJson)

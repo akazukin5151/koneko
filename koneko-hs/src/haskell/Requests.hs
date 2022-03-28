@@ -2,73 +2,93 @@
 
 module Requests where
 
-import Network.Socket ( Socket )
 import Serialization.Out
     ( PixivRequest(..),
-      IPCActions(Login, Request),
+      IPCActions(Login, Request, Download),
       RefreshToken,
-      IPCJson(IPCJson, action) )
-import Serialization.In
-    ( IPCResponse(response),
-      IPCResponses(Requested, LoginInfo),
-      IllustDetailResponse,
-      LoginResponse,
-      UserDetailResponse,
-      UserIllustResponse )
-import Common ( bindWithMsg )
-import Sockets ( talk )
+      IPCJson(IPCJson, action, ident), Offset, Query, UserId, ImageId, DownloadInfo (..), Url )
+import Sockets ( sendEither )
 import Data.ByteString.Lazy.Char8 ( toStrict )
-import Data.Aeson ( eitherDecode, eitherDecodeStrict, encode )
-import Codec.Binary.UTF8.Generic (fromString)
-import Data.Aeson.Types (FromJSON)
-import Control.Arrow ((>>>))
-import Data.Bifunctor (Bifunctor(first))
-import Data.Function ((&))
+import Data.Aeson ( encode )
+import Types (St, conn, messageQueue)
+import Lens.Micro ((^.), (&), (<&>), (%~))
+import Data.IntMap (lookupMax, insert, keys)
+import Data.Maybe (fromMaybe)
+import Serialization.In (IPCResponses)
+import Data.Functor (($>))
+import Common (logger)
+import System.Directory (createDirectoryIfMissing)
+import Control.Monad (zipWithM, foldM)
+import Core (enumerate)
+import Data.IntMap.Lazy (union)
+import Data.Either (rights)
 
-request :: FromJSON b => PixivRequest -> Socket -> IO (Either String b)
-request x conn = do
-  res <- talk conn $ toStrict $ encode (IPCJson {action = Request x})
-  pure $
-    res
-    & first ("Talking to socket failed: " <>)
-    & bindWithMsg eitherDecodeStrict "Decoding request (IPCResponse) failed: "
-    & bindWithMsg (response >>> decodeRequested)
-        "Decoding Requested inside IPCResponse failed: "
+request :: PixivRequest -> St -> (IPCResponses -> IO ()) -> IO (Either String St)
+request x st cb = do
+  let i = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
+  let new_st = st & messageQueue %~ insert i cb
+  let r = IPCJson {ident = i, action = Request x}
+  ei <- sendEither st $ toStrict $ encode r
+  pure $ ei $> new_st
 
-login :: RefreshToken -> Socket -> IO (Either String LoginResponse)
-login x conn = do
-  res <- talk conn $ toStrict $ encode (IPCJson {action = Login x})
-  pure $
-    res
-    & first ("Talking to socket failed: " <>)
-    & bindWithMsg eitherDecodeStrict "Decoding request (IPCResponse) failed: "
-    & bindWithMsg (response >>> decodeLogin)
-        "Decoding LoginInfo inside IPCResponse failed: "
+download
+  :: (Int -> IPCResponses -> IO ())
+  -> St
+  -> [Url]
+  -> [FilePath]  -- ^ output paths
+  -> [FilePath]  -- ^ output names
+  -> IO (Either String St)
+download cb st urls dirs names = do
+  mapM_ (createDirectoryIfMissing True) dirs
+  let i = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
+  logger "[i..(i + length infos)]" [i..(i + length infos)]
+  let sts = [ do
+        let new_st = st & messageQueue %~ insert i (cb idx)
+        new_st
+        | (idx, i) <- enumerate [i..(i + length infos)]]
+  let r = IPCJson {ident = i, action = Download infos}
+  ei <- sendEither st $ toStrict $ encode r
+  let new_st = foldr1 f sts
+  pure $ ei $> new_st
+  -- pure $ Right $ foldr1 f $ rights sts
+  where
+    f a b = a & messageQueue %~ (`union` (b^.messageQueue))
+    infos =
+        [ DownloadInfo
+           { url = url'
+           , path = dir
+           , name = name'
+           }
+        | (url', dir, name') <- zip3 urls dirs names]
 
-decodeLogin :: IPCResponses -> Either String LoginResponse
-decodeLogin = \case
-  LoginInfo json -> Right json
-  _ -> Left "Wrong response type"
+login :: RefreshToken -> St -> (IPCResponses -> IO ()) -> IO (Either String St)
+login x st cb = do
+  let i = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
+  let new_st = st & messageQueue %~ insert i cb
+  let r = IPCJson {ident = i, action = Login x}
+  ei <- sendEither st $ toStrict $ encode r
+  pure $ ei $> new_st
 
-decodeRequested :: FromJSON b => IPCResponses -> Either String b
-decodeRequested = \case
-  Requested json -> eitherDecode (fromString json)
-  _ -> Left "Wrong response type"
-
-userIllustRequest :: String -> Int -> Socket -> IO (Either String UserIllustResponse)
+userIllustRequest
+  :: UserId -> Offset -> St -> (IPCResponses -> IO ()) -> IO (Either String St)
 userIllustRequest user_id offset = request (UserIllusts user_id offset)
 
-illustDetailRequest :: String -> Socket -> IO (Either String IllustDetailResponse)
+illustDetailRequest
+  :: ImageId -> St -> (IPCResponses -> IO ()) -> IO (Either String St)
 illustDetailRequest image_id = request (IllustDetail image_id)
 
-userFollowingRequest :: String -> Int -> Socket -> IO (Either String UserDetailResponse)
+userFollowingRequest
+  :: UserId -> Offset -> St -> (IPCResponses -> IO ()) -> IO (Either String St)
 userFollowingRequest user_id offset = request (UserFollowing user_id offset)
 
-searchUserRequest :: String -> Int -> Socket -> IO (Either String UserDetailResponse)
+searchUserRequest
+  :: Query -> Offset -> St -> (IPCResponses -> IO ()) -> IO (Either String St)
 searchUserRequest query offset = request (SearchUser query offset)
 
-illustFollowRequest :: Int -> Socket -> IO (Either String UserIllustResponse)
+illustFollowRequest
+  :: Offset -> St -> (IPCResponses -> IO ()) -> IO (Either String St)
 illustFollowRequest offset = request (IllustFollow offset)
 
-illustRecommendedRequest :: Int -> Socket -> IO (Either String UserIllustResponse)
+illustRecommendedRequest
+  :: Offset -> St -> (IPCResponses -> IO ()) -> IO (Either String St)
 illustRecommendedRequest offset = request (IllustRecommended offset)

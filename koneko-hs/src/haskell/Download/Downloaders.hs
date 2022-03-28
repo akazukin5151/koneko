@@ -8,21 +8,33 @@ import Types
 import Lens.Micro ((^.))
 import System.FilePath (takeFileName, takeDirectory)
 import Data.Tuple (swap)
-import Download.Common ( download, showImagesConcurrently )
+import Download.Common ( showImagesConcurrently )
+import Requests
+import Serialization.In (IPCResponses)
+import Serialization.Out (Url)
 
 emptyCb :: Applicative f => (a1, b) -> p -> f (a1, [a2])
 emptyCb (a, _) _ = pure (a, [])
 
-downloadUserIllust' :: St -> String -> [FilePath] -> [String] -> IO [FilePath]
-downloadUserIllust' st dir sorted urls = do
-  download emptyCb (st^.conn) urls dirs names
+-- TODO: explore eta reduce potential
+-- emptyCb
+downloadUserIllust'
+  :: (Int -> IPCResponses -> IO ())
+  -> St
+  -> [Char]
+  -> [FilePath]
+  -> [Url]
+  -> IO (Either String St)
+downloadUserIllust' cb st dir sorted urls = download cb st urls dirs names
     where
       dirs = replicate (length urls) dir
       names = takeFileName <$> sorted
 
-downloadUserIllust :: St -> String -> [FilePath] -> [String] -> IO [FilePath]
-downloadUserIllust st dir sorted urls = do
-  download (showImagesConcurrently st assoc) (st^.conn) urls dirs names
+-- (showImagesConcurrently st assoc)
+downloadUserIllust :: (Int -> IPCResponses -> IO ())
+  -> St -> [Char] -> [FilePath] -> [Url] -> IO (Either String St)
+downloadUserIllust cb st dir sorted urls = do
+  download cb st urls dirs names
     where
       (nrows, ncols_) = viewToNRowsCols st
       subset = take (ncols_ * nrows) sorted
@@ -30,16 +42,20 @@ downloadUserIllust st dir sorted urls = do
       dirs = replicate (length urls) dir
       names = takeFileName <$> sorted
 
-downloadIllustDetail' :: St -> String -> [FilePath] -> [String] -> IO [FilePath]
-downloadIllustDetail' st dir sorted urls =
-  download emptyCb (st^.conn) urls dirs names
+-- emptyCb
+downloadIllustDetail' :: (Int -> IPCResponses -> IO ())
+  -> St -> [Char] -> [FilePath] -> [Url] -> IO (Either String St)
+downloadIllustDetail' cb st dir sorted urls =
+  download cb st urls dirs names
     where
       dirs = replicate (length urls) dir
       names = takeFileName <$> sorted
 
-downloadIllustDetail :: St -> String -> [FilePath] -> [String] -> IO [FilePath]
-downloadIllustDetail st dir sorted urls =
-  download (showImagesConcurrently st assoc) (st^.conn) urls dirs names
+-- (showImagesConcurrently st assoc)
+downloadIllustDetail :: (Int -> IPCResponses -> IO ())
+  -> St -> [Char] -> [FilePath] -> [Url] -> IO (Either String St)
+downloadIllustDetail cb st dir sorted urls =
+  download cb st urls dirs names
     where
       -- always 1 main image + 4 side images
       subset = take 5 sorted
@@ -47,16 +63,20 @@ downloadIllustDetail st dir sorted urls =
       dirs = replicate (length urls) dir
       names = takeFileName <$> sorted
 
-downloadUserFollowing' :: St -> [FilePath] -> [String] -> IO [FilePath]
-downloadUserFollowing' st sorted urls =
-  download emptyCb (st^.conn) urls dirs names
+-- emptyCb
+downloadUserFollowing' :: (Int -> IPCResponses -> IO ())
+  -> St -> [FilePath] -> [Url] -> IO (Either String St)
+downloadUserFollowing' cb st sorted urls =
+  download cb st urls dirs names
     where
       dirs = takeDirectory <$> sorted
       names = takeFileName <$> sorted
 
-downloadUserFollowing :: St -> [FilePath] -> [String] -> IO [FilePath]
-downloadUserFollowing st sorted urls =
-  download (showImagesConcurrently st assoc') (st^.conn) urls dirs names
+-- (showImagesConcurrently st assoc')
+downloadUserFollowing :: (Int -> IPCResponses -> IO ())
+  -> St -> [FilePath] -> [Url] -> IO (Either String St)
+downloadUserFollowing cb st sorted urls =
+  download cb st urls dirs names
     where
       (n_artists, ncols) = modeToNRowsCols st
       n_total_pics = ncols - 1

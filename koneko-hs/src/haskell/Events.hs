@@ -1,18 +1,17 @@
 module Events where
 
 import Types
-    ( activeView, Event(..), Field, St, View(PromptView, WelcomeView) )
+    ( activeView, Event, Field, St, View(PromptView, WelcomeView) )
 import Brick ( EventM, BrickEvent, Next )
 import Events.Core
     ( back,
-      handleEnterView,
       handleH,
       handleJ,
       handleK,
       handleL,
       handleN,
-      handleP, handleLogin, prefetchInBg )
-import Brick.Types ( BrickEvent(AppEvent, VtyEvent) )
+      handleP, commonEvent )
+import Brick.Types ( BrickEvent(VtyEvent) )
 import qualified Graphics.Vty as V
 import Brick.Main ( continue, halt )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
@@ -25,7 +24,7 @@ appEvent st e =
   case st^.activeView of
     WelcomeView -> welcomeEvent st e
     PromptView -> promptEvent st e
-    _ ->
+    _ -> commonEvent st e (\st e ->
       case e of
         VtyEvent (V.EvKey (V.KChar 'q') []) -> halt st
         VtyEvent (V.EvKey (V.KChar 'b') []) -> continue =<< liftIO (back st)
@@ -35,8 +34,5 @@ appEvent st e =
         VtyEvent (V.EvKey (V.KChar 'k') []) -> continue =<< liftIO (handleK st)
         VtyEvent (V.EvKey (V.KChar 'n') []) -> continue =<< liftIO (handleN st)
         VtyEvent (V.EvKey (V.KChar 'p') []) -> continue =<< liftIO (handleP st)
-        AppEvent (ModeEnter mode)           -> continue =<< liftIO (handleEnterView st mode)
-        AppEvent (LoginResult e_i)          -> continue =<< liftIO (handleLogin st e_i)
-        AppEvent (DownloadFinished new_st)  -> continue =<< liftIO (prefetchInBg new_st)
-        AppEvent (RequestFinished new_st)   -> continue new_st
         _                                   -> continue st
+      )

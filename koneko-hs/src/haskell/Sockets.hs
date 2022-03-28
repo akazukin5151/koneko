@@ -2,61 +2,77 @@
 
 module Sockets where
 
-import Lens.Micro ( (&), (<&>) )
 import Network.Socket (Socket)
-import Data.ByteString.Char8 (ByteString)
+import Data.ByteString.Char8 (ByteString, split)
 import Control.Exception (try, SomeException)
 import Network.Socket.ByteString (sendAll, recv)
-import Control.Arrow ((>>>))
 import Data.Aeson (eitherDecodeStrict, encode)
-import Serialization.In (IPCResponse (response), IPCResponses (ReportLen))
+import Serialization.In (IPCResponses (ReportLen), IPCResponse (response))
 import qualified Data.ByteString as B
-import Common (bindWithMsg)
-import Serialization.Out (IPCJson(action, IPCJson))
+import Serialization.Out (IPCJson(action, IPCJson, ident))
 import Data.ByteString.Lazy.Char8 (toStrict)
 import qualified Serialization.Out as Out
 import Control.Concurrent (threadDelay)
+import Data.Either (rights)
+import Brick.BChan (writeBChan, BChan)
+import Types (Event(IPCReceived), messageQueue, St (St), conn)
+import Data.Foldable (foldl')
+import Data.IntMap (lookupMax)
+import Data.Functor ((<&>))
+import Data.Function ((&))
+import Data.Maybe (fromMaybe)
+import Lens.Micro ((^.))
+import Codec.Binary.UTF8.Generic (fromString)
 
 catchSomeException :: IO a -> IO (Either SomeException a)
 catchSomeException = try
 
-talk :: Socket -> ByteString -> IO (Either String ByteString)
-talk conn text = do
-  r <- catchSomeException (sendAll' conn text)
+sendEither :: St -> ByteString -> IO (Either String ())
+sendEither st text = do
+  r <- catchSomeException (sendAllWithLen st text)
   case r of
     Left e -> pure $ Left $ show e
-    Right _ -> recvAll conn
+    Right _ -> pure $ Right ()
 
-decodeReportLen :: IPCResponses -> Either String Int
-decodeReportLen (ReportLen len) = Right len
-decodeReportLen _ = Left "Wrong response type, expected ReportLen"
+recvAll :: BChan Event -> Socket -> IO ()
+recvAll chan conn = do
+  msg_bs <- recv conn 4096
+  if msg_bs == ""
+     then recvAll chan conn
+     else do
+       let messages = split '\n' msg_bs
+       let actions = map eitherDecodeStrict $ filter (/= "") messages
+       mapM_ (handle chan conn) $ rights actions
+       recvAll chan conn
 
-recvAll :: Socket -> IO (Either String ByteString)
-recvAll conn = do
-  header_bs <- recv conn 4096
-  if header_bs == ""
-     then recvAll conn
-     else
-      eitherDecodeStrict header_bs
-        & bindWithMsg (response >>> decodeReportLen)
-            "Decoding ReportLen inside IPCResponse failed: "
-        <&> go ""
-        & sequenceA
+handle :: BChan Event -> Socket -> IPCResponse -> IO ()
+handle chan conn x = do
+  case response x of
+    (ReportLen l) -> do
+      bs <- handleLen conn "" l
+      case eitherDecodeStrict bs of
+        Left _ -> pure ()
+        Right d -> handle chan conn d
+    _ -> do
+      writeBChan chan $ IPCReceived x
 
-  where
-    go :: ByteString -> Int -> IO ByteString
-    go res total_len = do
-      piece <- recv conn 4096
-      let new = res <> piece
-      let new_len = B.length new
-      if new_len == total_len
-         then pure new
-         else go new total_len
+handleLen :: Socket -> ByteString -> Int -> IO ByteString
+handleLen conn res total_len = do
+  piece <- recv conn 4096
+  let messages = split '\n' piece
+  let filtered = filter (/= "") messages
+  let new = foldl' (<>) res filtered
+  let new_len = B.length new
+  if new_len == total_len
+     then pure new
+     else handleLen conn new total_len
 
-sendAll' :: Socket -> ByteString -> IO ()
-sendAll' conn text = do
-  let x = Out.ReportLen (B.length text)
-  let len = toStrict $ encode (IPCJson {action = x})
-  _ <- catchSomeException (sendAll conn len)
+sendAllWithLen :: St -> ByteString -> IO ()
+sendAllWithLen st text = do
+  let msg = text <> "\n"
+  let x = Out.ReportLen (B.length msg)
+  let i = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
+  let len_msg = toStrict $ encode (IPCJson {ident = i, action = x}) <> "\n"
+  sendAll (st^.conn) len_msg
   threadDelay 100000
-  sendAll conn text
+  sendAll (st^.conn) msg

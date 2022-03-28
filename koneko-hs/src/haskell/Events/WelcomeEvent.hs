@@ -25,24 +25,24 @@ import Brick.BChan ( writeBChan )
 import Brick.Widgets.Edit (applyEdit)
 import Data.Text.Zipper (textZipper)
 import Data.Char (isDigit)
-import Events.Core (handleLogin)
+import Events.Core (handleLogin, commonEvent)
 import Data.Text (unpack)
 import Graphics.Ueberzug (clear)
 
 welcomeEvent :: St -> BrickEvent n1 Event -> EventM n2 (Next St)
 welcomeEvent st e =
-  case e of
-    VtyEvent (V.EvKey V.KEsc []) -> halt st
-    VtyEvent (V.EvKey (V.KChar 'q') []) -> halt st
-    VtyEvent (V.EvKey (V.KChar 'j') []) -> continue =<< liftIO (handleDown st)
-    VtyEvent (V.EvKey (V.KChar 'k') []) -> continue =<< liftIO (handleUp st)
-    VtyEvent (V.EvKey (V.KChar '\t') []) | isHistoryActive st ->
-      continue $ st & isHistoryFocused %~ not
-    VtyEvent (V.EvKey (V.KChar c) []) -> continue =<< liftIO (handleJump st c)
-    VtyEvent (V.EvKey V.KEnter []) -> handleEnter st
-    AppEvent (ModeEnter Home) -> continue =<< onAppStart st
-    AppEvent (LoginResult e_i)          -> continue =<< liftIO (handleLogin st e_i)
-    _ -> continue st
+  commonEvent st e (\st e ->
+    case e of
+      VtyEvent (V.EvKey V.KEsc []) -> halt st
+      VtyEvent (V.EvKey (V.KChar 'q') []) -> halt st
+      VtyEvent (V.EvKey (V.KChar 'j') []) -> continue =<< liftIO (handleDown st)
+      VtyEvent (V.EvKey (V.KChar 'k') []) -> continue =<< liftIO (handleUp st)
+      VtyEvent (V.EvKey (V.KChar '\t') []) | isHistoryActive st ->
+        continue $ st & isHistoryFocused %~ not
+      VtyEvent (V.EvKey (V.KChar c) []) -> continue =<< liftIO (handleJump st c)
+      VtyEvent (V.EvKey V.KEnter []) -> handleEnter st
+      _ -> continue st
+   )
 
 handleJump :: St -> Char -> IO St
 handleJump st 'a' = radioInner $ st & modeIdx .~ 0

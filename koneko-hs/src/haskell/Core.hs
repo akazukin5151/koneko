@@ -8,6 +8,7 @@ import Types
            FollowingArtistsIllustrations, RecommendedIllustrations, Info,
            Manual, BrowseCache, ArtistIllustrations),
       St, )
+import Control.Monad (zipWithM)
 
 modes :: [Mode]
 modes =

@@ -5,22 +5,6 @@ module Events.Core where
 import Common ( coordsToIndex, indexToCoords,  viewToNRowsCols, updateFooter, nextOffset, logger)
 import Core ( intToStr, highlightedMode)
 import Types
-    ( St,
-      Event(ModeEnter, DownloadFinished, RequestFinished),
-      Mode(Home),
-      View(WelcomeView, SingleImageView),
-      activeView,
-      chan,
-      currentSlice,
-      displayedImages,
-      editor,
-      selectedCellIdx,
-      ub,
-      currentPage1,
-      your_id,
-      footer,
-      offset,
-      pendingOnLogin, request, Request (paths, urls, nextUrl_) )
 import Graphics.Ueberzug ( clear )
 import Control.Monad (void, unless)
 import Lens.Micro ((^.), (.~), (&), (%~), (?~), (<&>))
@@ -29,17 +13,45 @@ import System.FilePath (takeFileName, (</>))
 import Brick.BChan (writeBChan)
 import Brick.Widgets.Edit (applyEdit)
 import Data.Text.Zipper (clearZipper)
-import Events.ShowImages (showImagesView)
+import Events.ShowImages (showImagesView, showImageView)
 import Events.FindImages (findImagesView)
 import Events.Common ( getDirectory, listDirectoryFullSorted, getFirstDirectory, wrapped, getNextDirectory)
 import System.Directory (doesDirectoryExist, listDirectory)
-import Download.Core (fetchFirst, downloadWithoutShowing, fetch)
-import Brick (txt)
+import Download.Core (fetchFirst, downloadWithoutShowing, fetch, fetchWithPrefetchCb, requestCallback)
+import Brick (txt, BrickEvent (AppEvent), continue)
 import Data.Text (pack)
 import Control.Arrow ((<<<), (>>>))
 import Control.Concurrent (forkIO)
 import System.Directory.Internal (andM)
 import Data.IntMap (insert, singleton, (!))
+import Serialization.In (IPCResponses(Requested, Downloaded), IPCResponse (ident, IPCResponse, response))
+import Codec.Binary.UTF8.Generic (fromString)
+import Data.Aeson (eitherDecodeStrict)
+import Download.Parsers
+import Control.Monad.IO.Class (MonadIO(..))
+import qualified Data.IntMap as M
+import Brick.Types (EventM, Next)
+
+commonEvent
+  :: St
+  -> BrickEvent n1 Event
+  -> (St -> BrickEvent n1 Event -> EventM n2 (Next St))
+  -> Brick.Types.EventM n2 (Next St)
+commonEvent st e fallback =
+  case e of
+    AppEvent (ModeEnter mode)           -> continue =<< liftIO (handleEnterView st mode)
+    AppEvent (LoginResult e_i)          -> continue =<< liftIO (handleLogin st e_i)
+    AppEvent (DownloadFinished new_st)  -> continue =<< liftIO (prefetchInBg new_st)
+    AppEvent (RequestFinished new_st)   -> continue new_st
+    AppEvent (IPCReceived r)            -> continue =<< liftIO (handle st r)
+    _                                   -> fallback st e
+
+handle :: St -> IPCResponse -> IO St
+handle st IPCResponse {ident = i, response = r} = do
+  let f = st^.messageQueue & M.lookup i & fromMaybe (const $ pure ())
+  logger "r" r
+  f r
+  pure st
 
 handleInner :: (Int -> Int) -> St -> IO St
 handleInner f st = do
@@ -71,7 +83,12 @@ clearImages st =
    mapM_ (clear (st^.ub)) $ st^.displayedImages
 
 handleSliceOrPage :: (Int -> Int) -> Bool -> Int -> St -> IO St
-handleSliceOrPage f isSamePage sliceReset st =
+handleSliceOrPage f isSamePage sliceReset st = do
+  logger "(st^.request)" (st^.request)
+  logger "(st^.currentPage1)" (st^.currentPage1)
+  logger "(st^.currentSlice)" (st^.currentSlice)
+  logger "totalSlices st" $ totalSlices st
+  logger "isSamePage" isSamePage
   if isSamePage
      then do
        clearImages st
@@ -121,6 +138,13 @@ back st = do
             & displayedImages .~ []
             & updateFooter
 
+handleAction :: St -> Mode -> p -> Request -> IO ()
+handleAction st' mode _ r' = do
+  writeBChan (st'^.chan) (RequestFinished new_st')
+  prefetchInner new_st' mode
+    where
+      new_st' = st' & request .~ singleton 1 r'
+
 handleEnterView :: St -> Mode -> IO St
 handleEnterView st mode = do
   let dir = getFirstDirectory st
@@ -128,41 +152,39 @@ handleEnterView st mode = do
   if cond
     then do
       (labels', imgs) <- findImagesView mode st
-      new_st' <- showImagesView st st imgs
+      new_st <- showImagesView st st imgs
       -- TODO: verify cache up-to-date
       void $ forkIO $ do
-        Right r <- fetchFirst mode new_st' dir
-        let new_st'' = st & request .~ singleton 1 r
-        writeBChan (st^.chan) (RequestFinished new_st'')
-        prefetchInner new_st'' mode
-      pure $ new_st'
-    else
+        let cb =
+              case mode of
+                ArtistIllustrations -> requestCallback parseUserIllustResponse handleAction
+                SingleIllustration -> requestCallback parseIllustDetailResponse handleAction
+                SearchArtists -> requestCallback parseUserDetailResponse handleAction
+                FollowingArtists -> requestCallback parseUserDetailResponse handleAction
+                FollowingArtistsIllustrations -> requestCallback parseUserIllustResponse handleAction
+                RecommendedIllustrations -> requestCallback parseUserIllustResponse handleAction
+        Right new_st' <- fetchFirst cb mode new_st dir
+        writeBChan (st^.chan) (RequestFinished new_st')
+      pure new_st
+    else do
       case st^.your_id of
         Nothing -> pure $ st & pendingOnLogin ?~ downloadInBg mode dir
         Just _ -> downloadInBg mode dir st
 
 prefetchInner :: St -> Mode -> IO ()
 prefetchInner st mode = do
-  -- idx is copied from getNextDirectory
-  let idx = st^.currentPage1 + 1
   let dir = getNextDirectory st
-  cond <- andM (doesDirectoryExist dir) (listDirectory dir <&> (not <<< null))
   void $ forkIO $ do
     let d = (st^.request) ! (st^.currentPage1)
     case d & nextUrl_ >>= (pack >>> nextOffset) of
       Nothing -> pure ()
       Just no -> do
-        r' <- fetch no mode st dir
-        -- TODO: see if this is still needed after fixing 'extra data' bug
+        r' <- fetchWithPrefetchCb no mode st dir
         case r' of
           Left _ -> pure ()
-          Right r -> do
-            -- TODO: do i need to store these in next_labels/imgs?
-            let new_st = st & request %~ insert idx r
+          Right new_st ->
+            -- TODO: abusing RequestFinished to just update the st and do nothing else
             writeBChan (st^.chan) (RequestFinished new_st)
-            -- download only if dir doesn't exist or is empty
-            unless cond $
-              downloadWithoutShowing mode st dir (paths r) (urls r)
 
 prefetchInBg :: St -> IO St
 prefetchInBg st = do
@@ -170,15 +192,34 @@ prefetchInBg st = do
   prefetchInner st mode
   pure st
 
+downloadAction :: St -> Mode -> [Char] -> Request -> IO ()
+downloadAction st' mode dir r' = do
+    let new_st = st' & request .~ singleton 1 r'
+    writeBChan (st'^.chan) (RequestFinished new_st)
+    e_new_st <- downloadWithoutShowing cb mode new_st dir (paths r') (urls r')
+    case e_new_st of
+      Right x -> writeBChan (st'^.chan) (RequestFinished x)
+      _ -> pure ()
+    where
+      cb :: Int -> IPCResponses -> IO ()
+      cb i x =
+          case x of
+              Downloaded s -> showImageView st' (st'^.ub) (i, s)
+              _ -> pure ()
+
 downloadInBg :: Mode -> String -> St -> IO St
 downloadInBg mode dir st = do
   void $ forkIO $ do
-    Right r <- fetchFirst mode st dir
-    let new_st = st & request .~ singleton 0 r
-    writeBChan (st^.chan) (RequestFinished new_st)
-    downloadWithoutShowing mode new_st dir (paths r) (urls r)
-    -- TODO remove DownloadFinished
-    -- writeBChan (st^.chan) (DownloadFinished new_st')
+    let cb =
+          case mode of
+            ArtistIllustrations -> requestCallback parseUserIllustResponse downloadAction
+            SingleIllustration -> requestCallback parseIllustDetailResponse downloadAction
+            SearchArtists -> requestCallback parseUserDetailResponse downloadAction
+            FollowingArtists -> requestCallback parseUserDetailResponse downloadAction
+            FollowingArtistsIllustrations -> requestCallback parseUserIllustResponse downloadAction
+            RecommendedIllustrations -> requestCallback parseUserIllustResponse downloadAction
+    Right s <- fetchFirst cb mode st dir
+    writeBChan (st^.chan) (RequestFinished s)
   pure st
 
 handleLogin :: St -> Either a String -> IO St

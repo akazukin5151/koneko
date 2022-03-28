@@ -10,7 +10,9 @@ import Network.Socket (Socket)
 import Config.Types ( Config )
 import Brick (Widget)
 import Data.Text (Text)
-import Data.IntMap.Lazy (IntMap)
+import Serialization.In (IPCResponses, IPCResponse)
+import qualified Data.IntMap.Lazy as Lazy
+import qualified Data.IntMap.Strict as Strict
 
 data View = GalleryView
           | WelcomeView
@@ -38,6 +40,7 @@ data Event = ModeEnter Mode
            | LoginResult (Either String String)
            | DownloadFinished St
            | RequestFinished St
+           | IPCReceived IPCResponse
 
 data Request =
   Request
@@ -100,6 +103,7 @@ data St =
     --, _socket :: Socket
     , _conn :: Socket
     , _pendingOnLogin :: Maybe (St -> IO St)
+    , _messageQueue :: Strict.IntMap (IPCResponses -> IO ())
 
     -- config stuff
     , _config :: Config
@@ -108,9 +112,9 @@ data St =
     -- ^ the koneko dir
 
     -- requests
-    , _request :: IntMap Request
+    , _request :: Lazy.IntMap Request
     -- ^ All the parsed requests for every page for this mode,
-    -- indexed by _currentPage1
+    -- indexed by _currentPage1 (so it's 1-indexed as well)
     , _your_id :: Maybe String
     -- ^ the currently logged in user's pixiv id
     }

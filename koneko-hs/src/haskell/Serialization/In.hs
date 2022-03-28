@@ -52,7 +52,11 @@ data IPCResponses = Requested String
 
 $(deriveJSON defaultOptions ''IPCResponses)
 
-data IPCResponse = IPCResponse { response :: IPCResponses }
+data IPCResponse =
+  IPCResponse
+    { ident :: Int
+    , response :: IPCResponses
+    }
   deriving (Show)
 
 $(deriveJSON defaultOptions ''IPCResponse)

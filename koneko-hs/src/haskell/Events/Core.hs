@@ -5,8 +5,28 @@ module Events.Core where
 import Common ( coordsToIndex, indexToCoords,  viewToNRowsCols, updateFooter, nextOffset, logger)
 import Core ( intToStr, highlightedMode)
 import Types
+    ( St,
+      Request(nextUrl_, paths, urls),
+      Event(..),
+      Mode(RecommendedIllustrations, Home, ArtistIllustrations,
+           SingleIllustration, SearchArtists, FollowingArtists,
+           FollowingArtistsIllustrations),
+      View(WelcomeView, SingleImageView),
+      activeView,
+      chan,
+      currentPage1,
+      currentSlice,
+      displayedImages,
+      editor,
+      footer,
+      messageQueue,
+      pendingOnLogin,
+      requestsCache1,
+      selectedCellIdx,
+      ub,
+      your_id )
 import Graphics.Ueberzug ( clear )
-import Control.Monad (void, unless)
+import Control.Monad (void)
 import Lens.Micro ((^.), (.~), (&), (%~), (?~), (<&>))
 import Data.Maybe (fromMaybe)
 import System.FilePath (takeFileName, (</>))
@@ -17,17 +37,18 @@ import Events.ShowImages (showImagesView, showImageView)
 import Events.FindImages (findImagesView)
 import Events.Common ( getDirectory, listDirectoryFullSorted, getFirstDirectory, wrapped, getNextDirectory)
 import System.Directory (doesDirectoryExist, listDirectory)
-import Download.Core (fetchFirst, downloadWithoutShowing, fetch, fetchWithPrefetchCb, requestCallback)
+import Download.Core (fetchFirst, downloadWithoutShowing, fetchWithPrefetchCb, requestCallback)
 import Brick (txt, BrickEvent (AppEvent), continue)
 import Data.Text (pack)
 import Control.Arrow ((<<<), (>>>))
 import Control.Concurrent (forkIO)
 import System.Directory.Internal (andM)
-import Data.IntMap (insert, singleton, (!))
-import Serialization.In (IPCResponses(Requested, Downloaded), IPCResponse (ident, IPCResponse, response))
-import Codec.Binary.UTF8.Generic (fromString)
-import Data.Aeson (eitherDecodeStrict)
+import Data.IntMap (singleton, (!))
+import Serialization.In (IPCResponses(Downloaded), IPCResponse (ident, IPCResponse, response))
 import Download.Parsers
+    ( parseIllustDetailResponse,
+      parseUserDetailResponse,
+      parseUserIllustResponse )
 import Control.Monad.IO.Class (MonadIO(..))
 import qualified Data.IntMap as M
 import Brick.Types (EventM, Next)

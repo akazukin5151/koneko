@@ -3,13 +3,10 @@ module Download.Downloaders where
 import Common ( viewToNRowsCols, modeToNRowsCols)
 import Core ( enumerate)
 import Types
-    ( conn,
-      St )
-import Lens.Micro ((^.))
+    ( St )
 import System.FilePath (takeFileName, takeDirectory)
 import Data.Tuple (swap)
-import Download.Common ( showImagesConcurrently )
-import Requests
+import Requests ( download )
 import Serialization.In (IPCResponses)
 import Serialization.Out (Url)
 

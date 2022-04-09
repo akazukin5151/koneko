@@ -3,7 +3,7 @@
 
 module Download.Core where
 
-import Common ( getEditorText, logger)
+import Common ( getEditorText)
 import Types
     ( Mode(FollowingArtists, ArtistIllustrations, SingleIllustration,
            SearchArtists, FollowingArtistsIllustrations, RecommendedIllustrations),
@@ -18,7 +18,7 @@ import Download.Parsers
       parseUserDetailResponse )
 import Download.Downloaders
     ( downloadUserIllust', downloadIllustDetail', downloadUserFollowing' )
-import Control.Monad (void, unless)
+import Control.Monad (unless)
 import Serialization.In ( IPCResponses(Requested) )
 import Data.Aeson (eitherDecodeStrict)
 import Codec.Binary.UTF8.Generic (fromString)

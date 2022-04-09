@@ -2,32 +2,13 @@
 
 module Download.Common where
 
-import Common ( bindWithMsg )
-import Sockets ( catchSomeException, recvAll, sendAllWithLen, sendEither)
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromJust)
 import Serialization.In
-    ( IPCResponse(response), IPCResponses(Downloaded) )
-import Serialization.Out
-    ( DownloadInfo(DownloadInfo, url, path, name),
-      IPCActions(Download),
-      IPCJson(IPCJson, action, ident) )
+    ( IPCResponses(Downloaded) )
 import Data.List ( sortBy )
-import qualified Data.ByteString.Char8 as B
-import Data.ByteString.Char8 (ByteString)
-import Network.Socket ( Socket )
-import Control.Monad (foldM)
-import Data.Aeson ( eitherDecodeStrict, encode )
-import Control.Arrow ( (>>>) )
-import Data.ByteString.Lazy (toStrict)
-import Data.Function ((&))
-import Data.Bifunctor (Bifunctor(first))
-import Data.Functor ((<&>))
-import Data.Either (rights)
-import System.Directory (createDirectoryIfMissing)
 import Events.ShowImages ( showImageView )
-import Types ( ub, St, messageQueue, conn )
+import Types ( ub, St )
 import Lens.Micro ((^.))
-import Data.IntMap (lookupMax)
 
 showImagesConcurrently
   :: St -> [(String, Int)] -> (Int, [String]) -> String -> IO (Int, [String])
@@ -79,53 +60,6 @@ displayPrevInOrder g cur_idx ((i, p) : xs) = do
 
 sortByFst :: Ord a => [(a, b)] -> [(a, b)]
 sortByFst = sortBy (\(a, _) (b, _) -> compare a b)
-
---download
---  :: St
---  -> [String] -- ^ urls to download
---  -> [FilePath] -- ^ output paths
---  -> [String] -- ^ output names
---  -> IO (Either String ())
---download st urls dirs names = do
---  mapM_ (createDirectoryIfMissing True) dirs
---  let i = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
---  sendEither st $ toStrict $ encode (IPCJson {ident = i, action = Download info})
---  where
---    -- total = length names
---    -- recvToTotal cb conn total [] (0, [])
---    info =
---        [ DownloadInfo
---           { url = url'
---           , path = dir
---           , name = name'
---           }
---        | (url', dir, name') <- zip3 urls dirs names]
-
---recvToTotal :: (a -> FilePath -> IO a) -> Socket -> Int -> [FilePath] -> a -> IO [FilePath]
---recvToTotal cb conn total res arg = do
---  d <- recvAll conn
---  -- TODO: arguably, the download functions should return Either
---  -- flatten the either from recvAll and decoding
---  let files =
---        d
---        -- This crashes if recvAll failed
---        & fromRight
---        & B.lines
---        <&> (\bytestring ->
---              bytestring
---                & eitherDecodeStrict
---                & first ("Decoding bytestring into IPCResponse failed: " <>)
---                & bindWithMsg (response >>> decodeDownloaded)
---                    "Decoding Download from IPCResponse failed: "
---          )
---        -- this ignores all Lefts (decode failures ignored)
---        & rights
---
---  let new = files <> res
---  newImageIdx <- foldM cb arg new
---  if length new < total
---     then recvToTotal cb conn total new newImageIdx
---     else pure new
 
 decodeDownloaded :: IPCResponses -> Either String FilePath
 decodeDownloaded = \case

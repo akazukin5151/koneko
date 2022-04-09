@@ -20,8 +20,7 @@ import Brick.AttrMap
   )
 
 import Graphics.Ueberzug
-    ( clear,
-      newUeberzug )
+    ( newUeberzug )
 import System.Directory (getHomeDirectory, removePathForcibly)
 import qualified Brick.Widgets.Edit as E
 import Brick.BChan (newBChan, writeBChan)
@@ -48,7 +47,7 @@ import Config.Types ( Config, pythonProcessPath, refreshToken )
 import Requests (login)
 import Control.Concurrent (forkIO)
 import Control.Monad (void)
-import Common (initialFooter, logger)
+import Common (initialFooter)
 import Data.IntMap.Lazy (empty)
 import Sockets (recvAll)
 

@@ -1,20 +1,9 @@
 # todo
 
-downloading from scratch (then prefetch) broken
-vvv
-## fix bug where quick consecutive IPC actions fails
-whenever a function need to send a message and get a reply:
-- only send (message, callback function) and return (do nothing else)
-- internally:
-    - generate unique int
-    - update mapping with {k=int, v=cb}
-    - send the msg with the int
-- when the global centralized handler in background receives the response with the int
-    - lookup the mapping with the int
-    - find the cb
-    - apply the cb to response
-
 ## bugs
+- prefetch after downloading from scratch broken
+- requested from a mode but mode turned into home
+    koneko-hs: src/haskell/Download/Core.hs:(93,3)-(114,22): Non-exhaustive patterns in case
 - run download in background so grid is responsive
     - still a delay for artistlistview
 - mode 2: when download finishes, going next doesn't clear the first image. it will clear when you go back and next again

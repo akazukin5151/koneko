@@ -2,6 +2,7 @@
 
 ## bugs
 - fetch when dir is already downloaded is broken
+- ensure whenever a new_st is created, the old st is never used
 - requested from a mode but mode turned into home
     koneko-hs: src/haskell/Download/Core.hs:(93,3)-(114,22): Non-exhaustive patterns in case
 - run download in background so grid is responsive

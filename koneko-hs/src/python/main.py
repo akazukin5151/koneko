@@ -65,7 +65,6 @@ def handle_request(api: Any, j: Any) -> str:
 
 def handle_download(api: Any, j: Any, s: socket.socket) -> None:
     download_infos: list[DownloadInfo] = j['action']['contents']
-    # TODO: only one identifier for an entire batch of images to download
     ident = j['ident']
     for idx, download_info in enumerate(download_infos):
         path = download(

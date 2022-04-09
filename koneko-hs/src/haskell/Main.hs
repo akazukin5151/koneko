@@ -72,7 +72,7 @@ initialState ub' chan config konekoDir conn =
      , _conn = conn
      , _pendingOnLogin = Nothing
      , _your_id = Nothing
-     , _request = empty
+     , _requestsCache1 = empty
      , _messageQueue = empty
      }
 

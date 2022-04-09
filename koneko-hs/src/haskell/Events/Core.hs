@@ -84,7 +84,7 @@ clearImages st =
 
 handleSliceOrPage :: (Int -> Int) -> Bool -> Int -> St -> IO St
 handleSliceOrPage f isSamePage sliceReset st = do
-  logger "(st^.request)" (st^.request)
+  logger "(st^.request)" (st^.requestsCache1)
   logger "(st^.currentPage1)" (st^.currentPage1)
   logger "(st^.currentSlice)" (st^.currentSlice)
   logger "totalSlices st" $ totalSlices st
@@ -94,7 +94,7 @@ handleSliceOrPage f isSamePage sliceReset st = do
        clearImages st
        let new_st = st & currentSlice %~ f
                        & displayedImages .~ []
-       let images = (st^.request) ! (st^.currentPage1) & paths
+       let images = (st^.requestsCache1) ! (st^.currentPage1) & paths
        showImagesView st new_st images
      else do
        let next_dir = getDirectory st </> intToStr (f (st^.currentPage1))
@@ -127,7 +127,7 @@ totalSlices st
   | otherwise = length images `div` (ncols*nrows) - 1
   where
     (nrows, ncols) = viewToNRowsCols st
-    images = (st^.request) ! (st^.currentPage1) & paths
+    images = (st^.requestsCache1) ! (st^.currentPage1) & paths
 
 back :: St -> IO St
 back st = do
@@ -143,7 +143,7 @@ handleAction st' mode _ r' = do
   writeBChan (st'^.chan) (RequestFinished new_st')
   prefetchInner new_st' mode
     where
-      new_st' = st' & request .~ singleton 1 r'
+      new_st' = st' & requestsCache1 .~ singleton 1 r'
 
 handleEnterView :: St -> Mode -> IO St
 handleEnterView st mode = do
@@ -175,7 +175,7 @@ prefetchInner :: St -> Mode -> IO ()
 prefetchInner st mode = do
   let dir = getNextDirectory st
   void $ forkIO $ do
-    let d = (st^.request) ! (st^.currentPage1)
+    let d = (st^.requestsCache1) ! (st^.currentPage1)
     case d & nextUrl_ >>= (pack >>> nextOffset) of
       Nothing -> pure ()
       Just no -> do
@@ -194,7 +194,7 @@ prefetchInBg st = do
 
 downloadAction :: St -> Mode -> [Char] -> Request -> IO ()
 downloadAction st' mode dir r' = do
-    let new_st = st' & request .~ singleton 1 r'
+    let new_st = st' & requestsCache1 .~ singleton 1 r'
     writeBChan (st'^.chan) (RequestFinished new_st)
     e_new_st <- downloadWithoutShowing cb mode new_st dir (paths r') (urls r')
     case e_new_st of

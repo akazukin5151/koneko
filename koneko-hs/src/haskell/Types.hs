@@ -112,7 +112,7 @@ data St =
     -- ^ the koneko dir
 
     -- requests
-    , _request :: Lazy.IntMap Request
+    , _requestsCache1 :: Lazy.IntMap Request
     -- ^ All the parsed requests for every page for this mode,
     -- indexed by _currentPage1 (so it's 1-indexed as well)
     , _your_id :: Maybe String

@@ -4,7 +4,7 @@ import qualified Brick.Widgets.Center as C
 import Brick ( hBox, (<=>), vBox, Widget )
 import Common ( indexToCoords, viewToNRowsCols )
 import Types
-    ( currentSlice, footer, selectedCellIdx, Field, St, config, labels_, currentPage1, request )
+    ( currentSlice, footer, selectedCellIdx, Field, St, config, labels_, currentPage1, requestsCache1 )
 import Lens.Micro ( (^.), (&) )
 import UI.Common ( highlight, mkCell, mkEmptyCell, mapEnumerate )
 import Config.Types (boxWidth, boxHeight)
@@ -17,7 +17,7 @@ artistListUI st = [ui]
   where
     ui = C.center $ vBox vs <=> (st^.footer)
     (nrows, ncols) = viewToNRowsCols st
-    labels = (st^.request) ! (st^.currentPage1) & labels_
+    labels = (st^.requestsCache1) ! (st^.currentPage1) & labels_
     names = drop (st^.currentSlice * nrows) $ labels
     number_of_previews = 3
     size = (st^.config.boxWidth, st^.config.boxHeight)

@@ -7,7 +7,7 @@ import Common ( getEditorText, logger)
 import Types
     ( Mode(FollowingArtists, ArtistIllustrations, SingleIllustration,
            SearchArtists, FollowingArtistsIllustrations, RecommendedIllustrations),
-      St, your_id, Request (urls, paths), request, Event (RequestFinished), chan, currentPage1 )
+      St, your_id, Request (urls, paths), requestsCache1, Event (RequestFinished), chan, currentPage1 )
 import Lens.Micro ((^.), (&), (%~), (<&>))
 import Requests (userIllustRequest, illustDetailRequest, searchUserRequest, userFollowingRequest, illustFollowRequest, illustRecommendedRequest )
 import Data.Text ( unpack )
@@ -69,7 +69,7 @@ requestCallback parser action mode st dir ir =
 prefetchAction :: St -> Mode -> FilePath -> Request -> IO ()
 prefetchAction st mode dir r' = do
   let idx = st^.currentPage1 + 1
-  let new_st = st & request %~ insert idx r'
+  let new_st = st & requestsCache1 %~ insert idx r'
   writeBChan (st^.chan) (RequestFinished new_st)
   -- download only if dir doesn't exist or is empty
   cond <-

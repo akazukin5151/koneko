@@ -70,7 +70,6 @@ commonEvent st e fallback =
 handle :: St -> IPCResponse -> IO St
 handle st IPCResponse {ident = i, response = r} = do
   let f = st^.messageQueue & M.lookup i & fromMaybe (const $ pure ())
-  logger "r" r
   f r
   pure st
 
@@ -105,11 +104,6 @@ clearImages st =
 
 handleSliceOrPage :: (Int -> Int) -> Bool -> Int -> St -> IO St
 handleSliceOrPage f isSamePage sliceReset st = do
-  logger "(st^.request)" (st^.requestsCache1)
-  logger "(st^.currentPage1)" (st^.currentPage1)
-  logger "(st^.currentSlice)" (st^.currentSlice)
-  logger "totalSlices st" $ totalSlices st
-  logger "isSamePage" isSamePage
   if isSamePage
      then do
        clearImages st

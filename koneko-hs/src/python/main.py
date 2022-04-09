@@ -78,8 +78,6 @@ def handle_download(api: Any, j: Any, s: socket.socket) -> None:
             'response': {'tag': 'Downloaded', 'contents': path}
         }
         res = json.dumps(response)
-        with open('logp', 'a') as f:
-            f.write(f"{res=}\n")
         try_send(s, res, ident)
 
 def handle(s: socket.socket, api: Any, j: Any) -> None:
@@ -92,8 +90,6 @@ def handle(s: socket.socket, api: Any, j: Any) -> None:
         handle_inner(s, api, j)
 
 def handle_inner(s: socket.socket, api: Any, j: Any) -> None:
-    with open('logp', 'a') as f:
-        f.write(f'handle inner {j=}\n')
     ident = j['ident']
     if j['action']['tag'] == 'Login':
         api, res = login(api, j['action']['contents'], ident)

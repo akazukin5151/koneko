@@ -39,7 +39,6 @@ download
 download cb st urls dirs names = do
   mapM_ (createDirectoryIfMissing True) dirs
   let i = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
-  logger "[i..(i + length infos)]" [i..(i + length infos)]
   let sts = [ do
         let new_st = st & messageQueue %~ insert i (cb idx)
         new_st

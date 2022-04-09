@@ -120,17 +120,17 @@ downloadWithoutShowing :: (Int -> IPCResponses -> IO ())
   -> [FilePath]
   -> [Url]
   -> IO (Either String St)
-downloadWithoutShowing cb mode st dir sorted urls =
+downloadWithoutShowing cb mode st dir sorted urls' =
   case mode of
     ArtistIllustrations ->
-      downloadUserIllust' cb st dir sorted urls
+      downloadUserIllust' cb st dir sorted urls'
     SingleIllustration ->
-      downloadIllustDetail' cb st dir sorted urls
+      downloadIllustDetail' cb st dir sorted urls'
     SearchArtists ->
-      downloadUserFollowing' cb st sorted urls
+      downloadUserFollowing' cb st sorted urls'
     FollowingArtists ->
-      downloadUserFollowing' cb st sorted urls
+      downloadUserFollowing' cb st sorted urls'
     FollowingArtistsIllustrations ->
-      downloadUserIllust' cb st dir sorted urls
+      downloadUserIllust' cb st dir sorted urls'
     RecommendedIllustrations ->
-      downloadUserIllust' cb st dir sorted urls
+      downloadUserIllust' cb st dir sorted urls'

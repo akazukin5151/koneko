@@ -49,7 +49,7 @@ parseUserIllustResponse dir r =
   Request
     { labels_ = []
     , paths = sorted
-    , urls = urls
+    , urls = urls'
     , nextUrl_ = Just n
     }
     where
@@ -58,35 +58,35 @@ parseUserIllustResponse dir r =
       titles = title <$> illusts'
       -- default sort is by date; enumerate preserves this order
       names = [leftPad idx <> "_" <> title' <.> "jpg" | (idx, title') <- enumerate titles]
-      paths = [dir </> name' | name' <- names]
-      sorted = sort paths
-      urls = square_medium . userIllust_image_url <$> illusts'
+      paths' = [dir </> name' | name' <- names]
+      sorted = sort paths'
+      urls' = square_medium . userIllust_image_url <$> illusts'
 
 parseIllustDetailResponse :: String -> IllustDetailResponse -> Request
 parseIllustDetailResponse dir r =
   Request
     { labels_ = []
     , paths = sorted
-    , urls = urls
+    , urls = urls'
     , nextUrl_ = Nothing
     }
     where
       meta_pages = illustDetail_meta_pages $ illustDetailResponse_illust r
       -- it's not possible to get the titles without another query, so whatever
-      urls = large . image_urls <$> meta_pages
+      urls' = large . image_urls <$> meta_pages
       -- TODO: efficiency
       names = [
           leftPad idx <> "_" <> unpack (last $ splitOn "/" $ pack url)
-            | (idx, url) <- enumerate urls]
-      paths = [dir </> name' | name' <- names]
-      sorted = sort paths
+            | (idx, url) <- enumerate urls']
+      paths' = [dir </> name' | name' <- names]
+      sorted = sort paths'
 
 parseUserDetailResponse :: String -> UserDetailResponse -> Request
 parseUserDetailResponse dir r =
   Request
     { labels_ = user_name <$> users'
     , paths = full_paths
-    , urls = urls
+    , urls = urls'
     , nextUrl_ = Just n
     }
     where
@@ -124,6 +124,6 @@ parseUserDetailResponse dir r =
           ]
 
       interleaved = interleave user_stuff illust_stuff
-      urls = (\(a, _, _) -> a) <$> interleaved
+      urls' = (\(a, _, _) -> a) <$> interleaved
       names = (\(i, (_, a, _)) -> leftPad i <> "_" <> a) <$> enumerate interleaved
       full_paths = zipWith (</>) dirs names

@@ -56,9 +56,9 @@ bindWithMsg f msg x = first (msg <>) (x >>= f)
 -- more specific utils
 -- coordsToIndex is the partial inverse function of indexToCoords
 coordsToIndex :: Int -> Int -> Int -> Int -> Maybe Int
-coordsToIndex ncols nrows x' y' =
-  [ (x' `rem` ncols) + (ncols * y')
-    | 0 <= x' && x' <= ncols && 0 <= y' && y' <= nrows ]
+coordsToIndex ncols' nrows' x' y' =
+  [ (x' `rem` ncols') + (ncols' * y')
+    | 0 <= x' && x' <= ncols' && 0 <= y' && y' <= nrows' ]
 
 -- >>> indexToCoords 5 0
 -- (0, 0)
@@ -70,10 +70,10 @@ coordsToIndex ncols nrows x' y' =
 -- (4, 1)
 -- indexToCoords is the inverse function of coordsToIndex
 indexToCoords :: Int -> Int -> (Int, Int)
-indexToCoords ncols idx = (x', y')
+indexToCoords ncols' idx = (x', y')
   where
-    x' = idx `mod` ncols
-    y' = idx `div` ncols
+    x' = idx `mod` ncols'
+    y' = idx `div` ncols'
 
 validInput :: Mode -> String -> Bool
 validInput ArtistIllustrations = all isDigit

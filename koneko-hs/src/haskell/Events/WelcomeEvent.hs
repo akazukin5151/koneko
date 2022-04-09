@@ -2,7 +2,7 @@ module Events.WelcomeEvent where
 
 import Core ( modes, modeIdxtoMode, highlightedMode, strToInt )
 import Common ( validInput, modeToView, updateFooter )
-import Graphics ( onAppStart, radioInner )
+import Graphics ( radioInner )
 import Events.Common ( historyDown, historyUp, wrapped)
 import Types
     ( activeView,
@@ -11,8 +11,8 @@ import Types
       displayedImages,
       modeIdx,
       selectedCellIdx,
-      Event(ModeEnter, LoginResult),
-      Mode(Home, ArtistIllustrations, SingleIllustration,
+      Event(ModeEnter),
+      Mode(ArtistIllustrations, SingleIllustration,
            SearchArtists),
       St,
       View(PromptView), isHistoryFocused, historyIdx, history, editor, ub )
@@ -20,12 +20,12 @@ import Brick ( continue, halt )
 import qualified Graphics.Vty as V
 import Lens.Micro ((^.), (.~), (&), (%~))
 import Control.Monad.IO.Class (MonadIO(liftIO))
-import Brick.Types ( EventM, BrickEvent(AppEvent, VtyEvent), Next )
+import Brick.Types ( EventM, BrickEvent(VtyEvent), Next )
 import Brick.BChan ( writeBChan )
 import Brick.Widgets.Edit (applyEdit)
 import Data.Text.Zipper (textZipper)
 import Data.Char (isDigit)
-import Events.Core (handleLogin, commonEvent)
+import Events.Core (commonEvent)
 import Data.Text (unpack)
 import Graphics.Ueberzug (clear)
 

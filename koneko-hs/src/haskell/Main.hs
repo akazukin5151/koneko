@@ -51,7 +51,7 @@ import Common (initialFooter)
 import Data.IntMap.Lazy (empty)
 import Sockets (recvAll)
 
-initialState ub' chan config konekoDir conn =
+initialState ub' chan' config' konekoDir' conn' =
   St { _selectedCellIdx = 0
      , _ub = ub'
      , _displayedImages = []
@@ -64,11 +64,11 @@ initialState ub' chan config konekoDir conn =
      , _history = []
      , _isHistoryFocused = False
      , _historyIdx = 0
-     , _chan = chan
+     , _chan = chan'
      , _footer = initialFooter
-     , _config = config
-     , _konekoDir = konekoDir
-     , _conn = conn
+     , _config = config'
+     , _konekoDir = konekoDir'
+     , _conn = conn'
      , _pendingOnLogin = Nothing
      , _your_id = Nothing
      , _requestsCache1 = empty
@@ -97,49 +97,49 @@ main = do
   home <- getHomeDirectory
   let config_path = home </> ".config" </> "koneko_new" </> "config.json"
   e_config <- (eitherDecodeFileStrict config_path :: IO (Either String Config))
-  let config =
+  let config' =
         case e_config of
           Left x -> error x
           Right x -> x
-  let path = config^.pythonProcessPath
+  let path = config'^.pythonProcessPath
   bracket
     (createProcess (proc "python" [path]))
     -- it doesn't seem to clean the process up when haskell program is killed
     -- but it does close the socket, and the python program can be set to exit
     -- when the socket is closed
     (\a -> cleanupProcess a *> close sock)
-    (const (main' home config sock))
+    (const (main' home config' sock))
 
 main' :: [Char] -> Config -> Socket -> IO ()
-main' home config sock = do
-  (conn, _) <- accept sock
+main' home config' sock = do
+  (conn', _) <- accept sock
 
   ub' <- newUeberzug
-  let konekoDir = home </> ".local/share/koneko/cache"
+  let konekoDir' = home </> ".local/share/koneko/cache"
 
-  chan <- newBChan 10
+  chan' <- newBChan 10
 
   void $ forkIO $
-    recvAll chan conn
+    recvAll chan' conn'
 
-  let st = initialState ub' chan config konekoDir conn
+  let st = initialState ub' chan' config' konekoDir' conn'
   void $ forkIO $ do
-    new_st <- login (config^.refreshToken) st $ \ir -> do
+    new_st <- login (config'^.refreshToken) st $ \ir -> do
       res <-
         case ir of
           LoginInfo lr -> do
             let e_id = _LoginUser_id $ _LoginResponse_user lr
             pure (LoginResult $ Right e_id)
           _ -> pure (LoginResult $ Left "Wrong response type")
-      writeBChan chan res
+      writeBChan chan' res
     case new_st of
       Left _ -> pure ()
-      Right x -> writeBChan chan (RequestFinished x)
+      Right x -> writeBChan chan' (RequestFinished x)
 
   let buildVty = V.mkVty V.defaultConfig
   initialVty <- buildVty
   let app = theApp
-  _final_state <- customMain initialVty buildVty (Just chan) app st
+  _final_state <- customMain initialVty buildVty (Just chan') app st
   --threadDelay 1000000
   -- _ <- clear (_final_state^.ub) "crab"
   --threadDelay 1000000

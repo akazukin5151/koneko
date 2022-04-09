@@ -15,14 +15,13 @@ import qualified Serialization.Out as Out
 import Control.Concurrent (threadDelay)
 import Data.Either (rights)
 import Brick.BChan (writeBChan, BChan)
-import Types (Event(IPCReceived), messageQueue, St (St), conn)
+import Types (Event(IPCReceived), messageQueue, conn, St)
 import Data.Foldable (foldl')
 import Data.IntMap (lookupMax)
 import Data.Functor ((<&>))
 import Data.Function ((&))
 import Data.Maybe (fromMaybe)
 import Lens.Micro ((^.))
-import Codec.Binary.UTF8.Generic (fromString)
 
 catchSomeException :: IO a -> IO (Either SomeException a)
 catchSomeException = try
@@ -35,37 +34,37 @@ sendEither st text = do
     Right _ -> pure $ Right ()
 
 recvAll :: BChan Event -> Socket -> IO ()
-recvAll chan conn = do
-  msg_bs <- recv conn 4096
+recvAll chan conn_ = do
+  msg_bs <- recv conn_ 4096
   if msg_bs == ""
-     then recvAll chan conn
+     then recvAll chan conn_
      else do
        let messages = split '\n' msg_bs
        let actions = map eitherDecodeStrict $ filter (/= "") messages
-       mapM_ (handle chan conn) $ rights actions
-       recvAll chan conn
+       mapM_ (handle chan conn_) $ rights actions
+       recvAll chan conn_
 
 handle :: BChan Event -> Socket -> IPCResponse -> IO ()
-handle chan conn x = do
+handle chan conn_ x = do
   case response x of
     (ReportLen l) -> do
-      bs <- handleLen conn "" l
+      bs <- handleLen conn_ "" l
       case eitherDecodeStrict bs of
         Left _ -> pure ()
-        Right d -> handle chan conn d
+        Right d -> handle chan conn_ d
     _ -> do
       writeBChan chan $ IPCReceived x
 
 handleLen :: Socket -> ByteString -> Int -> IO ByteString
-handleLen conn res total_len = do
-  piece <- recv conn 4096
+handleLen conn_ res total_len = do
+  piece <- recv conn_ 4096
   let messages = split '\n' piece
   let filtered = filter (/= "") messages
   let new = foldl' (<>) res filtered
   let new_len = B.length new
   if new_len == total_len
      then pure new
-     else handleLen conn new total_len
+     else handleLen conn_ new total_len
 
 sendAllWithLen :: St -> ByteString -> IO ()
 sendAllWithLen st text = do

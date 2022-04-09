@@ -5,13 +5,11 @@ import Core ( highlightedMode, intToStr )
 import Types
     ( history,
       historyIdx,
-      ub,
       Mode(ArtistIllustrations, SingleIllustration,
            FollowingArtists, FollowingArtistsIllustrations, SearchArtists,
            RecommendedIllustrations),
       St, konekoDir, currentPage1, your_id )
-import Graphics.Ueberzug ( clear )
-import Lens.Micro ((^.), (.~), (&), (%~))
+import Lens.Micro ((^.), (&), (%~))
 import System.FilePath ((</>))
 import System.Directory (listDirectory)
 import Data.List (sort)

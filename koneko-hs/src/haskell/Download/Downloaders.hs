@@ -1,11 +1,8 @@
 module Download.Downloaders where
 
-import Common ( viewToNRowsCols, modeToNRowsCols)
-import Core ( enumerate)
 import Types
     ( St )
 import System.FilePath (takeFileName, takeDirectory)
-import Data.Tuple (swap)
 import Requests ( download )
 import Serialization.In (IPCResponses)
 import Serialization.Out (Url)
@@ -33,9 +30,6 @@ downloadUserIllust :: (Int -> IPCResponses -> IO ())
 downloadUserIllust cb st dir sorted urls = do
   download cb st urls dirs names
     where
-      (nrows, ncols_) = viewToNRowsCols st
-      subset = take (ncols_ * nrows) sorted
-      assoc = swap <$> enumerate subset
       dirs = replicate (length urls) dir
       names = takeFileName <$> sorted
 
@@ -55,8 +49,6 @@ downloadIllustDetail cb st dir sorted urls =
   download cb st urls dirs names
     where
       -- always 1 main image + 4 side images
-      subset = take 5 sorted
-      assoc = swap <$> enumerate subset
       dirs = replicate (length urls) dir
       names = takeFileName <$> sorted
 
@@ -75,10 +67,7 @@ downloadUserFollowing :: (Int -> IPCResponses -> IO ())
 downloadUserFollowing cb st sorted urls =
   download cb st urls dirs names
     where
-      (n_artists, ncols) = modeToNRowsCols st
-      n_total_pics = ncols - 1
       -- TODO: rather inefficient to construct the path in parseUserDetailResponse
       -- then deconstruct it again here
       dirs = takeDirectory <$> sorted
       names = takeFileName <$> sorted
-      assoc' = swap <$> enumerate (take (n_artists*n_total_pics) sorted)

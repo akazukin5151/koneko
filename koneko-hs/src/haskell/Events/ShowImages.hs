@@ -64,17 +64,17 @@ showImageSimple
   -> Ueberzug
   -> (Int, FilePath)
   -> IO ()
-showImageSimple st ncols xs ys ub' (idx, filepath) =
+showImageSimple st ncols' xs ys ub' (idx, filepath) =
   case (m_xpos, m_ypos) of
     (Just xp, Just yp) -> showImageInner px py xp yp w h ub' filepath
     _ -> pure ()
     where
       m_xpos = xs ^? ix px
       m_ypos = ys ^? ix py
-      (px, py) = indexToCoords ncols idx
+      (px, py) = indexToCoords ncols' idx
       w = const2 (Just $ st^.config.imageWidth)
       h = const2 (Just $ st^.config.imageHeight)
-      const2 x _ _ = x
+      const2 a _ _ = a
 
 showImagesSimple
   :: (Ueberzug -> (Int, FilePath) -> IO b)
@@ -83,10 +83,10 @@ showImagesSimple
   -> [FilePath]
   -> IO St
 showImagesSimple f g st images = do
-   let (nrows, ncols_) = viewToNRowsCols st
-   let ncols = g ncols_
+   let (nrows', ncols_) = viewToNRowsCols st
+   let ncols' = g ncols_
    let c = st^.currentSlice
-   let subset = take (ncols * nrows) $ drop (c * ncols * nrows) images
+   let subset = take (ncols' * nrows') $ drop (c * ncols' * nrows') images
    mapM_ (f (st^.ub)) (enumerate subset)
    pure $ st & displayedImages .~ (takeFileName <$> subset)
 
@@ -103,8 +103,8 @@ showImagesSingle st images = do
       let other_imgs = drop (c + 1) images
       let subset = take 4 other_imgs
       case subset of
-        (x : xs) -> do
-          let i = [x] <> [main_img] <> xs
+        (x' : xs) -> do
+          let i = [x'] <> [main_img] <> xs
           mapM_ (showImageSingle (st^.ub)) (enumerate i)
           pure $ st & displayedImages .~ (takeFileName <$> i)
         [] -> do

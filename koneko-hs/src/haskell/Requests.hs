@@ -38,16 +38,13 @@ download
   -> IO (Either String St)
 download cb st urls dirs names = do
   mapM_ (createDirectoryIfMissing True) dirs
-  let i = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
-  let sts = [ do
-        let new_st = st & messageQueue %~ insert i (cb idx)
-        new_st
-        | (idx, i) <- enumerate [i..(i + length infos)]]
-  let r = IPCJson {ident = i, action = Download infos}
+  let identifier = st^.messageQueue & lookupMax <&> fst & fromMaybe 0 & (+ 1)
+  let sts = [ st & messageQueue %~ insert msg_idx (cb img_idx)
+            | (img_idx, msg_idx) <- enumerate [identifier..(identifier + length infos)]]
+  let r = IPCJson {ident = identifier, action = Download infos}
   ei <- sendEither st $ toStrict $ encode r
   let new_st = foldr1 f sts
   pure $ ei $> new_st
-  -- pure $ Right $ foldr1 f $ rights sts
   where
     f a b = a & messageQueue %~ (`union` (b^.messageQueue))
     infos =

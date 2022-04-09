@@ -37,7 +37,7 @@ import Events.ShowImages (showImagesView, showImageView)
 import Events.FindImages (findImagesView)
 import Events.Common ( getDirectory, listDirectoryFullSorted, getFirstDirectory, wrapped, getNextDirectory)
 import System.Directory (doesDirectoryExist, listDirectory)
-import Download.Core (fetchFirst, downloadWithoutShowing, fetchWithPrefetchCb, requestCallback)
+import Download.Core (fetchFirst, downloadByMode, fetchWithPrefetchCb, requestCallback)
 import Brick (txt, BrickEvent (AppEvent), continue)
 import Data.Text (pack)
 import Control.Arrow ((<<<), (>>>))
@@ -183,8 +183,8 @@ handleEnterView st mode = do
       pure new_st
     else do
       case st^.your_id of
-        Nothing -> pure $ st & pendingOnLogin ?~ downloadInBg mode dir
-        Just _ -> downloadInBg mode dir st
+        Nothing -> pure $ st & pendingOnLogin ?~ downloadFromScratch mode dir
+        Just _ -> downloadFromScratch mode dir st
 
 prefetchInner :: St -> Mode -> IO ()
 prefetchInner st mode = do
@@ -211,7 +211,7 @@ downloadAction :: St -> Mode -> [Char] -> Request -> IO ()
 downloadAction st' mode dir r' = do
     let new_st = st' & requestsCache1 .~ singleton 1 r'
     writeBChan (st'^.chan) (RequestFinished new_st)
-    e_new_st <- downloadWithoutShowing cb mode new_st dir (paths r') (urls r')
+    e_new_st <- downloadByMode cb mode new_st dir (paths r') (urls r')
     case e_new_st of
       Right x -> writeBChan (st'^.chan) (RequestFinished x)
       _ -> pure ()
@@ -222,8 +222,8 @@ downloadAction st' mode dir r' = do
               Downloaded s -> showImageView st' (st'^.ub) (i, s)
               _ -> pure ()
 
-downloadInBg :: Mode -> String -> St -> IO St
-downloadInBg mode dir st = do
+downloadFromScratch :: Mode -> String -> St -> IO St
+downloadFromScratch mode dir st = do
   void $ forkIO $ do
     let cb =
           case mode of

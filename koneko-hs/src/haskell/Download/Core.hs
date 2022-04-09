@@ -76,7 +76,7 @@ prefetchAction st mode dir r' = do
     andM (doesDirectoryExist dir) (listDirectory dir <&> (not <<< null))
   unless cond $ do
     let cb _ _ = pure ()
-    m_new_st <- downloadWithoutShowing cb mode st dir (paths r') (urls r')
+    m_new_st <- downloadByMode cb mode st dir (paths r') (urls r')
     case m_new_st of
       Right x -> writeBChan (st^.chan) (RequestFinished x)
       _ -> pure ()
@@ -113,14 +113,14 @@ fetch cb offset mode st dir =
       illustRecommendedRequest offset st $
         cb mode st dir
 
-downloadWithoutShowing :: (Int -> IPCResponses -> IO ())
+downloadByMode :: (Int -> IPCResponses -> IO ())
   -> Mode
   -> St
   -> String
   -> [FilePath]
   -> [Url]
   -> IO (Either String St)
-downloadWithoutShowing cb mode st dir sorted urls' =
+downloadByMode cb mode st dir sorted urls' =
   case mode of
     ArtistIllustrations ->
       downloadUserIllust' cb st dir sorted urls'

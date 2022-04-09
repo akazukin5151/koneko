@@ -182,9 +182,10 @@ handleEnterView st mode = do
         writeBChan (st^.chan) (RequestFinished new_st')
       pure new_st
     else do
+      let func st' = downloadFromScratch mode dir st'
       case st^.your_id of
-        Nothing -> pure $ st & pendingOnLogin ?~ downloadFromScratch mode dir
-        Just _ -> downloadFromScratch mode dir st
+        Nothing -> pure $ st & pendingOnLogin ?~ func
+        Just _ -> func st
 
 prefetchInner :: St -> Mode -> IO ()
 prefetchInner st mode = do
@@ -213,7 +214,9 @@ downloadAction st' mode dir r' = do
     writeBChan (st'^.chan) (RequestFinished new_st)
     e_new_st <- downloadByMode cb mode new_st dir (paths r') (urls r')
     case e_new_st of
-      Right x -> writeBChan (st'^.chan) (RequestFinished x)
+      Right x -> do
+        writeBChan (st'^.chan) (RequestFinished x)
+        prefetchInner x mode
       _ -> pure ()
     where
       cb :: Int -> IPCResponses -> IO ()

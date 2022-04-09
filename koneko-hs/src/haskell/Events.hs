@@ -24,15 +24,15 @@ appEvent st e =
   case st^.activeView of
     WelcomeView -> welcomeEvent st e
     PromptView -> promptEvent st e
-    _ -> commonEvent st e (\st e ->
-      case e of
-        VtyEvent (V.EvKey (V.KChar 'q') []) -> halt st
-        VtyEvent (V.EvKey (V.KChar 'b') []) -> continue =<< liftIO (back st)
-        VtyEvent (V.EvKey (V.KChar 'l') []) -> continue =<< liftIO (handleL st)
-        VtyEvent (V.EvKey (V.KChar 'h') []) -> continue =<< liftIO (handleH st)
-        VtyEvent (V.EvKey (V.KChar 'j') []) -> continue =<< liftIO (handleJ st)
-        VtyEvent (V.EvKey (V.KChar 'k') []) -> continue =<< liftIO (handleK st)
-        VtyEvent (V.EvKey (V.KChar 'n') []) -> continue =<< liftIO (handleN st)
-        VtyEvent (V.EvKey (V.KChar 'p') []) -> continue =<< liftIO (handleP st)
-        _                                   -> continue st
+    _ -> commonEvent st e (\st' e' ->
+      case e' of
+        VtyEvent (V.EvKey (V.KChar 'q') []) -> halt st'
+        VtyEvent (V.EvKey (V.KChar 'b') []) -> continue =<< liftIO (back st')
+        VtyEvent (V.EvKey (V.KChar 'l') []) -> continue =<< liftIO (handleL st')
+        VtyEvent (V.EvKey (V.KChar 'h') []) -> continue =<< liftIO (handleH st')
+        VtyEvent (V.EvKey (V.KChar 'j') []) -> continue =<< liftIO (handleJ st')
+        VtyEvent (V.EvKey (V.KChar 'k') []) -> continue =<< liftIO (handleK st')
+        VtyEvent (V.EvKey (V.KChar 'n') []) -> continue =<< liftIO (handleN st')
+        VtyEvent (V.EvKey (V.KChar 'p') []) -> continue =<< liftIO (handleP st')
+        _                                   -> continue st'
       )

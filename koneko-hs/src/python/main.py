@@ -133,12 +133,40 @@ def main_() -> None:
             if msg == b'':
                 continue
 
-            messages = msg.split(b'\n')
-            for m in messages:
-                if m == b'':
+            messages: list[bytes] = msg.split(b'\n')
+            if len(messages) == 1:
+                j: Any = json.loads(messages[0])
+                return handle(s, api, j)
+
+            # if we received both reportlen and the action,
+            # don't block to wait on the action. instead, consume the reportlen
+            # and the action and move on to the other messages
+            idx = 0
+            while idx < len(messages):
+                this_message = messages[idx]
+                if this_message == b'':
+                    idx += 1
                     continue
-                j: Any = json.loads(m)
-                handle(s, api, j)
+                j = json.loads(this_message)
+                if j['action']['tag'] == 'ReportLen':
+                    try:
+                        next_message = messages[idx + 1]
+                    except IndexError:
+                        handle(s, api, j)
+                    else:
+                        total_length: int = j['action']['contents']
+                        # FIXME: cop-out of off-by-one-error bug
+                        # in sendAllWithLen
+                        if total_length == len(next_message) or total_length - 1 == len(next_message):
+                            jsn = json.loads(next_message)
+                            handle_inner(s, api, jsn)
+                            # skip to the next element in the next loop
+                            idx += 1
+                        else:
+                            handle(s, api, j)
+                else:
+                    handle(s, api, j)
+                idx += 1
 
 def try_send(s: socket.socket, res: str, ident: int) -> None:
     # length is the length haskell should expect *after* splitting by newlines

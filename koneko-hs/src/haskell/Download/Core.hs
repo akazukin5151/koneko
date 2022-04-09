@@ -3,7 +3,7 @@
 
 module Download.Core where
 
-import Common ( getEditorText)
+import Common ( getEditorText, logger)
 import Types
     ( Mode(FollowingArtists, ArtistIllustrations, SingleIllustration,
            SearchArtists, FollowingArtistsIllustrations, RecommendedIllustrations),
@@ -76,9 +76,9 @@ prefetchAction st mode dir r' = do
     andM (doesDirectoryExist dir) (listDirectory dir <&> (not <<< null))
   unless cond $ do
     let cb _ _ = pure ()
-    m_new_st <- downloadByMode cb mode st dir (paths r') (urls r')
+    m_new_st <- downloadByMode cb mode new_st dir (paths r') (urls r')
     case m_new_st of
-      Right x -> writeBChan (st^.chan) (RequestFinished x)
+      Right x -> writeBChan (new_st^.chan) (RequestFinished x)
       _ -> pure ()
 
 

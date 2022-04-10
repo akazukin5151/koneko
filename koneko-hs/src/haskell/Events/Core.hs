@@ -62,7 +62,6 @@ commonEvent st e fallback =
   case e of
     AppEvent (ModeEnter mode)           -> continue =<< liftIO (handleEnterView st mode)
     AppEvent (LoginResult e_i)          -> continue =<< liftIO (handleLogin st e_i)
-    AppEvent (DownloadFinished new_st)  -> continue =<< liftIO (prefetchInBg new_st)
     AppEvent (RequestFinished new_st)   -> continue new_st
     AppEvent (IPCReceived r)            -> continue =<< liftIO (handle st r)
     _                                   -> fallback st e

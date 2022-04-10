@@ -38,7 +38,6 @@ data Mode = ArtistIllustrations
 
 data Event = ModeEnter Mode
            | LoginResult (Either String String)
-           | DownloadFinished St
            | RequestFinished St
            | IPCReceived IPCResponse
 

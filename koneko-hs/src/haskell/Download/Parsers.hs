@@ -87,7 +87,7 @@ parseUserDetailResponse dir r =
     { labels_ = user_name <$> users'
     , paths = full_paths
     , urls = urls'
-    , nextUrl_ = Just n
+    , nextUrl_ = n
     }
     where
       n = userDetailResponse_next_url r

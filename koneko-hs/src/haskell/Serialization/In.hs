@@ -149,7 +149,7 @@ $(deriveJSON defaultOptions
 data UserDetailResponse =
   UserDetailResponse
     { userDetailResponse_user_previews :: [UserPreview]
-    , userDetailResponse_next_url :: String
+    , userDetailResponse_next_url :: Maybe String
     }
     deriving Show
 

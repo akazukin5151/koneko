@@ -9,6 +9,8 @@
 - mode 2: when download finishes, going next doesn't clear the first image. it will clear when you go back and next again
     - mode 3 and 4 too, but the entire first page isn't cleared
 - remove file extension and number from artist label in artist list view
+- artist list view can have less than user specified rows, if there are few enough results
+    - need to adjust keybindings and image pos based on that
 
 ## features
 ### feature parity

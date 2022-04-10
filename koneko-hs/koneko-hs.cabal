@@ -49,7 +49,8 @@ executable koneko-hs
                        Events.FindImages,
                        Events.ShowImages,
                        Events.WelcomeEvent,
-                       Events.PromptEvent
+                       Events.PromptEvent,
+                       Events.ItemActions
 
   default-language:    Haskell2010
   ghc-options:         -threaded

@@ -111,14 +111,15 @@ getEditorText st = T.unwords $ getEditContents $ st^.editor
 defaultViewFooter :: St -> Widget Field
 defaultViewFooter st =
   case st^.activeView of
+    -- illustfollow: [a]rtist illusts
     GalleryView ->
-      txt " [v]iew [d]ownload  [b]ack [q]uit"
-    -- TODO: illusts when profile pic highlighted, view and download when previews
+      txt " [o]pen in browser [v]iew [d]ownload  [n]ext [p]previous  [b]ack [q]uit"
+    -- TODO: illusts when profile pic highlighted, view when previews
     -- highlighted
     ArtistListView ->
-      txt " [i]llusts  [b]ack [q]uit"
+      txt " [i]llusts  [n]ext [p]revious  [b]ack [q]uit"
     SingleImageView ->
-      txt " [n]ext [p]revious [d]ownload [r]elated [b]ack [q]uit"
+      txt " [o]pen in browser [f]ull res [d]ownload [r]elated  [n]ext [p]revious  [b]ack [q]uit"
     WelcomeView -> initialFooter
 
 initialFooter :: Widget n

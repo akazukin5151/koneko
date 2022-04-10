@@ -3,7 +3,7 @@
 module Events.Core where
 
 import Common ( coordsToIndex, indexToCoords,  viewToNRowsCols, updateFooter, nextOffset, logger)
-import Core ( intToStr, highlightedMode)
+import Core ( intToStr, highlightedMode, continueL)
 import Types
     ( St,
       Request(nextUrl_, paths, urls),
@@ -60,11 +60,11 @@ commonEvent
   -> Brick.Types.EventM n2 (Next St)
 commonEvent st e fallback =
   case e of
-    AppEvent (ModeEnter mode)           -> continue =<< liftIO (handleEnterView st mode)
-    AppEvent (LoginResult e_i)          -> continue =<< liftIO (handleLogin st e_i)
-    AppEvent (UpdateSt new_st)   -> continue new_st
-    AppEvent (IPCReceived r)            -> continue =<< liftIO (handle st r)
-    _                                   -> fallback st e
+    AppEvent (ModeEnter mode)  -> continueL $ handleEnterView st mode
+    AppEvent (LoginResult e_i) -> continueL $ handleLogin st e_i
+    AppEvent (UpdateSt new_st) -> continue new_st
+    AppEvent (IPCReceived r)   -> continueL $ handle st r
+    _                          -> fallback st e
 
 handle :: St -> IPCResponse -> IO St
 handle st IPCResponse {ident = i, response = r} = do

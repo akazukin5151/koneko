@@ -21,7 +21,7 @@ import Control.Monad.IO.Class ( MonadIO(liftIO) )
 import Lens.Micro ((^.), (&), (^?), ix)
 import Data.IntMap ((!))
 import System.Process (callProcess)
-import Core (intToStr)
+import Core (intToStr, continueL)
 import Common (viewToNRowsCols)
 import Serialization.In (IllustDetail(illustDetail_meta_single_page, illustDetail_meta_pages), MetaSinglePage (original_image_url), MetaPage (image_urls), ImageUrl (original))
 import Requests (download)
@@ -34,13 +34,13 @@ navigableFallback :: (St -> BrickEvent n1 e -> EventM n2 (Next St)) -> St -> Bri
 navigableFallback fallback st' e' =
   case e' of
     VtyEvent (V.EvKey (V.KChar 'q') []) -> halt st'
-    VtyEvent (V.EvKey (V.KChar 'b') []) -> continue =<< liftIO (back st')
-    VtyEvent (V.EvKey (V.KChar 'l') []) -> continue =<< liftIO (handleL st')
-    VtyEvent (V.EvKey (V.KChar 'h') []) -> continue =<< liftIO (handleH st')
-    VtyEvent (V.EvKey (V.KChar 'j') []) -> continue =<< liftIO (handleJ st')
-    VtyEvent (V.EvKey (V.KChar 'k') []) -> continue =<< liftIO (handleK st')
-    VtyEvent (V.EvKey (V.KChar 'n') []) -> continue =<< liftIO (handleN st')
-    VtyEvent (V.EvKey (V.KChar 'p') []) -> continue =<< liftIO (handleP st')
+    VtyEvent (V.EvKey (V.KChar 'b') []) -> continueL $ back st'
+    VtyEvent (V.EvKey (V.KChar 'l') []) -> continueL $ handleL st'
+    VtyEvent (V.EvKey (V.KChar 'h') []) -> continueL $ handleH st'
+    VtyEvent (V.EvKey (V.KChar 'j') []) -> continueL $ handleJ st'
+    VtyEvent (V.EvKey (V.KChar 'k') []) -> continueL $ handleK st'
+    VtyEvent (V.EvKey (V.KChar 'n') []) -> continueL $ handleN st'
+    VtyEvent (V.EvKey (V.KChar 'p') []) -> continueL $ handleP st'
     _                                   -> fallback st' e'
 
 galleryEvent :: St -> BrickEvent n1 Event -> EventM n2 (Next St)
@@ -49,9 +49,9 @@ galleryEvent st e =
 
 galleryFallback :: St -> BrickEvent n1 e -> EventM n2 (Next St)
 galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'd') [])) =
-  continue =<< liftIO (downloadImage st')
+  continueL $ downloadImage st'
 galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'o') [])) =
-  continue =<< liftIO (openInBrowser st')
+  continueL $ openInBrowser st'
 galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'v') [])) = continue st'
 galleryFallback st' _ = continue st'
 
@@ -109,9 +109,9 @@ postViewEvent st e =
 
 postViewFallback :: St -> BrickEvent n1 e -> EventM n2 (Next St)
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'd') [])) =
-  continue =<< liftIO (downloadImageInPost st')
+  continueL $ downloadImageInPost st'
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'o') [])) =
-  continue =<< liftIO (openPostInBrowser st')
+  continueL $ openPostInBrowser st'
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'v') [])) = continue st'
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'f') [])) = continue st'
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'r') [])) = continue st'

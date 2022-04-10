@@ -4,7 +4,7 @@ module Events.PromptEvent where
 
 import Common
     ( validInput, modeToView, getEditorText, updateFooter )
-import Core ( highlightedMode, intToStr )
+import Core ( highlightedMode, intToStr, continueL )
 import Types
     ( activeView,
       chan,
@@ -37,8 +37,8 @@ import qualified Data.Text.IO as T
 promptEvent :: St -> BrickEvent n Event -> T.EventM Field (T.Next St)
 promptEvent st e =
   case e of
-    VtyEvent (V.EvKey V.KEsc []) -> continue =<< back st
-    VtyEvent (V.EvKey (V.KChar 'q') []) | st^.isHistoryFocused -> continue =<< back st
+    VtyEvent (V.EvKey V.KEsc []) -> continueL $ back st
+    VtyEvent (V.EvKey (V.KChar 'q') []) | st^.isHistoryFocused -> continueL $ back st
     VtyEvent (V.EvKey (V.KChar '\t') []) ->
       continue $ st & isHistoryFocused %~ not
     VtyEvent (V.EvKey (V.KChar 'j') []) | st^.isHistoryFocused ->
@@ -46,17 +46,17 @@ promptEvent st e =
     VtyEvent (V.EvKey (V.KChar 'k') []) | st^.isHistoryFocused ->
       continue $ historyUp st
     VtyEvent (V.EvKey V.KEnter []) | not (st^.isHistoryFocused) ->
-      continue =<< liftIO (onEnterNormal st)
+      continueL $ onEnterNormal st
     VtyEvent (V.EvKey V.KEnter []) | st^.isHistoryFocused ->
-      continue =<< liftIO (onEnterHistory st)
+      continueL $ onEnterHistory st
     T.VtyEvent ev | not (st^.isHistoryFocused) ->
       continue =<< handleEventLensed st editor handleEditorEvent ev
-    AppEvent (LoginResult e_i)          -> continue =<< liftIO (handleLogin st e_i)
+    AppEvent (LoginResult e_i)          -> continueL $ handleLogin st e_i
     _ -> continue st
 
-back :: MonadIO m => St -> m St
+back :: St -> IO St
 back st = do
-  liftIO $ writeBChan (st^.chan) (ModeEnter Home)
+  writeBChan (st^.chan) (ModeEnter Home)
   pure $ st & activeView .~ WelcomeView
             & isHistoryFocused .~ False
             & historyIdx .~ 0

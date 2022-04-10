@@ -8,6 +8,10 @@ import Types
            PixivPost, FollowingArtists, SearchArtists,
            FollowingArtistsIllustrations),
       modeIdx )
+import Brick (continue, EventM)
+import Control.Monad.IO.Class (MonadIO(..))
+import Brick.Types (Next)
+import Control.Monad ((<=<))
 
 modes :: [Mode]
 modes =
@@ -47,3 +51,6 @@ intToStr = show
 -- | Just @read@ but with a better name and type in parallel to intToStr
 strToInt :: String -> Int
 strToInt = read
+
+continueL :: IO s -> EventM n (Next s)
+continueL = continue <=< liftIO

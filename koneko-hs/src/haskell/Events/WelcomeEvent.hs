@@ -28,6 +28,7 @@ import Data.Char (isDigit)
 import Events.Core (commonEvent)
 import Data.Text (unpack)
 import Graphics.Ueberzug (clear)
+import Core (continueL)
 
 welcomeEvent :: St -> BrickEvent n1 Event -> EventM n2 (Next St)
 welcomeEvent st e =
@@ -35,11 +36,11 @@ welcomeEvent st e =
     case e of
       VtyEvent (V.EvKey V.KEsc []) -> halt st
       VtyEvent (V.EvKey (V.KChar 'q') []) -> halt st
-      VtyEvent (V.EvKey (V.KChar 'j') []) -> continue =<< liftIO (handleDown st)
-      VtyEvent (V.EvKey (V.KChar 'k') []) -> continue =<< liftIO (handleUp st)
+      VtyEvent (V.EvKey (V.KChar 'j') []) -> continueL $ handleDown st
+      VtyEvent (V.EvKey (V.KChar 'k') []) -> continueL $ handleUp st
       VtyEvent (V.EvKey (V.KChar '\t') []) | isHistoryActive st ->
         continue $ st & isHistoryFocused %~ not
-      VtyEvent (V.EvKey (V.KChar c) []) -> continue =<< liftIO (handleJump st c)
+      VtyEvent (V.EvKey (V.KChar c) []) -> continueL $ handleJump st c
       VtyEvent (V.EvKey V.KEnter []) -> handleEnter st
       _ -> continue st
    )
@@ -109,13 +110,13 @@ historySelect st = do
      then do
        new_st <- liftIO $ select st
        let newer_st = new_st & editor %~ applyEdit (const $ textZipper [input] Nothing)
-       continue =<< liftIO (onSelectNoPrompt new_mode newer_st)
+       continueL $ onSelectNoPrompt new_mode newer_st
      else continue st
 
 modeSelect :: St -> EventM n (Next St)
 modeSelect st = do
   new_st <- liftIO $ select st
-  continue =<< liftIO (onSelect (modeIdxtoMode (new_st ^. modeIdx)) new_st)
+  continueL $ onSelect (modeIdxtoMode (new_st ^. modeIdx)) new_st
 
 onSelectNoPrompt :: Mode -> St -> IO St
 onSelectNoPrompt m st = do

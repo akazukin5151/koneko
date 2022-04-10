@@ -1,7 +1,6 @@
 # todo
 
 ## bugs
-- fetch when dir is already downloaded is broken
 - ensure whenever a new_st is created, the old st is never used
 - requested from a mode but mode turned into home
     koneko-hs: src/haskell/Download/Core.hs:(93,3)-(114,22): Non-exhaustive patterns in case
@@ -30,6 +29,7 @@
 - error messages shouldn't crash anyway, just display in footer
 - refactoring and de-duplicate code
     - reducing the size of St
+- read only lenses for immutable fields
 
 ## double check
 - move magic numbers into config (see old config)

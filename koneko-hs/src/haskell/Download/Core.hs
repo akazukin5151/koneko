@@ -17,7 +17,7 @@ import Download.Parsers
       parseIllustDetailResponse,
       parseUserDetailResponse )
 import Download.Downloaders
-    ( downloadUserIllust', downloadIllustDetail', downloadUserFollowing' )
+    ( downloadReplicateDir, downloadReplicateDir, downloadTakeDir )
 import Control.Monad (unless)
 import Serialization.In ( IPCResponses(Requested) )
 import Data.Aeson (eitherDecodeStrict)
@@ -123,14 +123,14 @@ downloadByMode :: (Int -> IPCResponses -> IO ())
 downloadByMode cb mode st dir sorted urls' =
   case mode of
     ArtistIllustrations ->
-      downloadUserIllust' cb st dir sorted urls'
+      downloadReplicateDir cb st dir sorted urls'
     SingleIllustration ->
-      downloadIllustDetail' cb st dir sorted urls'
+      downloadReplicateDir cb st dir sorted urls'
     SearchArtists ->
-      downloadUserFollowing' cb st sorted urls'
+      downloadTakeDir cb st sorted urls'
     FollowingArtists ->
-      downloadUserFollowing' cb st sorted urls'
+      downloadTakeDir cb st sorted urls'
     FollowingArtistsIllustrations ->
-      downloadUserIllust' cb st dir sorted urls'
+      downloadReplicateDir cb st dir sorted urls'
     RecommendedIllustrations ->
-      downloadUserIllust' cb st dir sorted urls'
+      downloadReplicateDir cb st dir sorted urls'

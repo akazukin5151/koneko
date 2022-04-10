@@ -1,4 +1,6 @@
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module Events.ItemActions where
 
 import Types
@@ -26,6 +28,7 @@ import Requests (download)
 import Lens.Micro.Internal ( Ixed, Index, IxValue )
 import System.Directory (getHomeDirectory)
 import System.FilePath ((</>), (<.>))
+import Data.Text (splitOn, unpack, pack)
 
 navigableFallback :: (St -> BrickEvent n1 e -> EventM n2 (Next St)) -> St -> BrickEvent n1 e -> EventM n2 (Next St)
 navigableFallback fallback st' e' =
@@ -105,13 +108,39 @@ postViewEvent st e =
   commonEvent st e (navigableFallback postViewFallback)
 
 postViewFallback :: St -> BrickEvent n1 e -> EventM n2 (Next St)
-postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'd') [])) = continue st'
+postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'd') [])) =
+  continue =<< liftIO (downloadImageInPost st')
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'o') [])) =
   continue =<< liftIO (openPostInBrowser st')
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'v') [])) = continue st'
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'f') [])) = continue st'
 postViewFallback st' (VtyEvent (V.EvKey (V.KChar 'r') [])) = continue st'
 postViewFallback st' _ = continue st'
+
+downloadImageInPost :: St -> IO St
+downloadImageInPost st =
+  case m_original_url of
+    Just (Just url) -> do
+      home <- getHomeDirectory
+      let name = unpack $ last $ splitOn "/" $ pack url
+      e_st <- download cb st [url] [home </> "Downloads"] [name]
+      case e_st of
+        Right s -> pure s
+        _ -> pure st
+    _ -> pure st
+  where
+    -- TODO: report status in footer
+    cb _ _ = pure ()
+    offset = st^.currentSlice
+    idx =
+      case st^.selectedCellIdx of
+        0 -> 1
+        1 -> 0
+        4 -> 0
+        5 -> 4
+        x -> x
+    request = (st^.requestsCache1) ! (st^.currentPage1)
+    m_original_url = original_urls request ^? ix (idx + offset)
 
 openPostInBrowser :: St -> IO St
 openPostInBrowser st =

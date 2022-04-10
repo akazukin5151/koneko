@@ -83,12 +83,15 @@ parseIllustDetailResponse dir r =
     , urls = urls'
     , nextUrl_ = Nothing
     , image_ids = [Just image_ids']
-    , original_urls = [original_urls']
+    , original_urls = original_urls'
     }
     where
-      original_urls' = originals_single <|> originals_meta
+      original_urls' =
+        case originals_meta of
+          [] -> [originals_single]
+          xs -> xs
       originals_single = original_image_url . illustDetail_meta_single_page $ illusts'
-      originals_meta = original . image_urls . head . illustDetail_meta_pages $ illusts'
+      originals_meta = original . image_urls <$> illustDetail_meta_pages illusts'
       illusts' = illustDetailResponse_illust r
       image_ids' = illustDetail_id illusts'
       meta_pages' = illustDetail_meta_pages illusts'
@@ -130,6 +133,9 @@ parseUserDetailResponse dir r =
       illust_stuff =
         [
         let originals_single = original_image_url . illustDetail_meta_single_page $ i
+            -- multiple meta pages = multiple images in a post
+            -- but for downloading from this mode, only download the first image
+            -- in the post
             originals_meta = original . image_urls . head . illustDetail_meta_pages $ i in
           ( square_medium $ illustDetail_image_urls i
           , filter (/= '/') $ illustDetail_title i <.> "jpg"

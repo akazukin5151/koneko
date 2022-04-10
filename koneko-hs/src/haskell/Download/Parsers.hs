@@ -7,14 +7,14 @@ import System.FilePath ((</>), (<.>))
 import Serialization.In
     ( ImageUrl(square_medium, large),
       MetaPage(image_urls),
-      UserIllust(title, userIllust_image_url),
+      UserIllust(title, userIllust_image_url, userIllust_id),
       UserIllustResponse(illusts),
       IllustDetailResponse (illustDetailResponse_illust),
       ProfileImageUrl(profileImageUrl_medium),
       User(user_profile_image_urls, user_name),
       UserPreview(userPreview_user, userPreview_illusts),
       UserDetailResponse(userDetailResponse_user_previews, userDetailResponse_next_url),
-      IllustDetail(illustDetail_meta_pages, illustDetail_image_urls, illustDetail_title, illustDetail_user), IllustUser (illustUser_name), next_url )
+      IllustDetail(illustDetail_meta_pages, illustDetail_image_urls, illustDetail_title, illustDetail_user, illustDetail_id), IllustUser (illustUser_name), next_url )
 import Data.List ( sort )
 import Data.Text ( pack, unpack, splitOn )
 import Types (Request(..))
@@ -51,8 +51,10 @@ parseUserIllustResponse dir r =
     , paths = sorted
     , urls = urls'
     , nextUrl_ = n
+    , image_ids = Just <$> image_ids'
     }
     where
+      image_ids' = userIllust_id <$> illusts'
       n = next_url r
       illusts' = illusts r
       titles = title <$> illusts'
@@ -69,9 +71,12 @@ parseIllustDetailResponse dir r =
     , paths = sorted
     , urls = urls'
     , nextUrl_ = Nothing
+    , image_ids = [Just image_ids']
     }
     where
-      meta_pages = illustDetail_meta_pages $ illustDetailResponse_illust r
+      illusts' = illustDetailResponse_illust r
+      image_ids' = illustDetail_id illusts'
+      meta_pages = illustDetail_meta_pages illusts'
       -- it's not possible to get the titles without another query, so whatever
       urls' = large . image_urls <$> meta_pages
       -- TODO: efficiency
@@ -88,6 +93,7 @@ parseUserDetailResponse dir r =
     , paths = full_paths
     , urls = urls'
     , nextUrl_ = n
+    , image_ids = image_ids'
     }
     where
       n = userDetailResponse_next_url r
@@ -100,13 +106,17 @@ parseUserDetailResponse dir r =
         [ ( profileImageUrl_medium $ user_profile_image_urls u
           , user_name u <.> "jpg"
           , \idx -> dir </> leftPad idx <> "_" <> user_name u </> "profile"
+          , Nothing
           )
         | u <- users']
 
       illust_stuff =
         [ ( square_medium $ illustDetail_image_urls i
           , filter (/= '/') $ illustDetail_title i <.> "jpg"
-          , \idx -> dir </> leftPad idx <> "_" <> illustUser_name (illustDetail_user i) </> "previews"
+          , \idx ->
+              dir
+              </> leftPad idx <> "_" <> illustUser_name (illustDetail_user i) </> "previews"
+          , Just $ illustDetail_id i
           )
         | i <- concat illusts'
         ]
@@ -124,6 +134,7 @@ parseUserDetailResponse dir r =
           ]
 
       interleaved = interleave user_stuff illust_stuff
-      urls' = (\(a, _, _) -> a) <$> interleaved
-      names = (\(i, (_, a, _)) -> leftPad i <> "_" <> a) <$> enumerate interleaved
+      urls' = (\(a, _, _, _) -> a) <$> interleaved
+      image_ids' = (\(_, _, _, a) -> a) <$> interleaved
+      names = (\(i, (_, a, _, _)) -> leftPad i <> "_" <> a) <$> enumerate interleaved
       full_paths = zipWith (</>) dirs names

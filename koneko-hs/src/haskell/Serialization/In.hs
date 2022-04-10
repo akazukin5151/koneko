@@ -68,6 +68,7 @@ data UserIllustResponse =
     }
     deriving (Show)
 
+-- TODO: if this has meta_pages then this can be merged with IllustDetail
 data UserIllust =
   UserIllust
     { userIllust_id :: Int

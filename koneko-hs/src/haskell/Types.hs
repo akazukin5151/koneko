@@ -49,6 +49,8 @@ data Request =
     -- ^ images to display (not all of them will fit in screen)
     , urls :: [String]
     , nextUrl_ :: Maybe String
+    , image_ids :: [Maybe Int]
+    -- ^ image ids for artworks for open in browser
     }
     deriving Show
 

@@ -5,7 +5,7 @@ module Download.Core where
 
 import Common ( getEditorText, logger)
 import Types
-    ( Mode(FollowingArtists, ArtistIllustrations, SingleIllustration,
+    ( Mode(FollowingArtists, ArtistIllustrations, PixivPost,
            SearchArtists, FollowingArtistsIllustrations, RecommendedIllustrations),
       St, your_id, Request (urls, paths), requestsCache1, Event (UpdateSt), chan, currentPage1 )
 import Lens.Micro ((^.), (&), (%~), (<&>))
@@ -41,7 +41,7 @@ fetchWithPrefetchCb offset mode = fetch cb offset mode
     cb =
       case mode of
         ArtistIllustrations -> requestCallback parseUserIllustResponse prefetchAction
-        SingleIllustration -> requestCallback parseIllustDetailResponse prefetchAction
+        PixivPost -> requestCallback parseIllustDetailResponse prefetchAction
         SearchArtists -> requestCallback parseUserDetailResponse prefetchAction
         FollowingArtists -> requestCallback parseUserDetailResponse prefetchAction
         FollowingArtistsIllustrations -> requestCallback parseUserIllustResponse prefetchAction
@@ -95,7 +95,7 @@ fetch cb offset mode st dir =
       let artist_id = unpack $ getEditorText st
       userIllustRequest artist_id offset st $
         cb mode st dir
-    SingleIllustration -> do
+    PixivPost -> do
       let image_id = unpack $ getEditorText st
       illustDetailRequest image_id st $
         cb mode st dir
@@ -124,7 +124,7 @@ downloadByMode cb mode st dir sorted urls' =
   case mode of
     ArtistIllustrations ->
       downloadReplicateDir cb st dir sorted urls'
-    SingleIllustration ->
+    PixivPost ->
       downloadReplicateDir cb st dir sorted urls'
     SearchArtists ->
       downloadTakeDir cb st sorted urls'

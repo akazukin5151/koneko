@@ -68,7 +68,7 @@ welcomeUI st = [ui]
 
 fmt :: Mode -> Widget n
 fmt ArtistIllustrations           = easyBold "" "a" "rtist illustrations"
-fmt SingleIllustration            = easyBold "s" "i" "ngle illustration"
+fmt PixivPost            = easyBold "s" "i" "ngle illustration"
 fmt FollowingArtists              = easyBold "" "f" "ollowing artists"
 fmt SearchArtists                 = easyBold "" "s" "earch artists"
 fmt FollowingArtistsIllustrations = easyBold "followi" "n" "g artists illustrations"

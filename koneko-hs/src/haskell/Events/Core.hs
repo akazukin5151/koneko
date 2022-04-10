@@ -9,7 +9,7 @@ import Types
       Request(nextUrl_, paths, urls),
       Event(..),
       Mode(RecommendedIllustrations, Home, ArtistIllustrations,
-           SingleIllustration, SearchArtists, FollowingArtists,
+           PixivPost, SearchArtists, FollowingArtists,
            FollowingArtistsIllustrations),
       View(WelcomeView, PostView),
       activeView,
@@ -172,7 +172,7 @@ handleEnterView st mode = do
         let cb =
               case mode of
                 ArtistIllustrations -> requestCallback parseUserIllustResponse handleAction
-                SingleIllustration -> requestCallback parseIllustDetailResponse handleAction
+                PixivPost -> requestCallback parseIllustDetailResponse handleAction
                 SearchArtists -> requestCallback parseUserDetailResponse handleAction
                 FollowingArtists -> requestCallback parseUserDetailResponse handleAction
                 FollowingArtistsIllustrations -> requestCallback parseUserIllustResponse handleAction
@@ -229,7 +229,7 @@ downloadFromScratch mode dir st = do
     let cb =
           case mode of
             ArtistIllustrations -> requestCallback parseUserIllustResponse downloadAction
-            SingleIllustration -> requestCallback parseIllustDetailResponse downloadAction
+            PixivPost -> requestCallback parseIllustDetailResponse downloadAction
             SearchArtists -> requestCallback parseUserDetailResponse downloadAction
             FollowingArtists -> requestCallback parseUserDetailResponse downloadAction
             FollowingArtistsIllustrations -> requestCallback parseUserIllustResponse downloadAction

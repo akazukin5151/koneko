@@ -3,7 +3,7 @@ module Events.FindImages where
 
 import Types
     ( St,
-      Mode(SingleIllustration, ArtistIllustrations,
+      Mode(PixivPost, ArtistIllustrations,
            FollowingArtistsIllustrations, RecommendedIllustrations,
            SearchArtists, FollowingArtists),
       konekoDir, currentPage1, your_id )
@@ -30,7 +30,7 @@ findImagesView mode =
     RecommendedIllustrations -> findImagesRecommendedIllustrations
     SearchArtists -> findSearchArtists
     FollowingArtists -> findFollowingArtists
-    SingleIllustration -> findSingleImages
+    PixivPost -> findSingleImages
 
 findSingleImages :: St -> IO ([a], [FilePath])
 findSingleImages st = do

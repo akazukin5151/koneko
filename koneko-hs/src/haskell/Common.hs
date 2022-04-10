@@ -11,7 +11,7 @@ import Types
       editor,
       footer,
       Field,
-      Mode(SingleIllustration, FollowingArtists, SearchArtists,
+      Mode(PixivPost, FollowingArtists, SearchArtists,
            FollowingArtistsIllustrations, RecommendedIllustrations, ArtistIllustrations, Home),
       St,
       View(WelcomeView, GalleryView, ArtistListView, PostView), config )
@@ -77,7 +77,7 @@ indexToCoords ncols' idx = (x', y')
 
 validInput :: Mode -> String -> Bool
 validInput ArtistIllustrations = all isDigit
-validInput SingleIllustration = all isDigit
+validInput PixivPost = all isDigit
 validInput _ = const True
 
 viewToNRowsCols :: St -> (Int, Int)
@@ -97,7 +97,7 @@ modeToNRowsCols st =
 
 modeToView :: Mode -> View
 modeToView ArtistIllustrations           = GalleryView
-modeToView SingleIllustration            = PostView
+modeToView PixivPost            = PostView
 modeToView FollowingArtists              = ArtistListView
 modeToView FollowingArtistsIllustrations = GalleryView
 modeToView SearchArtists                 = ArtistListView

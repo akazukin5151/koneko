@@ -5,14 +5,14 @@ import Lens.Micro ( (^.) )
 import Types
     ( St,
       Mode(RecommendedIllustrations, ArtistIllustrations,
-           SingleIllustration, FollowingArtists, SearchArtists,
+           PixivPost, FollowingArtists, SearchArtists,
            FollowingArtistsIllustrations),
       modeIdx )
 
 modes :: [Mode]
 modes =
   [ ArtistIllustrations
-  , SingleIllustration
+  , PixivPost
   , FollowingArtists
   , SearchArtists
   , FollowingArtistsIllustrations

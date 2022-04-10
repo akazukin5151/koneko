@@ -25,7 +25,7 @@ data Field = CmdField
   deriving (Ord, Eq, Show)
 
 data Mode = ArtistIllustrations
-          | SingleIllustration
+          | PixivPost
           | FollowingArtists
           | SearchArtists
           | FollowingArtistsIllustrations

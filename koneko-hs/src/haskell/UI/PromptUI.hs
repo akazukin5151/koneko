@@ -12,7 +12,7 @@ import Types
       historyIdx,
       isHistoryFocused,
       Field,
-      Mode(SearchArtists, ArtistIllustrations, SingleIllustration),
+      Mode(SearchArtists, ArtistIllustrations, PixivPost),
       St )
 import Brick.Widgets.Core (txt, translateBy)
 import Common ( validInput, getEditorText )
@@ -67,5 +67,5 @@ promptUI st = [ui]
 
 modeToPromptQuestion :: Mode -> Text
 modeToPromptQuestion ArtistIllustrations = "Artist user ID"
-modeToPromptQuestion SingleIllustration = "Image ID"
+modeToPromptQuestion PixivPost = "Image ID"
 modeToPromptQuestion SearchArtists = "Search query"

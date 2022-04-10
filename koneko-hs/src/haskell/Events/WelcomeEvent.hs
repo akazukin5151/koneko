@@ -12,7 +12,7 @@ import Types
       modeIdx,
       selectedCellIdx,
       Event(ModeEnter),
-      Mode(ArtistIllustrations, SingleIllustration,
+      Mode(ArtistIllustrations, PixivPost,
            SearchArtists),
       St,
       View(PromptView), isHistoryFocused, historyIdx, history, editor, ub )
@@ -63,7 +63,7 @@ isHistoryActive :: St -> Bool
 isHistoryActive st =
   case highlightedMode st of
     ArtistIllustrations -> True
-    SingleIllustration -> True
+    PixivPost -> True
     SearchArtists -> True
     _ -> False
 
@@ -133,6 +133,6 @@ onSelectToPrompt st =
 
 onSelect :: Mode -> St -> EventM n (Next St)
 onSelect ArtistIllustrations st = onSelectToPrompt st
-onSelect SingleIllustration st  = onSelectToPrompt st
+onSelect PixivPost st  = onSelectToPrompt st
 onSelect SearchArtists st       = onSelectToPrompt st
 onSelect m st                   = onSelectNoPrompt m st

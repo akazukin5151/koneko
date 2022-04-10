@@ -5,7 +5,7 @@ import Core ( highlightedMode, intToStr )
 import Types
     ( history,
       historyIdx,
-      Mode(ArtistIllustrations, SingleIllustration,
+      Mode(ArtistIllustrations, PixivPost,
            FollowingArtists, FollowingArtistsIllustrations, SearchArtists,
            RecommendedIllustrations),
       St, konekoDir, currentPage1, your_id )
@@ -39,19 +39,19 @@ getDirectory st =
       st^.konekoDir </> "search" </> unpack (getEditorText st)
     FollowingArtists ->
       st^.konekoDir </> "following" </> fromJust (st^.your_id) <> "_new"
-    SingleIllustration ->
+    PixivPost ->
       st^.konekoDir </> "individual" </> unpack (getEditorText st)
 
 getFirstDirectory :: St -> FilePath
 getFirstDirectory st =
   case highlightedMode st of
-    SingleIllustration -> getDirectory st
+    PixivPost -> getDirectory st
     _ -> getDirectory st </> intToStr (st^.currentPage1)
 
 getNextDirectory :: St -> FilePath
 getNextDirectory st =
   case highlightedMode st of
-    SingleIllustration -> getDirectory st
+    PixivPost -> getDirectory st
     _ -> getDirectory st </> intToStr (st^.currentPage1 + 1)
 
 listDirectoryFullSorted :: FilePath -> IO [FilePath]

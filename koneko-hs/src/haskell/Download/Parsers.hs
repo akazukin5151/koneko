@@ -5,16 +5,20 @@ module Download.Parsers where
 import Core ( enumerate, intToStr)
 import System.FilePath ((</>), (<.>))
 import Serialization.In
-    ( ImageUrl(square_medium, large, original),
+    ( IllustDetail(illustDetail_meta_single_page,
+                   illustDetail_meta_pages, illustDetail_image_urls,
+                   illustDetail_title, illustDetail_user, illustDetail_id),
+      IllustDetailResponse(illustDetailResponse_illust),
+      IllustUser(illustUser_name),
+      ImageUrl(large, original, square_medium),
       MetaPage(image_urls),
-      UserIllust(title, userIllust_image_url, userIllust_id, meta_pages, meta_single_page),
-      UserIllustResponse(illusts),
-      IllustDetailResponse (illustDetailResponse_illust),
+      MetaSinglePage(original_image_url),
       ProfileImageUrl(profileImageUrl_medium),
       User(user_profile_image_urls, user_name),
-      UserPreview(userPreview_user, userPreview_illusts),
-      UserDetailResponse(userDetailResponse_user_previews, userDetailResponse_next_url),
-      IllustDetail(illustDetail_meta_pages, illustDetail_image_urls, illustDetail_title, illustDetail_user, illustDetail_id, illustDetail_meta_single_page), IllustUser (illustUser_name), next_url, MetaSinglePage (original_image_url) )
+      UserDetailResponse(userDetailResponse_next_url,
+                         userDetailResponse_user_previews),
+      UserIllustResponse(next_url, illusts),
+      UserPreview(userPreview_user, userPreview_illusts) )
 import Data.List ( sort )
 import Data.Text ( pack, unpack, splitOn )
 import Types (Request(..))
@@ -57,19 +61,19 @@ parseUserIllustResponse dir r =
     }
     where
       original_urls' = zipWith (<|>) originals_single originals_meta
-      originals_single = original_image_url . meta_single_page <$> illusts'
+      originals_single = original_image_url . illustDetail_meta_single_page <$> illusts'
       -- multiple meta pages = multiple images in a post
       -- but for downloading from this mode, only download the first image in the post
-      originals_meta = original . image_urls . head . meta_pages <$> illusts'
-      image_ids' = userIllust_id <$> illusts'
+      originals_meta = original . image_urls . head . illustDetail_meta_pages <$> illusts'
+      image_ids' = illustDetail_id <$> illusts'
       n = next_url r
       illusts' = illusts r
-      titles = title <$> illusts'
+      titles = illustDetail_title <$> illusts'
       -- default sort is by date; enumerate preserves this order
       names = [leftPad idx <> "_" <> title' <.> "jpg" | (idx, title') <- enumerate titles]
       paths' = [dir </> name' | name' <- names]
       sorted = sort paths'
-      urls' = square_medium . userIllust_image_url <$> illusts'
+      urls' = square_medium . illustDetail_image_urls <$> illusts'
 
 parseIllustDetailResponse :: String -> IllustDetailResponse -> Request
 parseIllustDetailResponse dir r =

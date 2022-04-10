@@ -37,6 +37,49 @@ data MetaSinglePage =
 
 $(deriveJSON defaultOptions ''MetaSinglePage)
 
+data Tag =
+  Tag
+    { tag_name :: String
+    , translated_name :: Maybe String
+    }
+    deriving (Show)
+
+$(deriveJSON defaultOptions
+    {fieldLabelModifier = \str -> if str == "tag_name" then "name" else str} ''Tag)
+
+data IllustUser =
+  IllustUser
+    { illustUser_id :: Int
+    , illustUser_name :: String
+    , illustUser_is_followed :: Bool
+    }
+    deriving (Show)
+
+$(deriveJSON defaultOptions
+    {fieldLabelModifier = drop (length "illustUser_")} ''IllustUser)
+
+data IllustDetail =
+  IllustDetail
+    { illustDetail_id :: Int
+    , illustDetail_title :: String
+    , illustDetail_image_urls :: ImageUrl
+    , illustDetail_caption :: String
+    , illustDetail_user :: IllustUser
+    , illustDetail_tags :: [Tag]
+    , illustDetail_tools :: [String]
+    , illustDetail_create_date :: String
+    , illustDetail_page_count :: Int
+    , illustDetail_meta_single_page :: MetaSinglePage
+    , illustDetail_meta_pages :: [MetaPage]
+    , illustDetail_total_view :: Int
+    , illustDetail_total_bookmarks :: Int
+    , illustDetail_is_bookmarked :: Bool
+    }
+    deriving Show
+
+$(deriveJSON defaultOptions
+    {fieldLabelModifier = drop (length "illustDetail_")} ''IllustDetail)
+
 data LoginUser = LoginUser { _LoginUser_id :: String }
   deriving Show
 
@@ -70,84 +113,12 @@ $(deriveJSON defaultOptions ''IPCResponse)
 
 data UserIllustResponse =
   UserIllustResponse
-    { illusts :: [UserIllust]
+    { illusts :: [IllustDetail]
     , next_url :: Maybe String
     }
     deriving (Show)
 
--- TODO: merge with IllustDetail
-data UserIllust =
-  UserIllust
-    { userIllust_id :: Int
-    , title :: String
-    , userIllust_image_url :: ImageUrl
-    , caption :: String
-    , user :: IllustUser
-    , tags :: [Tag]
-    , tools :: [String]
-    , create_date :: String
-    , page_count :: Int
-    , meta_single_page :: MetaSinglePage
-    , meta_pages :: [MetaPage]
-    , total_view :: Int
-    , total_bookmarks :: Int
-    , is_bookmarked :: Bool
-    }
-    deriving (Show)
-
-data Tag =
-  Tag
-    { tag_name :: String
-    , translated_name :: Maybe String
-    }
-    deriving (Show)
-
-data IllustUser =
-  IllustUser
-    { illustUser_id :: Int
-    , illustUser_name :: String
-    , illustUser_is_followed :: Bool
-    }
-    deriving (Show)
-
-$(deriveJSON defaultOptions
-    {fieldLabelModifier = \str -> if str == "tag_name" then "name" else str} ''Tag)
-
-$(deriveJSON defaultOptions
-    {fieldLabelModifier = drop (length "illustUser_")} ''IllustUser)
-
-$(deriveJSON defaultOptions
-    { fieldLabelModifier =
-       \case
-         "userIllust_id" -> "id"
-         "userIllust_image_url" -> "image_urls"
-         x -> x
-    } ''UserIllust)
-
 $(deriveJSON defaultOptions ''UserIllustResponse)
-
--- Doesn't need the image_urls key because it's in meta_pages already
-data IllustDetail =
-  IllustDetail
-    { illustDetail_id :: Int
-    , illustDetail_title :: String
-    , illustDetail_image_urls :: ImageUrl
-    , illustDetail_caption :: String
-    , illustDetail_user :: IllustUser
-    , illustDetail_tags :: [Tag]
-    , illustDetail_tools :: [String]
-    , illustDetail_create_date :: String
-    , illustDetail_page_count :: Int
-    , illustDetail_meta_single_page :: MetaSinglePage
-    , illustDetail_meta_pages :: [MetaPage]
-    , illustDetail_total_view :: Int
-    , illustDetail_total_bookmarks :: Int
-    , illustDetail_is_bookmarked :: Bool
-    }
-    deriving Show
-
-$(deriveJSON defaultOptions
-    {fieldLabelModifier = drop (length "illustDetail_")} ''IllustDetail)
 
 data IllustDetailResponse =
   IllustDetailResponse

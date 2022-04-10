@@ -14,7 +14,6 @@
 
 ## features
 ### feature parity
-- prefetch next page
 - continuously show new images in current slice as they finish downloading
 - check cached contents to see if they need to be re-downloaded or continue an interrupted download
 - actions on selected image (view post)

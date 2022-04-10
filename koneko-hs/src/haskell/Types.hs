@@ -51,6 +51,8 @@ data Request =
     , nextUrl_ :: Maybe String
     , image_ids :: [Maybe Int]
     -- ^ image ids for artworks for open in browser
+    , original_urls :: [Maybe String]
+    -- ^ original resolution url for downloading
     }
     deriving Show
 

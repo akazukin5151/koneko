@@ -30,6 +30,13 @@ $(deriveJSON defaultOptions ''ImageUrl)
 
 $(deriveJSON defaultOptions ''MetaPage)
 
+data MetaSinglePage =
+  MetaSinglePage
+    { original_image_url :: Maybe String
+    } deriving Show
+
+$(deriveJSON defaultOptions ''MetaSinglePage)
+
 data LoginUser = LoginUser { _LoginUser_id :: String }
   deriving Show
 
@@ -68,7 +75,7 @@ data UserIllustResponse =
     }
     deriving (Show)
 
--- TODO: if this has meta_pages then this can be merged with IllustDetail
+-- TODO: merge with IllustDetail
 data UserIllust =
   UserIllust
     { userIllust_id :: Int
@@ -80,6 +87,8 @@ data UserIllust =
     , tools :: [String]
     , create_date :: String
     , page_count :: Int
+    , meta_single_page :: MetaSinglePage
+    , meta_pages :: [MetaPage]
     , total_view :: Int
     , total_bookmarks :: Int
     , is_bookmarked :: Bool
@@ -129,6 +138,7 @@ data IllustDetail =
     , illustDetail_tools :: [String]
     , illustDetail_create_date :: String
     , illustDetail_page_count :: Int
+    , illustDetail_meta_single_page :: MetaSinglePage
     , illustDetail_meta_pages :: [MetaPage]
     , illustDetail_total_view :: Int
     , illustDetail_total_bookmarks :: Int

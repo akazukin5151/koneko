@@ -1,7 +1,8 @@
+{-# LANGUAGE GADTs #-}
 module Events.ItemActions where
 
 import Types
-    ( Event, St, selectedCellIdx, requestsCache1, currentPage1, Request (urls, image_ids), currentSlice )
+    ( Event, St, selectedCellIdx, requestsCache1, currentPage1, Request (urls, image_ids, original_urls), currentSlice )
 import Brick ( EventM, BrickEvent, Next )
 import Events.Core
     ( back,
@@ -20,6 +21,11 @@ import Data.IntMap ((!))
 import System.Process (callProcess)
 import Core (intToStr)
 import Common (viewToNRowsCols)
+import Serialization.In (IllustDetail(illustDetail_meta_single_page, illustDetail_meta_pages), MetaSinglePage (original_image_url), MetaPage (image_urls), ImageUrl (original))
+import Requests (download)
+import Lens.Micro.Internal ( Ixed, Index, IxValue )
+import System.Directory (getHomeDirectory)
+import System.FilePath ((</>), (<.>))
 
 navigableFallback :: (St -> BrickEvent n1 e -> EventM n2 (Next St)) -> St -> BrickEvent n1 e -> EventM n2 (Next St)
 navigableFallback fallback st' e' =
@@ -39,11 +45,28 @@ galleryEvent st e =
   commonEvent st e (navigableFallback galleryFallback)
 
 galleryFallback :: St -> BrickEvent n1 e -> EventM n2 (Next St)
-galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'd') [])) = continue st'
+galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'd') [])) =
+  continue =<< liftIO (downloadImage st')
 galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'o') [])) =
   continue =<< liftIO (openInBrowser st')
 galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'v') [])) = continue st'
 galleryFallback st' _ = continue st'
+
+downloadImage :: St -> IO St
+downloadImage st = do
+  case (m_original_url, m_image_id) of
+    (Just (Just url), Just (Just image_id)) -> do
+      home <- getHomeDirectory
+      e_st <- download cb st [url] [home </> "Downloads"] [intToStr image_id <.> "jpg"]
+      case e_st of
+        Right s -> pure s
+        _ -> pure st
+    _ -> pure st
+  where
+    -- TODO: report status in footer
+    cb _ _ = pure ()
+    m_original_url = getNthFromCachedRequest original_urls st
+    m_image_id = getNthFromCachedRequest image_ids st
 
 openInBrowser :: St -> IO St
 openInBrowser st =
@@ -54,12 +77,20 @@ openInBrowser st =
       pure st
     _ -> pure st
   where
+    m_image_id = getNthFromCachedRequest image_ids st
+
+getNthFromCachedRequest
+  :: (Ixed s, Index s ~ Int)
+  => (Request -> s)
+  -> St
+  -> Maybe (IxValue s)
+getNthFromCachedRequest f st = f request ^? ix idx
+  where
     (nrows, ncols) = viewToNRowsCols st
     imgs_in_slice = nrows * ncols
     offset = imgs_in_slice * st^.currentSlice
     idx = st^.selectedCellIdx + offset
     request = (st^.requestsCache1) ! (st^.currentPage1)
-    m_image_id = (request & image_ids) ^? ix idx
 
 artistListViewEvent :: St -> BrickEvent n Event -> EventM n2 (Next St)
 artistListViewEvent st e =

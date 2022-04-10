@@ -5,19 +5,20 @@ module Download.Parsers where
 import Core ( enumerate, intToStr)
 import System.FilePath ((</>), (<.>))
 import Serialization.In
-    ( ImageUrl(square_medium, large),
+    ( ImageUrl(square_medium, large, original),
       MetaPage(image_urls),
-      UserIllust(title, userIllust_image_url, userIllust_id),
+      UserIllust(title, userIllust_image_url, userIllust_id, meta_pages, meta_single_page),
       UserIllustResponse(illusts),
       IllustDetailResponse (illustDetailResponse_illust),
       ProfileImageUrl(profileImageUrl_medium),
       User(user_profile_image_urls, user_name),
       UserPreview(userPreview_user, userPreview_illusts),
       UserDetailResponse(userDetailResponse_user_previews, userDetailResponse_next_url),
-      IllustDetail(illustDetail_meta_pages, illustDetail_image_urls, illustDetail_title, illustDetail_user, illustDetail_id), IllustUser (illustUser_name), next_url )
+      IllustDetail(illustDetail_meta_pages, illustDetail_image_urls, illustDetail_title, illustDetail_user, illustDetail_id, illustDetail_meta_single_page), IllustUser (illustUser_name), next_url, MetaSinglePage (original_image_url) )
 import Data.List ( sort )
 import Data.Text ( pack, unpack, splitOn )
 import Types (Request(..))
+import Control.Applicative ((<|>))
 
 leftPad :: Int -> String
 leftPad num | num <= 9 = "0" <> intToStr num
@@ -52,8 +53,14 @@ parseUserIllustResponse dir r =
     , urls = urls'
     , nextUrl_ = n
     , image_ids = Just <$> image_ids'
+    , original_urls = original_urls'
     }
     where
+      original_urls' = zipWith (<|>) originals_single originals_meta
+      originals_single = original_image_url . meta_single_page <$> illusts'
+      -- multiple meta pages = multiple images in a post
+      -- but for downloading from this mode, only download the first image in the post
+      originals_meta = original . image_urls . head . meta_pages <$> illusts'
       image_ids' = userIllust_id <$> illusts'
       n = next_url r
       illusts' = illusts r
@@ -72,13 +79,17 @@ parseIllustDetailResponse dir r =
     , urls = urls'
     , nextUrl_ = Nothing
     , image_ids = [Just image_ids']
+    , original_urls = [original_urls']
     }
     where
+      original_urls' = originals_single <|> originals_meta
+      originals_single = original_image_url . illustDetail_meta_single_page $ illusts'
+      originals_meta = original . image_urls . head . illustDetail_meta_pages $ illusts'
       illusts' = illustDetailResponse_illust r
       image_ids' = illustDetail_id illusts'
-      meta_pages = illustDetail_meta_pages illusts'
+      meta_pages' = illustDetail_meta_pages illusts'
       -- it's not possible to get the titles without another query, so whatever
-      urls' = large . image_urls <$> meta_pages
+      urls' = large . image_urls <$> meta_pages'
       -- TODO: efficiency
       names = [
           leftPad idx <> "_" <> unpack (last $ splitOn "/" $ pack url)
@@ -94,6 +105,7 @@ parseUserDetailResponse dir r =
     , urls = urls'
     , nextUrl_ = n
     , image_ids = image_ids'
+    , original_urls = original_urls'
     }
     where
       n = userDetailResponse_next_url r
@@ -107,16 +119,21 @@ parseUserDetailResponse dir r =
           , user_name u <.> "jpg"
           , \idx -> dir </> leftPad idx <> "_" <> user_name u </> "profile"
           , Nothing
+          , Nothing
           )
         | u <- users']
 
       illust_stuff =
-        [ ( square_medium $ illustDetail_image_urls i
+        [
+        let originals_single = original_image_url . illustDetail_meta_single_page $ i
+            originals_meta = original . image_urls . head . illustDetail_meta_pages $ i in
+          ( square_medium $ illustDetail_image_urls i
           , filter (/= '/') $ illustDetail_title i <.> "jpg"
           , \idx ->
               dir
               </> leftPad idx <> "_" <> illustUser_name (illustDetail_user i) </> "previews"
           , Just $ illustDetail_id i
+          , originals_single <|> originals_meta
           )
         | i <- concat illusts'
         ]
@@ -134,7 +151,8 @@ parseUserDetailResponse dir r =
           ]
 
       interleaved = interleave user_stuff illust_stuff
-      urls' = (\(a, _, _, _) -> a) <$> interleaved
-      image_ids' = (\(_, _, _, a) -> a) <$> interleaved
-      names = (\(i, (_, a, _, _)) -> leftPad i <> "_" <> a) <$> enumerate interleaved
+      urls' = (\(a, _, _, _, _) -> a) <$> interleaved
+      image_ids' = (\(_, _, _, a, _) -> a) <$> interleaved
+      original_urls' = (\(_, _, _, _, a) -> a) <$> interleaved
+      names = (\(i, (_, a, _, _, _)) -> leftPad i <> "_" <> a) <$> enumerate interleaved
       full_paths = zipWith (</>) dirs names

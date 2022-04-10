@@ -50,7 +50,7 @@ parseUserIllustResponse dir r =
     { labels_ = []
     , paths = sorted
     , urls = urls'
-    , nextUrl_ = Just n
+    , nextUrl_ = n
     }
     where
       n = next_url r

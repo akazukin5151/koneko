@@ -64,7 +64,7 @@ $(deriveJSON defaultOptions ''IPCResponse)
 data UserIllustResponse =
   UserIllustResponse
     { illusts :: [UserIllust]
-    , next_url :: String
+    , next_url :: Maybe String
     }
     deriving (Show)
 

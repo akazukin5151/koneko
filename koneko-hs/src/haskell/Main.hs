@@ -134,7 +134,7 @@ main' home config' sock = do
       writeBChan chan' res
     case new_st of
       Left _ -> pure ()
-      Right x -> writeBChan chan' (RequestFinished x)
+      Right x -> writeBChan chan' (UpdateSt x)
 
   let buildVty = V.mkVty V.defaultConfig
   initialVty <- buildVty

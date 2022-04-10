@@ -62,7 +62,7 @@ commonEvent st e fallback =
   case e of
     AppEvent (ModeEnter mode)           -> continue =<< liftIO (handleEnterView st mode)
     AppEvent (LoginResult e_i)          -> continue =<< liftIO (handleLogin st e_i)
-    AppEvent (RequestFinished new_st)   -> continue new_st
+    AppEvent (UpdateSt new_st)   -> continue new_st
     AppEvent (IPCReceived r)            -> continue =<< liftIO (handle st r)
     _                                   -> fallback st e
 
@@ -154,7 +154,7 @@ back st = do
 
 handleAction :: St -> Mode -> p -> Request -> IO ()
 handleAction st' mode _ r' = do
-  writeBChan (st'^.chan) (RequestFinished new_st')
+  writeBChan (st'^.chan) (UpdateSt new_st')
   prefetchInner new_st' mode
     where
       new_st' = st' & requestsCache1 .~ singleton 1 r'
@@ -178,7 +178,7 @@ handleEnterView st mode = do
                 FollowingArtistsIllustrations -> requestCallback parseUserIllustResponse handleAction
                 RecommendedIllustrations -> requestCallback parseUserIllustResponse handleAction
         Right new_st' <- fetchFirst cb mode new_st dir
-        writeBChan (st^.chan) (RequestFinished new_st')
+        writeBChan (st^.chan) (UpdateSt new_st')
       pure new_st
     else do
       let func st' = downloadFromScratch mode dir st'
@@ -198,8 +198,7 @@ prefetchInner st mode = do
         case r' of
           Left _ -> pure ()
           Right new_st ->
-            -- TODO: abusing RequestFinished to just update the st and do nothing else
-            writeBChan (st^.chan) (RequestFinished new_st)
+            writeBChan (st^.chan) (UpdateSt new_st)
 
 prefetchInBg :: St -> IO St
 prefetchInBg st = do
@@ -210,11 +209,11 @@ prefetchInBg st = do
 downloadAction :: St -> Mode -> [Char] -> Request -> IO ()
 downloadAction st' mode dir r' = do
     let new_st = st' & requestsCache1 .~ singleton 1 r'
-    writeBChan (st'^.chan) (RequestFinished new_st)
+    writeBChan (st'^.chan) (UpdateSt new_st)
     e_new_st <- downloadByMode cb mode new_st dir (paths r') (urls r')
     case e_new_st of
       Right x -> do
-        writeBChan (st'^.chan) (RequestFinished x)
+        writeBChan (st'^.chan) (UpdateSt x)
         prefetchInner x mode
       _ -> pure ()
     where
@@ -236,7 +235,7 @@ downloadFromScratch mode dir st = do
             FollowingArtistsIllustrations -> requestCallback parseUserIllustResponse downloadAction
             RecommendedIllustrations -> requestCallback parseUserIllustResponse downloadAction
     Right s <- fetchFirst cb mode st dir
-    writeBChan (st^.chan) (RequestFinished s)
+    writeBChan (st^.chan) (UpdateSt s)
   pure st
 
 handleLogin :: St -> Either a String -> IO St

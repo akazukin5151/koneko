@@ -38,7 +38,7 @@ data Mode = ArtistIllustrations
 
 data Event = ModeEnter Mode
            | LoginResult (Either String String)
-           | RequestFinished St
+           | UpdateSt St
            | IPCReceived IPCResponse
 
 data Request =

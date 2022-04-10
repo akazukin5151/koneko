@@ -7,7 +7,7 @@ import Common ( getEditorText, logger)
 import Types
     ( Mode(FollowingArtists, ArtistIllustrations, SingleIllustration,
            SearchArtists, FollowingArtistsIllustrations, RecommendedIllustrations),
-      St, your_id, Request (urls, paths), requestsCache1, Event (RequestFinished), chan, currentPage1 )
+      St, your_id, Request (urls, paths), requestsCache1, Event (UpdateSt), chan, currentPage1 )
 import Lens.Micro ((^.), (&), (%~), (<&>))
 import Requests (userIllustRequest, illustDetailRequest, searchUserRequest, userFollowingRequest, illustFollowRequest, illustRecommendedRequest )
 import Data.Text ( unpack )
@@ -70,7 +70,7 @@ prefetchAction :: St -> Mode -> FilePath -> Request -> IO ()
 prefetchAction st mode dir r' = do
   let idx = st^.currentPage1 + 1
   let new_st = st & requestsCache1 %~ insert idx r'
-  writeBChan (st^.chan) (RequestFinished new_st)
+  writeBChan (st^.chan) (UpdateSt new_st)
   -- download only if dir doesn't exist or is empty
   cond <-
     andM (doesDirectoryExist dir) (listDirectory dir <&> (not <<< null))
@@ -78,7 +78,7 @@ prefetchAction st mode dir r' = do
     let cb _ _ = pure ()
     m_new_st <- downloadByMode cb mode new_st dir (paths r') (urls r')
     case m_new_st of
-      Right x -> writeBChan (new_st^.chan) (RequestFinished x)
+      Right x -> writeBChan (new_st^.chan) (UpdateSt x)
       _ -> pure ()
 
 

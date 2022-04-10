@@ -30,9 +30,6 @@ data Mode = ArtistIllustrations
           | SearchArtists
           | FollowingArtistsIllustrations
           | RecommendedIllustrations
-          | Info
-          | Manual
-          | BrowseCache
           | Home
           deriving Eq
 

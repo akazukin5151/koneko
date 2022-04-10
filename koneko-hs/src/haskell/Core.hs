@@ -3,11 +3,11 @@ module Core where
 import Data.Maybe (fromJust)
 import Lens.Micro ( (^.) )
 import Types
-    ( modeIdx,
-      Mode(SingleIllustration, FollowingArtists, SearchArtists,
-           FollowingArtistsIllustrations, RecommendedIllustrations, Info,
-           Manual, BrowseCache, ArtistIllustrations),
-      St, )
+    ( St,
+      Mode(RecommendedIllustrations, ArtistIllustrations,
+           SingleIllustration, FollowingArtists, SearchArtists,
+           FollowingArtistsIllustrations),
+      modeIdx )
 
 modes :: [Mode]
 modes =
@@ -17,9 +17,6 @@ modes =
   , SearchArtists
   , FollowingArtistsIllustrations
   , RecommendedIllustrations
-  , Info
-  , Manual
-  , BrowseCache
   ]
 
 enumerate :: [a] -> [(Int, a)]

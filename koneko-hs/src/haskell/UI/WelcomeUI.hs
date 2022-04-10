@@ -73,9 +73,6 @@ fmt FollowingArtists              = easyBold "" "f" "ollowing artists"
 fmt SearchArtists                 = easyBold "" "s" "earch artists"
 fmt FollowingArtistsIllustrations = easyBold "followi" "n" "g artists illustrations"
 fmt RecommendedIllustrations      = easyBold "" "r" "ecommended illustrations"
-fmt Info                          = txt "Info"
-fmt Manual                        = txt "Manual"
-fmt BrowseCache                   = txt "Browse cache (offline)"
 fmt Home                          = txt "This should not happen"
 
 easyBold :: Text -> Text -> Text -> Widget n

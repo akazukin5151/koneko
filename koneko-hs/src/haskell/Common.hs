@@ -103,7 +103,6 @@ modeToView FollowingArtistsIllustrations = GalleryView
 modeToView SearchArtists                 = ArtistListView
 modeToView RecommendedIllustrations      = GalleryView
 modeToView Home                          = WelcomeView
-modeToView _ = error "if this mode doesn't have a view, perhaps it shouldn't be a mode"
 
 getEditorText :: St -> Text
 getEditorText st = T.unwords $ getEditContents $ st^.editor

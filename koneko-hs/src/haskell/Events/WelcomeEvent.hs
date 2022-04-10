@@ -109,30 +109,30 @@ historySelect st = do
      then do
        new_st <- liftIO $ select st
        let newer_st = new_st & editor %~ applyEdit (const $ textZipper [input] Nothing)
-       onSelectNoPrompt new_mode newer_st
+       continue =<< liftIO (onSelectNoPrompt new_mode newer_st)
      else continue st
 
 modeSelect :: St -> EventM n (Next St)
 modeSelect st = do
   new_st <- liftIO $ select st
-  onSelect (modeIdxtoMode (new_st ^. modeIdx)) new_st
+  continue =<< liftIO (onSelect (modeIdxtoMode (new_st ^. modeIdx)) new_st)
 
-onSelectNoPrompt :: Mode -> St -> EventM n (Next St)
+onSelectNoPrompt :: Mode -> St -> IO St
 onSelectNoPrompt m st = do
   let new_st = st & selectedCellIdx .~ 0
                   & activeView .~ modeToView m
                   & currentSlice .~ 0
                   & updateFooter
-  liftIO $ writeBChan (new_st^.chan) (ModeEnter m)
-  continue new_st
+  writeBChan (new_st^.chan) (ModeEnter m)
+  pure new_st
 
-onSelectToPrompt :: St -> EventM n (Next St)
+onSelectToPrompt :: St -> IO St
 onSelectToPrompt st =
-  continue $ st & activeView .~ PromptView
-                & updateFooter
+  pure $ st & activeView .~ PromptView
+            & updateFooter
 
-onSelect :: Mode -> St -> EventM n (Next St)
+onSelect :: Mode -> St -> IO St
 onSelect ArtistIllustrations st = onSelectToPrompt st
-onSelect PixivPost st  = onSelectToPrompt st
+onSelect PixivPost st           = onSelectToPrompt st
 onSelect SearchArtists st       = onSelectToPrompt st
 onSelect m st                   = onSelectNoPrompt m st

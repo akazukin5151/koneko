@@ -14,7 +14,7 @@ import Types
       Mode(SingleIllustration, FollowingArtists, SearchArtists,
            FollowingArtistsIllustrations, RecommendedIllustrations, ArtistIllustrations, Home),
       St,
-      View(WelcomeView, GalleryView, ArtistListView, SingleImageView), config )
+      View(WelcomeView, GalleryView, ArtistListView, PostView), config )
 import Data.Char (isDigit)
 import Brick.Widgets.Edit (getEditContents)
 import Brick ( Widget, txt )
@@ -84,7 +84,7 @@ viewToNRowsCols :: St -> (Int, Int)
 viewToNRowsCols st =
   case st^.activeView of
     ArtistListView -> (st^.config.nrows, 5)
-    SingleImageView -> (2, 3)
+    PostView -> (2, 3)
     _ -> (st^.config.nrows, st^.config.ncols)
 
 -- | Uses highlighted mode, which is not necessarily the current mode
@@ -92,12 +92,12 @@ modeToNRowsCols :: St -> (Int, Int)
 modeToNRowsCols st =
   case modeToView $ highlightedMode st of
     ArtistListView -> (st^.config.nrows, 5)
-    SingleImageView -> (2, 3)
+    PostView -> (2, 3)
     _ -> (st^.config.nrows, st^.config.ncols)
 
 modeToView :: Mode -> View
 modeToView ArtistIllustrations           = GalleryView
-modeToView SingleIllustration            = SingleImageView
+modeToView SingleIllustration            = PostView
 modeToView FollowingArtists              = ArtistListView
 modeToView FollowingArtistsIllustrations = GalleryView
 modeToView SearchArtists                 = ArtistListView
@@ -118,7 +118,7 @@ defaultViewFooter st =
     -- highlighted
     ArtistListView ->
       txt " [i]llusts  [n]ext [p]revious  [b]ack [q]uit"
-    SingleImageView ->
+    PostView ->
       txt " [o]pen in browser [f]ull res [d]ownload [r]elated  [n]ext [p]revious  [b]ack [q]uit"
     WelcomeView -> initialFooter
 

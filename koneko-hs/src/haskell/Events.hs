@@ -1,7 +1,7 @@
 module Events where
 
 import Types
-    ( activeView, Event, Field, St, View(PromptView, WelcomeView, GalleryView, ArtistListView), View(SingleImageView) )
+    ( activeView, Event, Field, St, View(PromptView, WelcomeView, GalleryView, ArtistListView), View(PostView) )
 import Brick ( EventM, BrickEvent, Next )
 import Events.WelcomeEvent (welcomeEvent)
 import Lens.Micro ((^.))
@@ -16,4 +16,4 @@ appEvent st e =
     PromptView -> promptEvent st e
     GalleryView -> galleryEvent st e
     ArtistListView -> artistListViewEvent st e
-    SingleImageView -> postViewEvent st e
+    PostView -> postViewEvent st e

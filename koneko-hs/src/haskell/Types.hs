@@ -18,7 +18,7 @@ data View = GalleryView
           | WelcomeView
           | PromptView
           | ArtistListView
-          | SingleImageView
+          | PostView
           deriving Eq
 
 data Field = CmdField

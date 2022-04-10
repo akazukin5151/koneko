@@ -11,7 +11,7 @@ import Types
       Mode(RecommendedIllustrations, Home, ArtistIllustrations,
            SingleIllustration, SearchArtists, FollowingArtists,
            FollowingArtistsIllustrations),
-      View(WelcomeView, SingleImageView),
+      View(WelcomeView, PostView),
       activeView,
       chan,
       currentPage1,
@@ -137,7 +137,7 @@ handleN st = handleSliceOrPage (+1) (st^.currentSlice < totalSlices st) 0 st
 -- currentSlice is 0-indexed so need to subtract 1
 totalSlices :: St -> Int
 totalSlices st
-  | st^.activeView == SingleImageView = length images - 1
+  | st^.activeView == PostView = length images - 1
   | otherwise = length images `div` (ncols*nrows) - 1
   where
     (nrows, ncols) = viewToNRowsCols st

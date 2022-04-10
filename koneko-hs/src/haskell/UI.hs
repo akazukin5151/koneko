@@ -7,7 +7,7 @@ import UI.ArtistListUI ( artistListUI )
 import UI.SingleImageUI ( singleImageUI )
 import Types
     ( activeView,
-      View(SingleImageView, GalleryView, WelcomeView, PromptView,
+      View(PostView, GalleryView, WelcomeView, PromptView,
            ArtistListView), Field, St )
 import Lens.Micro ((^.))
 import Brick (Widget)
@@ -19,4 +19,4 @@ drawUI st =
     WelcomeView -> welcomeUI st
     PromptView -> promptUI st
     ArtistListView -> artistListUI st
-    SingleImageView -> singleImageUI st
+    PostView -> singleImageUI st

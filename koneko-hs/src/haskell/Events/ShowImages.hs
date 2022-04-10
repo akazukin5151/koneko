@@ -12,6 +12,7 @@ import Graphics.Ueberzug
       Ueberzug )
 import Lens.Micro ((^.), (.~), (&), (^?), ix)
 import System.FilePath (takeFileName)
+import Control.Monad (when)
 
 showImagesView :: St -> St -> [FilePath] -> IO St
 showImagesView st =
@@ -155,7 +156,8 @@ showImageSingle ub' (idx, filepath) = do
 -- because it does not require knowledge of the total number of images
 showImageSingle' :: Ueberzug -> (Int, FilePath) -> IO ()
 showImageSingle' ub' (idx, filepath) = do
-  showImageInner px py xposF yposF wF hF ub' filepath
+  when (idx <= 4) $
+    showImageInner px py xposF yposF wF hF ub' filepath
     where
       tmp = indexToCoords 3 idx
       (px, py) =

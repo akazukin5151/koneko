@@ -4,7 +4,7 @@
 module Events.ItemActions where
 
 import Types
-    ( Event, St, selectedCellIdx, requestsCache1, currentPage1, Request (urls, image_ids, original_urls), currentSlice )
+    ( Event, St, selectedCellIdx, requestsCache1, currentPage1, Request (urls, image_ids, original_urls), currentSlice, editor, Mode (PixivPost) )
 import Brick ( EventM, BrickEvent, Next )
 import Events.Core
     ( back,
@@ -13,13 +13,13 @@ import Events.Core
       handleK,
       handleL,
       handleN,
-      handleP, commonEvent )
+      handleP, commonEvent, clearImages )
 import Brick.Types ( BrickEvent(VtyEvent) )
 import qualified Graphics.Vty as V
 import Brick.Main ( continue, halt )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
-import Lens.Micro ((^.), (&), (^?), ix)
-import Data.IntMap ((!))
+import Lens.Micro ((^.), (&), (^?), ix, (%~), (<&>), (.~))
+import Data.IntMap ((!), empty)
 import System.Process (callProcess)
 import Core (intToStr, continueL)
 import Common (viewToNRowsCols)
@@ -29,6 +29,9 @@ import Lens.Micro.Internal ( Ixed, Index, IxValue )
 import System.Directory (getHomeDirectory)
 import System.FilePath ((</>), (<.>))
 import Data.Text (splitOn, unpack, pack)
+import Brick.Widgets.Edit (applyEdit)
+import Data.Text.Zipper (textZipper)
+import Events.WelcomeEvent (onSelectNoPrompt)
 
 navigableFallback :: (St -> BrickEvent n1 e -> EventM n2 (Next St)) -> St -> BrickEvent n1 e -> EventM n2 (Next St)
 navigableFallback fallback st' e' =
@@ -52,8 +55,24 @@ galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'd') [])) =
   continueL $ downloadImage st'
 galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'o') [])) =
   continueL $ openInBrowser st'
-galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'v') [])) = continue st'
+galleryFallback st' (VtyEvent (V.EvKey (V.KChar 'v') [])) =
+  continueL $ viewPost st'
 galleryFallback st' _ = continue st'
+
+viewPost :: St -> IO St
+viewPost st = do
+  case m_image_id of
+    Just (Just image_id) -> do
+      let new_editor = const $ textZipper [pack $ intToStr image_id] Nothing
+      clearImages st
+      -- TODO: ideally keep the cache separated by modes
+      let new_st = st & editor %~ applyEdit new_editor
+                      & requestsCache1 .~ empty
+                      & currentPage1 .~ 1
+      onSelectNoPrompt PixivPost new_st
+    _ -> pure st
+  where
+    m_image_id = getNthFromCachedRequest image_ids st
 
 downloadImage :: St -> IO St
 downloadImage st = do

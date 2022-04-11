@@ -2,7 +2,7 @@
 
 module Events.Core where
 
-import Common ( coordsToIndex, indexToCoords,  viewToNRowsCols, updateFooter, nextOffset, logger)
+import Common ( coordsToIndex, indexToCoords,  viewToNRowsCols, updateFooter, nextOffset, logger, getEditorText)
 import Core ( intToStr, highlightedMode, continueL)
 import Types
     ( St,
@@ -39,7 +39,7 @@ import Events.Common ( getDirectory, listDirectoryFullSorted, getFirstDirectory,
 import System.Directory (doesDirectoryExist, listDirectory)
 import Download.Core (fetchFirst, downloadByMode, fetchWithPrefetchCb, requestCallback)
 import Brick (txt, BrickEvent (AppEvent), continue)
-import Data.Text (pack)
+import Data.Text (pack, unpack)
 import Control.Arrow ((<<<), (>>>))
 import Control.Concurrent (forkIO)
 import System.Directory.Internal (andM)
@@ -103,6 +103,10 @@ clearImages st =
 
 handleSliceOrPage :: (Int -> Int) -> Bool -> Int -> St -> IO St
 handleSliceOrPage f isSamePage sliceReset st = do
+  logger "st^.currentSlice" (st^.currentSlice)
+  logger "(st^.requestsCache1)" (st^.requestsCache1)
+  logger "(st^.currentPage1)" (st^.currentPage1)
+  logger "(st^.activeView)" (st^.activeView)
   if isSamePage
      then do
        clearImages st
@@ -161,7 +165,7 @@ handleAction st' mode _ r' = do
 
 handleEnterView :: St -> Mode -> IO St
 handleEnterView st mode = do
-  let dir = getFirstDirectory st
+  let dir = getFirstDirectory st mode
   cond <- andM (doesDirectoryExist dir) (listDirectory dir <&> (not <<< null))
   if cond
     then do

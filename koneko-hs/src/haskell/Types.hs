@@ -19,7 +19,7 @@ data View = GalleryView
           | PromptView
           | ArtistListView
           | PostView
-          deriving Eq
+          deriving (Eq, Show)
 
 data Field = CmdField
   deriving (Ord, Eq, Show)
@@ -31,7 +31,7 @@ data Mode = ArtistIllustrations
           | FollowingArtistsIllustrations
           | RecommendedIllustrations
           | Home
-          deriving Eq
+          deriving (Eq, Show)
 
 data Event = ModeEnter Mode
            | LoginResult (Either String String)

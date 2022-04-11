@@ -91,12 +91,15 @@ parseIllustDetailResponse dir r =
           [] -> [originals_single]
           xs -> xs
       originals_single = original_image_url . illustDetail_meta_single_page $ illusts'
-      originals_meta = original . image_urls <$> illustDetail_meta_pages illusts'
+      originals_meta = original . image_urls <$> meta_pages'
       illusts' = illustDetailResponse_illust r
       image_ids' = illustDetail_id illusts'
       meta_pages' = illustDetail_meta_pages illusts'
-      -- it's not possible to get the titles without another query, so whatever
-      urls' = large . image_urls <$> meta_pages'
+      -- if there are multiple pages, use meta_pages -> image_urls -> large
+      -- if there is only one page, use image_urls -> large
+      urls'  = case meta_pages' of
+                [] -> [large $ illustDetail_image_urls illusts']
+                xs -> large . image_urls <$> xs
       -- TODO: efficiency
       names = [
           leftPad idx <> "_" <> unpack (last $ splitOn "/" $ pack url)

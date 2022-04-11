@@ -26,9 +26,9 @@ historyDown st = st & historyIdx %~ wrapped (length (st ^. history) - 1) (+1)
 historyUp :: St -> St
 historyUp st = st & historyIdx %~ wrapped (length (st ^. history) - 1) (subtract 1)
 
-getDirectory :: St -> FilePath
-getDirectory st =
-  case highlightedMode st of
+getDirectoryFromMode :: St -> Mode -> FilePath
+getDirectoryFromMode st mode =
+  case mode of
     ArtistIllustrations ->
       st^.konekoDir </> unpack (getEditorText st)
     FollowingArtistsIllustrations ->
@@ -42,11 +42,15 @@ getDirectory st =
     PixivPost ->
       st^.konekoDir </> "individual" </> unpack (getEditorText st)
 
-getFirstDirectory :: St -> FilePath
-getFirstDirectory st =
-  case highlightedMode st of
-    PixivPost -> getDirectory st
-    _ -> getDirectory st </> intToStr (st^.currentPage1)
+getDirectory :: St -> FilePath
+getDirectory st =
+  getDirectoryFromMode st $ highlightedMode st
+
+getFirstDirectory :: St -> Mode -> FilePath
+getFirstDirectory st mode =
+  case mode of
+    PixivPost -> getDirectoryFromMode st mode
+    _ -> getDirectoryFromMode st mode </> intToStr (st^.currentPage1)
 
 getNextDirectory :: St -> FilePath
 getNextDirectory st =

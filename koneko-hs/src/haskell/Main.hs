@@ -125,12 +125,12 @@ main' home config' sock = do
   let st = initialState ub' chan' config' konekoDir' conn'
   void $ forkIO $ do
     new_st <- login (config'^.refreshToken) st $ \ir -> do
-      res <-
-        case ir of
-          LoginInfo lr -> do
-            let e_id = _LoginUser_id $ _LoginResponse_user lr
-            pure (LoginResult $ Right e_id)
-          _ -> pure (LoginResult $ Left "Wrong response type")
+      let res =
+            case ir of
+              LoginInfo lr -> do
+                let e_id = _LoginUser_id $ _LoginResponse_user lr
+                LoginResult $ Right e_id
+              _ -> LoginResult $ Left "Wrong response type"
       writeBChan chan' res
     case new_st of
       Left _ -> pure ()

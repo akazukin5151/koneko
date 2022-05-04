@@ -118,8 +118,9 @@ artistListViewEvent :: St -> BrickEvent n Event -> EventM n2 (Next St)
 artistListViewEvent st e =
   commonEvent st e (navigableFallback artistListViewFallback)
 
+-- i for image, a for artist
 artistListViewFallback st' (VtyEvent (V.EvKey (V.KChar 'i') [])) = continue st'
-artistListViewFallback st' (VtyEvent (V.EvKey (V.KChar 'v') [])) = continue st'
+artistListViewFallback st' (VtyEvent (V.EvKey (V.KChar 'a') [])) = continue st'
 artistListViewFallback st' _ = continue st'
 
 postViewEvent :: St -> BrickEvent n1 Event -> EventM n2 (Next St)

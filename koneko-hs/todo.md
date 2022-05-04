@@ -1,6 +1,7 @@
 # todo
 
 ## bugs
+- when starting, history tab is visible, then disappears. returns when scrolling
 - there is a delay for going to mode -> getting request into cache. during that delay, pressing n will crash. 1) try to remove that delay if possible; 2) don't crash, just ignore
     - going to second page when everything is already downloaded doesn't need to wait for the request, and should do with no delay.
 - mode 2: when download finishes, going next doesn't clear the first image. it will clear when you go back and next again
@@ -20,6 +21,12 @@
 ## features
 ### feature parity
 - actions on selected image (view post)
+    - open
+    - download
+    - full res
+    - recommended (similar)
+    - view selected image in postview
+    - view selected artist in galleryview
 - check cached contents to see if they need to be re-downloaded or continue an interrupted download
 - download progress indicator (a progress bar would be a new feature, above parity)
 - interactive lscat assistant

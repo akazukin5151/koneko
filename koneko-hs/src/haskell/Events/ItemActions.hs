@@ -19,7 +19,7 @@ import qualified Graphics.Vty as V
 import Brick.Main ( continue, halt )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
 import Lens.Micro ((^.), (&), (^?), ix, (%~), (<&>), (.~))
-import Data.IntMap ((!), empty)
+import Data.IntMap ((!), empty, (!?))
 import System.Process (callProcess)
 import Core (intToStr, continueL)
 import Common (viewToNRowsCols)
@@ -106,13 +106,14 @@ getNthFromCachedRequest
   => (Request -> s)
   -> St
   -> Maybe (IxValue s)
-getNthFromCachedRequest f st = f request ^? ix idx
+getNthFromCachedRequest f st = do
+  request <- (st^.requestsCache1) !? (st^.currentPage1)
+  f request ^? ix idx
   where
     (nrows, ncols) = viewToNRowsCols st
     imgs_in_slice = nrows * ncols
     offset = imgs_in_slice * st^.currentSlice
     idx = st^.selectedCellIdx + offset
-    request = (st^.requestsCache1) ! (st^.currentPage1)
 
 artistListViewEvent :: St -> BrickEvent n Event -> EventM n2 (Next St)
 artistListViewEvent st e =
@@ -159,8 +160,8 @@ downloadImageInPost st =
         4 -> 0
         5 -> 4
         x -> x
-    request = (st^.requestsCache1) ! (st^.currentPage1)
-    m_original_url = original_urls request ^? ix (idx + offset)
+    m_request = (st^.requestsCache1) !? (st^.currentPage1)
+    m_original_url = m_request >>= \request -> original_urls request ^? ix (idx + offset)
 
 openPostInBrowser :: St -> IO St
 openPostInBrowser st =
@@ -171,6 +172,6 @@ openPostInBrowser st =
       pure st
     _ -> pure st
   where
-    request = (st^.requestsCache1) ! (st^.currentPage1)
+    m_request = (st^.requestsCache1) !? (st^.currentPage1)
     -- a post only has one valid image_id for every image
-    m_image_id = (request & image_ids) ^? ix 0
+    m_image_id = m_request >>= \request -> (request & image_ids) ^? ix 0

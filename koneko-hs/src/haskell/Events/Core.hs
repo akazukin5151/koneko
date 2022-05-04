@@ -43,7 +43,7 @@ import Data.Text (pack, unpack)
 import Control.Arrow ((<<<), (>>>))
 import Control.Concurrent (forkIO)
 import System.Directory.Internal (andM)
-import Data.IntMap (singleton, (!))
+import Data.IntMap (singleton, (!), (!?))
 import Serialization.In (IPCResponses(Downloaded), IPCResponse (ident, IPCResponse, response))
 import Download.Parsers
     ( parseIllustDetailResponse,
@@ -118,8 +118,9 @@ handleSliceOrPage f isSamePage sliceReset st = do
        clearImages st
        let new_st = st & currentSlice %~ f
                        & displayedImages .~ []
-       let images = (st^.requestsCache1) ! (st^.currentPage1) & paths
-       showImagesView st new_st images
+       case (st^.requestsCache1) !? (st^.currentPage1) of
+         Just x -> showImagesView st new_st $ paths x
+         Nothing -> pure new_st
      else do
        -- TODO: if this is done while waiting for login (eg, if internet was slow)
        -- then early-return (pure st), aka do nothing
@@ -141,19 +142,26 @@ handleSliceOrPage f isSamePage sliceReset st = do
 
 handleP :: St -> IO St
 handleP st =
-  handleSliceOrPage (subtract 1) (st^.currentSlice > 0) (totalSlices st) st
+  case totalSlices st of
+    Just x -> handleSliceOrPage (subtract 1) (st^.currentSlice > 0) x st
+    Nothing -> pure st
 
 handleN :: St -> IO St
-handleN st = handleSliceOrPage (+1) (st^.currentSlice < totalSlices st) 0 st
+handleN st =
+  case totalSlices st of
+    Just x -> handleSliceOrPage (+1) (st^.currentSlice < x) 0 st
+    Nothing -> pure st
 
 -- currentSlice is 0-indexed so need to subtract 1
-totalSlices :: St -> Int
-totalSlices st
-  | st^.activeView == PostView = length images - 1
-  | otherwise = length images `div` (ncols*nrows) - 1
+totalSlices :: St -> Maybe Int
+totalSlices st = do
+  x <- (st^.requestsCache1) !? (st^.currentPage1)
+  let images = paths x
+  pure $ if st^.activeView == PostView
+     then length images - 1
+     else length images `div` (ncols*nrows) - 1
   where
     (nrows, ncols) = viewToNRowsCols st
-    images = (st^.requestsCache1) ! (st^.currentPage1) & paths
 
 back :: St -> IO St
 back st = do
@@ -211,8 +219,8 @@ prefetchInner st mode = do
   -- which means user is already logged in
   let dir = fromJust $ getNextDirectory st
   void $ forkIO $ do
-    let d = (st^.requestsCache1) ! (st^.currentPage1)
-    case d & nextUrl_ >>= (pack >>> nextOffset) of
+    let d = (st^.requestsCache1) !? (st^.currentPage1)
+    case d >>= nextUrl_ >>= (pack >>> nextOffset) of
       Nothing -> pure ()
       Just no -> do
         r' <- fetchWithPrefetchCb no mode st dir

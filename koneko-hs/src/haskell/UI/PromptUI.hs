@@ -69,3 +69,4 @@ modeToPromptQuestion :: Mode -> Text
 modeToPromptQuestion ArtistIllustrations = "Artist user ID"
 modeToPromptQuestion PixivPost = "Image ID"
 modeToPromptQuestion SearchArtists = "Search query"
+modeToPromptQuestion _ = "Unknown"

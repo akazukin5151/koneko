@@ -14,7 +14,7 @@ import Types
       Mode(PixivPost, FollowingArtists, SearchArtists,
            FollowingArtistsIllustrations, RecommendedIllustrations, ArtistIllustrations, Home),
       St,
-      View(WelcomeView, GalleryView, ArtistListView, PostView), config )
+      View(WelcomeView, GalleryView, ArtistListView, PostView, PromptView), config )
 import Data.Char (isDigit)
 import Brick.Widgets.Edit (getEditContents)
 import Brick ( Widget, txt )
@@ -120,6 +120,8 @@ defaultViewFooter st =
     PostView ->
       txt " [o]pen in browser [f]ull res [d]ownload [r]elated  [n]ext [p]revious  [b]ack [q]uit"
     WelcomeView -> initialFooter
+    -- TODO: not shown yet
+    PromptView -> txt "Type query, tab to cycle focus"
 
 initialFooter :: Widget n
 initialFooter =

@@ -73,6 +73,7 @@ onEnterInner ans st = do
                        & currentSlice .~ 0
                        & isHistoryFocused .~ False
                        & historyIdx .~ 0
+                       & updateFooter
        saveHistory (st^.konekoDir) (st^.modeIdx) ans
        writeBChan (new_st^.chan) (ModeEnter new_mode)
        pure new_st

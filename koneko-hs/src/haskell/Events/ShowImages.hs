@@ -20,6 +20,9 @@ showImagesView st =
     GalleryView -> showImagesSimple (showImageView st) id
     ArtistListView -> showImagesSimple (showImageView st) (subtract 1)
     PostView -> showImagesSingle
+    _ -> \_ _ -> pure st
+
+-- TODO: welcome and prompt doesn't need this
 
 showImageView :: St -> Ueberzug -> (Int, FilePath) -> IO ()
 showImageView st =
@@ -33,6 +36,7 @@ showImageView st =
       let ys = st^.config.artistListView & artistListViewConfig_image_ycoords
       showImageSimple st 4 xs ys
     PostView -> showImageSingle'
+    _ -> \_ _ -> pure ()
 
 showImageInner
   :: a

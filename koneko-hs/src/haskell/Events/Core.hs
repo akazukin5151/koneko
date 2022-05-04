@@ -11,7 +11,7 @@ import Types
       Mode(RecommendedIllustrations, ArtistIllustrations,
            PixivPost, SearchArtists, FollowingArtists,
            FollowingArtistsIllustrations),
-      View(WelcomeView, PostView),
+      View(HomeView, PostView),
       activeView,
       chan,
       currentPage1,
@@ -52,7 +52,7 @@ import Download.Parsers
 import Control.Monad.IO.Class (MonadIO(..))
 import qualified Data.IntMap as M
 import Brick.Types (EventM, Next)
-import Graphics (displayWelcomeImage)
+import Graphics (displayHomeImage)
 
 commonEvent
   :: St
@@ -70,7 +70,7 @@ commonEvent st e fallback =
 
 returnHome :: St -> IO St
 returnHome st =
-  displayWelcomeImage st <&> (& activeView .~ WelcomeView)
+  displayHomeImage st <&> (& activeView .~ HomeView)
 
 handle :: St -> IPCResponse -> IO St
 handle st IPCResponse {ident = i, response = r} = do
@@ -158,7 +158,7 @@ back st = do
   mapM_ (clear (st^.ub)) (takeFileName <$> st^.displayedImages)
   writeBChan (st^.chan) (ReturnToHome)
   pure $ st & editor %~ applyEdit clearZipper
-            & activeView .~ WelcomeView
+            & activeView .~ HomeView
             & displayedImages .~ []
             & updateFooter
 

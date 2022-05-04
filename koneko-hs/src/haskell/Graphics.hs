@@ -22,17 +22,17 @@ radioInner st = do
   pure $ st & history .~ (fst <$> parseHistoryFile st file)
 
 onAppStart :: MonadIO m => St -> m St
-onAppStart st = liftIO (radioInner st >>= displayWelcomeImage)
+onAppStart st = liftIO (radioInner st >>= displayHomeImage)
 
-displayWelcomeImage :: St -> IO St
-displayWelcomeImage st = do
+displayHomeImage :: St -> IO St
+displayHomeImage st = do
   Right () <-
     draw (st^.ub) $ defaultUbConf
-      { identifier = "welcome"
+      { identifier = "home"
       , path = takeDirectory (st^.konekoDir) </> "pics/71471144_p0.png"
       , x = 1
       , y = 1
       , width = Just 28
       , height = Just 28
       }
-  pure $ st & displayedImages .~ ["welcome"]
+  pure $ st & displayedImages .~ ["home"]

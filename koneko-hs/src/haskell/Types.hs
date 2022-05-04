@@ -15,7 +15,7 @@ import qualified Data.IntMap.Lazy as Lazy
 import qualified Data.IntMap.Strict as Strict
 
 data View = GalleryView
-          | WelcomeView
+          | HomeView
           | PromptView
           | ArtistListView
           | PostView
@@ -90,7 +90,7 @@ data St =
     , _history :: [Text]
     -- ^ history of highlighted mode to display
     , _isHistoryFocused :: Bool
-    -- ^ Whether the history layer should be focused in welcome view
+    -- ^ Whether the history layer should be focused in home view
     , _historyIdx :: Int
     -- ^ The index of the focused history entry
     , _footer :: Widget Field

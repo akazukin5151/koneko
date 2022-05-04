@@ -12,7 +12,7 @@ import Types
       modeIdx,
       Event(ModeEnter, LoginResult, ReturnToHome),
       selectedCellIdx,
-      View(WelcomeView),
+      View(HomeView),
       currentSlice,
       konekoDir,
       isHistoryFocused,
@@ -56,7 +56,7 @@ promptEvent st e =
 back :: St -> IO St
 back st = do
   writeBChan (st^.chan) (ReturnToHome)
-  pure $ st & activeView .~ WelcomeView
+  pure $ st & activeView .~ HomeView
             & isHistoryFocused .~ False
             & historyIdx .~ 0
             & updateFooter

@@ -22,7 +22,7 @@ showImagesView st =
     PostView -> showImagesSingle
     _ -> \_ _ -> pure st
 
--- TODO: welcome and prompt doesn't need this
+-- TODO: home and prompt doesn't need this
 
 showImageView :: St -> Ueberzug -> (Int, FilePath) -> IO ()
 showImageView st =

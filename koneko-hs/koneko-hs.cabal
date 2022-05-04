@@ -42,13 +42,13 @@ executable koneko-hs
                        UI.GalleryUI,
                        UI.PromptUI,
                        UI.SingleImageUI,
-                       UI.WelcomeUI,
+                       UI.HomeUI,
 
                        Events.Core,
                        Events.Common,
                        Events.FindImages,
                        Events.ShowImages,
-                       Events.WelcomeEvent,
+                       Events.HomeEvent,
                        Events.PromptEvent,
                        Events.ItemActions
 

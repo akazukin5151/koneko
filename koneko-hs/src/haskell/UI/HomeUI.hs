@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module UI.WelcomeUI where
+module UI.HomeUI where
 
 import Brick
     ( Widget,
@@ -29,8 +29,8 @@ import UI.Common (colorFocused, mapEnumerate)
 import Brick.Widgets.Center (hCenter)
 import Data.Text (Text, pack)
 
-welcomeUI :: St -> [Widget Field]
-welcomeUI st = [ui]
+homeUI :: St -> [Widget Field]
+homeUI st = [ui]
   where
     ui =
       translateBy (Location (2, 0)) $

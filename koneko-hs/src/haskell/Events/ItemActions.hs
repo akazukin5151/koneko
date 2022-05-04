@@ -31,7 +31,7 @@ import System.FilePath ((</>), (<.>))
 import Data.Text (splitOn, unpack, pack)
 import Brick.Widgets.Edit (applyEdit)
 import Data.Text.Zipper (textZipper)
-import Events.WelcomeEvent (onSelectNoPrompt)
+import Events.HomeEvent (onSelectNoPrompt)
 
 navigableFallback :: (St -> BrickEvent n1 e -> EventM n2 (Next St)) -> St -> BrickEvent n1 e -> EventM n2 (Next St)
 navigableFallback fallback st' e' =

@@ -38,9 +38,9 @@ data Config =
     , _refreshToken :: String
     -- ^ Refresh token for your pixiv account
     , _imageWidth :: Int
-    -- ^ Width of all images (except on the welcome and info pages)
+    -- ^ Width of all images (except on the home and info pages)
     , _imageHeight :: Int
-    -- ^ Height of all images (except on the welcome and info pages)
+    -- ^ Height of all images (except on the home and info pages)
     , _boxWidth :: Int
     -- ^ Width of all boxes (around the images)
     , _boxHeight :: Int

@@ -1,4 +1,4 @@
-module Events.WelcomeEvent where
+module Events.HomeEvent where
 
 import Core ( modes, modeIdxtoMode, highlightedMode, strToInt )
 import Common ( validInput, modeToView, updateFooter )
@@ -30,8 +30,8 @@ import Data.Text (unpack)
 import Graphics.Ueberzug (clear)
 import Core (continueL)
 
-welcomeEvent :: St -> BrickEvent n1 Event -> EventM n2 (Next St)
-welcomeEvent st e =
+homeEvent :: St -> BrickEvent n1 Event -> EventM n2 (Next St)
+homeEvent st e =
   commonEvent st e (\st e ->
     case e of
       VtyEvent (V.EvKey V.KEsc []) -> halt st
@@ -97,7 +97,7 @@ handleEnter = handle historySelect modeSelect
 
 select :: St -> IO St
 select st = do
-  Right () <- clear (st^.ub) "welcome"
+  Right () <- clear (st^.ub) "home"
   pure $ st & displayedImages .~ []
             & isHistoryFocused .~ False
             & historyIdx .~ 0

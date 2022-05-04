@@ -18,7 +18,7 @@ import Types
       View(PromptView), isHistoryFocused, historyIdx, history, editor, ub )
 import Brick ( continue, halt )
 import qualified Graphics.Vty as V
-import Lens.Micro ((^.), (.~), (&), (%~))
+import Lens.Micro ((^.), (.~), (&), (%~), ix, (^?))
 import Control.Monad.IO.Class (MonadIO(liftIO))
 import Brick.Types ( EventM, BrickEvent(VtyEvent), Next )
 import Brick.BChan ( writeBChan )
@@ -104,14 +104,16 @@ select st = do
 
 historySelect :: St -> EventM n (Next St)
 historySelect st = do
-  let input = (st^.history) !! (st^.historyIdx)
-  let new_mode = modeIdxtoMode (st ^. modeIdx)
-  if validInput new_mode $ unpack input
-     then do
-       new_st <- liftIO $ select st
-       let newer_st = new_st & editor %~ applyEdit (const $ textZipper [input] Nothing)
-       continueL $ onSelectNoPrompt new_mode newer_st
-     else continue st
+  case (st^.history) ^? ix (st^.historyIdx) of
+    Nothing -> continue st
+    Just input -> do
+      let new_mode = modeIdxtoMode (st ^. modeIdx)
+      if validInput new_mode $ unpack input
+         then do
+           new_st <- liftIO $ select st
+           let newer_st = new_st & editor %~ applyEdit (const $ textZipper [input] Nothing)
+           continueL $ onSelectNoPrompt new_mode newer_st
+         else continue st
 
 modeSelect :: St -> EventM n (Next St)
 modeSelect st = do

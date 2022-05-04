@@ -104,17 +104,19 @@ showImagesSingle st images = do
       showImageSingle (st^.ub) (1, main_img)
       pure $ st & displayedImages .~ [takeFileName main_img]
     _ -> do
-      let main_img = images !! c
-      let other_imgs = drop (c + 1) images
-      let subset = take 4 other_imgs
-      case subset of
-        (x' : xs) -> do
-          let i = [x'] <> [main_img] <> xs
-          mapM_ (showImageSingle (st^.ub)) (enumerate i)
-          pure $ st & displayedImages .~ (takeFileName <$> i)
-        [] -> do
-          showImageSingle (st^.ub) (1, main_img)
-          pure $ st & displayedImages .~ [takeFileName main_img]
+      case images ^? ix c of
+        Nothing -> pure st
+        Just main_img -> do
+          let other_imgs = drop (c + 1) images
+          let subset = take 4 other_imgs
+          case subset of
+            (x' : xs) -> do
+              let i = [x'] <> [main_img] <> xs
+              mapM_ (showImageSingle (st^.ub)) (enumerate i)
+              pure $ st & displayedImages .~ (takeFileName <$> i)
+            [] -> do
+              showImageSingle (st^.ub) (1, main_img)
+              pure $ st & displayedImages .~ [takeFileName main_img]
 
 -- todo replace this one with showImageSingle'
 showImageSingle :: Ueberzug -> (Int, FilePath) -> IO ()

@@ -21,7 +21,7 @@ import Types
       St, Field )
 import Brick ( continue, BrickEvent(VtyEvent, AppEvent), handleEventLensed )
 import qualified Graphics.Vty as V
-import Lens.Micro ((^.), (.~), (&), (%~))
+import Lens.Micro ((^.), (.~), (&), (%~), (^?), ix)
 import Control.Monad.IO.Class (MonadIO(liftIO))
 import Brick.Widgets.Edit (handleEditorEvent, applyEdit)
 import qualified Brick.Types as T
@@ -82,10 +82,11 @@ onEnterNormal :: St -> IO St
 onEnterNormal st = onEnterInner (getEditorText st) st
 
 onEnterHistory :: St -> IO St
-onEnterHistory st = onEnterInner ans new_st
-  where
-    new_st = st & editor %~ applyEdit (const (textZipper [ans] Nothing))
-    ans = (st^.history) !! (st^.historyIdx)
+onEnterHistory st =
+  case (st^.history) ^? ix (st^.historyIdx) of
+    Nothing -> pure st
+    Just ans ->
+      onEnterInner ans $ st & editor %~ applyEdit (const (textZipper [ans] Nothing))
 
 saveHistory :: FilePath -> Int -> Text -> IO ()
 saveHistory dir mi input = T.appendFile file text

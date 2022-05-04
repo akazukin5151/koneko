@@ -28,7 +28,7 @@ import Types
 import Graphics.Ueberzug ( clear )
 import Control.Monad (void)
 import Lens.Micro ((^.), (.~), (&), (%~), (?~), (<&>))
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust)
 import System.FilePath (takeFileName, (</>))
 import Brick.BChan (writeBChan)
 import Brick.Widgets.Edit (applyEdit)
@@ -121,7 +121,9 @@ handleSliceOrPage f isSamePage sliceReset st = do
        let images = (st^.requestsCache1) ! (st^.currentPage1) & paths
        showImagesView st new_st images
      else do
-       let next_dir = getDirectory st </> intToStr (f (st^.currentPage1))
+       -- TODO: if this is done while waiting for login (eg, if internet was slow)
+       -- then early-return (pure st), aka do nothing
+       let next_dir = fromJust (getDirectory st) </> intToStr (f (st^.currentPage1))
        has_next <- doesDirectoryExist next_dir
        if has_next
          then do
@@ -171,7 +173,14 @@ handleAction st' mode _ r' = do
 
 handleEnterView :: St -> Mode -> IO St
 handleEnterView st mode = do
-  let dir = getFirstDirectory st mode
+  case getFirstDirectory st mode of
+    Just dir -> handleEnterViewI dir st mode
+    Nothing -> do
+      let func st' = handleEnterViewI (fromJust $ getFirstDirectory st mode) st' mode
+      pure $ st & pendingOnLogin ?~ func
+
+handleEnterViewI :: FilePath -> St -> Mode -> IO St
+handleEnterViewI dir st mode = do
   cond <- andM (doesDirectoryExist dir) (listDirectory dir <&> (not <<< null))
   if cond
     then do
@@ -198,7 +207,9 @@ handleEnterView st mode = do
 
 prefetchInner :: St -> Mode -> IO ()
 prefetchInner st mode = do
-  let dir = getNextDirectory st
+  -- safety: prefetching only happens after downloading the current dir
+  -- which means user is already logged in
+  let dir = fromJust $ getNextDirectory st
   void $ forkIO $ do
     let d = (st^.requestsCache1) ! (st^.currentPage1)
     case d & nextUrl_ >>= (pack >>> nextOffset) of
@@ -251,10 +262,11 @@ downloadFromScratch mode dir st = do
 handleLogin :: St -> Either a String -> IO St
 handleLogin st (Left e) = pure $ st & footer .~ txt "Login failed"
 handleLogin st (Right i) = do
-  new_st <-
-    case st^.pendingOnLogin of
-      Just f -> f st
-      Nothing -> pure st
-  pure $ new_st & your_id ?~ i
-                & footer .~ txt "Login succeed"
-                & pendingOnLogin .~ Nothing
+  let new_st = st & your_id ?~ i
+  case st^.pendingOnLogin of
+    Just f -> f new_st <&> clearer
+    Nothing -> pure $ clearer new_st
+  where
+    clearer st' =
+      st' & footer .~ txt "Login succeed"
+          & pendingOnLogin .~ Nothing

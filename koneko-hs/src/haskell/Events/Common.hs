@@ -9,7 +9,7 @@ import Types
            FollowingArtists, FollowingArtistsIllustrations, SearchArtists,
            RecommendedIllustrations),
       St, konekoDir, currentPage1, your_id )
-import Lens.Micro ((^.), (&), (%~))
+import Lens.Micro ((^.), (&), (%~), (<&>))
 import System.FilePath ((</>))
 import System.Directory (listDirectory)
 import Data.List (sort)
@@ -26,37 +26,37 @@ historyDown st = st & historyIdx %~ wrapped (length (st ^. history) - 1) (+1)
 historyUp :: St -> St
 historyUp st = st & historyIdx %~ wrapped (length (st ^. history) - 1) (subtract 1)
 
-getDirectoryFromMode :: St -> Mode -> FilePath
+getDirectoryFromMode :: St -> Mode -> Maybe FilePath
 getDirectoryFromMode st mode =
   case mode of
     ArtistIllustrations ->
-      st^.konekoDir </> unpack (getEditorText st)
+      Just $ st^.konekoDir </> unpack (getEditorText st)
     FollowingArtistsIllustrations ->
-      st^.konekoDir </> "illustfollow"
+      Just $ st^.konekoDir </> "illustfollow"
     RecommendedIllustrations ->
-      st^.konekoDir </> "recommended"
+      Just $ st^.konekoDir </> "recommended"
     SearchArtists ->
-      st^.konekoDir </> "search" </> unpack (getEditorText st)
+      Just $ st^.konekoDir </> "search" </> unpack (getEditorText st)
     FollowingArtists ->
-      st^.konekoDir </> "following" </> fromJust (st^.your_id) <> "_new"
+      (st^.your_id) <&> \x -> st^.konekoDir </> "following" </> x <> "_new"
     PixivPost ->
-      st^.konekoDir </> "individual" </> unpack (getEditorText st)
+      Just $ st^.konekoDir </> "individual" </> unpack (getEditorText st)
 
-getDirectory :: St -> FilePath
+getDirectory :: St -> Maybe FilePath
 getDirectory st =
   getDirectoryFromMode st $ highlightedMode st
 
-getFirstDirectory :: St -> Mode -> FilePath
+getFirstDirectory :: St -> Mode -> Maybe FilePath
 getFirstDirectory st mode =
   case mode of
     PixivPost -> getDirectoryFromMode st mode
-    _ -> getDirectoryFromMode st mode </> intToStr (st^.currentPage1)
+    _ -> getDirectoryFromMode st mode <&> (</> intToStr (st^.currentPage1))
 
-getNextDirectory :: St -> FilePath
+getNextDirectory :: St -> Maybe FilePath
 getNextDirectory st =
   case highlightedMode st of
     PixivPost -> getDirectory st
-    _ -> getDirectory st </> intToStr (st^.currentPage1 + 1)
+    _ -> getDirectory st <&> (</> intToStr (st^.currentPage1 + 1))
 
 listDirectoryFullSorted :: FilePath -> IO [FilePath]
 listDirectoryFullSorted dir = do

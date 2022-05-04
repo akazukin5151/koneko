@@ -16,13 +16,13 @@ import Control.Monad.IO.Class (MonadIO(liftIO))
 import qualified Data.Text.IO as T
 import History (parseHistoryFile)
 
-radioInner :: St -> IO St
-radioInner st = do
+loadHistory :: St -> IO St
+loadHistory st = do
   file <- T.readFile (st^.konekoDir </> "history_new")
   pure $ st & history .~ (fst <$> parseHistoryFile st file)
 
 onAppStart :: MonadIO m => St -> m St
-onAppStart st = liftIO (radioInner st >>= displayHomeImage)
+onAppStart st = liftIO (loadHistory st >>= displayHomeImage)
 
 displayHomeImage :: St -> IO St
 displayHomeImage st = do

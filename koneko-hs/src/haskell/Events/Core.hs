@@ -8,7 +8,7 @@ import Types
     ( St,
       Request(nextUrl_, paths, urls),
       Event(..),
-      Mode(RecommendedIllustrations, Home, ArtistIllustrations,
+      Mode(RecommendedIllustrations, ArtistIllustrations,
            PixivPost, SearchArtists, FollowingArtists,
            FollowingArtistsIllustrations),
       View(WelcomeView, PostView),
@@ -52,6 +52,7 @@ import Download.Parsers
 import Control.Monad.IO.Class (MonadIO(..))
 import qualified Data.IntMap as M
 import Brick.Types (EventM, Next)
+import Graphics (displayWelcomeImage)
 
 commonEvent
   :: St
@@ -61,10 +62,15 @@ commonEvent
 commonEvent st e fallback =
   case e of
     AppEvent (ModeEnter mode)  -> continueL $ handleEnterView st mode
+    AppEvent ReturnToHome      -> continueL $ returnHome st
     AppEvent (LoginResult e_i) -> continueL $ handleLogin st e_i
     AppEvent (UpdateSt new_st) -> continue new_st
     AppEvent (IPCReceived r)   -> continueL $ handle st r
     _                          -> fallback st e
+
+returnHome :: St -> IO St
+returnHome st =
+  displayWelcomeImage st <&> (& activeView .~ WelcomeView)
 
 handle :: St -> IPCResponse -> IO St
 handle st IPCResponse {ident = i, response = r} = do
@@ -150,7 +156,7 @@ totalSlices st
 back :: St -> IO St
 back st = do
   mapM_ (clear (st^.ub)) (takeFileName <$> st^.displayedImages)
-  writeBChan (st^.chan) (ModeEnter Home)
+  writeBChan (st^.chan) (ReturnToHome)
   pure $ st & editor %~ applyEdit clearZipper
             & activeView .~ WelcomeView
             & displayedImages .~ []

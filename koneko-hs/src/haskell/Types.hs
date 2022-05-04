@@ -30,10 +30,10 @@ data Mode = ArtistIllustrations
           | SearchArtists
           | FollowingArtistsIllustrations
           | RecommendedIllustrations
-          | Home
           deriving (Eq, Show)
 
 data Event = ModeEnter Mode
+           | ReturnToHome
            | LoginResult (Either String String)
            | UpdateSt St
            | IPCReceived IPCResponse

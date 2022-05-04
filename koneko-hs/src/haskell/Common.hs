@@ -12,7 +12,7 @@ import Types
       footer,
       Field,
       Mode(PixivPost, FollowingArtists, SearchArtists,
-           FollowingArtistsIllustrations, RecommendedIllustrations, ArtistIllustrations, Home),
+           FollowingArtistsIllustrations, RecommendedIllustrations, ArtistIllustrations),
       St,
       View(WelcomeView, GalleryView, ArtistListView, PostView, PromptView), config )
 import Data.Char (isDigit)
@@ -102,7 +102,6 @@ modeToView FollowingArtists              = ArtistListView
 modeToView FollowingArtistsIllustrations = GalleryView
 modeToView SearchArtists                 = ArtistListView
 modeToView RecommendedIllustrations      = GalleryView
-modeToView Home                          = WelcomeView
 
 getEditorText :: St -> Text
 getEditorText st = T.unwords $ getEditContents $ st^.editor

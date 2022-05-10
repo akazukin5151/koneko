@@ -20,17 +20,17 @@ wrapped :: Int -> (Int -> Int) -> Int -> Int
 wrapped lim f x' | 0 <= f x' && f x' <= lim = f x'
                  | otherwise                = x'
 
-historyDown :: St -> St
-historyDown st = st & historyIdx %~ wrapped (length historyHighlighted - 1) (+1)
+abstractHistory :: (Int -> Int) -> St -> St
+abstractHistory f st = st & historyIdx %~ wrapped (length historyHighlighted - 1) f
   where
     historyHighlighted =
       filter (\(mode, _) -> mode == highlightedMode st) $ st^.history
 
+historyDown :: St -> St
+historyDown = abstractHistory (+1)
+
 historyUp :: St -> St
-historyUp st = st & historyIdx %~ wrapped (length historyHighlighted - 1) (subtract 1)
-  where
-    historyHighlighted =
-      filter (\(mode, _) -> mode == highlightedMode st) $ st^.history
+historyUp = abstractHistory (subtract 1)
 
 getDirectoryFromMode :: St -> Mode -> Maybe FilePath
 getDirectoryFromMode st mode =

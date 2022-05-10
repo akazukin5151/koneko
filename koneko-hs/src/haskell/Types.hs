@@ -87,8 +87,8 @@ data St =
     -- UI stuff
     , _editor :: Editor Text Field
     -- ^ The editor for prompts that ask for artist id or search str
-    , _history :: [Text]
-    -- ^ history of highlighted mode to display
+    , _history :: [(Mode, Text)]
+    -- ^ history of all modes
     , _isHistoryFocused :: Bool
     -- ^ Whether the history layer should be focused in home view
     , _historyIdx :: Int

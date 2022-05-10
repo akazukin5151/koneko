@@ -2,7 +2,6 @@ module Events.HomeEvent where
 
 import Core ( modes, modeIdxtoMode, highlightedMode, strToInt )
 import Common ( validInput, modeToView, updateFooter )
-import Graphics ( radioInner )
 import Events.Common ( historyDown, historyUp, wrapped)
 import Types
     ( activeView,
@@ -36,29 +35,27 @@ homeEvent st e =
     case e of
       VtyEvent (V.EvKey V.KEsc []) -> halt st
       VtyEvent (V.EvKey (V.KChar 'q') []) -> halt st
-      VtyEvent (V.EvKey (V.KChar 'j') []) -> continueL $ handleDown st
-      VtyEvent (V.EvKey (V.KChar 'k') []) -> continueL $ handleUp st
+      VtyEvent (V.EvKey (V.KChar 'j') []) -> continue $ handleDown st
+      VtyEvent (V.EvKey (V.KChar 'k') []) -> continue $ handleUp st
       VtyEvent (V.EvKey (V.KChar '\t') []) | isHistoryActive st ->
         continue $ st & isHistoryFocused %~ not
-      VtyEvent (V.EvKey (V.KChar c) []) -> continueL $ handleJump st c
+      VtyEvent (V.EvKey (V.KChar c) []) -> continue $ handleJump st c
       VtyEvent (V.EvKey V.KEnter []) -> handleEnter st
       _ -> continue st
    )
 
-handleJump :: St -> Char -> IO St
-handleJump st 'a' = radioInner $ st & modeIdx .~ 0
-handleJump st 'i' = radioInner $ st & modeIdx .~ 1
-handleJump st 'f' = radioInner $ st & modeIdx .~ 2
-handleJump st 's' = radioInner $ st & modeIdx .~ 3
-handleJump st 'n' = radioInner $ st & modeIdx .~ 4
-handleJump st 'r' = radioInner $ st & modeIdx .~ 5
-handleJump st d | isDigit d =
-  if digit >= 0 && digit <= (length modes - 1)
-     then radioInner $ st & modeIdx .~ digit
-     else pure st
+handleJump :: St -> Char -> St
+handleJump st 'a' = st & modeIdx .~ 0
+handleJump st 'i' = st & modeIdx .~ 1
+handleJump st 'f' = st & modeIdx .~ 2
+handleJump st 's' = st & modeIdx .~ 3
+handleJump st 'n' = st & modeIdx .~ 4
+handleJump st 'r' = st & modeIdx .~ 5
+handleJump st d
+  | isDigit d && digit >= 0 && digit <= (length modes - 1) = st & modeIdx .~ digit
   where
     digit = strToInt [d]
-handleJump st _   = pure st
+handleJump st _   = st
 
 isHistoryActive :: St -> Bool
 isHistoryActive st =
@@ -74,23 +71,20 @@ handle f g st =
      then f st
      else g st
 
-handleUp :: St -> IO St
-handleUp = handle (pure . historyUp) radioUp
+handleUp :: St -> St
+handleUp = handle historyUp radioUp
 
-handleDown :: St -> IO St
-handleDown = handle (pure . historyDown) radioDown
+handleDown :: St -> St
+handleDown = handle historyDown radioDown
 
-radioDown :: St -> IO St
-radioDown = radio (\st -> st^.modeIdx == (length modes - 1)) (+1)
+radioDown :: St -> St
+radioDown = radio (+1)
 
-radioUp :: St -> IO St
-radioUp = radio (\st -> st^.modeIdx == 0) (subtract 1)
+radioUp :: St -> St
+radioUp = radio (subtract 1)
 
-radio :: (St -> Bool) -> (Int -> Int) -> St -> IO St
-radio cond _ st | cond st = pure st
-radio _ f st = do
-  let new_st = st & modeIdx %~ wrapped (length modes) f
-  radioInner new_st
+radio :: (Int -> Int) -> St -> St
+radio f st = st & modeIdx %~ wrapped (length modes - 1) f
 
 handleEnter :: St -> EventM n (Next St)
 handleEnter = handle historySelect modeSelect
@@ -104,9 +98,9 @@ select st = do
 
 historySelect :: St -> EventM n (Next St)
 historySelect st = do
-  case (st^.history) ^? ix (st^.historyIdx) of
+  case historyHighlighted ^? ix (st^.historyIdx) of
     Nothing -> continue st
-    Just input -> do
+    Just (_, input) -> do
       let new_mode = modeIdxtoMode (st ^. modeIdx)
       if validInput new_mode $ unpack input
          then do
@@ -114,6 +108,9 @@ historySelect st = do
            let newer_st = new_st & editor %~ applyEdit (const $ textZipper [input] Nothing)
            continueL $ onSelectNoPrompt new_mode newer_st
          else continue st
+  where
+    historyHighlighted =
+      filter (\(mode, _) -> mode == highlightedMode st) $ st^.history
 
 modeSelect :: St -> EventM n (Next St)
 modeSelect st = do

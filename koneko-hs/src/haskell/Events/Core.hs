@@ -52,7 +52,7 @@ import Download.Parsers
 import Control.Monad.IO.Class (MonadIO(..))
 import qualified Data.IntMap as M
 import Brick.Types (EventM, Next)
-import Graphics (displayHomeImage)
+import Common (displayHomeImage)
 
 commonEvent
   :: St

@@ -12,7 +12,7 @@ import Brick
       vLimit,
       withAttr,
       Location(Location) )
-import Core ( modes, enumerate, intToStr )
+import Core ( modes, enumerate, intToStr, highlightedMode )
 import Types
     ( footer,
       history,
@@ -38,6 +38,8 @@ homeUI st = [ui]
 
     historyText =
       st^.history
+      & filter (\(mode, _) -> mode == highlightedMode st)
+      <&> snd
       <&> txt
       & mapEnumerate g
       & vBox

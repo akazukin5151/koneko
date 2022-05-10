@@ -2,13 +2,13 @@
 
 module Main where
 
-import Graphics ( onAppStart )
+import Common ( initialFooter, displayHomeImage )
 import Types
 import Serialization.In
     ( LoginResponse(_LoginResponse_user), LoginUser(_LoginUser_id), IPCResponses (LoginInfo) )
 import Events ( appEvent )
 import UI ( drawUI )
-import Lens.Micro ((^.))
+import Lens.Micro ((^.), (&), (.~))
 import qualified Graphics.Vty as V
 import Brick.Main
   ( App(..)
@@ -23,7 +23,7 @@ import Graphics.Ueberzug
     ( newUeberzug )
 import System.Directory (getHomeDirectory, removePathForcibly)
 import qualified Brick.Widgets.Edit as E
-import Brick.BChan (newBChan, writeBChan)
+import Brick.BChan (newBChan, writeBChan, BChan)
 import System.FilePath ((</>))
 import Network.Socket
     ( maxListenQueue,
@@ -47,9 +47,11 @@ import Config.Types ( Config, pythonProcessPath, refreshToken )
 import Requests (login)
 import Control.Concurrent (forkIO)
 import Control.Monad (void)
-import Common (initialFooter)
 import Data.IntMap.Lazy (empty)
 import Sockets (recvAll)
+import Control.Monad.IO.Class (MonadIO (liftIO))
+import qualified Data.Text.IO as T
+import History (parseHistoryFile)
 
 initialState ub' chan' config' konekoDir' conn' =
   St { _selectedCellIdx = 0
@@ -82,13 +84,40 @@ theMap = attrMap V.defAttr
   , ("shortcut", withStyle mempty bold)
   ]
 
-theApp =
+theApp config' =
   App { appDraw = drawUI
       , appChooseCursor = showFirstCursor
       , appHandleEvent = appEvent
-      , appStartEvent = onAppStart
+      , appStartEvent = onAppStart config'
       , appAttrMap = const theMap
       }
+
+loadHistory :: St -> IO St
+loadHistory st = do
+  file <- T.readFile (st^.konekoDir </> "history_new")
+  pure $ st & history .~ parseHistoryFile file
+
+onAppStart :: MonadIO m => Config -> St -> m St
+onAppStart config' st =
+  liftIO $ do
+    s <- loadHistory st
+    loginInBackground config' s
+    displayHomeImage s
+
+loginInBackground :: Config -> St -> IO ()
+loginInBackground config' st =
+  void $ forkIO $ do
+    new_st <- login (config'^.refreshToken) st $ \ir -> do
+      let res =
+            case ir of
+              LoginInfo lr -> do
+                let e_id = _LoginUser_id $ _LoginResponse_user lr
+                LoginResult $ Right e_id
+              _ -> LoginResult $ Left "Wrong response type"
+      writeBChan (st^.chan) res
+    case new_st of
+      Left _ -> pure ()
+      Right x -> writeBChan (st^.chan) (UpdateSt x)
 
 main :: IO ()
 main = do
@@ -123,22 +152,9 @@ main' home config' sock = do
     recvAll chan' conn'
 
   let st = initialState ub' chan' config' konekoDir' conn'
-  void $ forkIO $ do
-    new_st <- login (config'^.refreshToken) st $ \ir -> do
-      let res =
-            case ir of
-              LoginInfo lr -> do
-                let e_id = _LoginUser_id $ _LoginResponse_user lr
-                LoginResult $ Right e_id
-              _ -> LoginResult $ Left "Wrong response type"
-      writeBChan chan' res
-    case new_st of
-      Left _ -> pure ()
-      Right x -> writeBChan chan' (UpdateSt x)
-
   let buildVty = V.mkVty V.defaultConfig
   initialVty <- buildVty
-  let app = theApp
+  let app = theApp config'
   _final_state <- customMain initialVty buildVty (Just chan') app st
   --threadDelay 1000000
   -- _ <- clear (_final_state^.ub) "crab"

@@ -27,6 +27,15 @@ import Control.Monad ((>=>))
 import Data.Bifunctor (Bifunctor (first))
 import Core (highlightedMode)
 import Config.Types (ncols, nrows)
+import Graphics.Ueberzug
+    ( defaultUbConf,
+      draw,
+      UbConf(identifier, path, x, y, width, height) )
+import System.FilePath ((</>), takeDirectory)
+import Types
+    ( displayedImages,
+      konekoDir,
+      ub, )
 
 -- | Bind a function to the second argument of a bifunctor, then append
 -- a value to the first argument of the bifunctor
@@ -146,6 +155,19 @@ nextOffset next_url =
 keyIsOffset :: [Text] -> Bool
 keyIsOffset ["offset", _] = True
 keyIsOffset _             = False
+
+displayHomeImage :: St -> IO St
+displayHomeImage st = do
+  Right () <-
+    draw (st^.ub) $ defaultUbConf
+      { identifier = "home"
+      , path = takeDirectory (st^.konekoDir) </> "pics/71471144_p0.png"
+      , x = 1
+      , y = 1
+      , width = Just 28
+      , height = Just 28
+      }
+  pure $ st & displayedImages .~ ["home"]
 
 logger :: Show a => [Char] -> a -> IO ()
 logger label x = appendFile "log.txt" $ label <> " " <> show x <> "\n"

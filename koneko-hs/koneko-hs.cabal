@@ -22,7 +22,6 @@ executable koneko-hs
                        Serialization.Out,
                        Core,
                        Common,
-                       Graphics,
                        UI,
                        Events,
                        Requests,

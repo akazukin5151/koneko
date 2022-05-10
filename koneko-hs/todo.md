@@ -1,7 +1,6 @@
 # todo
 
 ## bugs
-- when starting, history tab is visible, then disappears. returns when scrolling
 - there is a delay for going to mode -> getting request into cache. during that delay, pressing n will crash. 1) try to remove that delay if possible; 2) don't crash, just ignore
     - going to second page when everything is already downloaded doesn't need to wait for the request, and should do with no delay.
 - mode 2: when download finishes, going next doesn't clear the first image. it will clear when you go back and next again

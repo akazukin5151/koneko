@@ -83,10 +83,13 @@ onEnterNormal st = onEnterInner (getEditorText st) st
 
 onEnterHistory :: St -> IO St
 onEnterHistory st =
-  case (st^.history) ^? ix (st^.historyIdx) of
+  case historyHighlighted ^? ix (st^.historyIdx) of
     Nothing -> pure st
-    Just ans ->
+    Just (_, ans) ->
       onEnterInner ans $ st & editor %~ applyEdit (const (textZipper [ans] Nothing))
+  where
+    historyHighlighted =
+      filter (\(mode, _) -> mode == highlightedMode st) $ st^.history
 
 saveHistory :: FilePath -> Int -> Text -> IO ()
 saveHistory dir mi input = T.appendFile file text

@@ -44,6 +44,8 @@ promptUI st = [ui]
 
     historySection =
       st^.history
+      & filter (\(mode, _) -> mode == highlightedMode st)
+      <&> snd
       & filter filterHistory
       <&> txt
       & mapEnumerate g

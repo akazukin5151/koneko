@@ -52,7 +52,7 @@ setup(
         'pixcat~=0.1',
         'docopt~=0.6',
         'blessed~=1.18',
-        'pick~=1.0',
+        'pick>=1,<3',
         'plyer~=2.0.0',
         'funcy~=1.16',
         'returns==0.18.0',

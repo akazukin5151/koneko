@@ -8,14 +8,6 @@ from setuptools.command.install import install
 HERE = Path(__file__).parent
 README = (HERE / 'README.md').read_text()
 
-# Create the cache dir
-# The pythonic way is so unnecessarily complicated for two lines of shell...
-os.system('mkdir -p ~/.local/share/koneko')
-os.system('cp -r ./pics/ ~/.local/share/koneko/')
-os.system('cp example_config.ini ~/.local/share/koneko/')
-os.system('cp pixiv-url.desktop ~/.local/share/koneko/')
-
-
 class InstallCommand(install):
     def run(self):
         install.run(self)

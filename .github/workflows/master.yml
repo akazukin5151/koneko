@@ -36,9 +36,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-          pip install ueberzug
-        fi
+    - name: Install ueberzug
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt install libx11-dev
+        sudo apt install libxext-dev
+        sudo apt install libxres-dev
+        pip install setuptools
+        git clone https://github.com/WhiteBlackGoose/ueberzug-latest
+        cd ueberzug-latest
+        sudo pip install -e .
+        cd ..
     - name: Install desktop-file-utils
       env:
         CMD: ${{ matrix.desktop-file-utils-installer }}

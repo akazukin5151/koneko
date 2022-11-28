@@ -4,7 +4,7 @@ Note: the [haskell](https://github.com/akazukin5151/koneko/tree/haskell) branch 
 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt) [![PyPI](https://img.shields.io/pypi/v/koneko)](https://pypi.org/project/koneko/) [![commits since](https://img.shields.io/github/commits-since/akazukin5151/koneko/latest)](https://GitHub.com/akazukin5151/koneko/commit/) ![master](https://github.com/akazukin5151/koneko/workflows/master/badge.svg?branch=master) [![docs](https://readthedocs.org/projects/koneko/badge/?version=latest)](https://koneko.readthedocs.io/en/latest/?badge=latest) [![status](https://img.shields.io/badge/status-maintenance-green)](https://img.shields.io/badge/status-maintenance-green)
 
-> Browse pixiv in the terminal using kitty's icat to display images (or use ueberzug)
+> Browse pixiv in the terminal using kitty's icat to display images (or ueberzug for all terminals)
 
 Gallery view
 ![Gallery view_square_medium1](docs/pics/gallery_view_square_medium1.png)
@@ -18,7 +18,7 @@ View artists you're following
 
 Requires [kitty](https://github.com/kovidgoyal/kitty). It uses the magical `kitty +kitten icat` 'kitten' to display images. For more info see the [kitty documentation](https://sw.kovidgoyal.net/kitty/kittens/icat.html). Actually, `lscat.py` uses [pixcat](https://github.com/mirukana/pixcat), which is a Python API for icat.
 
-*New in version 0.11.0: [ueberzug](https://github.com/seebye/ueberzug) is now supported as an experimental feature, enable through the config file.*
+*New in version 0.11.0: [ueberzug](https://github.com/WhiteBlackGoose/ueberzug-latest) is now supported as an experimental feature, enable through the config file.*
 
 **Why the name Koneko?** Koneko (こねこ) means kitten, which is what `icat` is, a kitty `+kitten`
 
@@ -62,8 +62,8 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 ## Installation (how?)
 See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
-0. If you want to use the stable api, install [kitty](https://github.com/kovidgoyal/kitty) (Otherwise, you can use ueberzug with your current terminal, however note that it doesn't seem to work on macOS)
-    * If using ueberzug, run `pip install ueberzug` first
+0. If you want to use the stable api, install [kitty](https://github.com/kovidgoyal/kitty) (Otherwise, you can use ueberzug with your current terminal, however note that it work on macOS)
+    * If using ueberzug, follow the instructions [here](https://github.com/WhiteBlackGoose/ueberzug-latest)
 1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...)
 2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
 3. Login to pixiv on your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/

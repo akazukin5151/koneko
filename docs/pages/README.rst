@@ -125,7 +125,7 @@ See also: :ref:`manual installation <manual-installation>`
 #. ``pip install koneko`` (or if you use :ref:`conda <conda-environment>`...)
 #. Run ``koneko``. It will open a pixiv login page in your default browser and quit.
 #. Login to pixiv on your browser. If prompted, open the ``pixiv://`` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/
-#. Run ``lscat 1 7`` to help setup the recommended settings; copy to ``~/.config/koneko/config.ini``. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
+#. Run ``lscat 1 8`` to help setup the recommended settings; copy to ``~/.config/koneko/config.ini``. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
 #. Run ``koneko`` again. Hopefully you don't see any error messages about login failing. See the :ref:`usage manual <manual>` for how to use.
 
 Requirements

@@ -9,7 +9,7 @@ Usage
 Initial setup
 ^^^^^^^^^^^^^
 
-On your first time, be sure to use the configuration assistant at ``lscat 1 7``\ , and copy + paste the suggestions to your config at ``~/.local/config/koneko/config.ini`` (exact path)
+On your first time, be sure to use the configuration assistant at ``lscat 1 8``\ , and copy + paste the suggestions to your config at ``~/.local/config/koneko/config.ini`` (exact path)
 
 Launch ``koneko``. There are six modes of operation reachable from the main screen. The mode letter is bolded:
 

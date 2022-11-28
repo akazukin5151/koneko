@@ -24,9 +24,9 @@ def begin_prompt(printmessage=True) -> 'IO[str]':
     )
     if printmessage:
         for message in messages:
-            print(' ' * 30, message)
+            print(' ' * config.api.spaces_to_offset(), message)
 
-    image = lscat.api.show(WELCOME_IMAGE, 0, 0, 600)
+    image = lscat.api.show(WELCOME_IMAGE, 0, 0, config.api.image_size())
 
     command = input('\n\nEnter a command: ')
     lscat.api.hide(image)

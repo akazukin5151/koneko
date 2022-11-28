@@ -443,6 +443,36 @@ See [example config](example_config.ini) for reference.
 </tbody>
 </table>
 
+### [welcome_screen]
+
+<table>
+<thead>
+  <tr>
+    <th>Setting</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    <th>Notes</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><code>spaces_to_offset</code></td>
+    <td>int</td>
+    <td>30</td>
+    <td>Number of spaces to pad on the left, to shift the text in the welcome screen to the right of the welcome image</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>image_size</code></td>
+    <td>int</td>
+    <td>600</td>
+    <td>The size of the welcome image</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+
 ### [misc]
 
 <table>

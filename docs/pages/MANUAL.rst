@@ -439,6 +439,30 @@ Page spacing
 
 
 
+[welcome_screen]
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Setting
+     - Type
+     - Default
+     - Description
+     - Notes
+   * - ``spaces_to_offset``
+     - int
+     - 30
+     - Number of spaces to pad on the left, to shift the text in the welcome screen to the right of the welcome image
+     -
+   * - ``image_size``
+     - int
+     - 600
+     - The size of the welcome image
+     -
+
+
+
 [misc]
 ^^^^^^
 

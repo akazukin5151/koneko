@@ -95,6 +95,12 @@ class Config:
     def ueberzug_center_spaces(self) -> int:
         return self._get_int('experimental', 'ueberzug_center_spaces', 20)
 
+    def spaces_to_offset(self) -> int:
+        return self._get_int('welcome_screen', 'spaces_to_offset', 30)
+
+    def image_size(self) -> int:
+        return self._get_int('welcome_screen', 'image_size', 600)
+
     def gen_users_settings(self) -> 'tuple[int, int]':
         return (
             self._get_int('lscat', 'users_print_name_xcoord', 18),

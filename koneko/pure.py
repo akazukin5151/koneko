@@ -112,7 +112,7 @@ def concat_seqs_to_int(keyseqs: 'list[str]', start: int = 0) -> int:
 
 # From lscat
 def ncols(term_width: int, img_width: int, padding: int) -> int:
-    return round(term_width / (img_width + padding))
+    return term_width // (img_width + padding)
 
 
 def nrows(term_height: int, img_height: int, padding: int) -> int:
@@ -134,7 +134,7 @@ def xcoords(
     if number_of_columns is None:
         number_of_columns = ncols(term_width, img_width, padding)
     return [
-        col % number_of_columns * img_width + padding + offset
+        padding + ((img_width + padding) * col) + offset
         for col in range(number_of_columns)
     ]
 

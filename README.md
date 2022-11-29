@@ -64,6 +64,7 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 
 0. If you want to use the stable api, install [kitty](https://github.com/kovidgoyal/kitty) (Otherwise, you can use ueberzug with your current terminal, however note that it work on macOS)
     * If using ueberzug, follow the instructions [here](https://github.com/WhiteBlackGoose/ueberzug-latest), or use your package manager
+    * For problems with ueberzug see [here](https://github.com/akazukin5151/koneko/issues/34#issuecomment-1330665979)
 1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...)
 2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
 3. Login to pixiv on your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/

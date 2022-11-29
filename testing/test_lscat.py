@@ -6,7 +6,8 @@ from collections import namedtuple
 
 import pytest
 
-from koneko import lscat, WELCOME_IMAGE
+from koneko import lscat, config, WELCOME_IMAGE
+from conftest import setup_test_config
 
 
 FakeData = namedtuple('data', ('download_path',))
@@ -362,12 +363,13 @@ def test_TrackDownloadsImage(monkeypatch):
     ]
 
 
-def test_generate_page(monkeypatch, capsys):
+def test_generate_page(monkeypatch, capsys, tmp_path):
     mocked_api = Mock()
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.api.page_spacing', lambda: 1)
+    testconfig = setup_test_config(tmp_path, config.Config)
+    monkeypatch.setattr('koneko.config.api', testconfig)
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
@@ -407,11 +409,13 @@ def test_generate_page(monkeypatch, capsys):
     ]
 
 
-def test_generate_users(monkeypatch, capsys):
+def test_generate_users(monkeypatch, capsys, tmp_path):
     mocked_api = Mock()
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
+    testconfig = setup_test_config(tmp_path, config.Config)
+    monkeypatch.setattr('koneko.config.api', testconfig)
     monkeypatch.setattr('koneko.config.api.users_page_spacing', lambda: 1)
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
 
@@ -437,12 +441,13 @@ def test_generate_users(monkeypatch, capsys):
     assert captured.out == '                  00\n                  test\n\n\n                  04\n                  test\n\n\n                  08\n                  test\n\n\n                  12\n                  test\n\n\n                  16\n                  test\n\n\n                  20\n                  test\n\n\n                  24\n                  test\n\n\n                  28\n                  test\n\n\n                  32\n                  test\n\n\n                  36\n                  test\n\n\n                  40\n                  test\n\n\n                  44\n                  test\n\n\n                  48\n                  test\n\n\n                  52\n                  test\n\n\n                  56\n                  test\n\n\n                  60\n                  test\n\n\n                  64\n                  test\n\n\n                  68\n                  test\n\n\n                  72\n                  test\n\n\n                  76\n                  test\n\n\n                  80\n                  test\n\n\n                  84\n                  test\n\n\n                  88\n                  test\n\n\n                  92\n                  test\n\n\n                  96\n                  test\n\n\n                  00\n                  test\n\n\n                  04\n                  test\n\n\n                  08\n                  test\n\n\n                  12\n                  test\n\n\n                  16\n                  test\n\n\n'
 
 
-def test_generate_users_ueberzug(monkeypatch, capsys):
+def test_generate_users_ueberzug(monkeypatch, capsys, tmp_path):
     mocked_api = Mock()
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
-    monkeypatch.setattr('koneko.config.api.users_page_spacing', lambda: 1)
+    testconfig = setup_test_config(tmp_path, config.Config)
+    monkeypatch.setattr('koneko.config.api', testconfig)
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
 
     test_pics = [f"{str(idx).rjust(3, '0')}_test"
@@ -471,12 +476,14 @@ def test_generate_users_ueberzug(monkeypatch, capsys):
     assert captured.out == '                  00\n                  test\n\n\n\n\n\n\n\n\n\n                  04\n                  test\n'
 
 
-def test_generate_previews(monkeypatch):
+def test_generate_previews(monkeypatch, tmp_path):
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
     mocked_api = Mock()
     monkeypatch.setattr('koneko.lscat.api', mocked_api)
     monkeypatch.setattr('koneko.Terminal.width', 100)
     monkeypatch.setattr('koneko.Terminal.height', 20)
+    testconfig = setup_test_config(tmp_path, config.Config)
+    monkeypatch.setattr('koneko.config.api', testconfig)
 
     test_pics = [f"12345_p{idx}_master1200.jpg"
                  for idx in list(range(10))]

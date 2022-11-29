@@ -410,21 +410,26 @@ def _display_inital_row(ans, size, xpadding, image_width, image_height):
 
 def gallery_print_spacing_assistant(size, xpadding, image_width, image_height: int) -> 'list[int]':
     """=== Gallery print spacing ===
+    Do you want to preview an existing cache dir? [y/N]
+    To keep your chosen thumbnail size, image width and x spacing, press enter.
+    To preview an existing cache dir, type `y` and press enter.
+    """
+    key_help = """=== Gallery print spacing ===
     Use +/= to increase the spacing, and -/_ to decrease it
     Use q to exit the program, and press enter to go to the next assistant
-    Use left and right arrow keys to change the current space selection
-
-    Do you want to preview an existing cache dir? [y/N]
-    To keep your chosen thumbnail size, image width and x spacing, enter 'n'.
+    Use left/h and right/l arrow keys to change the current space selection
     """
+
     printer.print_doc(gallery_print_spacing_assistant.__doc__)  # Action before start
     ans = input()
+
+    printer.print_doc(key_help)
 
     # Setup variables
     ncols, images = _display_inital_row(ans, size, xpadding, image_width, image_height)
 
     # Just the default settings; len(first_list) == 5
-    spacings = [9, 17, 17, 17, 17] + [17] * (ncols - 5)
+    spacings = [1] * ncols
     current_selection = 0
 
     # Start

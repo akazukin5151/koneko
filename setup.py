@@ -8,6 +8,9 @@ from setuptools.command.install import install
 HERE = Path(__file__).parent
 README = (HERE / 'README.md').read_text()
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 class InstallCommand(install):
     def run(self):
         install.run(self)
@@ -39,17 +42,7 @@ setup(
     ],
     packages=['koneko', 'koneko.url_login'],
     include_package_data=True,
-    install_requires=[
-        'PixivPy~=3.5',
-        'pixcat~=0.1',
-        'docopt~=0.6',
-        'blessed~=1.18',
-        'pick~=1.0',
-        'plyer~=2.0.0',
-        'funcy~=1.16',
-        'returns==0.18.0',
-        'placeholder~=1.2',
-    ],
+    install_requires=required,
     tests_require=['pytest>=6.2,<8.0'],
     extras_require={'ueberzug': ['ueberzug~=18.1']},
     entry_points={

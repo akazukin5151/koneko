@@ -60,7 +60,7 @@ View artists you're following
 
 Requires `kitty <https://github.com/kovidgoyal/kitty>`_. It uses the magical ``kitty +kitten icat`` 'kitten' to display images. For more info see the `kitty documentation <https://sw.kovidgoyal.net/kitty/kittens/icat.html>`_. Actually, ``lscat.py`` uses `pixcat <https://github.com/mirukana/pixcat>`_\ , which is a Python API for icat.
 
-*New in version 0.11.0:* `ueberzug <https://github.com/seebye/ueberzug>`_ is now supported as an experimental feature, enable through the config file.
+*New in version 0.11.0:* `ueberzug <https://github.com/WhiteBlackGoose/ueberzug-latest>`_ is now supported as an experimental feature, enable through the config file.
 
 **Why the name Koneko?** Koneko (こねこ) means kitten, which is what ``icat`` is, a kitty ``+kitten``
 
@@ -120,12 +120,13 @@ See also: :ref:`manual installation <manual-installation>`
 
 #. If you want to use the stable api, install `kitty <https://github.com/kovidgoyal/kitty>`_ (Otherwise, you can use ueberzug with your current terminal, however note that it doesn't seem to work on macOS)
 
-   * If using ueberzug, run ``pip install ueberzug`` first
+   * * If using ueberzug, follow the instructions `here <https://github.com/WhiteBlackGoose/ueberzug-latest>`_
 
 #. ``pip install koneko`` (or if you use :ref:`conda <conda-environment>`...)
 #. Run ``koneko``. It will open a pixiv login page in your default browser and quit.
 #. Login to pixiv on your browser. If prompted, open the ``pixiv://`` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/
 #. Run ``lscat 1 8`` to help setup the recommended settings; copy to ``~/.config/koneko/config.ini``. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
+    * If you get "command not found", try the full path `$HOME/.local/bin/lscat`, and add that directory to your `$PATH` for easier future use.
 #. Run ``koneko`` again. Hopefully you don't see any error messages about login failing. See the :ref:`usage manual <manual>` for how to use.
 
 Requirements

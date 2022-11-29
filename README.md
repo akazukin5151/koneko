@@ -68,6 +68,7 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
 3. Login to pixiv on your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/
 4. Run `lscat 1 8` to help setup the recommended settings; copy to `~/.config/koneko/config.ini`. (Don't skip this step! Image display in the terminal is very sensitive to your config!)
+    - If you get "command not found", try the full path `$HOME/.local/bin/lscat`, and add that directory to your `$PATH` for easier future use.
 5. Run `koneko` again. Hopefully you don't see any error messages about login failing. See [usage](#usage) for how to use.
 
 ### Requirements

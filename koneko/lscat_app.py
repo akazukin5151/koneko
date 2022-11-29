@@ -151,6 +151,7 @@ def config_assistance(actions: 'Optional[list[int]]' = None) -> 'IO':
 
     ueberzug_center_spaces = maybe_center_spaces(actions)
 
+    os.system('clear')
     print('\n\nYour recommended settings are:')
     printer.maybe_print_size(actions, size)
     printer.maybe_print_width_xpadding(actions, image_width, xpadding)

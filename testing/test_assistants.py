@@ -4,7 +4,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from koneko import assistants
+from koneko import assistants, config
+from conftest import setup_test_config
 
 
 @pytest.fixture
@@ -51,27 +52,29 @@ def test_page_spacing_assistant_must_not_use_ueberzug(monkeypatch, capsys):
     assert captured.out == 'The page spacing assistant is not needed if you use ueberzug, because ueberzug does not respond to scroll events\n'
 
 
-def test_gallery_print_spacing_assistant_n(monkeypatch, disable_pixcat, disable_print_doc, patch_cbreak, capsys):
+def test_gallery_print_spacing_assistant_n(monkeypatch, disable_pixcat, disable_print_doc, patch_cbreak, capsys, tmp_path):
+    setup_test_config(tmp_path, config.Config)
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: False)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: '')
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Initially all spaces are 1s
-    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [1, 1, 1, 1]
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [1, 1, 1]
     captured = capsys.readouterr()
-    assert captured.out == '\n\n\x1b[2A\x1b[K 1 2 3 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+    assert captured.out == '\n\n\x1b[2A\x1b[K 1 2 3\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
-def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_pixcat, disable_print_doc, patch_cbreak, capsys):
+def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_pixcat, disable_print_doc, patch_cbreak, capsys, tmp_path):
+    setup_test_config(tmp_path, config.Config)
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
     monkeypatch.setattr('koneko.Terminal.width', 40)
     monkeypatch.setattr('builtins.input', lambda: '')
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Initially all spaces are 1s
-    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [1, 1, 1, 1]
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [1, 1, 1]
     captured = capsys.readouterr()
-    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K 1 2 3 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K 1 2 3\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 
 

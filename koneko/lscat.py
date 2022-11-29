@@ -295,7 +295,8 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
 
 
 def generate_users(path: 'Path', print_info=True) -> 'IO':
-    preview_xcoords = config.xcoords_config(offset=1)[-3:]
+    # There are 5 columns because 4 images + 1 space for the label
+    preview_xcoords = config.xcoords_config(offset=1, number_of_columns=5)[-3:]
     message_xcoord, padding = config.api.gen_users_settings()
     page_spacing = config.api.users_page_spacing()
     thumbnail_size = config.api.thumbnail_size()

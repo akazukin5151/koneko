@@ -303,7 +303,6 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
     number_of_rows = config.nrows_config()
 
     height, spacing = config.api.dimension(config.Dimension.y, (8, 1))
-    step = height + spacing
 
     os.system('clear')
     while True:
@@ -311,13 +310,16 @@ def generate_users(path: 'Path', print_info=True) -> 'IO':
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
         number = int(a_img.split('_')[0][1:])
-        ycoord = (number % number_of_rows) * step
+        ycoord = (number % number_of_rows) * height + spacing
 
         if print_info:
             print(
-                '\n' * spacing,
-                ' ' * message_xcoord, number, '\n',
-                ' ' * message_xcoord, artist_name,
+                '\n',
+                ' ' * message_xcoord,
+                number,
+                '\n',
+                ' ' * message_xcoord,
+                artist_name,
                 sep=''
             )
         if number % number_of_rows == 0 and number != 0:

@@ -57,10 +57,10 @@ def test_gallery_print_spacing_assistant_n(monkeypatch, disable_pixcat, disable_
     monkeypatch.setattr('builtins.input', lambda: '')
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
-    # Default
-    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
+    # Initially all spaces are 1s
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [1, 1, 1, 1]
     captured = capsys.readouterr()
-    assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2                 3                 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+    assert captured.out == '\n\n\x1b[2A\x1b[K 1 2 3 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_pixcat, disable_print_doc, patch_cbreak, capsys):
     monkeypatch.setattr('koneko.config.api.use_ueberzug', lambda: True)
@@ -68,10 +68,10 @@ def test_gallery_print_spacing_assistant_n_ueberzug(monkeypatch, disable_pixcat,
     monkeypatch.setattr('builtins.input', lambda: '')
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
-    # Default
-    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
+    # Initially all spaces are 1s
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [1, 1, 1, 1]
     captured = capsys.readouterr()
-    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K         1                 2                 3                 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K 1 2 3 4\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 
 
@@ -84,10 +84,10 @@ def test_gallery_print_spacing_assistant_y(monkeypatch, disable_print_doc, patch
     monkeypatch.setattr('koneko.lscat.show_instant', lambda *a: True)
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
-    # Default
-    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
+    # Initially all spaces are 1s
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [1, 1]
     captured = capsys.readouterr()
-    assert captured.out == '\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+    assert captured.out == '\n\n\x1b[2A\x1b[K 1 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 
 @pytest.mark.skipif(platform == 'darwin', reason='Ueberzug does not work on macOS')
@@ -102,9 +102,9 @@ def test_gallery_print_spacing_assistant_y_ueberzug(monkeypatch, disable_print_d
 
     monkeypatch.setattr('koneko.TERM.inkey', FakeInKey)
     # Default
-    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [9, 17, 17, 17, 17]
+    assert assistants.gallery_print_spacing_assistant(310, 1, 10, 10) == [1, 1]
     captured = capsys.readouterr()
-    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K         1                 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
+    assert captured.out == '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\x1b[2A\x1b[K 1 2\n\nAdjusting the number of spaces between 0 and 1\n\x1b[1A'
 
 
 def test_user_info_assistant(monkeypatch, disable_print_doc, disable_pixcat, patch_cbreak, capsys):

@@ -44,7 +44,10 @@ setup(
     include_package_data=True,
     install_requires=required,
     tests_require=['pytest>=6.2,<8.0'],
-    extras_require={'ueberzug': ['ueberzug~=18.1']},
+    # Ueberzug's main repo no longer exists, use
+    # https://github.com/WhiteBlackGoose/ueberzug-latest/
+    # follow their installation instructions, or use your package manager
+    #extras_require={'ueberzug': ['ueberzug~=18.1']},
     entry_points={
         'console_scripts': [
             'koneko=koneko.__main__:_main',

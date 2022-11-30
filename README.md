@@ -32,7 +32,7 @@ See the [manual](MANUAL.md) for more details
 5. View new illustrations from all the artists you are following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
 6. View recommended illustrations (now called 'discovery') ([ex](https://www.pixiv.net/discovery))
 
-* Save images individually ([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download) in full resolution
+* Save images individually in full resolution ([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download)
 * Open post in browser
 
 * Browse the offline cache
@@ -90,13 +90,16 @@ See also: [manual installation](CONTRIBUTING.md#manual-installation)
 0. If not using [kitty](https://github.com/kovidgoyal/kitty), you have to use the ueberzug backend. Follow the instructions [here](https://github.com/WhiteBlackGoose/ueberzug-latest)
 1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...)
 2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
-3. Login to pixiv in your browser. If prompted, open the `pixiv://` link with "koneko pixiv login handler". If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/
-4. Run `lscat 1 8` to get the recommended settings for your screen size.
+3. Login to pixiv in your browser.
+4. If prompted, open the `pixiv://` link with "koneko pixiv login handler".
+5. If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/
+6. Run `lscat 1 8` to get the recommended settings for your screen size.
     * (Don't skip this step! Image display in the terminal is very sensitive to your settings!)
-5. Copy the recommended settings to `~/.config/koneko/config.ini`. See [example_config.ini](example_config.ini) for reference
     * If you get command not found, try adding `$HOME/.local/bin` to your `$PATH`
-6. If using ueberzug, add `use_ueberzug = on` under `[experimental]` in the config
-7. Run `koneko` again. Hopefully you don't see any error messages about login failing. See [usage](#usage) for how to use.
+7. Copy the recommended settings to `~/.config/koneko/config.ini`. See [example_config.ini](example_config.ini) for reference
+8. If using ueberzug, add `use_ueberzug = on` under `[experimental]` in the config
+9. Run `koneko` again. Hopefully you don't see any error messages about login failing. 
+10. See [usage](#usage) for how to use.
 
 ## Usage and manual
 

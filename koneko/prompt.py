@@ -22,11 +22,19 @@ def ask_quit() -> 'IO':
             sys.exit(0)
 
 
-def ask_wait_user_input(keyseqs: 'list[str]', view_name: str) -> str:
+def ask_wait_user_input(
+    keyseqs: 'list[str]', view_name: str, use_ueberzug=None
+) -> str:
     if not keyseqs:
-        printer.print_bottom(f'Enter {view_name} view command:', offset=-1)
+        printer.print_bottom(
+            f'Enter {view_name} view command:', offset=-1,
+            use_ueberzug=use_ueberzug
+        )
     command = TERM.inkey()
-    printer.print_bottom(command, offset=2, end='', flush=True)
+    printer.print_bottom(
+        command, offset=2, end='', flush=True,
+        use_ueberzug=use_ueberzug
+    )
     return command
 
 
@@ -159,7 +167,11 @@ def image_prompt(image):
                 keyseqs = []
 
             # 2. Ask and wait for user input
-            image_prompt_command = ask_wait_user_input(keyseqs, 'an image')
+            # image mode needs to force use_ueberzug=True, see comments in
+            # lscat_prompt.ImageLoop
+            image_prompt_command = ask_wait_user_input(
+                keyseqs, 'an image', use_ueberzug=True
+            )
 
             # 3. Single char input with action that leaves prompt
             if image_prompt_command == 'b':

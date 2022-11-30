@@ -645,7 +645,9 @@ class Image(data.ImageData):  # Extends the data class by adding IO actions on t
 
     def __init__(self, raw: 'Json', image_id: str, firstmode=False):
         super().__init__(raw, image_id, firstmode)
-        self.use_ueberzug = config.api.use_ueberzug()
+        # image mode needs to force use_ueberzug=True, see comments in
+        # lscat_prompt.ImageLoop
+        self.use_ueberzug = True
         self.event = threading.Event()
         # Defined in self.start_preview()
         self.loc: 'tuple[int]'

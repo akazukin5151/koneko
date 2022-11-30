@@ -528,10 +528,11 @@ Ueberzug
    * - ``scroll_display``
      - bool
      - on
-     - Whether lscat should print newlines to scroll down the terminal and display more images
-     - * The number of images in a terminal page is number_of_cols * number_of_rows
-       * As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed. This is what "display scrolling" means
-       * The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down
+     - Whether the terminal should scroll to display all images
+     - * The number of images in a pixiv page is usually 30 images
+       * As the terminal window is usually too small to fit all 30 images, koneko will print newlines to move the top rows out of the view, so that later rows can be displayed. This is what "display scrolling" means
+       * The caveat is that the user has to manually scroll up to see the top rows using the mouse or the clunky ctrl+shift+up/down
+       * When off, newlines will not be printed and the terminal will not scroll. Instead, use the arrow up/down keys to view different rows
        * If ueberzug is on, this option will always be off, because only pixcat/icat respond to terminal scroll events
    * - ``ueberzug_center_spaces``
      - int

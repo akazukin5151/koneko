@@ -554,11 +554,12 @@ See [example config](example_config.ini) for reference.
     <td><code>scroll_display</code></td>
     <td>bool</td>
     <td>on</td>
-    <td>Whether lscat should print newlines to scroll down the terminal and display more images</td>
+    <td>Whether the terminal should scroll to display all images</td>
     <td><ul>
-        <li>The number of images in a terminal page is number_of_cols * number_of_rows</li>
-        <li>As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed. This is what "display scrolling" means</li>
-        <li>The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down</li>
+        <li>The number of images in a pixiv page is usually 30 images</li>
+        <li>As the terminal window is usually too small to fit all 30 images, koneko will print newlines to move the top rows out of the view, so that later rows can be displayed. This is what "display scrolling" means</li>
+        <li>The caveat is that the user has to manually scroll up to see the top rows using the mouse or the clunky ctrl+shift+up/down</li>
+        <li>When off, newlines will not be printed and the terminal will not scroll. Instead, use the arrow up/down keys to view different rows</li>
         <li>If ueberzug is on, this option will always be off, because only pixcat/icat respond to terminal scroll events</li>
   </tr>
   <tr>

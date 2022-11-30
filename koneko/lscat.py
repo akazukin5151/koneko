@@ -376,8 +376,8 @@ def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':
 
 def generate_previews(path: 'Path', min_num: int) -> 'IO':
     rowspaces = config.ycoords_config()
-    left_shifts = config.xcoords_config()
-    _xcoords = (left_shifts[0], left_shifts[-1])
+    image_width, x_spacing = config.api.dimension(config.Dimension.x, (0, 2))
+    _xcoords = (x_spacing, TERM.width - image_width - x_spacing)
     thumbnail_size = config.api.thumbnail_size()
 
     for preview_num in range(4):  # Max 4 previews

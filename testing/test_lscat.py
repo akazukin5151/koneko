@@ -382,27 +382,27 @@ def test_generate_page(monkeypatch, capsys, tmp_path):
 
     assert mocked_api.mock_calls[:10] == [
         call.show(Path('000_test'), 2, 0, 310),
-        call.show(Path('001_test'), 20, 0, 310),
-        call.show(Path('002_test'), 38, 0, 310),
-        call.show(Path('003_test'), 56, 0, 310),
-        call.show(Path('004_test'), 74, 0, 310),
+        call.show(Path('001_test'), 22, 0, 310),
+        call.show(Path('002_test'), 42, 0, 310),
+        call.show(Path('003_test'), 62, 0, 310),
+        call.show(Path('004_test'), 82, 0, 310),
         call.show(Path('005_test'), 2, 9, 310),
-        call.show(Path('006_test'), 20, 9, 310),
-        call.show(Path('007_test'), 38, 9, 310),
-        call.show(Path('008_test'), 56, 9, 310),
-        call.show(Path('009_test'), 74, 9, 310)
+        call.show(Path('006_test'), 22, 9, 310),
+        call.show(Path('007_test'), 42, 9, 310),
+        call.show(Path('008_test'), 62, 9, 310),
+        call.show(Path('009_test'), 82, 9, 310)
     ]
     assert mocked_api.mock_calls[-10:] == [
         call.show(Path('020_test'), 2, 0, 310),
-        call.show(Path('021_test'), 20, 0, 310),
-        call.show(Path('022_test'), 38, 0, 310),
-        call.show(Path('023_test'), 56, 0, 310),
-        call.show(Path('024_test'), 74, 0, 310),
+        call.show(Path('021_test'), 22, 0, 310),
+        call.show(Path('022_test'), 42, 0, 310),
+        call.show(Path('023_test'), 62, 0, 310),
+        call.show(Path('024_test'), 82, 0, 310),
         call.show(Path('025_test'), 2, 9, 310),
-        call.show(Path('026_test'), 20, 9, 310),
-        call.show(Path('027_test'), 38, 9, 310),
-        call.show(Path('028_test'), 56, 9, 310),
-        call.show(Path('029_test'), 74, 9, 310)
+        call.show(Path('026_test'), 22, 9, 310),
+        call.show(Path('027_test'), 42, 9, 310),
+        call.show(Path('028_test'), 62, 9, 310),
+        call.show(Path('029_test'), 82, 9, 310)
     ]
 
 
@@ -428,14 +428,14 @@ def test_generate_users(monkeypatch, capsys, tmp_path):
         gen.send(None)
 
     assert mocked_api.mock_calls[:4] == [
-        call.show(Path('000_test'), 2, 0, 310),
-        call.show(Path('001_test'), 39, 0, 310),
-        call.show(Path('002_test'), 57, 0, 310),
-        call.show(Path('003_test'), 75, 0, 310),
+        call.show(Path('000_test'), 2, 1, 310),
+        call.show(Path('001_test'), 43, 1, 310),
+        call.show(Path('002_test'), 63, 1, 310),
+        call.show(Path('003_test'), 83, 1, 310),
     ]
 
     captured = capsys.readouterr()
-    assert captured.out == '                  00\n                  test\n\n\n                  04\n                  test\n\n\n                  08\n                  test\n\n\n                  12\n                  test\n\n\n                  16\n                  test\n\n\n                  20\n                  test\n\n\n                  24\n                  test\n\n\n                  28\n                  test\n\n\n                  32\n                  test\n\n\n                  36\n                  test\n\n\n                  40\n                  test\n\n\n                  44\n                  test\n\n\n                  48\n                  test\n\n\n                  52\n                  test\n\n\n                  56\n                  test\n\n\n                  60\n                  test\n\n\n                  64\n                  test\n\n\n                  68\n                  test\n\n\n                  72\n                  test\n\n\n                  76\n                  test\n\n\n                  80\n                  test\n\n\n                  84\n                  test\n\n\n                  88\n                  test\n\n\n                  92\n                  test\n\n\n                  96\n                  test\n\n\n                  00\n                  test\n\n\n                  04\n                  test\n\n\n                  08\n                  test\n\n\n                  12\n                  test\n\n\n                  16\n                  test\n\n\n'
+    assert captured.out == '\n                  0\n                  test\n\n                  4\n                  test\n\n\n\n                  8\n                  test\n\n\n\n                  12\n                  test\n\n\n\n                  16\n                  test\n\n\n\n                  20\n                  test\n\n\n\n                  24\n                  test\n\n\n\n                  28\n                  test\n\n\n\n                  32\n                  test\n\n\n\n                  36\n                  test\n\n\n\n                  40\n                  test\n\n\n\n                  44\n                  test\n\n\n\n                  48\n                  test\n\n\n\n                  52\n                  test\n\n\n\n                  56\n                  test\n\n\n\n                  60\n                  test\n\n\n\n                  64\n                  test\n\n\n\n                  68\n                  test\n\n\n\n                  72\n                  test\n\n\n\n                  76\n                  test\n\n\n\n                  80\n                  test\n\n\n\n                  84\n                  test\n\n\n\n                  88\n                  test\n\n\n\n                  92\n                  test\n\n\n\n                  96\n                  test\n\n\n\n                  0\n                  test\n\n                  4\n                  test\n\n\n\n                  8\n                  test\n\n\n\n                  12\n                  test\n\n\n\n                  16\n                  test\n\n\n'
 
 
 def test_generate_users_ueberzug(monkeypatch, capsys, tmp_path):
@@ -460,13 +460,13 @@ def test_generate_users_ueberzug(monkeypatch, capsys, tmp_path):
 
     assert mocked_api.mock_calls == [
         call.show(Path('000_test'), 2, 0, 310),
-        call.show(Path('001_test'), 39, 0, 310),
-        call.show(Path('002_test'), 57, 0, 310),
-        call.show(Path('003_test'), 75, 0, 310),
+        call.show(Path('001_test'), 43, 0, 310),
+        call.show(Path('002_test'), 63, 0, 310),
+        call.show(Path('003_test'), 83, 0, 310),
         call.show(Path('004_test'), 2, 9, 310),
-        call.show(Path('005_test'), 39, 9, 310),
-        call.show(Path('006_test'), 57, 9, 310),
-        call.show(Path('007_test'), 75, 9, 310)
+        call.show(Path('005_test'), 43, 9, 310),
+        call.show(Path('006_test'), 63, 9, 310),
+        call.show(Path('007_test'), 83, 9, 310)
     ]
 
     captured = capsys.readouterr()
@@ -496,6 +496,6 @@ def test_generate_previews(monkeypatch, tmp_path):
     assert mocked_api.mock_calls == [
         call.show(Path('12345_p0_master1200.jpg'), 2, 0, 310),
         call.show(Path('12345_p1_master1200.jpg'), 2, 9, 310),
-        call.show(Path('12345_p2_master1200.jpg'), 74, 0, 310),
-        call.show(Path('12345_p3_master1200.jpg'), 74, 9, 310),
+        call.show(Path('12345_p2_master1200.jpg'), 82, 0, 310),
+        call.show(Path('12345_p3_master1200.jpg'), 82, 9, 310),
     ]

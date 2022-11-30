@@ -92,7 +92,7 @@ def test_newnames_with_ext():
 
 
 def test_xcoords():
-    assert pure.xcoords(100) == [2, 20, 38, 56, 74]
+    assert pure.xcoords(100) == [2, 22, 42, 62, 82]
 
 def test_ycoords():
     assert pure.ycoords(20) == [0, 9]

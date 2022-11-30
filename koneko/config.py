@@ -133,8 +133,11 @@ def nrows_config() -> int:
     return pure.nrows(TERM.height, *api.dimension(Dimension.y, (8, 1)))
 
 
-def xcoords_config(offset=0) -> 'list[int]':
-    return pure.xcoords(TERM.width, *api.dimension(Dimension.x, (18, 2)), offset)
+def xcoords_config(offset=0, number_of_columns=None) -> 'list[int]':
+    return pure.xcoords(
+        TERM.width, *api.dimension(Dimension.x, (18, 2)), offset,
+        number_of_columns
+    )
 
 
 def ycoords_config() -> 'list[int]':

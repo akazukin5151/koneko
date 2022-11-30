@@ -186,13 +186,10 @@ def test_show_row_pixcat(monkeypatch, tmp_path, use_pixcat_api):
         call().thumbnail().show(align='left', x=2, y=0),
         call(tmp_path),
         call().thumbnail(100),
-        call().thumbnail().show(align='left', x=20, y=0),
+        call().thumbnail().show(align='left', x=22, y=0),
         call(tmp_path),
         call().thumbnail(100),
-        call().thumbnail().show(align='left', x=38, y=0),
-        call(tmp_path),
-        call().thumbnail(100),
-        call().thumbnail().show(align='left', x=56, y=0)
+        call().thumbnail().show(align='left', x=42, y=0),
     ]
 
 def test_hide_all_pixcat(monkeypatch, tmp_path, use_pixcat_api):

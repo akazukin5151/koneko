@@ -4,12 +4,12 @@
 
 * [Usage](#Usage)
     * [Initial setup](#initial-setup)
-    * [Command line usage](#command-line-usage)
     * [Mode a/1](#mode-a1)
     * [Mode i/2](#mode-i2)
     * [Mode f/3 and s/4](#mode-f3-and-s4)
     * [Mode n/5](#mode-n5)
     * [Mode r/6](#mode-r6)
+    * [Command line usage](#command-line-usage)
     * [lscat app](#lscat-app)
 * [Configuration](#Configuration)
     * [Credentials](#credentials)
@@ -102,8 +102,12 @@ Examples:
 
 ![Image_view](docs/pics/image_view.png)
 
+* Press `n` and `p` to navigate between next and previous images respectively
+* `d` and `o` downloads and opens the current image
+* Press `f` to view the image in higher resolution
 * Press `r` to view other images related to this post
     * This mode is functionally identical to [mode a/1](#mode-a1)
+* You're done! Press `q` to exit and re-open koneko for the next tutorial
 
 ```
 Image view commands (No need to press enter):
@@ -126,6 +130,7 @@ Image view commands (No need to press enter):
 
 * The two digit numbers on top of the user name is the index.
 * Enter both digits to view that user's illustrations
+* The other keybindings below are self-explanatory
 
 ```
 User view commands (No need to press enter):
@@ -185,9 +190,10 @@ Examples:
 
 As an alternative to the main screen, you can supply a pixiv url as a command line argument, bypassing the first interactive prompt. The pixiv url must be either the url of the artist's page, or a pixiv post.
 
-Examples
+**Examples**
+
 ```sh
-# No mode specified, can only reach modes a, i, and s:
+# No mode specified, can only reach modes 1, 2, and 4:
 koneko https://www.pixiv.net/en/users/2232374         # Mode 1/a
 koneko https://www.pixiv.net/en/artworks/78823485     # Mode 2/i
 koneko "raika9"                                       # Mode 4/s
@@ -201,7 +207,8 @@ koneko n            # Mode 5
 koneko r            # Mode 6
 ```
 
-Manual
+### Manual
+
 ```
 Browse pixiv in the terminal using kitty's icat to display images (in the
 terminal!)
@@ -248,7 +255,7 @@ Options:
 4. Displays the 'testgallery' dir in mode 1, offline. For internal developer use.
 5. Displays the 'testuser' dir in mode 3/4, offline. For internal developer use.
 
-* FYI: KONEKODIR is currently set to be `~/.local/share/koneko/cache`. The parent folder also contains everything else you might want to delete in the even of uninstalling the app
+* FYI: KONEKODIR is currently set to be `~/.local/share/koneko/cache`. The parent folder also contains everything else you might want to delete if uninstalling
 * For developers: simply copy a "page dir" inside a pixiv ID into testgallery (eg, `cp -r ~/.local/share/koneko/cache/123/1 ~/.local/share/koneko/cache/testgallery`) for mode 4 to work;
 * ...and a "page dir" inside 'following' (eg, `cp -r ~/.local/share/koneko/cache/following/123/1 ~/.local/share/koneko/cache/testuser`) for mode 5 to work.
 
@@ -278,6 +285,7 @@ Possible configuration assistants:
   4  Page spacing
   5  Gallery print spacing
   6  User mode print info x-position
+  7  Ueberzug center images
   a  All of the above
 ```
 
@@ -285,7 +293,7 @@ Possible configuration assistants:
 
 ### It is highly recommended to use the interactive configuration assistant!
 
-After installing, type `lscat 1 7` and follow the instructions. Just copy the suggested settings to your config in `~/.config/koneko/config.ini`. The below text are just for documentation, so don't worry if it is confusing -- it is always better to configure it interactively.
+After installing, type `lscat 1 8` and follow the instructions. Just copy the suggested settings to your config in `~/.config/koneko/config.ini`. The below text are just for documentation, so don't worry if it is confusing -- it is always better to configure it interactively.
 
 See [example config](example_config.ini) for reference.
 
@@ -395,8 +403,9 @@ See [example config](example_config.ini) for reference.
     <td><code>gallery_print_spacing</code></td>
     <td>list[int]</td>
     <td>9,17,17,17,17</td>
-    <td>The number of blank spaces between column numbers (number of blank spaces between each number)</td>
+    <td>The number of blank spaces between each column number, if enabled by <code>print_info</code></td>
     <td><ul>
+        <li>Ignored if <code>print_info</code> is off</li>
         <li>Integers must be comma delimited, no spaces in between</li>
         <li>Number of values must be equal to the number of columns</li>
     </ul></td>
@@ -408,14 +417,12 @@ See [example config](example_config.ini) for reference.
     <td>The number of blank spaces between the left edge and the artist number and name</td>
     <td><ul>
         <li>x-position of number and artist name, relative from the left side (which should be on the right of the artist profile pic)</li>
-        <li>Number of values must be equal to the number of columns</li>
     </ul></td>
   </tr>
 </tbody>
 </table>
 
 * Both of them act on the x-axis
-* These settings are ignored if the `print_info` option is off
 
 #### Page spacing
 
@@ -436,7 +443,8 @@ See [example config](example_config.ini) for reference.
     <td>23</td>
     <td>The number of <code>\n</code> to print after every page, until all rows are out of view</td>
     <td><ul>
-        <li>Find a value such that the completed four-picture row is completely out of view.</li>
+        <li>Ignored if <code>scroll_display</code> is off</li>
+        <li>Find a value such that a row is completely out of view.</li>
         <li>Acts on the y-axis</li>
     </ul></td>
   </tr>
@@ -491,7 +499,7 @@ See [example config](example_config.ini) for reference.
     <td>bool</td>
     <td>on</td>
     <td>Whether to print the column numbers for gallery modes, and number+artist name for user modes.</td>
-    <td></td>
+    <td>If off, <code>gallery_print_spacing</code> will be ignored</td>
   </tr>
 </tbody>
 </table>
@@ -546,11 +554,12 @@ See [example config](example_config.ini) for reference.
     <td><code>scroll_display</code></td>
     <td>bool</td>
     <td>on</td>
-    <td>Whether lscat should print newlines to scroll down the terminal and display more images</td>
+    <td>Whether the terminal should scroll to display all images</td>
     <td><ul>
-        <li>The number of images in a terminal page is number_of_cols * number_of_rows</li>
-        <li>As the total number of images usually exceed that, lscat will print newlines to offset the old images, so that all images can be displayed. This is what "display scrolling" means</li>
-        <li>The caveat is that the user has to manually scroll with the mouse or the clunky ctrl+shift+up/down</li>
+        <li>The number of images in a pixiv page is usually 30 images</li>
+        <li>As the terminal window is usually too small to fit all 30 images, koneko will print newlines to move the top rows out of the view, so that later rows can be displayed. This is what "display scrolling" means</li>
+        <li>The caveat is that the user has to manually scroll up to see the top rows using the mouse or the clunky ctrl+shift+up/down</li>
+        <li>When off, newlines will not be printed and the terminal will not scroll. Instead, use the arrow up/down keys to view different rows</li>
         <li>If ueberzug is on, this option will always be off, because only pixcat/icat respond to terminal scroll events</li>
   </tr>
   <tr>

@@ -295,36 +295,45 @@ def generate_page_ueberzug(path: 'Path') -> 'IO':
 
 
 def generate_users(path: 'Path', print_info=True) -> 'IO':
-    preview_xcoords = config.xcoords_config(offset=1)[-3:]
+    # There are 5 columns because 4 images + 1 space for the label
+    preview_xcoords = config.xcoords_config(offset=1, number_of_columns=5)[-3:]
     message_xcoord, padding = config.api.gen_users_settings()
     page_spacing = config.api.users_page_spacing()
     thumbnail_size = config.api.thumbnail_size()
+    number_of_rows = config.nrows_config()
+
+    height, spacing = config.api.dimension(config.Dimension.y, (8, 1))
 
     os.system('clear')
     while True:
         # Wait for artist pic
         a_img = yield
         artist_name = a_img.split('.')[0].split('_')[-1]
-        number = a_img.split('_')[0][1:]
+        number = int(a_img.split('_')[0][1:])
+        ycoord = (number % number_of_rows) * height + spacing
 
         if print_info:
             print(
+                '\n',
                 ' ' * message_xcoord,
                 number,
                 '\n',
                 ' ' * message_xcoord,
                 artist_name,
-                sep='',
+                sep=''
             )
-        print('\n' * page_spacing)  # Scroll to new 'page'
+        if number % number_of_rows == 0 and number != 0:
+            print('\n' * page_spacing)
 
         # Display artist profile pic
-        yield api.show(path / a_img, padding, 0, thumbnail_size)
+        yield api.show(path / a_img, padding, ycoord, thumbnail_size)
 
         # Display the three previews
-        for i in range(3):
+        for j in range(3):
             p_img = yield
-            yield api.show(path / p_img, preview_xcoords[i], 0, thumbnail_size)
+            yield api.show(
+                path / p_img, preview_xcoords[j], ycoord, thumbnail_size
+            )
 
 
 def generate_users_ueberzug(path: 'Path', print_info=True) -> 'IO':

@@ -103,14 +103,15 @@ def _display_core(tracker, data, max_images):
 
 
 def display_path(path=None) -> 'IO':
+    path = Path(path)
     if not path:
         path = input('Please paste in your path:\n')
 
-    if not Path(path).is_dir():
+    if not path.is_dir():
         print('Invalid path!')
         sys.exit(1)
 
-    data = FakeData(Path(path))
+    data = FakeData(path)
     _lscat_prompt_switcher(path, data)
 
 

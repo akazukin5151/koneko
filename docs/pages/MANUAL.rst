@@ -109,9 +109,14 @@ Mode i/2
 
 
 
+* Press ``n`` and ``p`` to navigate between next and previous images respectively
+* ``d`` and ``o`` downloads and opens the current image
+* Press ``f`` to view the image in higher resolution
 * Press ``r`` to view other images related to this post
 
   * This mode is functionally identical to `mode a/1 <#mode-a1>`_
+
+* You're done! Press ``q`` to exit and re-open koneko for the next tutorial
 
 .. code-block::
 
@@ -140,6 +145,7 @@ Mode f/3 and s/4
 
 * The two digit numbers on top of the user name is the index.
 * Enter both digits to view that user's illustrations
+* The other keybindings below are self-explanatory
 
 .. code-block::
 
@@ -203,11 +209,11 @@ Command line usage
 
 As an alternative to the main screen, you can supply a pixiv url as a command line argument, bypassing the first interactive prompt. The pixiv url must be either the url of the artist's page, or a pixiv post.
 
-Examples
+**Examples**
 
 .. code-block:: sh
 
-   # No mode specified, can only reach modes a, i, and s:
+   # No mode specified, can only reach modes 1, 2, and 4:
    koneko https://www.pixiv.net/en/users/2232374         # Mode 1/a
    koneko https://www.pixiv.net/en/artworks/78823485     # Mode 2/i
    koneko "raika9"                                       # Mode 4/s
@@ -221,6 +227,7 @@ Examples
    koneko r            # Mode 6
 
 Manual
+^^^^^^
 
 .. code-block::
 
@@ -271,7 +278,7 @@ lscat app
 #. Displays the 'testuser' dir in mode 3/4, offline. For internal developer use.
 
 
-* FYI: KONEKODIR is currently set to be ``~/.local/share/koneko/cache``. The parent folder also contains everything else you might want to delete in the even of uninstalling the app
+* FYI: KONEKODIR is currently set to be ``~/.local/share/koneko/cache``. The parent folder also contains everything else you might want to delete if uninstalling
 * For developers: simply copy a "page dir" inside a pixiv ID into testgallery (eg, ``cp -r ~/.local/share/koneko/cache/123/1 ~/.local/share/koneko/cache/testgallery``\ ) for mode 4 to work;
 * ...and a "page dir" inside 'following' (eg, ``cp -r ~/.local/share/koneko/cache/following/123/1 ~/.local/share/koneko/cache/testuser``\ ) for mode 5 to work.
 
@@ -301,6 +308,7 @@ lscat app
      4  Page spacing
      5  Gallery print spacing
      6  User mode print info x-position
+     7  Ueberzug center images
      a  All of the above
 
 Configuration
@@ -309,7 +317,7 @@ Configuration
 It is highly recommended to use the interactive configuration assistant!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-After installing, type ``lscat 1 7`` and follow the instructions. Just copy the suggested settings to your config in ``~/.config/koneko/config.ini``. The below text are just for documentation, so don't worry if it is confusing -- it is always better to configure it interactively.
+After installing, type ``lscat 1 8`` and follow the instructions. Just copy the suggested settings to your config in ``~/.config/koneko/config.ini``. The below text are just for documentation, so don't worry if it is confusing -- it is always better to configure it interactively.
 
 See `example config <example_config.ini>`_ for reference.
 
@@ -405,19 +413,18 @@ Print spacing
    * - ``gallery_print_spacing``
      - list[int]
      - 9,17,17,17,17
-     - The number of blank spaces between column numbers (number of blank spaces between each number)
-     - * Integers must be comma delimited, no spaces in between
+     - The number of blank spaces between each column number, if enabled by ``print_info``
+     - * Ignored if ``print_info`` is off
+       * Integers must be comma delimited, no spaces in between
        * Number of values must be equal to the number of columns
    * - ``users_print_name_xcoord``
      - int
      - 18
      - The number of blank spaces between the left edge and the artist number and name
      - * x-position of number and artist name, relative from the left side (which should be on the right of the artist profile pic)
-       * Number of values must be equal to the number of columns
 
 
 * Both of them act on the x-axis
-* These settings are ignored if the ``print_info`` option is off
 
 Page spacing
 ~~~~~~~~~~~~
@@ -434,7 +441,8 @@ Page spacing
      - int
      - 23
      - The number of ``\n`` to print after every page, until all rows are out of view
-     - * Find a value such that the completed four-picture row is completely out of view.
+     - * Ignored if ``scroll_display`` is off.
+       * Find a value such that a row is completely out of view.
        * Acts on the y-axis
 
 
@@ -478,7 +486,7 @@ Page spacing
      - bool
      - on
      - Whether to print the column numbers for gallery modes, and number+artist name for user modes.
-     -
+     - If off, ``gallery_print_spacing`` will be ignored
 
 
 [experimental]

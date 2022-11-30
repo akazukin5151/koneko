@@ -45,6 +45,8 @@ class AbstractLoop(ABC):
         self.condition: int
         self.current_page: int
         self.scrollable: bool
+        # Warning: if used to something else other than print_bottom,
+        # check the comments for this value in ImageLoop
         self.use_ueberzug = config.api.use_ueberzug()
         # Defined in start
         self.terminal_page: int
@@ -173,8 +175,18 @@ class GalleryUserLoop(AbstractLoop):
 class ImageLoop(AbstractLoop):
     def __init__(self, root):
         super().__init__()
+        # This is set to True regardless of the setting, because
+        # it is only used in print_bottom, which, if True, enables
+        # the cursor to be moved. So setting to be always true will force
+        # the cursor to be always moved, ensuring that print_bottom nevers
+        # print in the middle.
+        # Because print_bottom assumes the last pixcat image is at the bottom,
+        # so printing text after that pixcat image will be at the "bottom",
+        # But some image previews might be lower than the main image
+        # so print_bottom's assumption is wrong, therefore we need to force it
+        # to move the cursor
+        self.use_ueberzug = True
         # Unique
-        self.use_ueberzug = config.api.use_ueberzug()
         self.root = root
         self.all_images = [f for f in sorted(os.listdir(root)) if (root / f).is_file()]
         self.image_path = self.all_images[0]

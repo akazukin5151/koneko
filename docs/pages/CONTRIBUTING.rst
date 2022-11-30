@@ -97,7 +97,7 @@ Build and upload to PyPI
 #. Run ``pytest testing/ -vvvv -l``.
 #. Review github action logs to make sure nothing is wrong
 #. Run ``java -jar ~/Applications/plantuml.jar docs/puml/*/ -o render`` (change 1st argument to where `plantuml.jar <https://plantuml.com/download`_ is stored)
-#. Bump version info in ``__init__.py``, ``setup.py``, ``CONTRIBUTING.md``, and ``docs/pages/CONTRIBUTING.rst``
+#. Bump version info in ``__init__.py``, ``setup.py``, and ``docs/pages/CONTRIBUTING.rst``
 #. Run:
 
 .. code-block:: sh

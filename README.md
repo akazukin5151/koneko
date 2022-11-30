@@ -85,10 +85,10 @@ curl -s https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/794943
 
 ### Steps
 
-See also: [manual installation](CONTRIBUTING.md#manual-installation)
+See also: [manual installation](docs/pages/CONTRIBUTING.rst#manual-installation)
 
 0. If not using [kitty](https://github.com/kovidgoyal/kitty), you have to use the ueberzug backend. Follow the instructions [here](https://github.com/WhiteBlackGoose/ueberzug-latest)
-1. `pip install koneko` (or if you use [conda](CONTRIBUTING.md#conda-environment)...)
+1. `pip install koneko` (or if you use [conda](docs/pages/CONTRIBUTING.rst#conda-environment)...)
 2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
 3. Login to pixiv in your browser.
 4. If prompted, open the `pixiv://` link with "koneko pixiv login handler".
@@ -123,7 +123,7 @@ For the best experience use the terminal in full screen, unless your screen is b
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md)
+See [CONTRIBUTING.rst](docs/pages/CONTRIBUTING.rst)
 
 ## Trackers avoided
 <details>

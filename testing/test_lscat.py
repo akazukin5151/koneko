@@ -496,6 +496,6 @@ def test_generate_previews(monkeypatch, tmp_path):
     assert mocked_api.mock_calls == [
         call.show(Path('12345_p0_master1200.jpg'), 2, 0, 310),
         call.show(Path('12345_p1_master1200.jpg'), 2, 9, 310),
-        call.show(Path('12345_p2_master1200.jpg'), 82, 0, 310),
-        call.show(Path('12345_p3_master1200.jpg'), 82, 9, 310),
+        call.show(Path('12345_p2_master1200.jpg'), 80, 0, 310),
+        call.show(Path('12345_p3_master1200.jpg'), 80, 9, 310),
     ]

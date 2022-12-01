@@ -28,12 +28,13 @@ koneko
    Browse pixiv in the terminal using kitty's icat to display images (or use ueberzug)
 
 
-Gallery view
+Gallery view 1
 
 .. image:: /pics/gallery_view_square_medium1.png
    :target: /pics/gallery_view_square_medium1.png
    :alt: Gallery view_square_medium1
 
+Gallery view 2
 
 .. image:: /pics/gallery_view_square_medium2.png
    :target: /pics/gallery_view_square_medium2.png
@@ -68,15 +69,15 @@ Features
 See the :ref:`manual <manual>` for more details
 
 
-#. View artist illustrations (\ `ex <https://www.pixiv.net/bookmark.php?type=user>`_\ )
-#. View a post (\ `ex <https://www.pixiv.net/en/artworks/78823485>`_\ )
+#. View artist illustrations (\ `eg <https://www.pixiv.net/bookmark.php?type=user>`_\ )
+#. View a post (\ `eg <https://www.pixiv.net/en/artworks/78823485>`_\ )
 
-   * View related images suggested by pixiv (ex: scroll down from the above example)
+   * View related images suggested by pixiv (eg: scroll down from the above example)
 
-#. View the artists that you are following (or any other user ID) (\ `ex <https://www.pixiv.net/bookmark.php?type=user>`_\ )
-#. Search for an artist/user (\ `ex <https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr>`_\ )
-#. View new illustrations from all the artists you are following (\ `ex <https://www.pixiv.net/bookmark_new_illust.php>`_\ )
-#. View recommended illustrations (now called 'discovery') (\ `ex <https://www.pixiv.net/discovery>`_\ )
+#. View the artists that you are following (or any other user ID) (\ `eg <https://www.pixiv.net/bookmark.php?type=user>`_\ )
+#. Search for an artist/user (\ `eg <https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr>`_\ )
+#. View new illustrations from all the artists you are following (\ `eg <https://www.pixiv.net/bookmark_new_illust.php>`_\ )
+#. View recommended illustrations (now called 'discovery') (\ `eg <https://www.pixiv.net/discovery>`_\ )
 
 
 * Save images individually in full resolution (\ `PixivUtil <https://github.com/Nandaka/PixivUtil2/>`_ would be more suitable for batch download)
@@ -118,18 +119,22 @@ Requirements
 ^^^^^^^^^^^^
 
 * Python 3.8+
-* It has been tested on kitty v0.17.2 onwards, but should work on older versions
-* Operating system: all OSes that kitty supports, which means Linux and macOS.
+* icat:
 
-  * Ueberzug only works on Linux systems with X11
+  * It has been tested on kitty v0.17.2 onwards, but should work on older versions
 
+  * Linux and macOS
+
+* Ueberzug: Linux with X11
 * Dependencies on external programs (your responsibility to install them):
 
-  * ``xdg-open`` (linux) or ``open`` (mac) for opening links in your browser
-  * ``curl`` to download koneko's welcome and about images if they are missing (not needed unless if you deleted them)
   * ``xdg-mime`` and ``update-desktop-database`` to handle the pixiv login callback
 
     * For ``update-desktop-database``, try install the ``desktop-file-utils`` package with your package manager
+
+  * ``xdg-open`` (linux) or ``open`` (mac) for opening links in your browser
+  * ``curl`` to download koneko's welcome and about images if they are missing (not needed unless if you deleted them)
+
 
 
 .. raw:: html
@@ -153,7 +158,7 @@ Steps
 See also: :ref:`manual installation <manual-installation>`
 
 
-#. If not using `kitty <https://github.com/kovidgoyal/kitty>`_, you have to use the ueberzug backend. Follow the instructions `here <https://github.com/WhiteBlackGoose/ueberzug-latest>`_
+#. If not using `kitty <https://github.com/kovidgoyal/kitty>`_, you have to use the ueberzug backend. Follow the instructions to install ueberzug `here <https://github.com/WhiteBlackGoose/ueberzug-latest>`_
 #. ``pip install koneko`` (or if you use :ref:`conda <conda-environment>`...)
 #. Run ``koneko``. It will open a pixiv login page in your default browser and quit.
 #. Login to pixiv on your browser.
@@ -161,11 +166,11 @@ See also: :ref:`manual installation <manual-installation>`
 #. If successful you should see a notification saying "Login finished!". If not, make a bug report at https://github.com/akazukin5151/koneko/issues/
 #. Run ``lscat 1 8`` to get the recommended settings for your screen size
 
-    * (Don't skip this step! Image display in the terminal is very sensitive to your config!)
+  * (Don't skip this step! Image display in the terminal is very sensitive to your config!)
 
-    * If you get command not found, try adding ``$HOME/.local/bin`` to your ``$PATH``
+  * If you get command not found, try adding ``$HOME/.local/bin`` to your ``$PATH``
 
-#. Copy the recommended settings to ``~/.config/koneko/config.ini``. See :ref:`example_config.ini <example_config.ini>` for reference
+#. Copy the recommended settings to ``~/.config/koneko/config.ini``. See :ref:`example_config.ini <../../example_config.ini>` for reference
 
 #. Run ``koneko`` again. Hopefully you don't see any error messages about login failing.
 

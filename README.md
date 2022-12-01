@@ -6,8 +6,9 @@ Note: the [haskell](https://github.com/akazukin5151/koneko/tree/haskell) branch 
 
 > Browse pixiv in the terminal using kitty's icat to display images (or ueberzug for all terminals)
 
-Gallery view
+Gallery view 1
 ![Gallery view_square_medium1](docs/pics/gallery_view_square_medium1.png)
+Gallery view 2
 ![Gallery view_square_medium2](docs/pics/gallery_view_square_medium2.png)
 Image view
 ![Image_view](docs/pics/image_view.png)
@@ -24,13 +25,13 @@ For the [icat](https://sw.kovidgoyal.net/kitty/kittens/icat.html), backend, the 
 ## Features
 See the [manual](MANUAL.md) for more details
 
-1. View artist illustrations ([ex](https://www.pixiv.net/bookmark.php?type=user))
-2. View a post ([ex](https://www.pixiv.net/en/artworks/78823485))
-    - View related images suggested by pixiv (ex: scroll down from the above example)
-3. View the artists that you are following (or any other user ID) ([ex](https://www.pixiv.net/bookmark.php?type=user))
-4. Search for an artist/user ([ex](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
-5. View new illustrations from all the artists you are following ([ex](https://www.pixiv.net/bookmark_new_illust.php))
-6. View recommended illustrations (now called 'discovery') ([ex](https://www.pixiv.net/discovery))
+1. View artist illustrations ([eg](https://www.pixiv.net/bookmark.php?type=user))
+2. View a post ([eg](https://www.pixiv.net/en/artworks/78823485))
+    - View related images suggested by pixiv (eg: scroll down from the above example)
+3. View the artists that you are following (or any other user ID) ([eg](https://www.pixiv.net/bookmark.php?type=user))
+4. Search for an artist/user ([eg](https://www.pixiv.net/search_user.php?nick=raika9&s_mode=s_usr))
+5. View new illustrations from all the artists you are following ([eg](https://www.pixiv.net/bookmark_new_illust.php))
+6. View recommended illustrations (now called 'discovery') ([eg](https://www.pixiv.net/discovery))
 
 * Save images individually in full resolution ([PixivUtil](https://github.com/Nandaka/PixivUtil2/) would be more suitable for batch download)
 * Open post in browser
@@ -62,14 +63,15 @@ The mobile app even directly tells you Google "and our 198 partners" "collect an
 ### Requirements
 
 * Python 3.8+
-* It has been tested on kitty v0.17.2 onwards, but should work on older versions
-* Operating system: all OSes that kitty supports, which means Linux and macOS.
-    * Ueberzug only works on Linux systems with X11
+* icat:
+    * It has been tested on kitty v0.17.2 onwards, but should work on older versions
+    * Linux and macOS
+* Ueberzug: Linux with X11
 * Dependencies on external programs (your responsibility to install them):
-    - `xdg-open` (linux) or `open` (mac) for opening links in your browser
-    - `curl` to download koneko's welcome and about images if they are missing (not needed unless if you deleted them)
     - `xdg-mime` and `update-desktop-database` to handle the pixiv login callback
         - For `update-desktop-database`, try install the `desktop-file-utils` package with your package manager
+    - `xdg-open` (linux) or `open` (mac) for opening links in your browser
+    - `curl` to download koneko's welcome and about images if they are missing (not needed unless if you deleted them)
 
 <details>
   <summary>If koneko crashes (it shouldn't), it might be because pip didn't 'install' the welcome pictures, *and* the program failed to download them for some reason. Try:</summary>
@@ -87,7 +89,7 @@ curl -s https://raw.githubusercontent.com/akazukin5151/koneko/master/pics/794943
 
 See also: [manual installation](docs/pages/CONTRIBUTING.rst#manual-installation)
 
-0. If not using [kitty](https://github.com/kovidgoyal/kitty), you have to use the ueberzug backend. Follow the instructions [here](https://github.com/WhiteBlackGoose/ueberzug-latest)
+0. If not using [kitty](https://github.com/kovidgoyal/kitty), you have to use the ueberzug backend. Follow the instructions to install ueberzug [here](https://github.com/WhiteBlackGoose/ueberzug-latest)
 1. `pip install koneko` (or if you use [conda](docs/pages/CONTRIBUTING.rst#conda-environment)...)
 2. Run `koneko`. It will open a pixiv login page in your default browser and quit.
 3. Login to pixiv in your browser.

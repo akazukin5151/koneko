@@ -94,10 +94,11 @@ Build and upload to PyPI
 ------------------------
 
 
+#. Run ``java -jar ~/Applications/plantuml.jar docs/puml/*/ -o render`` (change 1st argument to where `plantuml.jar <https://plantuml.com/download`_ is stored)
 #. Run ``pytest testing/ -vvvv -l``.
 #. Review github action logs to make sure nothing is wrong
-#. Run ``java -jar ~/Applications/plantuml.jar docs/puml/*/ -o render`` (change 1st argument to where `plantuml.jar <https://plantuml.com/download`_ is stored)
 #. Bump version info in ``__init__.py``, ``setup.py``, and ``docs/pages/CONTRIBUTING.rst``
+#. Git tag the commit and push it
 #. Run:
 
 .. code-block:: sh
@@ -106,3 +107,15 @@ Build and upload to PyPI
    python setup.py sdist bdist_wheel
    twine upload dist/*
    pip install koneko --upgrade
+
+
+Build and release docs
+----------------------
+
+#. Go to the `readthedocs project page <https://readthedocs.org/projects/koneko/>`_ for koneko
+#. Click Versions
+#. Under "Activate a version", activate the latest version
+#. Check the "Active" checkbox
+#. De-activate the previous version
+#. There should be two docs, latest (master) and the latest tagged version
+

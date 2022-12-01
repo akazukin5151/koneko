@@ -2,18 +2,16 @@
 Roadmap
 -------
 
-Features
-^^^^^^^^
+* Better code quality
 
-
-* Back button is broken (eg illust-related mode can't go back to image mode)
-* In-depth usage documentation; use letters to represent modes (at least in public docs) rather than numbers
+* Keep documentation up-to-date, clear, and accurate
 
   * Make sure the diagrams in HACKING.rst is up-to-date
 
 Known bugs
 ^^^^^^^^^^
 
+* Back button is broken (eg illust-related mode can't go back to image mode)
 
 * Some info (eg manual) are still being hidden by ueberzug; general unreliability of prints (need a rethink of implementation)
 

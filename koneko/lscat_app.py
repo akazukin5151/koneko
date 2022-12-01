@@ -103,10 +103,10 @@ def _display_core(tracker, data, max_images):
 
 
 def display_path(path=None) -> 'IO':
-    path = Path(path)
     if not path:
         path = input('Please paste in your path:\n')
 
+    path = Path(path)
     if not path.is_dir():
         print('Invalid path!')
         sys.exit(1)

@@ -9,7 +9,7 @@ Usage
 Initial setup
 ^^^^^^^^^^^^^
 
-On your first time, be sure to use the configuration assistant at ``lscat 1 8``\ , and copy + paste the suggestions to your config at ``~/.local/config/koneko/config.ini`` (exact path)
+On your first launch, be sure to use the configuration assistant at ``lscat 1 8``\ , and copy + paste the suggestions to your config at ``~/.local/config/koneko/config.ini`` (exact path). See the `Configuration <#Configuration>`_ section for reference
 
 Launch ``koneko``. There are six modes of operation reachable from the main screen. The mode letter is bolded:
 
@@ -270,10 +270,11 @@ Manual
 lscat app
 ^^^^^^^^^
 
+This program can be launched with the ``lscat`` command. There are 5 modes in this app:
 
 #. Configuration assistant: Interactively guides you to setting up your own config.
 #. Browse and manage the cache, filter dirs by mode, and view the illustrations/images offline, with similar but reduced functionality
-#. Display a specified path. Auto-detects which mode it is, providing that it is a valid dir.
+#. Display a path in the cache. Auto-detects which mode it is, providing that it is a valid dir.
 #. Displays the 'testgallery' dir in mode 1, offline. For internal developer use.
 #. Displays the 'testuser' dir in mode 3/4, offline. For internal developer use.
 

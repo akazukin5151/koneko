@@ -191,6 +191,8 @@ I'm having problems logging in
 
 Try these steps in order:
 
+- If you successfully logged in, but the redirect did not work (the handler did not launch), ensure ``koneko-url-login`` is in your ``$PATH``
+  * eg, look at where it is with ``whereis koneko-url-login`` and symlink it to ``$HOME/.local/bin/``
 - Update your system and reboot. No seriously, that's what worked for me.
 - Try a different browser
 - Set said different browser as your default browser
